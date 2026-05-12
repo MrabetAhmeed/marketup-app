@@ -1,0 +1,16 @@
+export { Company } from "./company.model";
+export { User } from "./user.model";
+export { AdminUser } from "./admin-user.model";
+export { Profile } from "./profile.model";
+export { BrandUp } from "./profile-brandup.model";
+export { TraceUp } from "./profile-traceup.model";
+export { LinkUp } from "./profile-linkup.model";
+export { Transaction } from "./transaction.model";
+export { Boost } from "./boost.model";
+export { Sponsoring } from "./sponsoring.model";
+export { RseReceipt } from "./rse-receipt.model";
+export { Notification } from "./notification.model";
+export { Association } from "./association.model";
+export { Sector } from "./sector.model";
+export { Gouvernorat } from "./gouvernorat.model";
+export { File } from "./file.model";
