@@ -11,7 +11,7 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "test:e2e": "playwright test",
-    "sync-shared": "rm -rf public/shared && cp -r reference/mockups/shared public/shared",
+    "sync-shared": "node scripts/sync-shared.mjs",
     "predev": "npm run sync-shared",
     "prebuild": "npm run sync-shared",
     "db:seed": "npx tsx scripts/seed.ts",
