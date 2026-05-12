@@ -18,9 +18,12 @@
     "db:reset": "npx tsx scripts/reset.ts"
   },
   "dependencies": {
+    "mongoose": "9.6.2",
     "next": "14.2.35",
+    "next-auth": "4.24.14",
     "react": "18.3.1",
-    "react-dom": "18.3.1"
+    "react-dom": "18.3.1",
+    "zod": "3.25.67"
   },
   "devDependencies": {
     "@types/node": "20.19.41",
