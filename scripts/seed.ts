@@ -340,7 +340,7 @@ interface CompanySeedData {
   pendingUpdates?: {
     submittedAt: Date;
     fields: { key: string; label: string; currentValue: unknown; newValue: unknown }[];
-    note?: { fr: string; ar: string; en: string } | null;
+    note?: string | null;
   } | null;
   registeredAt: Date;
   validatedAt?: Date | null;
@@ -363,7 +363,7 @@ interface ProfileSeedData {
   pendingData?: {
     submittedAt: Date;
     fields: { key: string; label: string; currentValue: unknown; newValue: unknown }[];
-    note?: { fr: string; ar: string; en: string } | null;
+    note?: string | null;
   } | null;
   rejectionReason?: string | null;
   rejectedAt?: Date | null;
