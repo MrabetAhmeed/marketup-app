@@ -1,0 +1,1393 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>MARKET-UP | Paramètres — TechnoFab Industries</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap"
+        rel="stylesheet" />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
+        rel="stylesheet" />
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+
+        .font-heading {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+        }
+
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+
+        .icon-fill {
+            font-variation-settings: 'FILL' 1;
+        }
+
+        /* ─────────── SIDEBAR NAV canon ─────────── */
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 8px 20px;
+            font-size: 13px;
+            font-weight: 500;
+            color: #616161;
+            border-left: 3px solid transparent;
+            transition: background-color 0.15s ease, color 0.15s ease;
+            cursor: pointer;
+            text-decoration: none;
+            line-height: 1.4;
+        }
+
+        .nav-item .material-symbols-outlined {
+            font-size: 18px;
+            color: #8A8886;
+            transition: color 0.15s ease;
+            flex-shrink: 0;
+        }
+
+        .nav-item:hover {
+            background: #F5F5F5;
+            color: #242424;
+        }
+
+        .nav-item:hover .material-symbols-outlined {
+            color: #616161;
+        }
+
+        .nav-item.active {
+            background: #EFF6FC;
+            border-left-color: #0078D4;
+            color: #0078D4;
+            font-weight: 600;
+        }
+
+        .nav-item.active .material-symbols-outlined {
+            color: #0078D4;
+        }
+
+        .section-label {
+            font-size: 9px;
+            font-weight: 700;
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+            color: #8A8886;
+            padding: 16px 20px 6px;
+            user-select: none;
+        }
+
+        nav::-webkit-scrollbar {
+            width: 4px;
+        }
+
+        nav::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        nav::-webkit-scrollbar-thumb {
+            background: #E0E0E0;
+            border-radius: 2px;
+        }
+
+        nav::-webkit-scrollbar-thumb:hover {
+            background: #C8C6C4;
+        }
+
+        /* ─────────── TOPBAR ─────────── */
+        .icon-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            color: #424242;
+            transition: background-color 0.15s ease;
+            position: relative;
+            background: transparent;
+            border: none;
+            cursor: pointer;
+        }
+
+        .icon-btn:hover {
+            background: #F5F5F5;
+        }
+
+        .icon-btn .material-symbols-outlined {
+            font-size: 22px;
+        }
+
+        /* ─────────── DROPDOWNS ─────────── */
+        .dropdown-panel {
+            position: absolute;
+            top: calc(100% + 8px);
+            right: 0;
+            background: white;
+            border: 1px solid #E0E0E0;
+            border-radius: 12px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.16);
+            opacity: 0;
+            transform: translateY(-4px);
+            pointer-events: none;
+            transition: opacity 0.15s ease, transform 0.15s ease;
+            z-index: 40;
+        }
+
+        .dropdown-panel.open {
+            opacity: 1;
+            transform: translateY(0);
+            pointer-events: auto;
+        }
+
+        .dropdown-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px 16px;
+            font-size: 13px;
+            color: #242424;
+            text-decoration: none;
+            transition: background-color 0.1s ease;
+            cursor: pointer;
+        }
+
+        .dropdown-item:hover {
+            background: #F5F5F5;
+        }
+
+        .dropdown-item .material-symbols-outlined {
+            font-size: 18px;
+            color: #616161;
+            flex-shrink: 0;
+        }
+
+        .dropdown-item .ext-arrow {
+            margin-left: auto;
+            font-size: 14px;
+            color: #8A8886;
+        }
+
+        .dropdown-item--danger {
+            color: #B91C1C;
+        }
+
+        .dropdown-item--danger .material-symbols-outlined {
+            color: #B91C1C;
+        }
+
+        .dropdown-item--danger:hover {
+            background: #FEF2F2;
+        }
+
+        .dropdown-section-label {
+            padding: 12px 16px 6px;
+            font-size: 9px;
+            font-weight: 700;
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+            color: #8A8886;
+            user-select: none;
+        }
+
+        .dropdown-divider {
+            height: 1px;
+            background: #E0E0E0;
+            margin: 4px 0;
+        }
+
+        /* ─────────── CARDS ─────────── */
+        .card {
+            background: white;
+            border: 1px solid #E0E0E0;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.04);
+        }
+
+        /* ─────────── FORM CONTROLS ─────────── */
+        .field-label {
+            display: block;
+            font-size: 11px;
+            font-weight: 600;
+            color: #616161;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            margin-bottom: 6px;
+        }
+
+        .field-label .req {
+            color: #B91C1C;
+            font-weight: 700;
+            margin-left: 2px;
+        }
+
+        .field-input {
+            width: 100%;
+            padding: 9px 12px;
+            font-family: inherit;
+            font-size: 13.5px;
+            color: #242424;
+            background: #FFFFFF;
+            border: 1px solid #D1D1D1;
+            border-radius: 4px;
+            transition: border-color 0.15s ease, box-shadow 0.15s ease;
+            outline: none;
+        }
+
+        .field-input::placeholder {
+            color: #8A8886;
+        }
+
+        .field-input:hover:not(:disabled) {
+            border-color: #8A8886;
+        }
+
+        .field-input:focus {
+            border-color: #0078D4;
+            box-shadow: 0 0 0 2px #EFF6FC;
+        }
+
+        .field-help {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            font-size: 11px;
+            color: #8A8886;
+            margin-top: 4px;
+        }
+
+        .field-help .material-symbols-outlined {
+            font-size: 13px;
+        }
+
+        /* ─────────── BUTTONS ─────────── */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            padding: 9px 16px;
+            font-size: 13px;
+            font-weight: 600;
+            border-radius: 4px;
+            transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+            cursor: pointer;
+            border: 1px solid transparent;
+            text-decoration: none;
+            line-height: 1.2;
+            white-space: nowrap;
+        }
+
+        .btn .material-symbols-outlined {
+            font-size: 16px;
+        }
+
+        .btn-primary {
+            background: #0078D4;
+            color: white;
+        }
+
+        .btn-primary:hover:not(:disabled) {
+            background: #106EBE;
+        }
+
+        .btn-primary:disabled {
+            background: #E0E0E0;
+            color: #A8A8A8;
+            cursor: not-allowed;
+        }
+
+        .btn-secondary {
+            background: white;
+            color: #242424;
+            border-color: #D1D1D1;
+        }
+
+        .btn-secondary:hover:not(:disabled) {
+            background: #F5F5F5;
+            border-color: #8A8886;
+        }
+
+        .btn-ghost {
+            background: transparent;
+            color: #0078D4;
+            border-color: transparent;
+        }
+
+        .btn-ghost:hover:not(:disabled) {
+            background: #EFF6FC;
+        }
+
+        .btn-danger {
+            background: #DC2626;
+            color: white;
+            border-color: #DC2626;
+        }
+
+        .btn-danger:hover:not(:disabled) {
+            background: #B91C1C;
+            border-color: #B91C1C;
+        }
+
+        .btn-danger:disabled {
+            background: #FCA5A5;
+            border-color: #FCA5A5;
+            cursor: not-allowed;
+        }
+
+        .btn-danger-outline {
+            background: white;
+            color: #B91C1C;
+            border-color: #FCA5A5;
+        }
+
+        .btn-danger-outline:hover:not(:disabled) {
+            background: #FEF2F2;
+            border-color: #DC2626;
+            color: #991B1B;
+        }
+
+        /* ─────────── PASSWORD STRENGTH (canon Phase B2 réutilisé) ─────────── */
+        .pwd-strength {
+            margin-top: 10px;
+        }
+
+        .pwd-strength-bars {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 4px;
+            margin-bottom: 6px;
+        }
+
+        .pwd-strength-bar {
+            height: 4px;
+            border-radius: 2px;
+            background: #E0E0E0;
+            transition: background-color 0.2s ease;
+        }
+
+        .pwd-strength[data-level="1"] .pwd-strength-bar:nth-child(-n+1) {
+            background: #DC2626;
+        }
+
+        .pwd-strength[data-level="2"] .pwd-strength-bar:nth-child(-n+2) {
+            background: #D97706;
+        }
+
+        .pwd-strength[data-level="3"] .pwd-strength-bar:nth-child(-n+3) {
+            background: #65A30D;
+        }
+
+        .pwd-strength[data-level="4"] .pwd-strength-bar {
+            background: #107C10;
+        }
+
+        .pwd-strength-label {
+            font-size: 11px;
+            font-weight: 600;
+            color: #8A8886;
+        }
+
+        .pwd-strength[data-level="1"] .pwd-strength-label {
+            color: #DC2626;
+        }
+
+        .pwd-strength[data-level="2"] .pwd-strength-label {
+            color: #D97706;
+        }
+
+        .pwd-strength[data-level="3"] .pwd-strength-label {
+            color: #65A30D;
+        }
+
+        .pwd-strength[data-level="4"] .pwd-strength-label {
+            color: #107C10;
+        }
+
+        .pwd-rules {
+            margin-top: 10px;
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 6px 16px;
+        }
+
+        .pwd-rule {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 11.5px;
+            color: #8A8886;
+            transition: color 0.2s ease;
+        }
+
+        .pwd-rule .material-symbols-outlined {
+            font-size: 14px;
+            color: #C8C6C4;
+            transition: color 0.2s ease;
+        }
+
+        .pwd-rule.met {
+            color: #107C10;
+        }
+
+        .pwd-rule.met .material-symbols-outlined {
+            color: #107C10;
+        }
+
+        .pwd-toggle-btn {
+            position: absolute;
+            right: 8px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 28px;
+            height: 28px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            color: #8A8886;
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            border-radius: 4px;
+            transition: background-color 0.15s ease, color 0.15s ease;
+        }
+
+        .pwd-toggle-btn:hover {
+            background: #F5F5F5;
+            color: #242424;
+        }
+
+        .pwd-toggle-btn .material-symbols-outlined {
+            font-size: 16px;
+        }
+
+        /* ─────────── DANGER ZONE ─────────── */
+        .danger-zone {
+            border: 1px solid #FCA5A5;
+            background: #FEF2F2;
+            border-radius: 8px;
+        }
+
+        /* ─────────── PLACEHOLDER V2 (coming soon) ─────────── */
+        .coming-soon-card {
+            background: #F5F5F5;
+            border: 1px dashed #C8C6C4;
+            border-radius: 8px;
+        }
+
+        /* ─────────── MODAL ─────────── */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            z-index: 60;
+            background: rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: flex-end;
+            justify-content: center;
+            padding: 0;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.2s ease;
+        }
+
+        @media (min-width: 640px) {
+            .modal-overlay {
+                align-items: center;
+                padding: 16px;
+            }
+        }
+
+        .modal-overlay.open {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 12px 12px 0 0;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.16);
+            width: 100%;
+            max-width: 520px;
+            max-height: 90vh;
+            overflow-y: auto;
+            transform: translateY(20px);
+            transition: transform 0.25s ease;
+        }
+
+        @media (min-width: 640px) {
+            .modal-content {
+                border-radius: 12px;
+            }
+        }
+
+        .modal-overlay.open .modal-content {
+            transform: translateY(0);
+        }
+
+        /* ─────────── MOBILE DRAWER ─────────── */
+        #sidebar {
+            transition: transform 0.25s ease-out;
+        }
+
+        @media (max-width: 767px) {
+            #sidebar {
+                transform: translateX(-100%);
+            }
+
+            #sidebar.open {
+                transform: translateX(0);
+                box-shadow: 8px 0 32px rgba(0, 0, 0, 0.16);
+            }
+        }
+
+        /* ─────────── STICKY ACTION BAR (mobile) ─────────── */
+        @media (max-width: 767px) {
+            .action-bar-sticky {
+                position: sticky;
+                bottom: 0;
+                z-index: 20;
+                background: white;
+                border-top: 1px solid #E0E0E0;
+                margin: 0 -1rem;
+                padding: 0.75rem 1rem;
+                box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.04);
+            }
+        }
+    </style>
+</head>
+
+<body class="bg-[#F5F5F5] min-h-screen">
+
+    <div id="backdrop" class="md:hidden fixed inset-0 bg-gradient-to-b from-black/40 to-black/20 z-40 hidden"
+        aria-hidden="true"></div>
+
+    <!-- ═════════════════════════════════════════════════════
+         SIDEBAR (item Paramètres actif)
+         ═════════════════════════════════════════════════════ -->
+    <aside id="sidebar"
+        class="fixed top-0 left-0 w-60 h-screen bg-white border-r border-[#E0E0E0] flex flex-col z-50 md:translate-x-0"
+        aria-label="Navigation principale">
+
+        <a href="dashboard_index.html" class="flex items-center gap-2.5 px-5 py-4 border-b border-[#E0E0E0] shrink-0 h-14 hover:bg-[#FAFAFA] transition-colors" title="Retour au tableau de bord">
+            <span class="material-symbols-outlined icon-fill text-[#0078D4]" style="font-size:22px">hexagon</span>
+            <div class="leading-tight min-w-0">
+                <div class="text-[#242424] font-heading font-bold text-[15px] tracking-tight">MARKET-UP</div>
+                <div class="text-[10px] text-[#8A8886] tracking-wide">vivasky.media</div>
+            </div>
+        </a>
+
+        <nav class="flex-1 overflow-y-auto pt-2 pb-3">
+            <div class="section-label">Entreprise</div>
+            <a href="dashboard_index.html" class="nav-item">
+                <span class="material-symbols-outlined">dashboard</span>
+                <span class="flex-1 min-w-0 truncate">Vue d'ensemble</span>
+            </a>
+            <a href="dashboard_account.html" class="nav-item">
+                <span class="material-symbols-outlined">business</span>
+                <span class="flex-1 min-w-0 truncate">Compte</span>
+            </a>
+
+            <div class="section-label">Mes profils</div>
+            <a href="dashboard_brandup.html" class="nav-item">
+                <span class="material-symbols-outlined">storefront</span>
+                <span class="flex-1 min-w-0 truncate">BrandUP</span>
+                <span class="w-1.5 h-1.5 rounded-full bg-[#DC2626] shrink-0" title="Actif"></span>
+            </a>
+            <a href="dashboard_sponsoring.html" class="nav-item">
+                <span class="material-symbols-outlined">play_circle</span>
+                <span class="flex-1 min-w-0 truncate">TraceUP</span>
+                <span class="w-1.5 h-1.5 rounded-full bg-[#D97706] shrink-0" title="En attente"></span>
+            </a>
+            <a href="dashboard_linkup.html" class="nav-item">
+                <span class="material-symbols-outlined">qr_code_2</span>
+                <span class="flex-1 min-w-0 truncate">LinkUP</span>
+                <span class="w-1.5 h-1.5 rounded-full bg-[#107C10] shrink-0" title="Actif"></span>
+            </a>
+
+            <div class="section-label">Visibilité</div>
+            <a href="dashboard_boost.html" class="nav-item">
+                <span class="material-symbols-outlined">trending_up</span>
+                <span class="flex-1 min-w-0 truncate">Boost</span>
+                <span
+                    class="text-[9px] font-bold tracking-wider text-[#107C10] bg-[#F0FDF4] border border-[#B7EBC0] px-1.5 py-[2px] rounded shrink-0">1 ACTIF</span>
+            </a>
+            <a href="dashboard_sponsoring.html" class="nav-item">
+                <span class="material-symbols-outlined">campaign</span>
+                <span class="flex-1 min-w-0 truncate">Sponsoring</span>
+                <span class="w-1.5 h-1.5 rounded-full bg-[#107C10] shrink-0" title="Campagne active"></span>
+            </a>
+
+            <div class="section-label">Engagement</div>
+            <a href="dashboard_rse.html" class="nav-item">
+                <span class="material-symbols-outlined">volunteer_activism</span>
+                <span class="flex-1 min-w-0 truncate">Badge RSE</span>
+                <span
+                    class="text-[9px] font-bold tracking-wider text-[#107C10] bg-[#F0FDF4] border border-[#B7EBC0] px-1.5 py-[2px] rounded shrink-0">VALIDÉ</span>
+            </a>
+
+            <div class="section-label">Administration</div>
+            <a href="dashboard_billing.html" class="nav-item">
+                <span class="material-symbols-outlined">receipt_long</span>
+                <span class="flex-1 min-w-0 truncate">Facturation</span>
+            </a>
+            <a href="dashboard_notifications.html" class="nav-item">
+                <span class="material-symbols-outlined">notifications</span>
+                <span class="flex-1 min-w-0 truncate">Notifications</span>
+                <span
+                    class="min-w-[18px] h-[18px] px-1 rounded-full bg-[#DC2626] text-white text-[10px] font-bold flex items-center justify-center shrink-0">3</span>
+            </a>
+            <a href="dashboard_settings.html" class="nav-item active" aria-current="page">
+                <span class="material-symbols-outlined">settings</span>
+                <span class="flex-1 min-w-0 truncate">Paramètres</span>
+            </a>
+        </nav>
+
+        <div class="shrink-0 border-t border-[#E0E0E0]">
+            <div class="flex items-center gap-3 px-4 py-3">
+                <div class="w-9 h-9 rounded-full bg-[#374151] flex items-center justify-center shrink-0">
+                    <span id="sb-avatar-initials" class="text-white font-heading font-bold text-[13px]">TF</span>
+                </div>
+                <div class="min-w-0 flex-1">
+                    <div id="sb-company-name" class="text-[#242424] text-[12px] font-semibold truncate">TechnoFab Industries</div>
+                    <div id="sb-company-meta" class="text-[#8A8886] text-[10px] truncate">B2B · Sousse</div>
+                </div>
+            </div>
+            <div class="flex items-center gap-2.5 px-4 py-2.5 border-t border-[#E0E0E0]">
+                <div
+                    class="w-6 h-6 rounded-full bg-[#F5F5F5] border border-[#E0E0E0] flex items-center justify-center shrink-0">
+                    <span id="sb-user-initials" class="text-[#616161] text-[10px] font-semibold">AM</span>
+                </div>
+                <div class="min-w-0 flex-1">
+                    <div id="sb-user-name" class="text-[#424242] text-[11px] font-medium truncate">Ahmed Mrabet</div>
+                    <div class="text-[#8A8886] text-[9px] truncate">Propriétaire</div>
+                </div>
+                <button
+                    class="w-7 h-7 flex items-center justify-center rounded text-[#8A8886] hover:text-[#242424] hover:bg-[#F5F5F5] transition-colors shrink-0"
+                    title="Se déconnecter" aria-label="Se déconnecter" onclick="window.location.href='auth_connexion.html';">
+                    <span class="material-symbols-outlined" style="font-size:16px">logout</span>
+                </button>
+            </div>
+        </div>
+
+    </aside>
+
+    <!-- ═════════════════════════════════════════════════════
+         SHELL
+         ═════════════════════════════════════════════════════ -->
+    <div class="md:ml-60 min-h-screen flex flex-col">
+
+        <!-- TOPBAR -->
+        <header
+            class="sticky top-0 z-30 h-14 bg-white border-b border-[#E0E0E0] flex items-center justify-between px-4 md:px-6 gap-4"
+            role="banner">
+
+            <div class="flex items-center gap-3 min-w-0 flex-1">
+                <button id="menuBtn" class="icon-btn md:hidden -ml-2 shrink-0"
+                    aria-label="Ouvrir le menu de navigation">
+                    <span class="material-symbols-outlined">menu</span>
+                </button>
+                <div class="min-w-0 leading-tight">
+                    <nav class="hidden md:flex items-center gap-1.5 text-[11px] text-[#8A8886] mb-0.5" aria-label="Fil d'Ariane">
+                        <a href="dashboard_index.html" class="hover:text-[#0078D4] hover:underline transition-colors">Dashboard</a>
+                        <span class="material-symbols-outlined" style="font-size:12px">chevron_right</span>
+                        <span class="text-[#8A8886]">Administration</span>
+                        <span class="material-symbols-outlined" style="font-size:12px">chevron_right</span>
+                        <span class="text-[#616161] font-medium">Paramètres</span>
+                    </nav>
+                    <h1 class="font-heading text-[16px] font-bold text-[#242424] truncate">Paramètres</h1>
+                    <p class="hidden md:block text-[12px] text-[#616161] truncate">Sécurité de votre compte · mot de passe · suppression</p>
+                </div>
+            </div>
+
+            <div class="flex items-center gap-1 shrink-0">
+                <div class="relative">
+                    <button id="bellBtn" class="icon-btn" aria-label="Notifications" aria-haspopup="true"
+                        aria-expanded="false">
+                        <span class="material-symbols-outlined">notifications</span>
+                        <span
+                            class="absolute top-1.5 right-1.5 min-w-[16px] h-[16px] px-1 rounded-full bg-[#DC2626] text-white text-[9px] font-bold flex items-center justify-center leading-none ring-2 ring-white">3</span>
+                    </button>
+                    <div id="bellDropdown" class="dropdown-panel w-[340px] max-w-[calc(100vw-24px)]">
+                        <div class="flex items-center justify-between px-4 py-3 border-b border-[#E0E0E0]">
+                            <div class="font-heading font-semibold text-[13px] text-[#242424]">Notifications</div>
+                            <div class="text-[11px] text-[#616161]"><span class="text-[#DC2626] font-semibold">3</span> non lues</div>
+                        </div>
+                        <div class="max-h-[320px] overflow-y-auto">
+                            <a href="dashboard_notifications.html" class="block px-4 py-3 hover:bg-[#F5F5F5] transition-colors border-b border-[#F0F0F0]">
+                                <div class="flex items-start gap-3">
+                                    <span class="w-2 h-2 rounded-full bg-[#0078D4] mt-1.5 shrink-0"></span>
+                                    <div class="min-w-0 flex-1">
+                                        <div class="text-[12.5px] text-[#242424] leading-snug mb-1"><span class="font-semibold">Votre boost LinkUP</span> expire dans 3 jours</div>
+                                        <div class="text-[11px] text-[#8A8886]">Il y a 2 heures</div>
+                                    </div>
+                                    <span class="material-symbols-outlined text-[#0078D4] shrink-0 mt-0.5" style="font-size:16px">trending_up</span>
+                                </div>
+                            </a>
+                            <a href="dashboard_notifications.html" class="block px-4 py-3 hover:bg-[#F5F5F5] transition-colors border-b border-[#F0F0F0]">
+                                <div class="flex items-start gap-3">
+                                    <span class="w-2 h-2 rounded-full bg-[#0078D4] mt-1.5 shrink-0"></span>
+                                    <div class="min-w-0 flex-1">
+                                        <div class="text-[12.5px] text-[#242424] leading-snug mb-1"><span class="font-semibold">Votre campagne Sponsoring</span> a généré 1 250 impressions</div>
+                                        <div class="text-[11px] text-[#8A8886]">Il y a 1 jour</div>
+                                    </div>
+                                    <span class="material-symbols-outlined text-[#0078D4] shrink-0 mt-0.5" style="font-size:16px">campaign</span>
+                                </div>
+                            </a>
+                            <a href="dashboard_notifications.html" class="block px-4 py-3 hover:bg-[#F5F5F5] transition-colors">
+                                <div class="flex items-start gap-3">
+                                    <span class="w-2 h-2 rounded-full bg-[#0078D4] mt-1.5 shrink-0"></span>
+                                    <div class="min-w-0 flex-1">
+                                        <div class="text-[12.5px] text-[#242424] leading-snug mb-1"><span class="font-semibold">Reçu RSE soumis</span> — Association Al Ahed en attente de validation</div>
+                                        <div class="text-[11px] text-[#8A8886]">Il y a 1 jour</div>
+                                    </div>
+                                    <span class="material-symbols-outlined text-[#C5A059] shrink-0 mt-0.5" style="font-size:16px">volunteer_activism</span>
+                                </div>
+                            </a>
+                        </div>
+                        <a href="dashboard_notifications.html"
+                            class="flex items-center justify-center gap-1.5 px-4 py-2.5 text-[12px] font-semibold text-[#0078D4] hover:bg-[#EFF6FC] border-t border-[#E0E0E0] transition-colors rounded-b-xl">
+                            Voir toutes les notifications
+                            <span class="material-symbols-outlined" style="font-size:14px">arrow_forward</span>
+                        </a>
+                    </div>
+                </div>
+
+                <div class="relative">
+                    <button id="avatarBtn"
+                        class="flex items-center gap-1 pl-1 pr-2 py-1 rounded-lg hover:bg-[#F5F5F5] transition-colors ml-1"
+                        aria-label="Menu compte" aria-haspopup="true" aria-expanded="false">
+                        <div class="w-8 h-8 rounded-full bg-[#0078D4] flex items-center justify-center shrink-0">
+                            <span id="avd-trigger-initials" class="text-white font-heading font-bold text-[12px]">TF</span>
+                        </div>
+                        <span class="material-symbols-outlined text-[#8A8886] hidden md:inline"
+                            style="font-size:18px">expand_more</span>
+                    </button>
+                    <div id="avatarDropdown" class="dropdown-panel w-[300px] max-w-[calc(100vw-24px)]">
+                        <div class="flex items-center gap-3 px-4 py-3 border-b border-[#E0E0E0]">
+                            <div class="w-10 h-10 rounded-full bg-[#0078D4] flex items-center justify-center shrink-0">
+                                <span id="avd-initials" class="text-white font-heading font-bold text-[13px]">TF</span>
+                            </div>
+                            <div class="min-w-0 flex-1">
+                                <div id="avd-company-name" class="font-heading font-semibold text-[13px] text-[#242424] truncate">
+                                    TechnoFab Industries</div>
+                                <div id="avd-company-meta" class="text-[11px] text-[#616161] truncate">B2B · Sousse · Ahmed Mrabet</div>
+                            </div>
+                        </div>
+                        <div class="dropdown-section-label">Mes profils publics</div>
+                        <a id="avd-link-brandup" href="public_brandup_technofab-industries.html" target="_blank" rel="noopener" class="dropdown-item">
+                            <span class="material-symbols-outlined">storefront</span>
+                            <span class="flex-1">BrandUP</span>
+                            <span class="material-symbols-outlined ext-arrow">open_in_new</span>
+                        </a>
+                        <a id="avd-link-traceup" href="public_traceup_technofab-industries.html" target="_blank" rel="noopener" class="dropdown-item">
+                            <span class="material-symbols-outlined">play_circle</span>
+                            <span class="flex-1">TraceUP</span>
+                            <span class="material-symbols-outlined ext-arrow">open_in_new</span>
+                        </a>
+                        <a id="avd-link-linkup" href="public_linkup_technofab-industries.html" target="_blank" rel="noopener" class="dropdown-item">
+                            <span class="material-symbols-outlined">qr_code_2</span>
+                            <span class="flex-1">LinkUP</span>
+                            <span class="material-symbols-outlined ext-arrow">open_in_new</span>
+                        </a>
+                        <div class="dropdown-divider"></div>
+                        <a href="dashboard_settings.html" class="dropdown-item">
+                            <span class="material-symbols-outlined">settings</span>
+                            <span class="flex-1">Paramètres</span>
+                        </a>
+                        <button class="dropdown-item dropdown-item--danger w-full text-left">
+                            <span class="material-symbols-outlined">logout</span>
+                            <span class="flex-1">Se déconnecter</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- ═════════════════════════════════════════════════
+             CONTENU — Paramètres
+             ═════════════════════════════════════════════════ -->
+        <main class="flex-1 p-4 md:p-8">
+            <div class="max-w-[720px] mx-auto space-y-6">
+
+                <!-- ═════ PAGE HEADER ═════ -->
+                <section class="flex items-start gap-3">
+                    <div class="w-11 h-11 rounded-lg bg-[#EFF6FC] flex items-center justify-center shrink-0">
+                        <span class="material-symbols-outlined icon-fill text-[#0078D4]"
+                            style="font-size:24px">settings</span>
+                    </div>
+                    <div class="min-w-0">
+                        <h2 class="font-heading font-bold text-[20px] text-[#242424] leading-tight">
+                            Paramètres de sécurité
+                        </h2>
+                        <p class="text-[12.5px] text-[#616161] mt-1 leading-snug">
+                            Gérez votre mot de passe et la suppression de votre compte
+                        </p>
+                    </div>
+                </section>
+
+                <!-- ═════ SECTION : MOT DE PASSE ═════ -->
+                <section class="card p-5 md:p-6">
+                    <div class="mb-5">
+                        <h3 class="font-heading font-bold text-[15px] text-[#242424]">
+                            Mot de passe
+                        </h3>
+                        <p class="text-[12px] text-[#616161] mt-0.5 leading-snug">
+                            Choisissez un mot de passe robuste · après modification, vous resterez connecté
+                            sur cet appareil mais les autres sessions seront déconnectées
+                        </p>
+                    </div>
+
+                    <div class="space-y-5">
+
+                        <!-- Mot de passe actuel -->
+                        <div>
+                            <label for="pwd-current" class="field-label">
+                                Mot de passe actuel <span class="req">*</span>
+                            </label>
+                            <div class="relative">
+                                <span
+                                    class="absolute left-3 top-1/2 -translate-y-1/2 material-symbols-outlined text-[#8A8886] pointer-events-none"
+                                    style="font-size:16px">lock</span>
+                                <input id="pwd-current" class="field-input pl-9 pr-10" type="password"
+                                    placeholder="Saisissez votre mot de passe actuel"
+                                    autocomplete="current-password" />
+                                <button type="button" class="pwd-toggle-btn" data-toggle-pwd="pwd-current"
+                                    aria-label="Afficher / masquer le mot de passe">
+                                    <span class="material-symbols-outlined">visibility</span>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Nouveau mot de passe -->
+                        <div>
+                            <label for="pwd-new" class="field-label">
+                                Nouveau mot de passe <span class="req">*</span>
+                            </label>
+                            <div class="relative">
+                                <span
+                                    class="absolute left-3 top-1/2 -translate-y-1/2 material-symbols-outlined text-[#8A8886] pointer-events-none"
+                                    style="font-size:16px">key</span>
+                                <input id="pwd-new" class="field-input pl-9 pr-10" type="password"
+                                    placeholder="Nouveau mot de passe"
+                                    autocomplete="new-password" />
+                                <button type="button" class="pwd-toggle-btn" data-toggle-pwd="pwd-new"
+                                    aria-label="Afficher / masquer le mot de passe">
+                                    <span class="material-symbols-outlined">visibility</span>
+                                </button>
+                            </div>
+
+                            <!-- Strength indicator -->
+                            <div id="pwd-strength" class="pwd-strength" data-level="0">
+                                <div class="pwd-strength-bars">
+                                    <div class="pwd-strength-bar"></div>
+                                    <div class="pwd-strength-bar"></div>
+                                    <div class="pwd-strength-bar"></div>
+                                    <div class="pwd-strength-bar"></div>
+                                </div>
+                                <div class="flex items-center justify-between gap-2">
+                                    <span class="pwd-strength-label" id="pwd-strength-label">
+                                        Force du mot de passe
+                                    </span>
+                                    <span class="text-[11px] text-[#8A8886]">
+                                        <span id="pwd-char-count">0</span> caractères
+                                    </span>
+                                </div>
+
+                                <!-- Règles -->
+                                <div class="pwd-rules">
+                                    <div class="pwd-rule" data-rule="length">
+                                        <span class="material-symbols-outlined">circle</span>
+                                        <span>Au moins 8 caractères</span>
+                                    </div>
+                                    <div class="pwd-rule" data-rule="upper">
+                                        <span class="material-symbols-outlined">circle</span>
+                                        <span>Une majuscule</span>
+                                    </div>
+                                    <div class="pwd-rule" data-rule="number">
+                                        <span class="material-symbols-outlined">circle</span>
+                                        <span>Un chiffre</span>
+                                    </div>
+                                    <div class="pwd-rule" data-rule="special">
+                                        <span class="material-symbols-outlined">circle</span>
+                                        <span>Un caractère spécial</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Confirmation -->
+                        <div>
+                            <label for="pwd-confirm" class="field-label">
+                                Confirmer le nouveau mot de passe <span class="req">*</span>
+                            </label>
+                            <div class="relative">
+                                <span
+                                    class="absolute left-3 top-1/2 -translate-y-1/2 material-symbols-outlined text-[#8A8886] pointer-events-none"
+                                    style="font-size:16px">key</span>
+                                <input id="pwd-confirm" class="field-input pl-9 pr-10" type="password"
+                                    placeholder="Retapez votre nouveau mot de passe"
+                                    autocomplete="new-password" />
+                                <button type="button" class="pwd-toggle-btn" data-toggle-pwd="pwd-confirm"
+                                    aria-label="Afficher / masquer le mot de passe">
+                                    <span class="material-symbols-outlined">visibility</span>
+                                </button>
+                            </div>
+                            <div id="pwd-match-help" class="field-help hidden">
+                                <span class="material-symbols-outlined"></span>
+                                <span></span>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <!-- Barre d'actions mot de passe -->
+                    <div
+                        class="action-bar-sticky md:static flex flex-col md:flex-row md:items-center md:justify-between gap-3 md:gap-4 mt-6 pt-5 border-t border-[#F0F0F0]">
+                        <div class="text-[11.5px] text-[#8A8886] leading-snug">
+                            Un email de confirmation vous sera envoyé après changement.
+                        </div>
+                        <div class="flex items-center gap-2 shrink-0 flex-wrap justify-end">
+                            <button class="btn btn-ghost">
+                                Annuler
+                            </button>
+                            <button class="btn btn-primary" disabled>
+                                <span class="material-symbols-outlined">lock_reset</span>
+                                Mettre à jour le mot de passe
+                            </button>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- ═════ SECTION : ZONE DE DANGER — suppression compte ═════ -->
+                <section id="delete" class="danger-zone p-5 md:p-6">
+                    <div class="flex items-start gap-3 mb-4">
+                        <span class="material-symbols-outlined icon-fill text-[#DC2626] shrink-0 mt-[2px]"
+                            style="font-size:20px">warning</span>
+                        <div class="min-w-0 flex-1">
+                            <h3 class="font-heading font-bold text-[15px] text-[#991B1B] leading-tight">
+                                Supprimer mon compte
+                            </h3>
+                            <p class="text-[12px] text-[#991B1B] mt-0.5 leading-snug">
+                                Cette action est <strong>définitive et irréversible</strong>
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="bg-white border border-[#FCA5A5] rounded-lg p-4 md:p-5 space-y-4">
+
+                        <div>
+                            <div class="font-heading font-semibold text-[13px] text-[#242424] mb-2">
+                                En supprimant votre compte, vous allez définitivement perdre :
+                            </div>
+                            <ul class="space-y-1.5 text-[12.5px] text-[#424242]">
+                                <li class="flex items-start gap-2">
+                                    <span class="material-symbols-outlined shrink-0 mt-[1px] text-[#DC2626]"
+                                        style="font-size:14px">close</span>
+                                    <span>Vos <strong>3 profils publics</strong> (BrandUP, TraceUP, LinkUP)
+                                        et leur contenu</span>
+                                </li>
+                                <li class="flex items-start gap-2">
+                                    <span class="material-symbols-outlined shrink-0 mt-[1px] text-[#DC2626]"
+                                        style="font-size:14px">close</span>
+                                    <span>Votre <strong>badge RSE validé</strong> et l'historique de vos dons</span>
+                                </li>
+                                <li class="flex items-start gap-2">
+                                    <span class="material-symbols-outlined shrink-0 mt-[1px] text-[#DC2626]"
+                                        style="font-size:14px">close</span>
+                                    <span>Vos <strong>campagnes Boost / Sponsoring</strong> actives —
+                                        aucun remboursement possible</span>
+                                </li>
+                                <li class="flex items-start gap-2">
+                                    <span class="material-symbols-outlined shrink-0 mt-[1px] text-[#DC2626]"
+                                        style="font-size:14px">close</span>
+                                    <span>L'historique de <strong>facturation</strong> et les reçus PDF</span>
+                                </li>
+                                <li class="flex items-start gap-2">
+                                    <span class="material-symbols-outlined shrink-0 mt-[1px] text-[#DC2626]"
+                                        style="font-size:14px">close</span>
+                                    <span>Les <strong>URL publiques</strong> (/brandup/..., /traceup/...,
+                                        /linkup/...) — elles renverront 404</span>
+                                </li>
+                            </ul>
+                        </div>
+
+                        <div class="bg-[#FFFBEB] border border-[#FDE68A] rounded px-3 py-2 flex items-start gap-2">
+                            <span class="material-symbols-outlined icon-fill text-[#D97706] shrink-0 mt-[1px]"
+                                style="font-size:16px">info</span>
+                            <div class="text-[12px] text-[#92400E] leading-snug">
+                                <strong>Alternative :</strong> si vous souhaitez juste masquer votre présence
+                                sans tout effacer, désactivez vos profils individuellement depuis
+                                <a href="dashboard_brandup.html" class="font-semibold hover:underline">BrandUP</a>,
+                                <a href="dashboard_sponsoring.html" class="font-semibold hover:underline">TraceUP</a>
+                                et <a href="dashboard_linkup.html" class="font-semibold hover:underline">LinkUP</a>.
+                                Vous pourrez les réactiver plus tard.
+                            </div>
+                        </div>
+
+                        <div class="flex justify-end pt-1">
+                            <button id="openDeleteModalBtn" class="btn btn-danger-outline">
+                                <span class="material-symbols-outlined">delete_forever</span>
+                                Supprimer mon compte
+                            </button>
+                        </div>
+
+                    </div>
+                </section>
+
+            </div>
+        </main>
+
+    </div>
+
+    <!-- ═════════════════════════════════════════════════════
+         MODAL : Confirmation suppression
+         ═════════════════════════════════════════════════════ -->
+    <div id="deleteModal" class="modal-overlay" role="dialog" aria-modal="true"
+        aria-labelledby="deleteModalTitle" aria-hidden="true">
+        <div class="modal-content">
+
+            <!-- Header -->
+            <div class="flex items-start gap-3 px-5 py-4 border-b border-[#E0E0E0]">
+                <div class="w-10 h-10 rounded-lg bg-[#FEF2F2] border border-[#FCA5A5] flex items-center justify-center shrink-0">
+                    <span class="material-symbols-outlined icon-fill text-[#DC2626]"
+                        style="font-size:22px">warning</span>
+                </div>
+                <div class="min-w-0 flex-1">
+                    <h3 id="deleteModalTitle" class="font-heading font-bold text-[15px] text-[#991B1B] leading-tight">
+                        Supprimer définitivement votre compte ?
+                    </h3>
+                    <p class="text-[12px] text-[#991B1B] mt-0.5 leading-snug">
+                        Cette action ne peut pas être annulée
+                    </p>
+                </div>
+                <button id="closeDeleteModalBtn" class="icon-btn shrink-0 -mr-2 -mt-1 w-8 h-8"
+                    aria-label="Fermer">
+                    <span class="material-symbols-outlined" style="font-size:20px">close</span>
+                </button>
+            </div>
+
+            <!-- Body -->
+            <div class="p-5 space-y-4">
+
+                <div class="bg-[#FEF2F2] border border-[#FCA5A5] rounded p-3.5">
+                    <div class="flex items-start gap-2">
+                        <span class="material-symbols-outlined icon-fill text-[#DC2626] shrink-0 mt-[1px]"
+                            style="font-size:16px">info</span>
+                        <div class="text-[12.5px] text-[#991B1B] leading-snug">
+                            Votre compte <strong>TechnoFab Industries</strong> et l'ensemble de vos données
+                            seront supprimés de nos serveurs dans les prochaines minutes.
+                            <strong>Aucune récupération ne sera possible.</strong>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Champ confirmation : taper SUPPRIMER -->
+                <div>
+                    <label for="del-confirm-text" class="field-label">
+                        Pour confirmer, tapez <strong class="text-[#DC2626] font-mono">SUPPRIMER</strong>
+                        ci-dessous <span class="req">*</span>
+                    </label>
+                    <input id="del-confirm-text" class="field-input" type="text"
+                        placeholder="SUPPRIMER" autocomplete="off" />
+                </div>
+
+                <!-- Champ mot de passe -->
+                <div>
+                    <label for="del-password" class="field-label">
+                        Mot de passe de votre compte <span class="req">*</span>
+                    </label>
+                    <div class="relative">
+                        <span
+                            class="absolute left-3 top-1/2 -translate-y-1/2 material-symbols-outlined text-[#8A8886] pointer-events-none"
+                            style="font-size:16px">lock</span>
+                        <input id="del-password" class="field-input pl-9 pr-10" type="password"
+                            placeholder="Votre mot de passe" autocomplete="current-password" />
+                        <button type="button" class="pwd-toggle-btn" data-toggle-pwd="del-password"
+                            aria-label="Afficher / masquer">
+                            <span class="material-symbols-outlined">visibility</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Info email de confirmation -->
+                <div class="text-[11.5px] text-[#616161] leading-snug flex items-start gap-2">
+                    <span class="material-symbols-outlined shrink-0 mt-[1px]" style="font-size:14px">mail</span>
+                    <span>
+                        Un email de confirmation vous sera envoyé à
+                        <strong class="text-[#424242]">ahmed.mrabet@technofab.tn</strong>
+                        pour tracer l'opération.
+                    </span>
+                </div>
+
+            </div>
+
+            <!-- Footer -->
+            <div
+                class="px-5 py-4 bg-[#FAFAFA] border-t border-[#E0E0E0] flex items-center justify-end gap-2 rounded-b-xl flex-wrap">
+                <button id="cancelDeleteBtn" class="btn btn-secondary">
+                    Annuler
+                </button>
+                <button id="confirmDeleteBtn" class="btn btn-danger" disabled>
+                    <span class="material-symbols-outlined">delete_forever</span>
+                    Supprimer définitivement
+                </button>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- ═════════════════════════════════════════════════════
+         JS — drawer + dropdowns + password strength + modal
+         ═════════════════════════════════════════════════════ -->
+    <script>
+        (function () {
+            const sidebar = document.getElementById('sidebar');
+            const backdrop = document.getElementById('backdrop');
+            const menuBtn = document.getElementById('menuBtn');
+            const bellBtn = document.getElementById('bellBtn');
+            const bellDropdown = document.getElementById('bellDropdown');
+            const avatarBtn = document.getElementById('avatarBtn');
+            const avatarDropdown = document.getElementById('avatarDropdown');
+
+            // Modal
+            const deleteModal = document.getElementById('deleteModal');
+            const openDeleteBtn = document.getElementById('openDeleteModalBtn');
+            const closeDeleteBtn = document.getElementById('closeDeleteModalBtn');
+            const cancelDeleteBtn = document.getElementById('cancelDeleteBtn');
+            const confirmDeleteBtn = document.getElementById('confirmDeleteBtn');
+            const delConfirmText = document.getElementById('del-confirm-text');
+            const delPassword = document.getElementById('del-password');
+
+            // Password form
+            const pwdNew = document.getElementById('pwd-new');
+            const pwdConfirm = document.getElementById('pwd-confirm');
+            const pwdStrength = document.getElementById('pwd-strength');
+            const pwdStrengthLabel = document.getElementById('pwd-strength-label');
+            const pwdCharCount = document.getElementById('pwd-char-count');
+            const pwdMatchHelp = document.getElementById('pwd-match-help');
+
+            const dropdowns = [
+                { btn: bellBtn, panel: bellDropdown },
+                { btn: avatarBtn, panel: avatarDropdown },
+            ];
+
+            // ─── Dropdowns ─────────────────────
+            function closeAllDropdowns() {
+                dropdowns.forEach(({ btn, panel }) => {
+                    panel.classList.remove('open');
+                    btn.setAttribute('aria-expanded', 'false');
+                });
+            }
+
+            function toggleDropdown(target) {
+                const wasOpen = target.panel.classList.contains('open');
+                closeAllDropdowns();
+                if (!wasOpen) {
+                    target.panel.classList.add('open');
+                    target.btn.setAttribute('aria-expanded', 'true');
+                }
+            }
+
+            // ─── Drawer ─────────────────
+            function openDrawer() {
+                closeAllDropdowns();
+                sidebar.classList.add('open');
+                backdrop.classList.remove('hidden');
+                document.body.style.overflow = 'hidden';
+            }
+
+            function closeDrawer() {
+                sidebar.classList.remove('open');
+                backdrop.classList.add('hidden');
+                document.body.style.overflow = '';
+            }
+
+            // ─── Modal delete ─────────────
+            function openDeleteModal() {
+                deleteModal.classList.add('open');
+                deleteModal.setAttribute('aria-hidden', 'false');
+                document.body.style.overflow = 'hidden';
+                // Reset champs
+                delConfirmText.value = '';
+                delPassword.value = '';
+                confirmDeleteBtn.disabled = true;
+                setTimeout(() => delConfirmText.focus(), 50);
+            }
+
+            function closeDeleteModal() {
+                deleteModal.classList.remove('open');
+                deleteModal.setAttribute('aria-hidden', 'true');
+                if (!sidebar.classList.contains('open')) {
+                    document.body.style.overflow = '';
+                }
+            }
+
+            openDeleteBtn.addEventListener('click', openDeleteModal);
+            closeDeleteBtn.addEventListener('click', closeDeleteModal);
+            cancelDeleteBtn.addEventListener('click', closeDeleteModal);
+
+            // Click overlay outside content ferme
+            deleteModal.addEventListener('click', (e) => {
+                if (e.target === deleteModal) closeDeleteModal();
+            });
+
+            // Activation du bouton confirm : nécessite "SUPPRIMER" + mot de passe non vide
+            function updateDeleteBtnState() {
+                const textOk = delConfirmText.value.trim() === 'SUPPRIMER';
+                const pwdOk = delPassword.value.length > 0;
+                confirmDeleteBtn.disabled = !(textOk && pwdOk);
+            }
+            delConfirmText.addEventListener('input', updateDeleteBtnState);
+            delPassword.addEventListener('input', updateDeleteBtnState);
+
+            // ─── Password toggle visibility ─────
+            document.querySelectorAll('[data-toggle-pwd]').forEach((btn) => {
+                btn.addEventListener('click', () => {
+                    const targetId = btn.getAttribute('data-toggle-pwd');
+                    const input = document.getElementById(targetId);
+                    if (!input) return;
+                    const icon = btn.querySelector('.material-symbols-outlined');
+                    if (input.type === 'password') {
+                        input.type = 'text';
+                        icon.textContent = 'visibility_off';
+                    } else {
+                        input.type = 'password';
+                        icon.textContent = 'visibility';
+                    }
+                });
+            });
+
+            // ─── Password strength & rules ──────
+            function computeStrength(password) {
+                const rules = {
+                    length: password.length >= 8,
+                    upper: /[A-Z]/.test(password),
+                    number: /\d/.test(password),
+                    special: /[^A-Za-z0-9]/.test(password),
+                };
+                const metCount = Object.values(rules).filter(Boolean).length;
+                let level = 0;
+                if (password.length > 0) level = Math.max(1, metCount);
+                return { level, rules };
+            }
+
+            function strengthLabel(level) {
+                return ['Force du mot de passe', 'Faible', 'Moyenne', 'Bonne', 'Excellente'][level] || '';
+            }
+
+            function updatePasswordStrength() {
+                const pwd = pwdNew.value;
+                const { level, rules } = computeStrength(pwd);
+                pwdStrength.setAttribute('data-level', level);
+                pwdStrengthLabel.textContent = strengthLabel(level);
+                pwdCharCount.textContent = pwd.length;
+
+                document.querySelectorAll('.pwd-rule').forEach((el) => {
+                    const ruleName = el.dataset.rule;
+                    const met = rules[ruleName];
+                    el.classList.toggle('met', met);
+                    const icon = el.querySelector('.material-symbols-outlined');
+                    icon.textContent = met ? 'check_circle' : 'circle';
+                });
+
+                checkPasswordMatch();
+            }
+
+            function checkPasswordMatch() {
+                const newVal = pwdNew.value;
+                const confirmVal = pwdConfirm.value;
+                if (!confirmVal) {
+                    pwdMatchHelp.classList.add('hidden');
+                    return;
+                }
+                const match = newVal === confirmVal;
+                pwdMatchHelp.classList.remove('hidden');
+                const icon = pwdMatchHelp.querySelector('.material-symbols-outlined');
+                const text = pwdMatchHelp.querySelector('span:last-child');
+                if (match) {
+                    pwdMatchHelp.style.color = '#107C10';
+                    icon.textContent = 'check_circle';
+                    text.textContent = 'Les mots de passe correspondent';
+                } else {
+                    pwdMatchHelp.style.color = '#DC2626';
+                    icon.textContent = 'error';
+                    text.textContent = 'Les mots de passe ne correspondent pas';
+                }
+            }
+
+            pwdNew.addEventListener('input', updatePasswordStrength);
+            pwdConfirm.addEventListener('input', checkPasswordMatch);
+
+            // ─── Global listeners ──────────────
+            menuBtn.addEventListener('click', openDrawer);
+            backdrop.addEventListener('click', closeDrawer);
+
+            dropdowns.forEach((dd) => {
+                dd.btn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    toggleDropdown(dd);
+                });
+            });
+
+            document.addEventListener('click', (e) => {
+                const clickedInsideDropdown = dropdowns.some(
+                    (dd) => dd.panel.contains(e.target) || dd.btn.contains(e.target)
+                );
+                if (!clickedInsideDropdown) closeAllDropdowns();
+            });
+
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape') {
+                    closeAllDropdowns();
+                    if (sidebar.classList.contains('open')) closeDrawer();
+                    if (deleteModal.classList.contains('open')) closeDeleteModal();
+                }
+            });
+
+            let resizeTimer;
+            window.addEventListener('resize', () => {
+                clearTimeout(resizeTimer);
+                resizeTimer = setTimeout(() => {
+                    if (window.innerWidth >= 768 && sidebar.classList.contains('open')) {
+                        closeDrawer();
+                    }
+                }, 100);
+            });
+
+            // Scroll vers #delete si deep link
+            if (window.location.hash === '#delete') {
+                setTimeout(() => {
+                    document.getElementById('delete').scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }, 100);
+            }
+        })();
+    </script>
+
+    <!-- ════════════════════════════════════════════════════════════════
+         SEED DATA HYDRATION
+         Loads marketup_seed_data.js + dashboard_hydrate_utils.js,
+         then hydrates this page from window.MARKETUP_DATA.
+         Only common chrome (sidebar + topbar) is hydrated here;
+         page-specific content is hydrated in a follow-up wave.
+         ════════════════════════════════════════════════════════════════ -->
+    <script src="marketup_seed_data.js"></script>
+    <script src="dashboard_hydrate_utils.js"></script>
+    <script>
+        MARKETUP_HYDRATE.bootstrapPage(function (me, H) {
+            // Page title
+            const fullName = me.data.displayName.fr;
+            document.title = `MARKET-UP | Paramètres — ${fullName}`;
+
+            // NOTE: this page contains only password/security controls and
+            // an account deletion modal — no user-data fields to hydrate.
+        });
+    </script>
+
+</body>
+
+</html>

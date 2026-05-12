@@ -1,0 +1,1783 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Admin · Validation des comptes · MARKET-UP</title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap"
+        rel="stylesheet" />
+    <link rel="stylesheet"
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" />
+
+    <!-- Source de données démo (window.MARKETUP_DATA) -->
+    <script src="marketup_seed_data.js"></script>
+    <script src="admin_data_bridge.js"></script>
+    <script src="admin_notifications_dropdown.js"></script>
+
+    <style>
+        /* ═════════════════════════════════════════
+           CANON ADMIN — accent violet sur base Fluent
+           ═════════════════════════════════════════ */
+        :root {
+            --admin-primary: #5C2D91;
+            --admin-primary-hover: #4A2375;
+            --admin-primary-dark: #3D1F60;
+            --admin-primary-light: #F3EFFA;
+            --admin-primary-tint: #EBE2F5;
+            --text-primary: #242424;
+            --text-secondary: #616161;
+            --text-tertiary: #8A8886;
+            --border-default: #E0E0E0;
+            --bg-canvas: #F5F5F5;
+            --bg-surface: #FFFFFF;
+        }
+
+        html,
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Inter', sans-serif;
+            color: var(--text-primary);
+            background: var(--bg-canvas);
+        }
+
+        .font-heading {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+        }
+
+        .icon-fill {
+            font-variation-settings: 'FILL' 1;
+        }
+
+        /* ═════ CARD ═════ */
+        .card {
+            background: var(--bg-surface);
+            border: 1px solid var(--border-default);
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
+        }
+
+        /* ═════ NAV sidebar ═════ */
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 8px 12px;
+            border-radius: 6px;
+            color: var(--text-secondary);
+            font-size: 13px;
+            font-weight: 500;
+            transition: background 0.15s ease, color 0.15s ease;
+            cursor: pointer;
+            text-decoration: none;
+        }
+
+        .nav-item:hover {
+            background: #FAFAFA;
+            color: var(--text-primary);
+        }
+
+        .nav-item.active {
+            background: var(--admin-primary-light);
+            color: var(--admin-primary);
+            font-weight: 600;
+        }
+
+        .nav-item.active .material-symbols-outlined {
+            color: var(--admin-primary);
+        }
+
+        .nav-item .material-symbols-outlined {
+            font-size: 18px;
+            color: var(--text-tertiary);
+        }
+
+        .nav-group-label {
+            font-size: 10px;
+            font-weight: 700;
+            color: var(--text-tertiary);
+            letter-spacing: 0.06em;
+            padding: 12px 12px 6px;
+            text-transform: uppercase;
+        }
+
+        .nav-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 3px;
+            font-size: 10px;
+            font-weight: 700;
+            padding: 2px 6px;
+            border-radius: 10px;
+            line-height: 1;
+        }
+
+        .nav-pill--count-amber {
+            background: #D97706;
+            color: white;
+        }
+
+        .nav-pill--count-red {
+            background: #DC2626;
+            color: white;
+        }
+
+        /* ═════ BUTTONS ═════ */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            padding: 7px 14px;
+            border-radius: 4px;
+            font-size: 12.5px;
+            font-weight: 600;
+            cursor: pointer;
+            border: 1px solid transparent;
+            transition: all 0.15s ease;
+            text-decoration: none;
+            white-space: nowrap;
+        }
+
+        .btn .material-symbols-outlined {
+            font-size: 16px;
+        }
+
+        .btn-primary {
+            background: var(--admin-primary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--admin-primary-hover);
+        }
+
+        .btn-primary:disabled {
+            background: #CBD5E1;
+            cursor: not-allowed;
+        }
+
+        .btn-secondary {
+            background: white;
+            color: var(--text-primary);
+            border: 1px solid #D1D1D1;
+        }
+
+        .btn-secondary:hover {
+            background: #F5F5F5;
+        }
+
+        .btn-ghost {
+            background: transparent;
+            color: var(--text-primary);
+        }
+
+        .btn-ghost:hover {
+            background: #F5F5F5;
+        }
+
+        .btn-danger {
+            background: #B91C1C;
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #991B1B;
+        }
+
+        .btn-danger:disabled {
+            background: #FCA5A5;
+            cursor: not-allowed;
+        }
+
+        .btn-success {
+            background: #107C10;
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #0E6A0E;
+        }
+
+        /* ═════ STATUS PILLS ═════ */
+        .status-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 11px;
+            font-weight: 600;
+            padding: 3px 9px;
+            border-radius: 4px;
+            border: 1px solid;
+        }
+
+        .status-pill .dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+        }
+
+        .status-pill--pending {
+            color: #92400E;
+            background: #FFFBEB;
+            border-color: #FDE68A;
+        }
+
+        .status-pill--pending .dot {
+            background: #D97706;
+        }
+
+        .status-pill--sla-exceeded {
+            color: #B91C1C;
+            background: #FEF2F2;
+            border-color: #FCA5A5;
+        }
+
+        .status-pill--sla-exceeded .dot {
+            background: #DC2626;
+        }
+
+        .status-pill--sla-ok {
+            color: #107C10;
+            background: #F0FDF4;
+            border-color: #B7EBC0;
+        }
+
+        .status-pill--sla-ok .dot {
+            background: #107C10;
+        }
+
+        /* Type pill (B2B/B2C) */
+        .type-pill {
+            display: inline-flex;
+            align-items: center;
+            font-size: 10.5px;
+            font-weight: 700;
+            padding: 2px 7px;
+            border-radius: 4px;
+            letter-spacing: 0.02em;
+        }
+
+        .type-pill--b2b {
+            background: #EBE2F5;
+            color: #5C2D91;
+        }
+
+        .type-pill--b2c {
+            background: #FEF3C7;
+            color: #92400E;
+        }
+
+        /* ═════ TABS CANON ═════ */
+        .tabs-nav {
+            display: flex;
+            border-bottom: 1px solid var(--border-default);
+            overflow-x: auto;
+            margin-bottom: 20px;
+        }
+
+        .tab-item {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 16px;
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--text-secondary);
+            border-bottom: 2px solid transparent;
+            margin-bottom: -1px;
+            transition: color 0.15s ease, border-color 0.15s ease;
+            cursor: pointer;
+            white-space: nowrap;
+            background: none;
+            border-top: none;
+            border-left: none;
+            border-right: none;
+        }
+
+        .tab-item:hover {
+            color: var(--text-primary);
+        }
+
+        .tab-item.active {
+            color: var(--admin-primary);
+            border-bottom-color: var(--admin-primary);
+            font-weight: 600;
+        }
+
+        .tab-item .material-symbols-outlined {
+            font-size: 16px;
+        }
+
+        .tab-count {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 18px;
+            height: 18px;
+            padding: 0 5px;
+            background: #F1F5F9;
+            color: #475569;
+            font-size: 10.5px;
+            font-weight: 700;
+            border-radius: 9px;
+        }
+
+        .tab-item.active .tab-count {
+            background: var(--admin-primary-light);
+            color: var(--admin-primary);
+        }
+
+        /* ═════ KPI inline ═════ */
+        .kpi-inline {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 14px;
+            background: white;
+            border: 1px solid var(--border-default);
+            border-radius: 8px;
+            min-width: 0;
+            flex: 1;
+        }
+
+        .kpi-inline__value {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--text-primary);
+            line-height: 1;
+        }
+
+        .kpi-inline__label {
+            font-size: 11px;
+            color: var(--text-secondary);
+            line-height: 1.2;
+        }
+
+        /* ═════ TABLE ═════ */
+        .queue-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .queue-table thead th {
+            background: #FAFAFA;
+            border-bottom: 1px solid var(--border-default);
+            padding: 10px 16px;
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--text-secondary);
+            text-align: left;
+            letter-spacing: 0.04em;
+            text-transform: uppercase;
+            white-space: nowrap;
+        }
+
+        .queue-table tbody tr {
+            border-bottom: 1px solid #F0F0F0;
+            transition: background 0.1s ease;
+            cursor: pointer;
+        }
+
+        .queue-table tbody tr:hover {
+            background: #FAFAFA;
+        }
+
+        .queue-table tbody tr:last-child {
+            border-bottom: none;
+        }
+
+        .queue-table tbody td {
+            padding: 14px 16px;
+            font-size: 13px;
+            color: var(--text-primary);
+            vertical-align: middle;
+        }
+
+        /* ═════ AVATAR ═════ */
+        .avatar {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            font-weight: 700;
+            color: white;
+            flex-shrink: 0;
+        }
+
+        .avatar--sm {
+            width: 32px;
+            height: 32px;
+            font-size: 11px;
+        }
+
+        .avatar--md {
+            width: 40px;
+            height: 40px;
+            font-size: 13px;
+        }
+
+        .avatar--lg {
+            width: 56px;
+            height: 56px;
+            font-size: 16px;
+        }
+
+        /* ═════ DRAWER ═════ */
+        #drawer-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.3);
+            z-index: 55;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.2s ease;
+        }
+
+        #drawer-overlay.open {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        #drawer {
+            position: fixed;
+            top: 0;
+            right: 0;
+            width: 500px;
+            max-width: 100vw;
+            height: 100vh;
+            background: white;
+            z-index: 60;
+            box-shadow: -8px 0 32px rgba(0, 0, 0, 0.16);
+            transform: translateX(100%);
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            display: flex;
+            flex-direction: column;
+        }
+
+        #drawer.open {
+            transform: translateX(0);
+        }
+
+        .drawer-section-label {
+            font-size: 10px;
+            font-weight: 700;
+            color: var(--text-tertiary);
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+            margin-bottom: 10px;
+        }
+
+        .drawer-field {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+            padding: 8px 0;
+            border-bottom: 1px solid #F5F5F5;
+        }
+
+        .drawer-field:last-child {
+            border-bottom: none;
+        }
+
+        .drawer-field__label {
+            font-size: 11px;
+            color: var(--text-tertiary);
+        }
+
+        .drawer-field__value {
+            font-size: 13px;
+            color: var(--text-primary);
+            font-weight: 500;
+            word-break: break-word;
+        }
+
+        .drawer-field__value--muted {
+            color: var(--text-tertiary);
+            font-weight: 400;
+            font-style: italic;
+        }
+
+        /* ═════ MODAL ═════ */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 65;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 16px;
+        }
+
+        .modal-overlay.open {
+            display: flex;
+        }
+
+        .modal {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.16);
+            width: 100%;
+            max-width: 560px;
+            max-height: 90vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        /* Checkbox motif */
+        .motif-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            padding: 10px 12px;
+            border: 1px solid var(--border-default);
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background 0.1s ease, border-color 0.1s ease;
+            margin-bottom: 8px;
+        }
+
+        .motif-item:hover {
+            background: #FAFAFA;
+            border-color: #CBD5E1;
+        }
+
+        .motif-item input[type="checkbox"] {
+            margin-top: 2px;
+            accent-color: var(--admin-primary);
+            width: 16px;
+            height: 16px;
+            cursor: pointer;
+            flex-shrink: 0;
+        }
+
+        .motif-item.checked {
+            background: var(--admin-primary-light);
+            border-color: var(--admin-primary);
+        }
+
+        .motif-item__label {
+            font-size: 13px;
+            color: var(--text-primary);
+            line-height: 1.4;
+        }
+
+        .motif-item__hint {
+            font-size: 11px;
+            color: var(--text-tertiary);
+            margin-top: 2px;
+            display: block;
+        }
+
+        .textarea-canon {
+            width: 100%;
+            border: 1px solid #D1D1D1;
+            border-radius: 4px;
+            padding: 8px 12px;
+            font-size: 13px;
+            font-family: inherit;
+            color: var(--text-primary);
+            resize: vertical;
+            min-height: 80px;
+            transition: border-color 0.15s ease, box-shadow 0.15s ease;
+        }
+
+        .textarea-canon:focus {
+            outline: none;
+            border-color: var(--admin-primary);
+            box-shadow: 0 0 0 2px var(--admin-primary-light);
+        }
+
+        .info-box {
+            display: flex;
+            gap: 10px;
+            padding: 12px 14px;
+            background: #EFF6FC;
+            border: 1px solid #B8DAEF;
+            border-radius: 6px;
+            font-size: 12.5px;
+            color: #0B4B75;
+            line-height: 1.5;
+        }
+
+        .info-box .material-symbols-outlined {
+            font-size: 18px;
+            color: #0078D4;
+            flex-shrink: 0;
+        }
+
+        /* ═════ TOAST ═════ */
+        #toast {
+            position: fixed;
+            bottom: 24px;
+            left: 50%;
+            transform: translateX(-50%) translateY(16px);
+            background: var(--text-primary);
+            color: white;
+            padding: 10px 18px;
+            border-radius: 6px;
+            font-size: 13px;
+            opacity: 0;
+            pointer-events: none;
+            transition: all 0.2s ease;
+            z-index: 100;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        #toast.show {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+        }
+
+        #toast .material-symbols-outlined {
+            font-size: 16px;
+            color: #4CE67B;
+        }
+
+        /* ═════ Focus ═════ */
+        *:focus-visible {
+            outline: 2px solid var(--admin-primary);
+            outline-offset: 2px;
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #D1D1D1;
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #A19F9D;
+        }
+
+        /* Hidden tab panel */
+        .tab-panel {
+            display: none;
+        }
+
+        .tab-panel.active {
+            display: block;
+        }
+
+        /* ═════ MOBILE ═════ */
+        @media (max-width: 768px) {
+            #sidebar {
+                transform: translateX(-100%);
+                transition: transform 0.3s ease;
+            }
+
+            #sidebar.open {
+                transform: translateX(0);
+            }
+
+            #backdrop {
+                display: none;
+            }
+
+            #backdrop.show {
+                display: block;
+            }
+
+            #drawer {
+                width: 100vw;
+            }
+
+            .queue-table thead {
+                display: none;
+            }
+
+            .queue-table,
+            .queue-table tbody,
+            .queue-table tr,
+            .queue-table td {
+                display: block;
+                width: 100%;
+            }
+
+            .queue-table tbody tr {
+                border: 1px solid var(--border-default);
+                border-radius: 8px;
+                margin-bottom: 12px;
+                padding: 8px;
+            }
+
+            .queue-table td {
+                padding: 6px 8px;
+                border: none !important;
+            }
+
+            .queue-table td[data-label]::before {
+                content: attr(data-label);
+                display: block;
+                font-size: 10px;
+                font-weight: 700;
+                color: var(--text-tertiary);
+                text-transform: uppercase;
+                letter-spacing: 0.04em;
+                margin-bottom: 2px;
+            }
+        }
+    </style>
+</head>
+
+<body class="min-h-screen">
+
+    <!-- Backdrop mobile sidebar -->
+    <div id="backdrop" class="fixed inset-0 bg-black/30 z-40 hidden md:hidden" aria-hidden="true"></div>
+
+    <div class="flex">
+
+        <!-- ═══════════════════════════════════════════════
+             SIDEBAR ADMIN
+             ═══════════════════════════════════════════════ -->
+        <aside id="sidebar"
+            class="fixed top-0 left-0 w-60 h-screen bg-white border-r border-[#E0E0E0] z-50 flex flex-col">
+
+            <a href="admin_dashboard.html"
+                class="flex items-center gap-2.5 px-5 py-4 border-b border-[#E0E0E0] shrink-0 h-14 hover:bg-[#FAFAFA] transition-colors"
+                title="Retour au tableau de bord admin">
+                <span class="material-symbols-outlined icon-fill text-[#5C2D91]"
+                    style="font-size:22px">shield_person</span>
+                <div class="leading-tight min-w-0">
+                    <div class="text-[#242424] font-heading font-bold text-[15px] tracking-tight">MARKET-UP</div>
+                    <div class="text-[10px] text-[#5C2D91] tracking-wide font-semibold uppercase">Admin</div>
+                </div>
+            </a>
+
+            <nav class="flex-1 overflow-y-auto px-3 py-2" id="sidebar-nav">
+
+                <div class="nav-group-label">Tableau de bord</div>
+                <a href="admin_dashboard.html" class="nav-item">
+                    <span class="material-symbols-outlined">dashboard</span>
+                    <span class="flex-1 min-w-0 truncate">Vue d'ensemble</span>
+                </a>
+
+                <div class="nav-group-label">Validations</div>
+                <a href="admin_validation-comptes.html" class="nav-item active">
+                    <span class="material-symbols-outlined">person_check</span>
+                    <span class="flex-1 min-w-0 truncate">Comptes</span>
+                    <span class="nav-pill nav-pill--count-amber" data-pill="comptes">11</span>
+                </a>
+                <a href="admin_validation-profils.html" class="nav-item">
+                    <span class="material-symbols-outlined">fact_check</span>
+                    <span class="flex-1 min-w-0 truncate">Profils</span>
+                    <span class="nav-pill nav-pill--count-amber" data-pill="profils">10</span>
+                </a>
+                <a href="admin_validation-rse.html" class="nav-item">
+                    <span class="material-symbols-outlined">volunteer_activism</span>
+                    <span class="flex-1 min-w-0 truncate">Reçus RSE</span>
+                    <span class="nav-pill nav-pill--count-amber" data-pill="rse">3</span>
+                </a>
+
+                <div class="nav-group-label">Gestion</div>
+                <a href="admin_entreprises.html" class="nav-item">
+                    <span class="material-symbols-outlined">business</span>
+                    <span class="flex-1 min-w-0 truncate">Entreprises</span>
+                </a>
+             
+
+                
+
+                <div class="nav-group-label">Finances</div>
+                <a href="admin_transactions.html" class="nav-item">
+                    <span class="material-symbols-outlined">receipt_long</span>
+                    <span class="flex-1 min-w-0 truncate">Transactions</span>
+                </a>
+                
+
+            </nav>
+
+            <div class="border-t border-[#E0E0E0] p-3">
+                <div class="flex items-center gap-2.5 px-2 py-2 rounded-lg hover:bg-[#FAFAFA] transition-colors">
+                    <div class="avatar avatar--sm" style="background:#5C2D91;">BA</div>
+                    <div class="leading-tight min-w-0 flex-1">
+                        <div class="text-[12.5px] font-semibold text-[#242424] truncate">Bassem Admin</div>
+                        <div class="text-[10px] text-[#8A8886] truncate">Super administrateur</div>
+                    </div>
+                    <button
+                        class="p-1.5 rounded hover:bg-[#F5F5F5] text-[#8A8886] hover:text-[#B91C1C] transition-colors"
+                        title="Se déconnecter" aria-label="Se déconnecter" onclick="window.location.href='auth_connexion.html';">
+                        <span class="material-symbols-outlined" style="font-size:16px">logout</span>
+                    </button>
+                </div>
+            </div>
+        </aside>
+
+        <!-- ═══════════════════════════════════════════════
+             MAIN CONTENT
+             ═══════════════════════════════════════════════ -->
+        <div class="flex-1 md:ml-60 min-h-screen flex flex-col">
+
+            <header
+                class="sticky top-0 z-30 bg-white border-b border-[#E0E0E0] h-14 flex items-center px-4 md:px-6 shrink-0">
+
+                <button id="menuBtn" class="md:hidden mr-3 p-2 rounded hover:bg-[#F5F5F5] transition-colors"
+                    aria-label="Ouvrir le menu">
+                    <span class="material-symbols-outlined text-[#242424]">menu</span>
+                </button>
+
+                <div class="min-w-0 leading-tight flex-1">
+                    <nav class="hidden md:flex items-center gap-1.5 text-[11px] text-[#8A8886] mb-0.5"
+                        aria-label="Fil d'Ariane">
+                        <a href="admin_dashboard.html" class="hover:text-[#5C2D91] hover:underline transition-colors">Dashboard</a>
+                        <span class="material-symbols-outlined" style="font-size:12px">chevron_right</span>
+                        <span class="text-[#8A8886]">Validations</span>
+                        <span class="material-symbols-outlined" style="font-size:12px">chevron_right</span>
+                        <span class="text-[#616161] font-medium">Comptes</span>
+                    </nav>
+                    <h1 class="font-heading text-[16px] font-bold text-[#242424] truncate">Validation des comptes</h1>
+                </div>
+
+                <div class="flex items-center gap-2 ml-3">
+                    <button id="bellBtn" class="relative p-2 rounded-lg hover:bg-[#F5F5F5] transition-colors"
+                        aria-label="Notifications admin">
+                        <span class="material-symbols-outlined text-[#242424]">notifications</span>
+                        <span
+                            class="absolute top-1 right-1 w-4 h-4 bg-[#DC2626] text-white text-[9px] font-bold rounded-full flex items-center justify-center">5</span>
+                    </button>
+                    <button id="avatarBtn"
+                        class="flex items-center gap-2 px-1 py-1 rounded-lg hover:bg-[#F5F5F5] transition-colors"
+                        aria-label="Menu admin">
+                        <div class="avatar avatar--sm" style="background:#5C2D91;">BA</div>
+                        <span class="material-symbols-outlined text-[#8A8886] hidden md:inline"
+                            style="font-size:16px">expand_more</span>
+                    </button>
+                </div>
+
+            </header>
+
+            <main class="flex-1 p-4 md:p-8">
+                <div class="max-w-[1280px] mx-auto">
+
+                    <!-- ═══════════════════════════════════
+                         PAGE HEADER
+                         ═══════════════════════════════════ -->
+                    <div class="mb-6">
+                        <h2 class="font-heading text-[22px] md:text-[26px] font-bold text-[#242424] mb-1">
+                            Validation des comptes et modifications
+                        </h2>
+                        <p class="text-[13px] text-[#616161]">
+                            File d'attente FIFO — traitez les plus anciens en premier · SLA 48h
+                        </p>
+                    </div>
+
+                    <!-- ═══════════════════════════════════
+                         TABS NAV
+                         ═══════════════════════════════════ -->
+                    <div class="tabs-nav" role="tablist">
+                        <button class="tab-item active" data-tab="new" role="tab" aria-selected="true"
+                            aria-controls="panel-new">
+                            <span class="material-symbols-outlined">person_add</span>
+                            Nouveaux comptes
+                            <span class="tab-count" id="tab-count-new">8</span>
+                        </button>
+                        <button class="tab-item" data-tab="updates" role="tab" aria-selected="false"
+                            aria-controls="panel-updates">
+                            <span class="material-symbols-outlined">edit_note</span>
+                            Modifications d'infos
+                            <span class="tab-count" id="tab-count-updates">3</span>
+                        </button>
+                    </div>
+
+                    <!-- ═══════════════════════════════════
+                         KPI BAR (dynamique selon tab)
+                         ═══════════════════════════════════ -->
+                    <div class="flex flex-col sm:flex-row gap-3 mb-6" id="kpi-bar">
+                        <!-- JS render -->
+                    </div>
+
+                    <!-- ═══════════════════════════════════
+                         PANEL : NOUVEAUX COMPTES
+                         ═══════════════════════════════════ -->
+                    <div class="tab-panel active" id="panel-new" role="tabpanel">
+                        <div class="card overflow-hidden">
+                            <div class="overflow-x-auto">
+                                <table class="queue-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Entreprise</th>
+                                            <th>Localisation</th>
+                                            <th>Propriétaire</th>
+                                            <th>Inscrit</th>
+                                            <th style="text-align:right">Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="queue-new-body"></tbody>
+                                </table>
+                            </div>
+                            <div
+                                class="flex items-center justify-between px-4 py-3 border-t border-[#E0E0E0] bg-[#FAFAFA]">
+                                <span class="text-[12px] text-[#616161]">
+                                    <span id="queue-new-count" class="font-semibold text-[#242424]">8</span> nouveau(x)
+                                    compte(s) en attente
+                                </span>
+                                <span class="text-[11px] text-[#8A8886] flex items-center gap-1">
+                                    <span class="material-symbols-outlined" style="font-size:14px">sort</span>
+                                    Tri FIFO
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- ═══════════════════════════════════
+                         PANEL : MODIFICATIONS
+                         ═══════════════════════════════════ -->
+                    <div class="tab-panel" id="panel-updates" role="tabpanel">
+                        <div class="card overflow-hidden">
+                            <div class="overflow-x-auto">
+                                <table class="queue-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Entreprise</th>
+                                            <th>Champs modifiés</th>
+                                            <th>Propriétaire</th>
+                                            <th>Soumis</th>
+                                            <th style="text-align:right">Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="queue-updates-body"></tbody>
+                                </table>
+                            </div>
+                            <div
+                                class="flex items-center justify-between px-4 py-3 border-t border-[#E0E0E0] bg-[#FAFAFA]">
+                                <span class="text-[12px] text-[#616161]">
+                                    <span id="queue-updates-count" class="font-semibold text-[#242424]">3</span>
+                                    modification(s) en attente
+                                </span>
+                                <span class="text-[11px] text-[#8A8886] flex items-center gap-1">
+                                    <span class="material-symbols-outlined" style="font-size:14px">sort</span>
+                                    Tri FIFO
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </main>
+
+        </div>
+
+    </div>
+
+    <!-- ═══════════════════════════════════════════════
+         DRAWER — détail (contenu adaptatif selon mode)
+         ═══════════════════════════════════════════════ -->
+    <div id="drawer-overlay" aria-hidden="true"></div>
+
+    <aside id="drawer" role="dialog" aria-modal="true" aria-labelledby="drawer-title" aria-hidden="true">
+
+        <!-- Header drawer -->
+        <div class="flex items-start gap-3 p-5 border-b border-[#E0E0E0] shrink-0">
+            <div id="drawer-avatar" class="avatar avatar--lg shrink-0" style="background:#5C2D91;">??</div>
+            <div class="flex-1 min-w-0">
+                <h3 id="drawer-title" class="font-heading text-[17px] font-bold text-[#242424] leading-tight truncate">
+                    Nom entreprise
+                </h3>
+                <div class="flex items-center gap-2 mt-1.5 flex-wrap">
+                    <span id="drawer-type" class="type-pill type-pill--b2b">B2B</span>
+                    <span id="drawer-sla" class="status-pill status-pill--pending">
+                        <span class="dot"></span>En attente
+                    </span>
+                </div>
+            </div>
+            <button id="drawer-close" class="p-1.5 rounded hover:bg-[#F5F5F5] transition-colors shrink-0"
+                aria-label="Fermer le panneau">
+                <span class="material-symbols-outlined text-[#616161]">close</span>
+            </button>
+        </div>
+
+        <!-- Body drawer : 2 versions en JS render -->
+        <div class="flex-1 overflow-y-auto p-5" id="drawer-body">
+            <!-- JS injecte soit le body "nouveau compte" soit le body "modification" -->
+        </div>
+
+        <!-- Footer drawer -->
+        <div class="flex items-center gap-2 p-4 border-t border-[#E0E0E0] shrink-0 bg-white">
+            <button class="btn btn-secondary" id="btn-reject" style="color:#B91C1C;border-color:#FCA5A5;">
+                <span class="material-symbols-outlined">close</span>
+                Rejeter
+            </button>
+            <button class="btn btn-primary flex-1" id="btn-approve">
+                <span class="material-symbols-outlined">check</span>
+                Approuver le compte
+            </button>
+        </div>
+
+    </aside>
+
+    <!-- ═══════════════════════════════════════════════
+         MODAL — REJET (motifs adaptatifs selon mode)
+         ═══════════════════════════════════════════════ -->
+    <div class="modal-overlay" id="modal-reject" role="dialog" aria-modal="true" aria-labelledby="modal-reject-title">
+        <div class="modal">
+            <div class="flex items-center gap-3 p-5 border-b border-[#E0E0E0]">
+                <div class="w-10 h-10 rounded-full bg-[#FEF2F2] flex items-center justify-center shrink-0">
+                    <span class="material-symbols-outlined text-[#B91C1C]">block</span>
+                </div>
+                <div class="flex-1 min-w-0">
+                    <h3 id="modal-reject-title" class="font-heading text-[16px] font-bold text-[#242424] leading-tight">
+                        Rejeter
+                    </h3>
+                    <p class="text-[12px] text-[#616161]" id="modal-reject-subtitle">Nom de l'entreprise</p>
+                </div>
+                <button class="modal-close p-1.5 rounded hover:bg-[#F5F5F5]" data-close-modal="modal-reject"
+                    aria-label="Fermer">
+                    <span class="material-symbols-outlined text-[#616161]">close</span>
+                </button>
+            </div>
+
+            <div class="flex-1 overflow-y-auto p-5">
+                <p class="text-[13px] text-[#616161] mb-4" id="modal-reject-intro">
+                    Sélectionnez au moins un motif de rejet. Le propriétaire recevra ce motif par email avec la
+                    possibilité de resoumettre.
+                </p>
+
+                <div id="motifs-list">
+                    <!-- JS render selon mode -->
+                </div>
+
+                <div class="mt-4">
+                    <label for="reject-comment" class="block text-[12px] font-semibold text-[#242424] mb-1.5">
+                        Commentaire complémentaire <span class="text-[#8A8886] font-normal">(optionnel)</span>
+                    </label>
+                    <textarea id="reject-comment" class="textarea-canon" rows="3"
+                        placeholder="Précisez au propriétaire comment corriger les éléments concernés..."></textarea>
+                </div>
+            </div>
+
+            <div class="flex items-center justify-end gap-2 p-4 border-t border-[#E0E0E0] bg-[#FAFAFA]">
+                <button class="btn btn-ghost" data-close-modal="modal-reject">Annuler</button>
+                <button class="btn btn-danger" id="btn-confirm-reject" disabled>
+                    <span class="material-symbols-outlined">send</span>
+                    Confirmer le rejet
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════
+         MODAL — APPROBATION
+         ═══════════════════════════════════════════════ -->
+    <div class="modal-overlay" id="modal-approve" role="dialog" aria-modal="true" aria-labelledby="modal-approve-title">
+        <div class="modal">
+            <div class="flex items-center gap-3 p-5 border-b border-[#E0E0E0]">
+                <div class="w-10 h-10 rounded-full bg-[#F0FDF4] flex items-center justify-center shrink-0">
+                    <span class="material-symbols-outlined text-[#107C10]">verified</span>
+                </div>
+                <div class="flex-1 min-w-0">
+                    <h3 id="modal-approve-title"
+                        class="font-heading text-[16px] font-bold text-[#242424] leading-tight">
+                        Approuver
+                    </h3>
+                    <p class="text-[12px] text-[#616161]" id="modal-approve-subtitle">Nom de l'entreprise</p>
+                </div>
+                <button class="modal-close p-1.5 rounded hover:bg-[#F5F5F5]" data-close-modal="modal-approve"
+                    aria-label="Fermer">
+                    <span class="material-symbols-outlined text-[#616161]">close</span>
+                </button>
+            </div>
+
+            <div class="p-5">
+                <p class="text-[13px] text-[#242424] mb-4" id="modal-approve-body">
+                    Confirmez-vous l'approbation ?
+                </p>
+                <div class="info-box">
+                    <span class="material-symbols-outlined">info</span>
+                    <div id="modal-approve-info">
+                        Le propriétaire sera notifié par email.
+                    </div>
+                </div>
+            </div>
+
+            <div class="flex items-center justify-end gap-2 p-4 border-t border-[#E0E0E0] bg-[#FAFAFA]">
+                <button class="btn btn-ghost" data-close-modal="modal-approve">Annuler</button>
+                <button class="btn btn-success" id="btn-confirm-approve">
+                    <span class="material-symbols-outlined">check</span>
+                    Approuver
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════
+         TOAST
+         ═══════════════════════════════════════════════ -->
+    <div id="toast" role="status" aria-live="polite">
+        <span class="material-symbols-outlined">check_circle</span>
+        <span id="toast-msg">Action effectuée</span>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════
+         SCRIPTS
+         ═══════════════════════════════════════════════ -->
+    <script>
+        (function () {
+            // ═════════════════════════════════════
+            // DATA & CONSTANTES
+            // ═════════════════════════════════════
+            const data = window.MARKETUP_DATA;
+            if (!data) {
+                console.error('admin_data.js non chargé — vérifier le <script src>');
+                return;
+            }
+
+            const NOW = new Date('2026-04-20T14:00:00Z');
+            const SLA_HOURS = data.platform_settings?.sla?.account_validation_hours || 48;
+
+            const OWNER_COLORS = [
+                '#374151', '#1E40AF', '#7C2D12', '#166534',
+                '#92400E', '#831843', '#0F766E', '#5B21B6'
+            ];
+            const getOwnerColor = (id) => {
+                const hash = id.split('').reduce((a, c) => a + c.charCodeAt(0), 0);
+                return OWNER_COLORS[hash % OWNER_COLORS.length];
+            };
+
+            // ═════════════════════════════════════
+            // UTILITAIRES
+            // ═════════════════════════════════════
+            function getHoursElapsed(isoDate) {
+                const diff = NOW - new Date(isoDate);
+                return Math.floor(diff / (1000 * 60 * 60));
+            }
+            function isSlaExceeded(isoDate) {
+                return getHoursElapsed(isoDate) > SLA_HOURS;
+            }
+            function formatRelativeTime(isoDate) {
+                const hours = getHoursElapsed(isoDate);
+                if (hours < 1) return 'il y a quelques minutes';
+                if (hours < 24) return `il y a ${hours} h`;
+                const days = Math.floor(hours / 24);
+                return days === 1 ? 'il y a 1 jour' : `il y a ${days} jours`;
+            }
+            function formatDate(isoDate) {
+                const d = new Date(isoDate);
+                return d.toLocaleDateString('fr-FR', {
+                    day: '2-digit', month: 'long', year: 'numeric'
+                }) + ' à ' + d.toLocaleTimeString('fr-FR', {
+                    hour: '2-digit', minute: '2-digit'
+                });
+            }
+            function escapeHtml(str) {
+                if (str == null) return '';
+                return String(str)
+                    .replace(/&/g, '&amp;')
+                    .replace(/</g, '&lt;')
+                    .replace(/>/g, '&gt;')
+                    .replace(/"/g, '&quot;')
+                    .replace(/'/g, '&#039;');
+            }
+
+            // ═════════════════════════════════════
+            // SELECTIONS DES DONNÉES
+            // ═════════════════════════════════════
+            const newAccounts = data.companies
+                .filter(c => c.status === 'pending')
+                .sort((a, b) => new Date(a.registered_at) - new Date(b.registered_at));
+
+            const updateRequests = data.companies
+                .filter(c => c.pending_updates)
+                .sort((a, b) => new Date(a.pending_updates.submitted_at) - new Date(b.pending_updates.submitted_at));
+
+            // ═════════════════════════════════════
+            // COMPTEURS SIDEBAR + TABS + KPI
+            // ═════════════════════════════════════
+            function updateCounters() {
+                const newCount = newAccounts.length;
+                const updCount = updateRequests.length;
+                const comptesTotal = newCount + updCount;
+
+                let profilsCount = 0;
+                data.companies.forEach(c => {
+                    Object.values(c.profiles || {}).forEach(p => {
+                        if (p.status === 'pending') profilsCount++;
+                    });
+                });
+                const rseCount = data.rse_receipts.filter(r => r.status === 'pending').length;
+                const litigesCount = data.disputes.filter(d => d.status === 'open').length;
+
+                document.querySelectorAll('[data-pill="comptes"]').forEach(el => el.textContent = comptesTotal);
+                document.querySelectorAll('[data-pill="profils"]').forEach(el => el.textContent = profilsCount);
+                document.querySelectorAll('[data-pill="rse"]').forEach(el => el.textContent = rseCount);
+                document.querySelectorAll('[data-pill="litiges"]').forEach(el => el.textContent = litigesCount);
+
+                document.getElementById('tab-count-new').textContent = newCount;
+                document.getElementById('tab-count-updates').textContent = updCount;
+                document.getElementById('queue-new-count').textContent = newCount;
+                document.getElementById('queue-updates-count').textContent = updCount;
+            }
+
+            function renderKpiBar(mode) {
+                const bar = document.getElementById('kpi-bar');
+                if (mode === 'new') {
+                    const total = newAccounts.length;
+                    const slaExceeded = newAccounts.filter(c => isSlaExceeded(c.registered_at)).length;
+                    bar.innerHTML = `
+                        <div class="kpi-inline">
+                            <span class="material-symbols-outlined text-[#D97706]" style="font-size:24px">schedule</span>
+                            <div class="min-w-0">
+                                <div class="kpi-inline__value">${total}</div>
+                                <div class="kpi-inline__label">en attente</div>
+                            </div>
+                        </div>
+                        <div class="kpi-inline">
+                            <span class="material-symbols-outlined text-[#DC2626]" style="font-size:24px">error</span>
+                            <div class="min-w-0">
+                                <div class="kpi-inline__value">${slaExceeded > 0 ? `<span class="text-[#B91C1C]">${slaExceeded}</span>` : '0'}</div>
+                                <div class="kpi-inline__label">SLA dépassé</div>
+                            </div>
+                        </div>
+                    `;
+                } else {
+                    const total = updateRequests.length;
+                    const slaExceeded = updateRequests.filter(c => isSlaExceeded(c.pending_updates.submitted_at)).length;
+                    bar.innerHTML = `
+                        <div class="kpi-inline">
+                            <span class="material-symbols-outlined text-[#5C2D91]" style="font-size:24px">edit_note</span>
+                            <div class="min-w-0">
+                                <div class="kpi-inline__value">${total}</div>
+                                <div class="kpi-inline__label">en attente</div>
+                            </div>
+                        </div>
+                        <div class="kpi-inline">
+                            <span class="material-symbols-outlined text-[#DC2626]" style="font-size:24px">error</span>
+                            <div class="min-w-0">
+                                <div class="kpi-inline__value">${slaExceeded > 0 ? `<span class="text-[#B91C1C]">${slaExceeded}</span>` : '0'}</div>
+                                <div class="kpi-inline__label">SLA dépassé</div>
+                            </div>
+                        </div>
+                    `;
+                }
+            }
+
+            // ═════════════════════════════════════
+            // RENDU TABLES
+            // ═════════════════════════════════════
+            function renderNewAccountsTable() {
+                const tbody = document.getElementById('queue-new-body');
+                tbody.innerHTML = '';
+                newAccounts.forEach(company => {
+                    const tr = document.createElement('tr');
+                    tr.dataset.companyId = company.id;
+                    tr.dataset.mode = 'new';
+
+                    const ownerColor = getOwnerColor(company.id);
+                    const slaExceeded = isSlaExceeded(company.registered_at);
+                    const relativeTime = formatRelativeTime(company.registered_at);
+                    const hours = getHoursElapsed(company.registered_at);
+
+                    const slaPill = slaExceeded
+                        ? `<span class="status-pill status-pill--sla-exceeded"><span class="dot"></span>SLA dépassé · ${hours}h</span>`
+                        : `<span class="status-pill status-pill--sla-ok"><span class="dot"></span>${hours}h / 48h</span>`;
+
+                    const typePill = company.type === 'B2B'
+                        ? `<span class="type-pill type-pill--b2b">B2B</span>`
+                        : `<span class="type-pill type-pill--b2c">B2C</span>`;
+
+                    tr.innerHTML = `
+                        <td data-label="Entreprise">
+                            <div class="flex items-center gap-3 min-w-0">
+                                <div class="avatar avatar--sm" style="background:#5C2D91;">
+                                    ${escapeHtml(company.name.substring(0, 2).toUpperCase())}
+                                </div>
+                                <div class="min-w-0">
+                                    <div class="font-semibold text-[#242424] truncate">${escapeHtml(company.name)}</div>
+                                    <div class="flex items-center gap-1.5 mt-0.5">
+                                        ${typePill}
+                                        <span class="text-[11px] text-[#8A8886] truncate">${escapeHtml(company.sector)}</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </td>
+                        <td data-label="Localisation">
+                            <div class="text-[13px] text-[#242424]">${escapeHtml(company.city)}</div>
+                            <div class="text-[11px] text-[#8A8886]">${escapeHtml(company.governorate)}</div>
+                        </td>
+                        <td data-label="Propriétaire">
+                            <div class="flex items-center gap-2 min-w-0">
+                                <div class="avatar avatar--sm" style="background:${ownerColor};">
+                                    ${escapeHtml(company.owner.avatar_initials)}
+                                </div>
+                                <div class="min-w-0">
+                                    <div class="text-[12.5px] font-medium text-[#242424] truncate">
+                                        ${escapeHtml(company.owner.firstName)} ${escapeHtml(company.owner.lastName)}
+                                    </div>
+                                    <div class="text-[11px] text-[#8A8886] truncate">${escapeHtml(company.owner.email)}</div>
+                                </div>
+                            </div>
+                        </td>
+                        <td data-label="Inscrit">
+                            <div class="text-[12.5px] text-[#242424]">${relativeTime}</div>
+                            <div class="mt-1">${slaPill}</div>
+                        </td>
+                        <td data-label="Actions" style="text-align:right">
+                            <button class="btn btn-ghost" data-action="view">
+                                <span class="material-symbols-outlined">visibility</span>
+                                Voir détails
+                            </button>
+                        </td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+                bindNewRowClicks(tbody);
+            }
+
+            function bindNewRowClicks(tbody) {
+                tbody.querySelectorAll('tr').forEach(tr => {
+                    tr.addEventListener('click', (e) => {
+                        if (e.target.closest('button')) return;
+                        openDrawer(tr.dataset.companyId);
+                    });
+                });
+                tbody.querySelectorAll('[data-action="view"]').forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        const tr = btn.closest('tr');
+                        openDrawer(tr.dataset.companyId);
+                    });
+                });
+            }
+
+            function renderUpdatesTable() {
+                const tbody = document.getElementById('queue-updates-body');
+                tbody.innerHTML = '';
+                updateRequests.forEach(company => {
+                    const tr = document.createElement('tr');
+                    tr.dataset.companyId = company.id;
+                    tr.dataset.mode = 'update';
+
+                    const ownerColor = getOwnerColor(company.id);
+                    const submittedAt = company.pending_updates.submitted_at;
+                    const slaExceeded = isSlaExceeded(submittedAt);
+                    const relativeTime = formatRelativeTime(submittedAt);
+                    const hours = getHoursElapsed(submittedAt);
+
+                    const slaPill = slaExceeded
+                        ? `<span class="status-pill status-pill--sla-exceeded"><span class="dot"></span>SLA dépassé · ${hours}h</span>`
+                        : `<span class="status-pill status-pill--sla-ok"><span class="dot"></span>${hours}h / 48h</span>`;
+
+                    const fields = company.pending_updates.fields;
+                    const fieldChips = [];
+                    if (fields.logo) {
+                        fieldChips.push(`<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10.5px] font-semibold bg-[#F3EFFA] text-[#5C2D91]"><span class="material-symbols-outlined" style="font-size:12px">image</span>Logo</span>`);
+                    }
+                    if (fields.name) {
+                        fieldChips.push(`<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10.5px] font-semibold bg-[#F3EFFA] text-[#5C2D91]"><span class="material-symbols-outlined" style="font-size:12px">badge</span>Nom</span>`);
+                    }
+
+                    const typePill = company.type === 'B2B'
+                        ? `<span class="type-pill type-pill--b2b">B2B</span>`
+                        : `<span class="type-pill type-pill--b2c">B2C</span>`;
+
+                    tr.innerHTML = `
+                        <td data-label="Entreprise">
+                            <div class="flex items-center gap-3 min-w-0">
+                                <div class="avatar avatar--sm" style="background:#5C2D91;">
+                                    ${escapeHtml(company.name.substring(0, 2).toUpperCase())}
+                                </div>
+                                <div class="min-w-0">
+                                    <div class="font-semibold text-[#242424] truncate">${escapeHtml(company.name)}</div>
+                                    <div class="flex items-center gap-1.5 mt-0.5">
+                                        ${typePill}
+                                        <span class="text-[11px] text-[#8A8886] truncate">${escapeHtml(company.sector)}</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </td>
+                        <td data-label="Champs modifiés">
+                            <div class="flex items-center gap-1.5 flex-wrap">
+                                ${fieldChips.join('')}
+                            </div>
+                        </td>
+                        <td data-label="Propriétaire">
+                            <div class="flex items-center gap-2 min-w-0">
+                                <div class="avatar avatar--sm" style="background:${ownerColor};">
+                                    ${escapeHtml(company.owner.avatar_initials)}
+                                </div>
+                                <div class="min-w-0">
+                                    <div class="text-[12.5px] font-medium text-[#242424] truncate">
+                                        ${escapeHtml(company.owner.firstName)} ${escapeHtml(company.owner.lastName)}
+                                    </div>
+                                    <div class="text-[11px] text-[#8A8886] truncate">${escapeHtml(company.owner.email)}</div>
+                                </div>
+                            </div>
+                        </td>
+                        <td data-label="Soumis">
+                            <div class="text-[12.5px] text-[#242424]">${relativeTime}</div>
+                            <div class="mt-1">${slaPill}</div>
+                        </td>
+                        <td data-label="Actions" style="text-align:right">
+                            <a href="admin_entreprise-detail.html?id=${encodeURIComponent(company.id)}" class="btn btn-ghost" data-action="view-profile">
+                                <span class="material-symbols-outlined">open_in_new</span>
+                                Voir le profil
+                            </a>
+                        </td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+                bindUpdateRowRedirects(tbody);
+            }
+
+            function bindUpdateRowRedirects(tbody) {
+                tbody.querySelectorAll('tr').forEach(tr => {
+                    tr.addEventListener('click', (e) => {
+                        if (e.target.closest('a[data-action="view-profile"]')) return;
+                        const id = tr.dataset.companyId;
+                        window.location.href = `admin_entreprise-detail.html?id=${encodeURIComponent(id)}`;
+                    });
+                });
+            }
+
+            // ═════════════════════════════════════
+            // TABS SWITCH
+            // ═════════════════════════════════════
+            let currentMode = 'new'; // 'new' | 'update'
+
+            document.querySelectorAll('.tab-item').forEach(tab => {
+                tab.addEventListener('click', () => {
+                    const target = tab.dataset.tab;
+                    currentMode = target === 'updates' ? 'update' : 'new';
+
+                    document.querySelectorAll('.tab-item').forEach(t => {
+                        t.classList.toggle('active', t === tab);
+                        t.setAttribute('aria-selected', t === tab ? 'true' : 'false');
+                    });
+                    document.querySelectorAll('.tab-panel').forEach(p => {
+                        p.classList.toggle('active', p.id === `panel-${target}`);
+                    });
+                    renderKpiBar(currentMode);
+                });
+            });
+
+            // ═════════════════════════════════════
+            // DRAWER (nouveaux comptes uniquement)
+            // ═════════════════════════════════════
+            const drawer = document.getElementById('drawer');
+            const drawerOverlay = document.getElementById('drawer-overlay');
+            let currentCompanyId = null;
+
+            function openDrawer(companyId) {
+                const company = newAccounts.find(c => c.id === companyId);
+                if (!company) return;
+
+                currentCompanyId = companyId;
+
+                document.getElementById('drawer-avatar').textContent = company.name.substring(0, 2).toUpperCase();
+                document.getElementById('drawer-title').textContent = company.name;
+
+                const typeEl = document.getElementById('drawer-type');
+                typeEl.className = company.type === 'B2B' ? 'type-pill type-pill--b2b' : 'type-pill type-pill--b2c';
+                typeEl.textContent = company.type;
+
+                const slaEl = document.getElementById('drawer-sla');
+                const refDate = company.registered_at;
+                const hours = getHoursElapsed(refDate);
+                const slaExceeded = isSlaExceeded(refDate);
+
+                if (slaExceeded) {
+                    slaEl.className = 'status-pill status-pill--sla-exceeded';
+                    slaEl.innerHTML = `<span class="dot"></span>SLA dépassé · ${hours}h`;
+                } else {
+                    slaEl.className = 'status-pill status-pill--pending';
+                    slaEl.innerHTML = `<span class="dot"></span>En attente · ${hours}h`;
+                }
+
+                document.getElementById('drawer-body').innerHTML =
+                    renderNewAccountBody(company, hours, slaExceeded, refDate);
+
+                drawer.classList.add('open');
+                drawer.setAttribute('aria-hidden', 'false');
+                drawerOverlay.classList.add('open');
+                document.body.style.overflow = 'hidden';
+            }
+
+            function renderNewAccountBody(company, hours, slaExceeded, refDate) {
+                const ownerColor = getOwnerColor(company.id);
+
+                const tlBg = slaExceeded ? '#FEF2F2' : '#FFFBEB';
+                const tlBorder = slaExceeded ? '#FCA5A5' : '#FDE68A';
+                const tlIcon = slaExceeded ? 'error' : 'schedule';
+                const tlIconColor = slaExceeded ? '#DC2626' : '#D97706';
+                const tlTitleColor = slaExceeded ? '#B91C1C' : '#92400E';
+                const tlTitle = slaExceeded
+                    ? `En attente depuis ${hours}h — SLA dépassé`
+                    : `En attente depuis ${hours}h`;
+                const tlSla = slaExceeded
+                    ? `SLA réglementaire : ${SLA_HOURS}h · Dépassement : ${hours - SLA_HOURS}h`
+                    : `SLA réglementaire : ${SLA_HOURS}h · Reste ${SLA_HOURS - hours}h avant dépassement`;
+
+                return `
+                    <section class="mb-6">
+                        <div class="drawer-section-label">Informations entreprise</div>
+                        <div class="drawer-field">
+                            <span class="drawer-field__label">Raison sociale</span>
+                            <span class="drawer-field__value">${escapeHtml(company.name)}</span>
+                        </div>
+                        <div class="drawer-field">
+                            <span class="drawer-field__label">Identifiant légal</span>
+                            <span class="drawer-field__value font-mono">${escapeHtml(company.rne)}</span>
+                        </div>
+                        <div class="drawer-field">
+                            <span class="drawer-field__label">Document légal</span>
+                            <a href="/shared/sample-legal-id.pdf" target="_blank"
+                                class="drawer-field__value text-[#5C2D91] hover:underline inline-flex items-center gap-1">
+                                <span class="material-symbols-outlined" style="font-size:14px">description</span>
+                                Voir le document
+                                <span class="material-symbols-outlined" style="font-size:13px">open_in_new</span>
+                            </a>
+                        </div>
+                        <div class="drawer-field">
+                            <span class="drawer-field__label">Secteur d'activité</span>
+                            <span class="drawer-field__value">${escapeHtml(company.sector)}</span>
+                        </div>
+                        <div class="drawer-field">
+                            <span class="drawer-field__label">Email de contact</span>
+                            <span class="drawer-field__value">${escapeHtml(company.email)}</span>
+                        </div>
+                        <div class="drawer-field">
+                            <span class="drawer-field__label">Téléphone</span>
+                            <span class="drawer-field__value">${escapeHtml(company.phone)}</span>
+                        </div>
+                        <div class="drawer-field">
+                            <span class="drawer-field__label">WhatsApp</span>
+                            <span class="drawer-field__value">${escapeHtml(company.whatsapp || company.phone)}</span>
+                        </div>
+                        <div class="drawer-field">
+                            <span class="drawer-field__label">Adresse</span>
+                            <span class="drawer-field__value">${escapeHtml(company.address)}</span>
+                        </div>
+                        <div class="drawer-field">
+                            <span class="drawer-field__label">Ville · Gouvernorat</span>
+                            <span class="drawer-field__value">${escapeHtml(company.city)} · ${escapeHtml(company.governorate)}</span>
+                        </div>
+                    </section>
+
+                    <section class="mb-6">
+                        <div class="drawer-section-label">Propriétaire du compte</div>
+                        <div class="flex items-center gap-3 p-3 bg-[#FAFAFA] rounded-lg border border-[#E0E0E0]">
+                            <div class="avatar avatar--md shrink-0" style="background:${ownerColor};">
+                                ${escapeHtml(company.owner.avatar_initials)}
+                            </div>
+                            <div class="flex-1 min-w-0">
+                                <div class="text-[14px] font-semibold text-[#242424] truncate">
+                                    ${escapeHtml(company.owner.firstName)} ${escapeHtml(company.owner.lastName)}
+                                </div>
+                                <div class="text-[12px] text-[#616161] truncate">${escapeHtml(company.owner.email)}</div>
+                                <div class="text-[11px] text-[#8A8886] truncate">${escapeHtml(company.owner.phone)}</div>
+                            </div>
+                        </div>
+                    </section>
+
+                    <section>
+                        <div class="drawer-section-label">Timeline d'inscription</div>
+                        <div class="p-3 rounded-lg border" style="background:${tlBg};border-color:${tlBorder}">
+                            <div class="flex items-center gap-2 mb-2">
+                                <span class="material-symbols-outlined" style="font-size:18px;color:${tlIconColor}">${tlIcon}</span>
+                                <span class="text-[13px] font-semibold" style="color:${tlTitleColor}">${tlTitle}</span>
+                            </div>
+                            <div class="text-[12px] text-[#616161]">Inscription le ${formatDate(refDate)}</div>
+                            <div class="text-[11px] text-[#8A8886] mt-1">${tlSla}</div>
+                        </div>
+                    </section>
+                `;
+            }
+
+            function closeDrawer() {
+                drawer.classList.remove('open');
+                drawer.setAttribute('aria-hidden', 'true');
+                drawerOverlay.classList.remove('open');
+                document.body.style.overflow = '';
+                currentCompanyId = null;
+            }
+
+            document.getElementById('drawer-close').addEventListener('click', closeDrawer);
+            drawerOverlay.addEventListener('click', closeDrawer);
+
+            // ═════════════════════════════════════
+            // MOTIFS DE REJET (nouveaux comptes)
+            // ═════════════════════════════════════
+            const MOTIFS_NEW = [
+                { key: 'rne', label: 'RNE invalide ou non vérifiable', hint: 'Le numéro RNE fourni ne correspond pas à une entreprise enregistrée.' },
+                { key: 'legal_doc', label: 'Document légal manquant ou illisible', hint: 'Le document fourni à l\'inscription est manquant, illisible ou ne correspond pas au RNE déclaré.' },
+                { key: 'contact', label: 'Informations de contact incomplètes', hint: 'Téléphone, email ou adresse manquant ou invalide.' },
+                { key: 'docs', label: 'Documents justificatifs manquants', hint: 'Extrait RNE, patente ou document d\'identité du représentant légal à fournir.' },
+                { key: 'sector', label: 'Secteur d\'activité non autorisé', hint: 'Le secteur déclaré ne fait pas partie du référentiel MARKET-UP.' },
+                { key: 'other', label: 'Autre (précisez ci-dessous)', hint: 'Un commentaire complémentaire est obligatoire.' }
+            ];
+
+            function renderMotifs() {
+                const container = document.getElementById('motifs-list');
+                container.innerHTML = MOTIFS_NEW.map(m => `
+                    <label class="motif-item" data-motif="${m.key}">
+                        <input type="checkbox" />
+                        <div class="flex-1">
+                            <span class="motif-item__label">${escapeHtml(m.label)}</span>
+                            <span class="motif-item__hint">${escapeHtml(m.hint)}</span>
+                        </div>
+                    </label>
+                `).join('');
+
+                container.querySelectorAll('.motif-item').forEach(item => {
+                    const cb = item.querySelector('input[type="checkbox"]');
+                    cb.addEventListener('change', () => {
+                        item.classList.toggle('checked', cb.checked);
+                        updateRejectButtonState();
+                    });
+                });
+            }
+
+            function updateRejectButtonState() {
+                const btn = document.getElementById('btn-confirm-reject');
+                const checked = document.querySelectorAll('#motifs-list input[type="checkbox"]:checked');
+                const otherChecked = document.querySelector('.motif-item[data-motif="other"] input:checked');
+                const comment = document.getElementById('reject-comment').value.trim();
+
+                const hasMotif = checked.length > 0;
+                const otherOk = !otherChecked || comment.length > 0;
+                btn.disabled = !(hasMotif && otherOk);
+            }
+
+            document.getElementById('reject-comment').addEventListener('input', updateRejectButtonState);
+
+            // ═════════════════════════════════════
+            // MODALS
+            // ═════════════════════════════════════
+            function openModal(id) {
+                document.getElementById(id).classList.add('open');
+                document.body.style.overflow = 'hidden';
+            }
+            function closeModal(id) {
+                document.getElementById(id).classList.remove('open');
+                if (!drawer.classList.contains('open')) {
+                    document.body.style.overflow = '';
+                }
+            }
+
+            document.querySelectorAll('[data-close-modal]').forEach(btn => {
+                btn.addEventListener('click', () => closeModal(btn.dataset.closeModal));
+            });
+            document.querySelectorAll('.modal-overlay').forEach(ov => {
+                ov.addEventListener('click', (e) => {
+                    if (e.target === ov) closeModal(ov.id);
+                });
+            });
+
+            // ─── Approbation
+            document.getElementById('btn-approve').addEventListener('click', () => {
+                const company = newAccounts.find(c => c.id === currentCompanyId);
+                if (!company) return;
+
+                document.getElementById('modal-approve-title').textContent = 'Approuver le compte';
+                document.getElementById('modal-approve-subtitle').textContent = company.name;
+                document.getElementById('modal-approve-body').innerHTML =
+                    `Confirmez-vous l'activation du compte <strong>${escapeHtml(company.name)}</strong> ?`;
+                document.getElementById('modal-approve-info').textContent =
+                    'Le propriétaire recevra un email d\'activation et pourra se connecter à son dashboard pour créer ses profils BrandUP, TraceUP et LinkUP. Les profils resteront soumis à une validation séparée.';
+
+                openModal('modal-approve');
+            });
+
+            document.getElementById('btn-confirm-approve').addEventListener('click', () => {
+                const company = newAccounts.find(c => c.id === currentCompanyId);
+                if (!company) return;
+                closeModal('modal-approve');
+                closeDrawer();
+                showToast(`Compte ${company.name} approuvé · email d'activation envoyé`);
+            });
+
+            // ─── Rejet
+            document.getElementById('btn-reject').addEventListener('click', () => {
+                const company = newAccounts.find(c => c.id === currentCompanyId);
+                if (!company) return;
+
+                document.getElementById('modal-reject-title').textContent = 'Rejeter le compte';
+                document.getElementById('modal-reject-subtitle').textContent = company.name;
+                document.getElementById('modal-reject-intro').textContent =
+                    'Sélectionnez au moins un motif de rejet. Le propriétaire recevra ce motif par email avec la possibilité de resoumettre.';
+
+                renderMotifs();
+                document.getElementById('reject-comment').value = '';
+                updateRejectButtonState();
+                openModal('modal-reject');
+            });
+
+            document.getElementById('btn-confirm-reject').addEventListener('click', () => {
+                const company = newAccounts.find(c => c.id === currentCompanyId);
+                if (!company) return;
+                closeModal('modal-reject');
+                closeDrawer();
+                showToast(`Compte ${company.name} rejeté · motif envoyé par email`);
+            });
+
+            // ═════════════════════════════════════
+            // TOAST
+            // ═════════════════════════════════════
+            let toastTimer = null;
+            function showToast(msg) {
+                const toast = document.getElementById('toast');
+                document.getElementById('toast-msg').textContent = msg;
+                toast.classList.add('show');
+                clearTimeout(toastTimer);
+                toastTimer = setTimeout(() => toast.classList.remove('show'), 1800);
+            }
+
+            // ═════════════════════════════════════
+            // ESCAPE KEY
+            // ═════════════════════════════════════
+            document.addEventListener('keydown', (e) => {
+                if (e.key !== 'Escape') return;
+                const openMod = document.querySelector('.modal-overlay.open');
+                if (openMod) {
+                    closeModal(openMod.id);
+                } else if (drawer.classList.contains('open')) {
+                    closeDrawer();
+                }
+            });
+
+            // ═════════════════════════════════════
+            // SIDEBAR MOBILE
+            // ═════════════════════════════════════
+            const sidebar = document.getElementById('sidebar');
+            const backdrop = document.getElementById('backdrop');
+            document.getElementById('menuBtn')?.addEventListener('click', () => {
+                sidebar.classList.add('open');
+                backdrop.classList.add('show');
+            });
+            backdrop?.addEventListener('click', () => {
+                sidebar.classList.remove('open');
+                backdrop.classList.remove('show');
+            });
+
+            // ═════════════════════════════════════
+            // INIT
+            // ═════════════════════════════════════
+            updateCounters();
+            renderKpiBar('new');
+            renderNewAccountsTable();
+            renderUpdatesTable();
+
+        })();
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,560 @@
+<!DOCTYPE html>
+<html class="light" lang="fr">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>MARKET-UP — Onboarding</title>
+
+    <!-- ============================================================
+         ONBOARDING MARKET-UP
+         Page commune aux 3 produits (BrandUP / TraceUP / LinkUP).
+         Le produit est déterminé par le paramètre ?product= de l'URL.
+         - /onboarding_onboarding.html              → BrandUP (défaut)
+         - /onboarding_onboarding.html?product=brandup
+         - /onboarding_onboarding.html?product=traceup
+         - /onboarding_onboarding.html?product=linkup
+         Le script en fin de body met à jour :
+           • le logo produit dans le header
+           • les URLs des 2 CTAs B2B / B2C vers le moteur correspondant
+           • le highlight de la tuile produit dans l'app launcher
+           • le <title> du document
+         ============================================================ -->
+
+    <!-- Fonts -->
+    <link
+        href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;family=Inter:wght@400;500;600&amp;display=swap"
+        rel="stylesheet" />
+    <!-- Icons -->
+    <link
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+        rel="stylesheet" />
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        // === CANON MARKET-UP — Microsoft Fluent ===
+                        "primary":       "#0078D4",
+                        "primary-hover": "#106EBE",
+                        "primary-dark":  "#005A9E",
+                        "primary-light": "#EFF6FC",
+                        "ms-text":       "#242424",
+                        "ms-text-muted": "#616161",
+                        "ms-border":     "#E0E0E0",
+                        "ms-surface":    "#F5F5F5",
+                        "ms-gold":       "#C5A059",
+                    },
+                    fontFamily: {
+                        "headline": ["Plus Jakarta Sans", "sans-serif"],
+                        "body":     ["Inter", "sans-serif"],
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.25rem",  // 4px  — inputs, tags, badges
+                        "lg":      "0.5rem",   // 8px  — buttons, cards
+                        "xl":      "0.75rem",  // 12px — modals, dropdowns
+                        "2xl":     "1rem",     // 16px — large panels
+                        "full":    "9999px"
+                    },
+                },
+            },
+        }
+    </script>
+    <style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+
+        .material-symbols-outlined.fill {
+            font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #000;
+            overflow: hidden;
+        }
+
+        h1, h2, h3 {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+        }
+
+        /* Split-screen animations — conservé de la Phase A */
+        .split-panel {
+            transition: all 0.7s cubic-bezier(0.23, 1, 0.32, 1);
+            position: relative;
+            z-index: 1;
+        }
+
+        @media (min-width: 768px) {
+            .split-container:hover .split-panel {
+                width: 45%;
+                filter: grayscale(0.2) brightness(0.7);
+            }
+
+            .split-container .split-panel:hover {
+                width: 55%;
+                filter: grayscale(0) brightness(1.1);
+                z-index: 10;
+            }
+        }
+
+        .panel-image {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 1.5s ease;
+        }
+
+        .split-panel:hover .panel-image {
+            transform: scale(1.05);
+        }
+
+        .glass-overlay {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(to top, rgba(0, 0, 0, 0.95) 0%, rgba(0, 0, 0, 0.5) 50%, rgba(0, 0, 0, 0.3) 100%);
+            z-index: 6;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translate(-50%, -50%) translateY(0); }
+            50%      { transform: translate(-50%, -50%) translateY(-8px); }
+        }
+
+        .central-pivot {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 20;
+            pointer-events: none;
+            animation: float 4s ease-in-out infinite;
+        }
+
+        /* Dropdowns — Country + App Launcher */
+        [data-dropdown] { display: none; }
+        [data-dropdown].open { display: block; }
+
+        /* App launcher tile — label passe en couleur produit au hover */
+        .launcher-tile { transition: background-color 0.15s; }
+        .launcher-tile:hover { background-color: #F5F5F5; }
+        .launcher-tile:hover .launcher-label { color: var(--tile-color, #242424); }
+
+        /* === MOBILE BOTTOM SHEET === */
+        /* Sur mobile, les dropdowns deviennent un bottom sheet fullwidth */
+        #mobileBackdrop {
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.25s ease;
+        }
+        #mobileBackdrop.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        @media (max-width: 767px) {
+            [data-mobile-sheet] {
+                display: block !important;
+                position: fixed !important;
+                left: 0 !important;
+                right: 0 !important;
+                bottom: 0 !important;
+                top: auto !important;
+                margin: 0 !important;
+                width: 100% !important;
+                max-height: 85vh;
+                overflow-y: auto;
+                border-radius: 16px 16px 0 0 !important;
+                transform: translateY(100%);
+                transition: transform 0.3s cubic-bezier(0.23, 1, 0.32, 1);
+                visibility: hidden;
+                z-index: 50;
+                padding: 0 !important;
+            }
+            [data-mobile-sheet].open {
+                transform: translateY(0);
+                visibility: visible;
+            }
+            /* Handle visuel en haut du sheet mobile */
+            [data-mobile-sheet]::before {
+                content: '';
+                display: block;
+                width: 40px;
+                height: 4px;
+                background: #D1D1D1;
+                border-radius: 2px;
+                margin: 8px auto 0;
+            }
+            /* Grid des tuiles launcher avec plus d'espace en mode sheet */
+            [data-mobile-sheet] .launcher-grid {
+                padding: 16px;
+                gap: 12px;
+            }
+        }
+    </style>
+</head>
+
+<body class="h-screen w-full flex flex-col">
+
+    <!-- Backdrop mobile (activé par JS quand un bottom sheet s'ouvre) -->
+    <div id="mobileBackdrop" class="fixed inset-0 bg-black/60 z-40 md:hidden"></div>
+
+    <!-- =========================================================
+         HEADER — style navbar moteur canon, dark transparent
+         Desktop : 3 colonnes w-1/3 chacune
+         Mobile  : colonnes latérales = taille naturelle, logo = flex-1
+         ========================================================= -->
+    <header class="fixed top-0 left-0 w-full z-50 flex items-center gap-2 md:gap-3 px-3 md:px-6 min-h-[64px] md:h-[72px] bg-gradient-to-b from-black/70 to-black/30 border-b border-white/10">
+
+        <!-- GAUCHE — Country dropdown -->
+        <div class="shrink-0 md:w-1/3 flex items-center">
+            <div class="relative">
+                <button id="countryBtn" type="button"
+                    class="flex items-center gap-2 px-3 py-2 bg-black/40 backdrop-blur-sm text-white text-sm rounded-lg border border-white/10 hover:bg-black/60 transition-colors">
+                    <span class="text-base">🇹🇳</span>
+                    <span class="font-medium hidden sm:inline">Tunisie</span>
+                    <span class="material-symbols-outlined text-lg">keyboard_arrow_down</span>
+                </button>
+                <div id="countryMenu" data-dropdown data-mobile-sheet
+                    class="absolute left-0 mt-2 w-60 bg-white rounded-xl border border-[#E0E0E0] overflow-hidden z-50"
+                    style="box-shadow: 0 8px 32px rgba(0,0,0,0.16);">
+                    <!-- Header mobile (visible uniquement en bottom sheet) -->
+                    <div class="md:hidden flex items-center justify-between px-4 pt-2 pb-3 border-b border-[#F0F0F0]">
+                        <span class="text-sm font-bold text-[#242424]">Choisir un pays</span>
+                        <button type="button" class="close-dropdown w-9 h-9 flex items-center justify-center rounded-lg hover:bg-[#F5F5F5] -mr-2" aria-label="Fermer">
+                            <span class="material-symbols-outlined">close</span>
+                        </button>
+                    </div>
+                    <button type="button" class="w-full flex items-center gap-3 px-4 py-3 text-left hover:bg-[#EFF6FC] transition-colors">
+                        <span class="text-lg">🇹🇳</span>
+                        <span class="flex-1 text-sm font-semibold text-[#242424]">Tunisie</span>
+                        <span class="material-symbols-outlined text-primary text-lg fill">check</span>
+                    </button>
+                    <div class="border-t border-[#F0F0F0]"></div>
+                    <button type="button" class="w-full flex items-center gap-3 px-4 py-3 text-left opacity-50 cursor-not-allowed" disabled>
+                        <span class="text-lg">🇫🇷</span>
+                        <div class="flex-1">
+                            <div class="text-sm font-medium text-[#242424]">France</div>
+                            <div class="text-xs text-[#616161]">Bientôt disponible</div>
+                        </div>
+                    </button>
+                    <button type="button" class="w-full flex items-center gap-3 px-4 py-3 text-left opacity-50 cursor-not-allowed" disabled>
+                        <span class="text-lg">🇲🇦</span>
+                        <div class="flex-1">
+                            <div class="text-sm font-medium text-[#242424]">Maroc</div>
+                            <div class="text-xs text-[#616161]">Bientôt disponible</div>
+                        </div>
+                    </button>
+                    <button type="button" class="w-full flex items-center gap-3 px-4 py-3 text-left opacity-50 cursor-not-allowed" disabled>
+                        <span class="text-lg">🇩🇿</span>
+                        <div class="flex-1">
+                            <div class="text-sm font-medium text-[#242424]">Algérie</div>
+                            <div class="text-xs text-[#616161]">Bientôt disponible</div>
+                        </div>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- CENTRE — Logo produit (géré par le product switcher) -->
+        <div class="flex-1 md:w-1/3 flex items-center justify-center min-w-0">
+            <img id="productLogo" alt="BrandUP"
+                src="shared/logos/logos-brandup.png"
+                class="h-7 md:h-10 w-auto object-contain brightness-0 invert max-w-full" />
+        </div>
+
+        <!-- DROITE — App launcher + Connexion + Inscrire une marque -->
+        <div class="shrink-0 md:w-1/3 flex items-center justify-end gap-1 md:gap-3">
+
+            <!-- App launcher -->
+            <div class="relative">
+                <button id="launcherBtn" type="button" aria-label="Produits MARKET-UP"
+                    class="w-10 h-10 flex items-center justify-center rounded-lg hover:bg-white/10 transition-colors text-white">
+                    <span class="material-symbols-outlined">apps</span>
+                </button>
+                <div id="launcherMenu" data-dropdown data-mobile-sheet
+                    class="absolute right-0 mt-2 w-80 bg-white rounded-xl border border-[#E0E0E0] p-3 z-50"
+                    style="box-shadow: 0 8px 32px rgba(0,0,0,0.16);">
+                    <!-- Header mobile (visible uniquement en bottom sheet) -->
+                    <div class="md:hidden flex items-center justify-between px-4 pt-2 pb-3 border-b border-[#F0F0F0]">
+                        <span class="text-sm font-bold text-[#242424]">Produits MARKET-UP</span>
+                        <button type="button" class="close-dropdown w-9 h-9 flex items-center justify-center rounded-lg hover:bg-[#F5F5F5] -mr-2" aria-label="Fermer">
+                            <span class="material-symbols-outlined">close</span>
+                        </button>
+                    </div>
+                    <!-- Header desktop (caché sur mobile) -->
+                    <div class="hidden md:block text-[11px] font-bold uppercase tracking-wider text-[#616161] px-2 pt-1 pb-2">
+                        Produits MARKET-UP
+                    </div>
+                    <div class="launcher-grid grid grid-cols-3 gap-2">
+                        <!-- BrandUP tile -->
+                        <a href="?product=brandup" id="tileBrandup"
+                            class="launcher-tile flex flex-col items-center gap-2 p-3 rounded-lg text-center no-underline"
+                            style="--tile-color: #0078D4;">
+                            <div class="w-12 h-12 rounded-lg bg-[#0078D4] flex items-center justify-center">
+                                <span class="material-symbols-outlined text-white fill">storefront</span>
+                            </div>
+                            <span class="launcher-label text-xs font-semibold text-[#242424]">BrandUP</span>
+                        </a>
+                        <!-- TraceUP tile -->
+                        <a href="?product=traceup" id="tileTraceup"
+                            class="launcher-tile flex flex-col items-center gap-2 p-3 rounded-lg text-center no-underline"
+                            style="--tile-color: #8764B8;">
+                            <div class="w-12 h-12 rounded-lg bg-[#8764B8] flex items-center justify-center">
+                                <span class="material-symbols-outlined text-white fill">play_circle</span>
+                            </div>
+                            <span class="launcher-label text-xs font-semibold text-[#242424]">TraceUP</span>
+                        </a>
+                        <!-- LinkUP tile -->
+                        <a href="?product=linkup" id="tileLinkup"
+                            class="launcher-tile flex flex-col items-center gap-2 p-3 rounded-lg text-center no-underline"
+                            style="--tile-color: #C5A059;">
+                            <div class="w-12 h-12 rounded-lg bg-[#1A1A1A] border border-[#C5A059]/50 flex items-center justify-center">
+                                <span class="material-symbols-outlined fill" style="color: #C5A059;">qr_code_2</span>
+                            </div>
+                            <span class="launcher-label text-xs font-semibold text-[#242424]">LinkUP</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Connexion (desktop only) -->
+            <a href="auth_connexion.html"
+                class="hidden md:inline-block px-3 py-2 text-sm font-medium text-white hover:text-[#d3e3ff] transition-colors whitespace-nowrap">
+                Connexion
+            </a>
+
+            <!-- Inscription → redirige vers /signup (type choisi dans le formulaire) -->
+            <a href="auth_inscription-entreprise.html"
+                class="px-3 py-2 md:px-5 md:py-2.5 bg-primary hover:bg-primary-hover text-white rounded-lg text-xs md:text-sm font-semibold transition-colors whitespace-nowrap">
+                <span class="hidden md:inline">Inscrire une marque</span>
+                <span class="md:hidden">S'inscrire</span>
+            </a>
+
+        </div>
+    </header>
+
+    <!-- Central Pivot "OU" — desktop only -->
+    <div class="hidden md:flex central-pivot flex-col items-center">
+        <div class="w-16 h-16 rounded-full border border-white/20 bg-white/10 backdrop-blur-2xl flex items-center justify-center">
+            <span class="text-white font-extrabold text-sm tracking-widest">OU</span>
+        </div>
+    </div>
+
+    <!-- =========================================================
+         MAIN — Split B2B / B2C
+         Les CTAs <a id="b2bLink" / id="b2cLink"> sont mis à jour
+         par le product switcher vers /{product}?type=B2B|B2C.
+         Les sections entières sont cliquables via onclick.
+         ========================================================= -->
+    <main class="split-container flex flex-col md:flex-row flex-grow w-full overflow-hidden">
+
+        <!-- B2B Panel -->
+        <section class="split-panel w-full md:w-1/2 h-1/2 md:h-full cursor-pointer group"
+            onclick="window.location.href = document.getElementById('b2bLink').href">
+            <img alt="B2B" class="panel-image"
+                src="shared/onboarding-images/onboarding-images-b2b_img.jpg" />
+            <div class="glass-overlay"></div>
+            <div class="relative z-10 h-full flex flex-col justify-end p-8 pt-24 md:p-16 lg:p-24">
+                <div class="max-w-md">
+                    <div class="flex items-center gap-2 mb-4 bg-black/40 w-fit px-3 py-1 rounded-full backdrop-blur-sm">
+                        <span class="w-8 h-[2px] bg-primary"></span>
+                        <span class="font-bold text-xs uppercase tracking-widest text-white">Espace Professionnel</span>
+                    </div>
+                    <h2 class="text-white text-4xl md:text-6xl font-extrabold mb-6 tracking-tight">B2B</h2>
+                    <p class="text-white/80 text-base md:text-lg font-medium leading-relaxed mb-8 md:opacity-0 group-hover:opacity-100 transition-opacity duration-500">
+                        Connectez votre entreprise aux fournisseurs, partenaires et services industriels. Développez votre réseau professionnel.
+                    </p>
+                    <a id="b2bLink" href="public_brandup.html"
+                        onclick="event.stopPropagation();"
+                        class="w-full sm:w-auto inline-flex py-4 px-8 bg-primary hover:bg-primary-hover text-white rounded-lg font-bold items-center justify-center gap-3 transition-colors">
+                        Choisir B2B
+                        <span class="material-symbols-outlined text-sm">arrow_forward</span>
+                    </a>
+                </div>
+            </div>
+        </section>
+
+        <!-- B2C Panel -->
+        <section class="split-panel w-full md:w-1/2 h-1/2 md:h-full cursor-pointer group border-t md:border-t-0 md:border-l border-white/10"
+            onclick="window.location.href = document.getElementById('b2cLink').href">
+            <img alt="B2C" class="panel-image"
+                src="shared/onboarding-images/onboarding-images-b2c_img.jpg" />
+            <div class="glass-overlay"></div>
+            <div class="relative z-10 h-full flex flex-col justify-end p-8 pt-24 md:p-16 lg:p-24">
+                <div class="max-w-md">
+                    <div class="flex items-center gap-2 mb-4 bg-black/40 w-fit px-3 py-1 rounded-full backdrop-blur-sm">
+                        <span class="w-8 h-[2px] bg-white"></span>
+                        <span class="font-bold text-xs uppercase tracking-widest text-white">Espace Grand Public</span>
+                    </div>
+                    <h2 class="text-white text-4xl md:text-6xl font-extrabold mb-6 tracking-tight">B2C</h2>
+                    <p class="text-white/80 text-base md:text-lg font-medium leading-relaxed mb-8 md:opacity-0 group-hover:opacity-100 transition-opacity duration-500">
+                        Présentez vos produits aux particuliers et consommateurs. Boostez votre visibilité directe.
+                    </p>
+                    <a id="b2cLink" href="public_brandup.html"
+                        onclick="event.stopPropagation();"
+                        class="w-full sm:w-auto inline-flex py-4 px-8 border border-white text-white rounded-lg font-bold items-center justify-center gap-3 transition-colors hover:bg-white hover:text-[#242424]">
+                        Choisir B2C
+                        <span class="material-symbols-outlined text-sm">arrow_forward</span>
+                    </a>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- =========================================================
+         SCRIPTS
+         ========================================================= -->
+    <script>
+        // ============================================================
+        // PRODUCT SWITCHER — lit ?product= et adapte la page
+        // ============================================================
+        (function () {
+            var PRODUCTS = {
+                brandup: {
+                    name:      'BrandUP',
+                    logo:      'shared/logos/logos-brandup.png',
+                    searchUrl: 'public_brandup.html',
+                    tileId:    'tileBrandup',
+                    color:     '#0078D4',
+                    accentBg:  '#EFF6FC'
+                },
+                traceup: {
+                    name:      'TraceUP',
+                    logo:      'shared/logos/logos-traceup.png',
+                    searchUrl: 'public_traceup.html',
+                    tileId:    'tileTraceup',
+                    color:     '#8764B8',
+                    accentBg:  '#F3EEFB'
+                },
+                linkup: {
+                    name:      'LinkUP',
+                    logo:      'shared/logos/logos-linkup.png',
+                    searchUrl: 'public_linkup.html',
+                    tileId:    'tileLinkup',
+                    color:     '#C5A059',
+                    accentBg:  '#FAF6EC'
+                }
+            };
+
+            var params     = new URLSearchParams(window.location.search);
+            var productKey = (params.get('product') || 'brandup').toLowerCase();
+            var product    = PRODUCTS[productKey] || PRODUCTS.brandup;
+
+            // Logo produit dans le header
+            var logoEl = document.getElementById('productLogo');
+            if (logoEl) {
+                logoEl.src = product.logo;
+                logoEl.alt = product.name;
+            }
+
+            // CTAs B2B / B2C → moteur du produit courant
+            var b2bLink = document.getElementById('b2bLink');
+            var b2cLink = document.getElementById('b2cLink');
+            if (b2bLink) b2bLink.href = product.searchUrl + '?type=B2B';
+            if (b2cLink) b2cLink.href = product.searchUrl + '?type=B2C';
+
+            // Tuile produit courant : highlight dans l'app launcher
+            var currentTile = document.getElementById(product.tileId);
+            if (currentTile) {
+                currentTile.style.backgroundColor = product.accentBg;
+                currentTile.style.border          = '1px solid ' + product.color + '33';
+                var label = currentTile.querySelector('.launcher-label');
+                if (label) label.style.color = product.color;
+            }
+
+            // Titre de l'onglet
+            document.title = product.name + ' — Onboarding | MARKET-UP';
+        })();
+
+        // ============================================================
+        // DROPDOWNS — Country + App Launcher
+        // - close on outside click
+        // - close on Escape
+        // - fermeture mutuelle
+        // - bottom sheet + backdrop sur mobile
+        // ============================================================
+        (function () {
+            var dropdowns = [
+                { btnId: 'countryBtn',  menuId: 'countryMenu' },
+                { btnId: 'launcherBtn', menuId: 'launcherMenu' }
+            ];
+
+            var backdrop = document.getElementById('mobileBackdrop');
+
+            function closeAll() {
+                dropdowns.forEach(function (d) {
+                    var menu = document.getElementById(d.menuId);
+                    if (menu) menu.classList.remove('open');
+                });
+                if (backdrop) backdrop.classList.remove('active');
+            }
+
+            function openOne(menuId) {
+                closeAll();
+                var menu = document.getElementById(menuId);
+                if (menu) menu.classList.add('open');
+                if (backdrop) backdrop.classList.add('active');
+            }
+
+            dropdowns.forEach(function (d) {
+                var btn  = document.getElementById(d.btnId);
+                var menu = document.getElementById(d.menuId);
+                if (!btn || !menu) return;
+                btn.addEventListener('click', function (e) {
+                    e.stopPropagation();
+                    var isOpen = menu.classList.contains('open');
+                    if (isOpen) {
+                        closeAll();
+                    } else {
+                        openOne(d.menuId);
+                    }
+                });
+            });
+
+            // Boutons close (mobile sheets)
+            document.querySelectorAll('.close-dropdown').forEach(function (btn) {
+                btn.addEventListener('click', function (e) {
+                    e.stopPropagation();
+                    closeAll();
+                });
+            });
+
+            // Click sur le backdrop ferme tout
+            if (backdrop) {
+                backdrop.addEventListener('click', function () { closeAll(); });
+            }
+
+            // Close on outside click (desktop)
+            document.addEventListener('click', function (e) {
+                dropdowns.forEach(function (d) {
+                    var menu = document.getElementById(d.menuId);
+                    var btn  = document.getElementById(d.btnId);
+                    if (!menu || !btn) return;
+                    if (!menu.contains(e.target) && !btn.contains(e.target)) {
+                        menu.classList.remove('open');
+                    }
+                });
+                // Si plus rien n'est ouvert, retirer le backdrop
+                var anyOpen = dropdowns.some(function (d) {
+                    var m = document.getElementById(d.menuId);
+                    return m && m.classList.contains('open');
+                });
+                if (!anyOpen && backdrop) backdrop.classList.remove('active');
+            });
+
+            // Close on Escape
+            document.addEventListener('keydown', function (e) {
+                if (e.key === 'Escape') closeAll();
+            });
+        })();
+    </script>
+</body>
+
+</html>

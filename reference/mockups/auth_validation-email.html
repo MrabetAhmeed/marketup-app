@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Renvoyer un code de validation | MARKET-UP</title>
+
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet" />
+
+    <script src="https://cdn.tailwindcss.com?plugins=forms"></script>
+    <script id="tailwind-config">
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        "primary":          "#0078D4",
+                        "primary-hover":    "#106EBE",
+                        "primary-dark":     "#005A9E",
+                        "primary-light":    "#EFF6FC",
+                        "ms-text":          "#242424",
+                        "ms-text-muted":    "#616161",
+                        "ms-border":        "#E0E0E0",
+                        "ms-border-strong": "#D1D1D1",
+                        "ms-surface":       "#F5F5F5",
+                        "ms-placeholder":   "#8A8886",
+                        "ms-success":       "#107C10",
+                        "ms-error":         "#D13438"
+                    },
+                    fontFamily: {
+                        "headline": ["'Plus Jakarta Sans'", "sans-serif"],
+                        "body":     ["Inter", "sans-serif"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.25rem",
+                        "lg":      "0.5rem",
+                        "xl":      "0.75rem",
+                        "full":    "9999px"
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body { font-family: 'Inter', sans-serif; color: #242424; }
+        h1, h2, h3 { font-family: 'Plus Jakarta Sans', sans-serif; }
+        .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+        .material-symbols-outlined.fill { font-variation-settings: 'FILL' 1; }
+
+        .fluent-input {
+            width: 100%;
+            padding: 10px 14px;
+            background: #FFFFFF;
+            border: 1px solid #D1D1D1;
+            border-radius: 4px;
+            font-size: 14px;
+            color: #242424;
+            transition: border-color 0.15s, box-shadow 0.15s;
+        }
+        .fluent-input:focus {
+            border-color: #0078D4;
+            outline: none;
+            box-shadow: 0 0 0 2px #EFF6FC;
+        }
+        .fluent-input::placeholder { color: #8A8886; }
+
+        .fluent-label {
+            display: block;
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            color: #616161;
+            margin-bottom: 6px;
+        }
+        .label-required::after { content: '*'; color: #D13438; margin-left: 4px; }
+
+        .btn-primary {
+            background: #0078D4; color: white;
+            padding: 12px 24px; border-radius: 4px;
+            font-weight: 600; font-size: 14px; border: none; cursor: pointer;
+            transition: background 0.15s;
+            display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+        }
+        .btn-primary:hover { background: #106EBE; }
+        .btn-primary:active { background: #005A9E; }
+
+        .btn-ghost {
+            background: transparent; color: #0078D4;
+            padding: 12px 20px; border-radius: 4px;
+            font-weight: 600; font-size: 14px; border: none; cursor: pointer;
+            transition: background 0.15s;
+            display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+        }
+        .btn-ghost:hover { background: #EFF6FC; }
+    </style>
+</head>
+
+<body class="bg-white min-h-screen">
+    <main class="flex min-h-screen">
+
+        <!-- LEFT PANEL CANON (brand only, pas de stepper car hors flow) -->
+        <aside class="hidden lg:flex lg:w-[40%] bg-[#005A9E] text-white flex-col justify-between p-12 relative">
+            <div>
+                <div class="mb-16">
+                    <span class="text-2xl font-bold tracking-tighter font-headline"><a href="onboarding_onboarding.html">MARKET-UP</a></span>
+                </div>
+                <div class="max-w-sm">
+                    <h2 class="text-3xl font-semibold leading-tight mb-4 tracking-tight text-white">
+                        La plateforme digitale des entreprises.
+                    </h2>
+                    <p class="text-[#d3e3ff] text-base leading-relaxed">
+                        BrandUP, TraceUP, LinkUP — un seul compte, trois vitrines.
+                    </p>
+                </div>
+            </div>
+
+            <div class="text-xs text-[#d3e3ff]/70">
+                <p>© 2026 MARKET-UP · AGGREGAX SUARL</p>
+                <p class="mt-1">Fait en Tunisie 🇹🇳</p>
+            </div>
+        </aside>
+
+        <!-- RIGHT PANEL -->
+        <section class="flex-1 flex flex-col">
+
+            <!-- Mobile header -->
+            <div class="lg:hidden flex items-center justify-between px-6 py-4 border-b border-[#E0E0E0]">
+                <a href="#" class="text-xl font-bold tracking-tighter text-[#0078D4] font-headline">MARKET-UP</a>
+                <a href="auth_inscription-otp.html" class="text-xs text-[#0078D4] font-semibold flex items-center gap-1">
+                    <span class="material-symbols-outlined text-base">arrow_back</span>
+                    Retour
+                </a>
+            </div>
+
+            <div class="flex-1 flex items-center justify-center px-6 md:px-12 py-12 md:py-16">
+                <div class="w-full max-w-md">
+
+                    <!-- Icon -->
+                    <div class="w-16 h-16 rounded-lg bg-[#EFF6FC] mb-8 flex items-center justify-center">
+                        <span class="material-symbols-outlined text-[#0078D4] fill" style="font-size: 36px;">forward_to_inbox</span>
+                    </div>
+
+                    <header class="mb-8">
+                        <h1 class="text-3xl md:text-[32px] font-semibold text-[#242424] mb-3 tracking-tight">
+                            Renvoyer un code de validation
+                        </h1>
+                        <p class="text-[#616161] text-base leading-relaxed">
+                            Saisissez l'adresse email de votre compte. Nous vous enverrons un nouveau code à 6 chiffres pour finaliser votre inscription.
+                        </p>
+                    </header>
+
+                    <form id="resendForm" class="space-y-6">
+                        <div>
+                            <label for="email" class="fluent-label label-required">Email professionnel</label>
+                            <input id="email" name="email" type="email" required class="fluent-input" placeholder="contact@votre-entreprise.tn" autofocus />
+                        </div>
+
+                        <button type="submit" class="btn-primary w-full">
+                            Envoyer un nouveau code
+                            <span class="material-symbols-outlined text-base">send</span>
+                        </button>
+                    </form>
+
+                    <!-- Help info -->
+                    <div class="mt-8 flex items-start gap-3 p-4 bg-[#F5F5F5] border border-[#E0E0E0] rounded-lg">
+                        <span class="material-symbols-outlined text-[#616161] shrink-0 mt-0.5">info</span>
+                        <div>
+                            <p class="text-xs font-bold uppercase tracking-wider text-[#616161] mb-1">Vous ne recevez pas l'email ?</p>
+                            <p class="text-xs text-[#616161] leading-relaxed">
+                                Vérifiez votre dossier spam. Si le problème persiste, contactez notre support à <a href="mailto:support@marketup.tn" class="text-[#0078D4] font-semibold hover:underline">support@marketup.tn</a>.
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Back (desktop) -->
+                    <div class="mt-10 pt-6 border-t border-[#E0E0E0] text-center hidden lg:block">
+                        <a href="auth_inscription-otp.html" class="btn-ghost">
+                            <span class="material-symbols-outlined text-base">arrow_back</span>
+                            Retour à la validation
+                        </a>
+                    </div>
+
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <script>
+        // Submit handler — production : POST /api/resend-otp
+        // Maquette : redirection vers la page OTP (qui reset son countdown de 60s)
+        document.getElementById('resendForm').addEventListener('submit', function (e) {
+            e.preventDefault();
+            window.location.href = 'auth_inscription-otp.html';
+        });
+    </script>
+</body>
+
+</html>

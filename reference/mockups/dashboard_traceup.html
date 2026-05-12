@@ -1,0 +1,2230 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>MARKET-UP | Profil TraceUP — TechnoFab Industries</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap"
+        rel="stylesheet" />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
+        rel="stylesheet" />
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+
+        .font-heading {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+        }
+
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+
+        .icon-fill {
+            font-variation-settings: 'FILL' 1;
+        }
+
+        /* ─────────── SIDEBAR NAV (canon Cluster 1) ─────────── */
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 8px 20px;
+            font-size: 13px;
+            font-weight: 500;
+            color: #616161;
+            border-left: 3px solid transparent;
+            transition: background-color 0.15s ease, color 0.15s ease;
+            cursor: pointer;
+            text-decoration: none;
+            line-height: 1.4;
+        }
+
+        .nav-item .material-symbols-outlined {
+            font-size: 18px;
+            color: #8A8886;
+            transition: color 0.15s ease;
+            flex-shrink: 0;
+        }
+
+        .nav-item:hover {
+            background: #F5F5F5;
+            color: #242424;
+        }
+
+        .nav-item:hover .material-symbols-outlined {
+            color: #616161;
+        }
+
+        .nav-item.active {
+            background: #EFF6FC;
+            border-left-color: #0078D4;
+            color: #0078D4;
+            font-weight: 600;
+        }
+
+        .nav-item.active .material-symbols-outlined {
+            color: #0078D4;
+        }
+
+        .section-label {
+            font-size: 9px;
+            font-weight: 700;
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+            color: #8A8886;
+            padding: 16px 20px 6px;
+            user-select: none;
+        }
+
+        nav::-webkit-scrollbar {
+            width: 4px;
+        }
+
+        nav::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        nav::-webkit-scrollbar-thumb {
+            background: #E0E0E0;
+            border-radius: 2px;
+        }
+
+        nav::-webkit-scrollbar-thumb:hover {
+            background: #C8C6C4;
+        }
+
+        /* ─────────── TOPBAR ─────────── */
+        .icon-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            color: #424242;
+            transition: background-color 0.15s ease;
+            position: relative;
+            background: transparent;
+            border: none;
+            cursor: pointer;
+        }
+
+        .icon-btn:hover {
+            background: #F5F5F5;
+        }
+
+        .icon-btn .material-symbols-outlined {
+            font-size: 22px;
+        }
+
+        /* ─────────── DROPDOWNS ─────────── */
+        .dropdown-panel {
+            position: absolute;
+            top: calc(100% + 8px);
+            right: 0;
+            background: white;
+            border: 1px solid #E0E0E0;
+            border-radius: 12px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.16);
+            opacity: 0;
+            transform: translateY(-4px);
+            pointer-events: none;
+            transition: opacity 0.15s ease, transform 0.15s ease;
+            z-index: 40;
+        }
+
+        .dropdown-panel.open {
+            opacity: 1;
+            transform: translateY(0);
+            pointer-events: auto;
+        }
+
+        .dropdown-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px 16px;
+            font-size: 13px;
+            color: #242424;
+            text-decoration: none;
+            transition: background-color 0.1s ease;
+            cursor: pointer;
+        }
+
+        .dropdown-item:hover {
+            background: #F5F5F5;
+        }
+
+        .dropdown-item .material-symbols-outlined {
+            font-size: 18px;
+            color: #616161;
+            flex-shrink: 0;
+        }
+
+        .dropdown-item .ext-arrow {
+            margin-left: auto;
+            font-size: 14px;
+            color: #8A8886;
+        }
+
+        .dropdown-item--danger {
+            color: #B91C1C;
+        }
+
+        .dropdown-item--danger .material-symbols-outlined {
+            color: #B91C1C;
+        }
+
+        .dropdown-item--danger:hover {
+            background: #FEF2F2;
+        }
+
+        .dropdown-section-label {
+            padding: 12px 16px 6px;
+            font-size: 9px;
+            font-weight: 700;
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+            color: #8A8886;
+            user-select: none;
+        }
+
+        .dropdown-divider {
+            height: 1px;
+            background: #E0E0E0;
+            margin: 4px 0;
+        }
+
+        /* ─────────── CARDS ─────────── */
+        .card {
+            background: white;
+            border: 1px solid #E0E0E0;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.04);
+        }
+
+        /* ─────────── SWITCH canon ─────────── */
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 36px;
+            height: 20px;
+            flex-shrink: 0;
+        }
+
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .switch-track {
+            position: absolute;
+            cursor: pointer;
+            inset: 0;
+            background: #C8C6C4;
+            border-radius: 10px;
+            transition: background 0.2s ease;
+        }
+
+        .switch-track::before {
+            content: '';
+            position: absolute;
+            height: 14px;
+            width: 14px;
+            left: 3px;
+            top: 3px;
+            background: white;
+            border-radius: 50%;
+            transition: transform 0.2s ease;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+        }
+
+        .switch input:checked+.switch-track {
+            background: #0078D4;
+        }
+
+        .switch input:checked+.switch-track::before {
+            transform: translateX(16px);
+        }
+
+        /* ─────────── FORM CONTROLS (modal) ─────────── */
+        .field-label {
+            display: block;
+            font-size: 11px;
+            font-weight: 600;
+            color: #616161;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            margin-bottom: 6px;
+        }
+
+        .field-label .req {
+            color: #B91C1C;
+            font-weight: 700;
+            margin-left: 2px;
+        }
+
+        .field-label .opt {
+            color: #8A8886;
+            font-weight: 400;
+            text-transform: none;
+            letter-spacing: normal;
+            margin-left: 4px;
+        }
+
+        .field-input,
+        .field-select,
+        .field-textarea {
+            width: 100%;
+            padding: 9px 12px;
+            font-family: inherit;
+            font-size: 13.5px;
+            color: #242424;
+            background: #FFFFFF;
+            border: 1px solid #D1D1D1;
+            border-radius: 4px;
+            transition: border-color 0.15s ease, box-shadow 0.15s ease;
+            outline: none;
+        }
+
+        .field-input::placeholder,
+        .field-textarea::placeholder {
+            color: #8A8886;
+        }
+
+        .field-input:hover,
+        .field-select:hover,
+        .field-textarea:hover {
+            border-color: #8A8886;
+        }
+
+        .field-input:focus,
+        .field-select:focus,
+        .field-textarea:focus {
+            border-color: #0078D4;
+            box-shadow: 0 0 0 2px #EFF6FC;
+        }
+
+        .field-textarea {
+            resize: vertical;
+            min-height: 72px;
+        }
+
+        .field-help {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            font-size: 11px;
+            color: #8A8886;
+            margin-top: 4px;
+        }
+
+        .field-help .material-symbols-outlined {
+            font-size: 13px;
+        }
+
+        /* ─────────── STATUS BADGES ─────────── */
+        .status-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 11px;
+            font-weight: 600;
+            padding: 3px 9px;
+            border-radius: 4px;
+            border: 1px solid;
+        }
+
+        .status-pill .dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+        }
+
+        .status-pill--pending {
+            color: #92400E;
+            background: #FFFBEB;
+            border-color: #FDE68A;
+        }
+
+        .status-pill--pending .dot {
+            background: #D97706;
+        }
+
+        /* ─────────── BUTTONS ─────────── */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            padding: 9px 16px;
+            font-size: 13px;
+            font-weight: 600;
+            border-radius: 4px;
+            transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+            cursor: pointer;
+            border: 1px solid transparent;
+            text-decoration: none;
+            line-height: 1.2;
+            white-space: nowrap;
+        }
+
+        .btn .material-symbols-outlined {
+            font-size: 16px;
+        }
+
+        .btn-primary {
+            background: #0078D4;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #106EBE;
+        }
+
+        .btn-primary:disabled {
+            background: #C8C6C4;
+            color: white;
+            cursor: not-allowed;
+        }
+
+        .btn-secondary {
+            background: white;
+            color: #242424;
+            border-color: #D1D1D1;
+        }
+
+        .btn-secondary:hover {
+            background: #F5F5F5;
+            border-color: #8A8886;
+        }
+
+        .btn-ghost {
+            background: transparent;
+            color: #0078D4;
+            border-color: transparent;
+        }
+
+        .btn-ghost:hover {
+            background: #EFF6FC;
+        }
+
+        /* ─────────── TABS canon (bottom border 2px primary sur actif) ─────────── */
+        .tab-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 12px 16px;
+            font-size: 13px;
+            font-weight: 500;
+            color: #616161;
+            border: none;
+            border-bottom: 2px solid transparent;
+            background: transparent;
+            cursor: pointer;
+            white-space: nowrap;
+            transition: color 0.15s ease, border-color 0.15s ease, background-color 0.15s ease;
+            margin-bottom: -1px;
+        }
+
+        .tab-btn:hover {
+            color: #242424;
+            background: #FAFAFA;
+        }
+
+        .tab-btn.active {
+            color: #0078D4;
+            font-weight: 600;
+            border-bottom-color: #0078D4;
+        }
+
+        .tab-btn .tab-count {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 18px;
+            height: 18px;
+            padding: 0 5px;
+            font-size: 10px;
+            font-weight: 700;
+            color: #8A8886;
+            background: #F5F5F5;
+            border-radius: 9px;
+            transition: background-color 0.15s ease, color 0.15s ease;
+        }
+
+        .tab-btn.active .tab-count {
+            color: #0078D4;
+            background: #EFF6FC;
+        }
+
+        .tab-panel {
+            display: none;
+        }
+
+        .tab-panel.active {
+            display: block;
+        }
+
+        /* ─────────── VIDEO CARD ─────────── */
+        .video-card {
+            background: white;
+            border: 1px solid #E0E0E0;
+            border-radius: 8px;
+            transition: border-color 0.15s ease, box-shadow 0.15s ease;
+        }
+
+        .video-card:hover {
+            border-color: #C8C6C4;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+        }
+
+        .video-card:hover .video-delete-btn {
+            opacity: 1;
+        }
+
+        .video-delete-btn {
+            opacity: 0;
+            transition: opacity 0.15s ease, background-color 0.15s ease, color 0.15s ease;
+        }
+
+        @media (max-width: 767px) {
+            .video-delete-btn {
+                opacity: 1;
+            }
+        }
+
+        .video-thumb {
+            width: 160px;
+            aspect-ratio: 16 / 9;
+            background: linear-gradient(135deg, #D1D1D1 0%, #8A8886 100%);
+            border-radius: 4px;
+            position: relative;
+            overflow: hidden;
+            flex-shrink: 0;
+        }
+
+        .video-thumb::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(135deg, rgba(0, 120, 212, 0.08) 0%, rgba(0, 0, 0, 0.15) 100%);
+        }
+
+        .video-thumb .play-overlay {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1;
+            transition: background-color 0.15s ease;
+        }
+
+        .video-card:hover .video-thumb .play-overlay {
+            background: rgba(0, 0, 0, 0.25);
+        }
+
+        @media (max-width: 767px) {
+            .video-thumb {
+                width: 100%;
+                max-width: 100%;
+            }
+        }
+
+        /* ─────────── MODAL ─────────── */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            z-index: 60;
+            background: rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: flex-end;
+            justify-content: center;
+            padding: 0;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.2s ease;
+        }
+
+        @media (min-width: 640px) {
+            .modal-overlay {
+                align-items: center;
+                padding: 16px;
+            }
+        }
+
+        .modal-overlay.open {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 12px 12px 0 0;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.16);
+            width: 100%;
+            max-width: 480px;
+            max-height: 90vh;
+            overflow-y: auto;
+            transform: translateY(20px);
+            transition: transform 0.25s ease;
+        }
+
+        @media (min-width: 640px) {
+            .modal-content {
+                border-radius: 12px;
+            }
+        }
+
+        .modal-overlay.open .modal-content {
+            transform: translateY(0);
+        }
+
+        /* ─────────── MOBILE DRAWER ─────────── */
+        #sidebar {
+            transition: transform 0.25s ease-out;
+        }
+
+        @media (max-width: 767px) {
+            #sidebar {
+                transform: translateX(-100%);
+            }
+
+            #sidebar.open {
+                transform: translateX(0);
+                box-shadow: 8px 0 32px rgba(0, 0, 0, 0.16);
+            }
+        }
+
+        /* Scroll horizontal tabs sur mobile si besoin */
+        .tabs-scroll::-webkit-scrollbar {
+            display: none;
+        }
+
+        .tabs-scroll {
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+        }
+
+        /* ─────────── STICKY ACTION BAR (mobile) ─────────── */
+        @media (max-width: 767px) {
+            .action-bar-sticky {
+                position: sticky;
+                bottom: 0;
+                z-index: 20;
+                background: white;
+                border-top: 1px solid #E0E0E0;
+                margin: 0 -1rem;
+                padding: 0.75rem 1rem;
+                box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.04);
+            }
+        }
+    </style>
+</head>
+
+<body class="bg-[#F5F5F5] min-h-screen">
+
+    <!-- Backdrop mobile -->
+    <div id="backdrop" class="md:hidden fixed inset-0 bg-gradient-to-b from-black/40 to-black/20 z-40 hidden"
+        aria-hidden="true"></div>
+
+    <!-- ═════════════════════════════════════════════════════
+         SIDEBAR (item TraceUP actif)
+         ═════════════════════════════════════════════════════ -->
+    <aside id="sidebar"
+        class="fixed top-0 left-0 w-60 h-screen bg-white border-r border-[#E0E0E0] flex flex-col z-50 md:translate-x-0"
+        aria-label="Navigation principale">
+
+        <a href="dashboard_index.html" class="flex items-center gap-2.5 px-5 py-4 border-b border-[#E0E0E0] shrink-0 h-14 hover:bg-[#FAFAFA] transition-colors" title="Retour au tableau de bord">
+            <span class="material-symbols-outlined icon-fill text-[#0078D4]" style="font-size:22px">hexagon</span>
+            <div class="leading-tight min-w-0">
+                <div class="text-[#242424] font-heading font-bold text-[15px] tracking-tight">MARKET-UP</div>
+                <div class="text-[10px] text-[#8A8886] tracking-wide">vivasky.media</div>
+            </div>
+        </a>
+
+        <nav class="flex-1 overflow-y-auto pt-2 pb-3">
+            <div class="section-label">Entreprise</div>
+            <a href="dashboard_index.html" class="nav-item">
+                <span class="material-symbols-outlined">dashboard</span>
+                <span class="flex-1 min-w-0 truncate">Vue d'ensemble</span>
+            </a>
+            <a href="dashboard_account.html" class="nav-item">
+                <span class="material-symbols-outlined">business</span>
+                <span class="flex-1 min-w-0 truncate">Compte</span>
+            </a>
+
+            <div class="section-label">Mes profils</div>
+            <a href="dashboard_brandup.html" class="nav-item">
+                <span class="material-symbols-outlined">storefront</span>
+                <span class="flex-1 min-w-0 truncate">BrandUP</span>
+                <span class="w-1.5 h-1.5 rounded-full bg-[#DC2626] shrink-0" title="Refusé"></span>
+            </a>
+            <a href="dashboard_traceup.html" class="nav-item active" aria-current="page">
+                <span class="material-symbols-outlined">play_circle</span>
+                <span class="flex-1 min-w-0 truncate">TraceUP</span>
+                <span id="tu-sidebar-dot" class="w-1.5 h-1.5 rounded-full bg-[#D97706] shrink-0" title="En attente"></span>
+            </a>
+            <a href="dashboard_linkup.html" class="nav-item">
+                <span class="material-symbols-outlined">qr_code_2</span>
+                <span class="flex-1 min-w-0 truncate">LinkUP</span>
+                <span class="w-1.5 h-1.5 rounded-full bg-[#107C10] shrink-0" title="Actif"></span>
+            </a>
+
+            <div class="section-label">Visibilité</div>
+            <a href="dashboard_boost.html" class="nav-item">
+                <span class="material-symbols-outlined">trending_up</span>
+                <span class="flex-1 min-w-0 truncate">Boost</span>
+                <span
+                    class="text-[9px] font-bold tracking-wider text-[#107C10] bg-[#F0FDF4] border border-[#B7EBC0] px-1.5 py-[2px] rounded shrink-0">1 ACTIF</span>
+            </a>
+            <a href="dashboard_sponsoring.html" class="nav-item">
+                <span class="material-symbols-outlined">campaign</span>
+                <span class="flex-1 min-w-0 truncate">Sponsoring</span>
+                <span class="w-1.5 h-1.5 rounded-full bg-[#107C10] shrink-0" title="Campagne active"></span>
+            </a>
+
+            <div class="section-label">Engagement</div>
+            <a href="dashboard_rse.html" class="nav-item">
+                <span class="material-symbols-outlined">volunteer_activism</span>
+                <span class="flex-1 min-w-0 truncate">Badge RSE</span>
+                <span
+                    class="text-[9px] font-bold tracking-wider text-[#107C10] bg-[#F0FDF4] border border-[#B7EBC0] px-1.5 py-[2px] rounded shrink-0">VALIDÉ</span>
+            </a>
+
+            <div class="section-label">Administration</div>
+            <a href="dashboard_billing.html" class="nav-item">
+                <span class="material-symbols-outlined">receipt_long</span>
+                <span class="flex-1 min-w-0 truncate">Facturation</span>
+            </a>
+            <a href="dashboard_notifications.html" class="nav-item">
+                <span class="material-symbols-outlined">notifications</span>
+                <span class="flex-1 min-w-0 truncate">Notifications</span>
+                <span
+                    class="min-w-[18px] h-[18px] px-1 rounded-full bg-[#DC2626] text-white text-[10px] font-bold flex items-center justify-center shrink-0">3</span>
+            </a>
+            <a href="dashboard_settings.html" class="nav-item">
+                <span class="material-symbols-outlined">settings</span>
+                <span class="flex-1 min-w-0 truncate">Paramètres</span>
+            </a>
+        </nav>
+
+        <div class="shrink-0 border-t border-[#E0E0E0]">
+            <div class="flex items-center gap-3 px-4 py-3">
+                <div class="w-9 h-9 rounded-full bg-[#374151] flex items-center justify-center shrink-0">
+                    <span id="sb-avatar-initials" class="text-white font-heading font-bold text-[13px]">TF</span>
+                </div>
+                <div class="min-w-0 flex-1">
+                    <div id="sb-company-name" class="text-[#242424] text-[12px] font-semibold truncate">TechnoFab Industries</div>
+                    <div id="sb-company-meta" class="text-[#8A8886] text-[10px] truncate">B2B · Sousse</div>
+                </div>
+            </div>
+            <div class="flex items-center gap-2.5 px-4 py-2.5 border-t border-[#E0E0E0]">
+                <div
+                    class="w-6 h-6 rounded-full bg-[#F5F5F5] border border-[#E0E0E0] flex items-center justify-center shrink-0">
+                    <span id="sb-user-initials" class="text-[#616161] text-[10px] font-semibold">AM</span>
+                </div>
+                <div class="min-w-0 flex-1">
+                    <div id="sb-user-name" class="text-[#424242] text-[11px] font-medium truncate">Ahmed Mrabet</div>
+                    <div class="text-[#8A8886] text-[9px] truncate">Propriétaire</div>
+                </div>
+                <button
+                    class="w-7 h-7 flex items-center justify-center rounded text-[#8A8886] hover:text-[#242424] hover:bg-[#F5F5F5] transition-colors shrink-0"
+                    title="Se déconnecter" aria-label="Se déconnecter" onclick="window.location.href='auth_connexion.html';">
+                    <span class="material-symbols-outlined" style="font-size:16px">logout</span>
+                </button>
+            </div>
+        </div>
+
+    </aside>
+
+    <!-- ═════════════════════════════════════════════════════
+         SHELL
+         ═════════════════════════════════════════════════════ -->
+    <div class="md:ml-60 min-h-screen flex flex-col">
+
+        <!-- TOPBAR -->
+        <header
+            class="sticky top-0 z-30 h-14 bg-white border-b border-[#E0E0E0] flex items-center justify-between px-4 md:px-6 gap-4"
+            role="banner">
+
+            <div class="flex items-center gap-3 min-w-0 flex-1">
+                <button id="menuBtn" class="icon-btn md:hidden -ml-2 shrink-0"
+                    aria-label="Ouvrir le menu de navigation">
+                    <span class="material-symbols-outlined">menu</span>
+                </button>
+                <div class="min-w-0 leading-tight">
+                    <nav class="hidden md:flex items-center gap-1.5 text-[11px] text-[#8A8886] mb-0.5" aria-label="Fil d'Ariane">
+                        <a href="dashboard_index.html" class="hover:text-[#0078D4] hover:underline transition-colors">Dashboard</a>
+                        <span class="material-symbols-outlined" style="font-size:12px">chevron_right</span>
+                        <span class="text-[#8A8886]">Mes profils</span>
+                        <span class="material-symbols-outlined" style="font-size:12px">chevron_right</span>
+                        <span class="text-[#616161] font-medium">TraceUP</span>
+                    </nav>
+                    <h1 class="font-heading text-[16px] font-bold text-[#242424] truncate">Profil TraceUP</h1>
+                    <p class="hidden md:block text-[12px] text-[#616161] truncate">Gérez les vidéos de votre vitrine média (YouTube, Dailymotion, Vimeo)</p>
+                </div>
+            </div>
+
+            <div class="flex items-center gap-1 shrink-0">
+
+                <!-- Cloche notifications -->
+                <div class="relative">
+                    <button id="bellBtn" class="icon-btn" aria-label="Notifications" aria-haspopup="true"
+                        aria-expanded="false">
+                        <span class="material-symbols-outlined">notifications</span>
+                        <span
+                            class="absolute top-1.5 right-1.5 min-w-[16px] h-[16px] px-1 rounded-full bg-[#DC2626] text-white text-[9px] font-bold flex items-center justify-center leading-none ring-2 ring-white">3</span>
+                    </button>
+
+                    <div id="bellDropdown" class="dropdown-panel w-[340px] max-w-[calc(100vw-24px)]">
+                        <div class="flex items-center justify-between px-4 py-3 border-b border-[#E0E0E0]">
+                            <div class="font-heading font-semibold text-[13px] text-[#242424]">Notifications</div>
+                            <div class="text-[11px] text-[#616161]"><span class="text-[#DC2626] font-semibold">3</span> non lues</div>
+                        </div>
+                        <div class="max-h-[320px] overflow-y-auto">
+                            <a href="dashboard_notifications.html" class="block px-4 py-3 hover:bg-[#F5F5F5] transition-colors border-b border-[#F0F0F0]">
+                                <div class="flex items-start gap-3">
+                                    <span class="w-2 h-2 rounded-full bg-[#0078D4] mt-1.5 shrink-0"></span>
+                                    <div class="min-w-0 flex-1">
+                                        <div class="text-[12.5px] text-[#242424] leading-snug mb-1"><span class="font-semibold">Votre boost LinkUP</span> expire dans 3 jours</div>
+                                        <div class="text-[11px] text-[#8A8886]">Il y a 2 heures</div>
+                                    </div>
+                                    <span class="material-symbols-outlined text-[#0078D4] shrink-0 mt-0.5" style="font-size:16px">trending_up</span>
+                                </div>
+                            </a>
+                            <a href="dashboard_notifications.html" class="block px-4 py-3 hover:bg-[#F5F5F5] transition-colors border-b border-[#F0F0F0]">
+                                <div class="flex items-start gap-3">
+                                    <span class="w-2 h-2 rounded-full bg-[#0078D4] mt-1.5 shrink-0"></span>
+                                    <div class="min-w-0 flex-1">
+                                        <div class="text-[12.5px] text-[#242424] leading-snug mb-1"><span class="font-semibold">Votre campagne Sponsoring</span> a généré 1 250 impressions</div>
+                                        <div class="text-[11px] text-[#8A8886]">Il y a 1 jour</div>
+                                    </div>
+                                    <span class="material-symbols-outlined text-[#0078D4] shrink-0 mt-0.5" style="font-size:16px">campaign</span>
+                                </div>
+                            </a>
+                            <a href="dashboard_notifications.html" class="block px-4 py-3 hover:bg-[#F5F5F5] transition-colors">
+                                <div class="flex items-start gap-3">
+                                    <span class="w-2 h-2 rounded-full bg-[#0078D4] mt-1.5 shrink-0"></span>
+                                    <div class="min-w-0 flex-1">
+                                        <div class="text-[12.5px] text-[#242424] leading-snug mb-1"><span class="font-semibold">Reçu RSE soumis</span> — Association Al Ahed en attente de validation</div>
+                                        <div class="text-[11px] text-[#8A8886]">Il y a 1 jour</div>
+                                    </div>
+                                    <span class="material-symbols-outlined text-[#C5A059] shrink-0 mt-0.5" style="font-size:16px">volunteer_activism</span>
+                                </div>
+                            </a>
+                        </div>
+                        <a href="dashboard_notifications.html"
+                            class="flex items-center justify-center gap-1.5 px-4 py-2.5 text-[12px] font-semibold text-[#0078D4] hover:bg-[#EFF6FC] border-t border-[#E0E0E0] transition-colors rounded-b-xl">
+                            Voir toutes les notifications
+                            <span class="material-symbols-outlined" style="font-size:14px">arrow_forward</span>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Avatar entreprise -->
+                <div class="relative">
+                    <button id="avatarBtn"
+                        class="flex items-center gap-1 pl-1 pr-2 py-1 rounded-lg hover:bg-[#F5F5F5] transition-colors ml-1"
+                        aria-label="Menu compte" aria-haspopup="true" aria-expanded="false">
+                        <div class="w-8 h-8 rounded-full bg-[#0078D4] flex items-center justify-center shrink-0">
+                            <span id="avd-trigger-initials" class="text-white font-heading font-bold text-[12px]">TF</span>
+                        </div>
+                        <span class="material-symbols-outlined text-[#8A8886] hidden md:inline"
+                            style="font-size:18px">expand_more</span>
+                    </button>
+
+                    <div id="avatarDropdown" class="dropdown-panel w-[300px] max-w-[calc(100vw-24px)]">
+                        <div class="flex items-center gap-3 px-4 py-3 border-b border-[#E0E0E0]">
+                            <div class="w-10 h-10 rounded-full bg-[#0078D4] flex items-center justify-center shrink-0">
+                                <span id="avd-initials" class="text-white font-heading font-bold text-[13px]">TF</span>
+                            </div>
+                            <div class="min-w-0 flex-1">
+                                <div id="avd-company-name" class="font-heading font-semibold text-[13px] text-[#242424] truncate">TechnoFab
+                                    Industries</div>
+                                <div id="avd-company-meta" class="text-[11px] text-[#616161] truncate">B2B · Sousse · Ahmed Mrabet</div>
+                            </div>
+                        </div>
+                        <div class="dropdown-section-label">Mes profils publics</div>
+                        <a id="avd-link-brandup" href="public_brandup_technofab-industries.html" target="_blank" rel="noopener" class="dropdown-item">
+                            <span class="material-symbols-outlined">storefront</span>
+                            <span class="flex-1">BrandUP</span>
+                            <span class="material-symbols-outlined ext-arrow">open_in_new</span>
+                        </a>
+                        <a id="avd-link-traceup" href="public_traceup_technofab-industries.html" target="_blank" rel="noopener" class="dropdown-item">
+                            <span class="material-symbols-outlined">play_circle</span>
+                            <span class="flex-1">TraceUP</span>
+                            <span class="material-symbols-outlined ext-arrow">open_in_new</span>
+                        </a>
+                        <a id="avd-link-linkup" href="public_linkup_technofab-industries.html" target="_blank" rel="noopener" class="dropdown-item">
+                            <span class="material-symbols-outlined">qr_code_2</span>
+                            <span class="flex-1">LinkUP</span>
+                            <span class="material-symbols-outlined ext-arrow">open_in_new</span>
+                        </a>
+                        <div class="dropdown-divider"></div>
+                        <a href="dashboard_settings.html" class="dropdown-item">
+                            <span class="material-symbols-outlined">settings</span>
+                            <span class="flex-1">Paramètres</span>
+                        </a>
+                        <button class="dropdown-item dropdown-item--danger w-full text-left">
+                            <span class="material-symbols-outlined">logout</span>
+                            <span class="flex-1">Se déconnecter</span>
+                        </button>
+                    </div>
+                </div>
+
+            </div>
+        </header>
+
+        <!-- ═════════════════════════════════════════════════
+             CONTENU — Édition profil TraceUP
+             ═════════════════════════════════════════════════ -->
+        <main class="flex-1 p-4 md:p-8">
+            <div class="max-w-[1120px] mx-auto space-y-6">
+
+                <!-- ═════ PAGE HEADER ═════ -->
+                <section class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+                    <div class="flex items-start gap-3 min-w-0">
+                        <div class="w-11 h-11 rounded-lg bg-[#EFF6FC] flex items-center justify-center shrink-0">
+                            <span class="material-symbols-outlined icon-fill text-[#0078D4]"
+                                style="font-size:24px">play_circle</span>
+                        </div>
+                        <div class="min-w-0">
+                            <h2 class="font-heading font-bold text-[20px] text-[#242424] leading-tight">
+                                Profil TraceUP
+                            </h2>
+                            <!-- Status region (hydrated at runtime by status-driven JS) -->
+                            <div id="tu-hero-status-region">
+                                <div class="flex items-center gap-2 mt-1.5 flex-wrap">
+                                    <span class="status-pill status-pill--pending">
+                                        <span class="dot"></span>
+                                        En attente
+                                    </span>
+                                    <span class="text-[11px] text-[#8A8886]">
+                                        Soumis pour validation · réponse admin sous 24-48 h
+                                    </span>
+                                </div>
+                                <div class="flex items-center gap-1.5 mt-1.5 text-[11.5px] text-[#8A8886]">
+                                    <span class="material-symbols-outlined" style="font-size:14px">visibility_off</span>
+                                    <span>
+                                        Profil <strong class="text-[#616161]">pas encore publié</strong> —
+                                        1ère validation admin requise avant mise en ligne
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-2 shrink-0">
+                        <a id="tu-preview-link" href="public_traceup_technofab-industries.html" target="_blank" rel="noopener"
+                            class="btn btn-secondary">
+                            <span class="material-symbols-outlined">open_in_new</span>
+                            Aperçu public
+                        </a>
+                        <a href="dashboard_boost.html?profile=traceup" class="btn btn-primary">
+                            <span class="material-symbols-outlined icon-fill">bolt</span>
+                            Booster ce profil
+                        </a>
+                    </div>
+                </section>
+
+                <!-- ═════ STATUS BLOCK REGION (hydrated at runtime — content varies by profile.status) ═════ -->
+                <section id="tu-status-block-region" style="display:none"></section>
+
+                <!-- ═════ BANDEAU CONTEXTUEL ═════ -->
+                <section
+                    class="bg-[#EFF6FC] border border-[#C7DDF1] rounded-lg px-4 py-3 flex items-start md:items-center gap-3">
+                    <span class="material-symbols-outlined text-[#0078D4] shrink-0 mt-[1px] md:mt-0"
+                        style="font-size:20px">info</span>
+                    <div class="min-w-0 flex-1 text-[12.5px] text-[#242424] leading-snug">
+                        Cette page ne gère que vos <strong>vidéos</strong> (Actualité, Offres, Astuces,
+                        Emplois).
+                        <span class="text-[#616161]">Les informations générales de l'entreprise (nom, logo,
+                            contact) se modifient depuis la page Compte.</span>
+                    </div>
+                    <a href="dashboard_account.html"
+                        class="shrink-0 inline-flex items-center gap-1 text-[12px] font-semibold text-[#0078D4] hover:underline whitespace-nowrap">
+                        Gérer depuis Compte
+                        <span class="material-symbols-outlined" style="font-size:14px">arrow_forward</span>
+                    </a>
+                </section>
+
+                <!-- ═════ CARD TOGGLE VISIBILITÉ ═════ -->
+                <section class="card p-5 flex items-center gap-4">
+                    <div class="w-10 h-10 rounded-lg bg-[#EFF6FC] flex items-center justify-center shrink-0">
+                        <span class="material-symbols-outlined text-[#0078D4]" style="font-size:20px">visibility</span>
+                    </div>
+                    <div class="min-w-0 flex-1">
+                        <div class="font-heading font-semibold text-[14px] text-[#242424] leading-tight">
+                            Profil public visible
+                        </div>
+                        <div class="text-[12px] text-[#616161] mt-0.5 leading-snug">
+                            Quand activé, votre profil apparaît dans le moteur TraceUP après validation admin.
+                        </div>
+                    </div>
+                    <label class="switch shrink-0" aria-label="Activer la visibilité du profil TraceUP">
+                        <input type="checkbox" checked />
+                        <span class="switch-track"></span>
+                    </label>
+                </section>
+
+                <!-- ═════ SECTION : VIDÉOS (4 onglets) ═════ -->
+                <section class="card overflow-hidden">
+
+                    <!-- Header section avec intro + CTA ajouter -->
+                    <div
+                        class="px-5 md:px-6 pt-5 md:pt-6 pb-4 flex items-start justify-between gap-3 flex-wrap">
+                        <div class="min-w-0">
+                            <h3 class="font-heading font-bold text-[15px] text-[#242424]">
+                                Vidéos
+                            </h3>
+                            <p class="text-[12px] text-[#616161] mt-0.5 leading-snug">
+                                Organisez vos vidéos en 4 catégories — l'ajout et la suppression sont
+                                instantanés
+                            </p>
+                        </div>
+                        <button id="openAddVideoBtn" class="btn btn-primary shrink-0">
+                            <span class="material-symbols-outlined">add</span>
+                            Ajouter une vidéo
+                        </button>
+                    </div>
+
+                    <!-- Tabs nav (4 catégories canon) -->
+                    <div class="border-b border-[#E0E0E0] overflow-x-auto tabs-scroll">
+                        <div class="flex px-2 md:px-4 min-w-max">
+                            <button class="tab-btn active" data-tab="actualite" aria-current="page">
+                                Actualité <span id="tu-tab-count-actualite" class="tab-count">3</span>
+                            </button>
+                            <button class="tab-btn" data-tab="offres">
+                                Offres <span id="tu-tab-count-offres" class="tab-count">1</span>
+                            </button>
+                            <button class="tab-btn" data-tab="astuces">
+                                Astuces <span id="tu-tab-count-astuces" class="tab-count">0</span>
+                            </button>
+                            <button class="tab-btn" data-tab="emplois">
+                                Emplois <span id="tu-tab-count-emplois" class="tab-count">2</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Tab panels -->
+                    <div class="p-5 md:p-6">
+
+                        <!-- ─── Panel : Actualité (active, 3 vidéos) ─── -->
+                        <div id="tu-panel-actualite" class="tab-panel active" data-panel="actualite">
+                            <div class="space-y-3">
+
+                                <!-- Video 1 -->
+                                <div class="video-card p-3 flex flex-col md:flex-row items-start md:items-center gap-3 md:gap-4">
+                                    <div class="video-thumb">
+                                        <div class="play-overlay">
+                                            <span class="material-symbols-outlined icon-fill text-white"
+                                                style="font-size:36px">play_circle</span>
+                                        </div>
+                                    </div>
+                                    <div class="min-w-0 flex-1">
+                                        <h4 class="font-heading font-bold text-[14px] text-[#242424] leading-snug mb-1 truncate">
+                                            Inauguration de notre nouvelle ligne d'usinage CNC 5 axes
+                                        </h4>
+                                        <p class="text-[12.5px] text-[#616161] leading-snug line-clamp-2 mb-2">
+                                            Découvrez en images notre dernier investissement industriel : une
+                                            ligne CNC 5 axes haute cadence installée à Sousse.
+                                        </p>
+                                        <div class="flex items-center gap-3 text-[11px] text-[#8A8886]">
+                                            <span class="inline-flex items-center gap-1">
+                                                <span class="material-symbols-outlined"
+                                                    style="font-size:13px">calendar_today</span>
+                                                Ajoutée le 12 avril 2026
+                                            </span>
+                                            <span class="inline-flex items-center gap-1">
+                                                <span class="material-symbols-outlined"
+                                                    style="font-size:13px">link</span>
+                                                youtu.be/dQw4w9WgXcQ
+                                            </span>
+                                        </div>
+                                    </div>
+                                    <button class="video-delete-btn btn btn-ghost text-[#B91C1C] hover:bg-[#FEF2F2] hover:text-[#991B1B] self-start md:self-center shrink-0"
+                                        aria-label="Supprimer la vidéo">
+                                        <span class="material-symbols-outlined">delete</span>
+                                        <span class="hidden md:inline">Supprimer</span>
+                                    </button>
+                                </div>
+
+                                <!-- Video 2 -->
+                                <div class="video-card p-3 flex flex-col md:flex-row items-start md:items-center gap-3 md:gap-4">
+                                    <div class="video-thumb">
+                                        <div class="play-overlay">
+                                            <span class="material-symbols-outlined icon-fill text-white"
+                                                style="font-size:36px">play_circle</span>
+                                        </div>
+                                    </div>
+                                    <div class="min-w-0 flex-1">
+                                        <h4 class="font-heading font-bold text-[14px] text-[#242424] leading-snug mb-1 truncate">
+                                            Bilan RSE 2025 : une année d'engagements concrets
+                                        </h4>
+                                        <p class="text-[12.5px] text-[#616161] leading-snug line-clamp-2 mb-2">
+                                            Retour sur les actions menées en faveur de l'environnement, de la
+                                            formation et de l'inclusion dans nos ateliers.
+                                        </p>
+                                        <div class="flex items-center gap-3 text-[11px] text-[#8A8886]">
+                                            <span class="inline-flex items-center gap-1">
+                                                <span class="material-symbols-outlined"
+                                                    style="font-size:13px">calendar_today</span>
+                                                Ajoutée le 28 mars 2026
+                                            </span>
+                                            <span class="inline-flex items-center gap-1">
+                                                <span class="material-symbols-outlined"
+                                                    style="font-size:13px">link</span>
+                                                youtube.com/watch?v=A1B2C3
+                                            </span>
+                                        </div>
+                                    </div>
+                                    <button class="video-delete-btn btn btn-ghost text-[#B91C1C] hover:bg-[#FEF2F2] hover:text-[#991B1B] self-start md:self-center shrink-0"
+                                        aria-label="Supprimer la vidéo">
+                                        <span class="material-symbols-outlined">delete</span>
+                                        <span class="hidden md:inline">Supprimer</span>
+                                    </button>
+                                </div>
+
+                                <!-- Video 3 -->
+                                <div class="video-card p-3 flex flex-col md:flex-row items-start md:items-center gap-3 md:gap-4">
+                                    <div class="video-thumb">
+                                        <div class="play-overlay">
+                                            <span class="material-symbols-outlined icon-fill text-white"
+                                                style="font-size:36px">play_circle</span>
+                                        </div>
+                                    </div>
+                                    <div class="min-w-0 flex-1">
+                                        <h4 class="font-heading font-bold text-[14px] text-[#242424] leading-snug mb-1 truncate">
+                                            Interview : Ahmed Mrabet sur l'avenir de l'industrie tunisienne
+                                        </h4>
+                                        <p class="text-[12.5px] text-[#616161] leading-snug line-clamp-2 mb-2">
+                                            Notre directeur général s'exprime sur les défis et opportunités du
+                                            secteur mécanique en Tunisie à l'horizon 2030.
+                                        </p>
+                                        <div class="flex items-center gap-3 text-[11px] text-[#8A8886]">
+                                            <span class="inline-flex items-center gap-1">
+                                                <span class="material-symbols-outlined"
+                                                    style="font-size:13px">calendar_today</span>
+                                                Ajoutée le 15 mars 2026
+                                            </span>
+                                            <span class="inline-flex items-center gap-1">
+                                                <span class="material-symbols-outlined"
+                                                    style="font-size:13px">link</span>
+                                                youtu.be/X7Y8Z9
+                                            </span>
+                                        </div>
+                                    </div>
+                                    <button class="video-delete-btn btn btn-ghost text-[#B91C1C] hover:bg-[#FEF2F2] hover:text-[#991B1B] self-start md:self-center shrink-0"
+                                        aria-label="Supprimer la vidéo">
+                                        <span class="material-symbols-outlined">delete</span>
+                                        <span class="hidden md:inline">Supprimer</span>
+                                    </button>
+                                </div>
+
+                            </div>
+                        </div>
+
+                        <!-- ─── Panel : Offres (1 vidéo) ─── -->
+                        <div id="tu-panel-offres" class="tab-panel" data-panel="offres">
+                            <div class="space-y-3">
+                                <div class="video-card p-3 flex flex-col md:flex-row items-start md:items-center gap-3 md:gap-4">
+                                    <div class="video-thumb">
+                                        <div class="play-overlay">
+                                            <span class="material-symbols-outlined icon-fill text-white"
+                                                style="font-size:36px">play_circle</span>
+                                        </div>
+                                    </div>
+                                    <div class="min-w-0 flex-1">
+                                        <h4 class="font-heading font-bold text-[14px] text-[#242424] leading-snug mb-1 truncate">
+                                            Campagne printemps : jusqu'à -15 % sur les pièces standards
+                                        </h4>
+                                        <p class="text-[12.5px] text-[#616161] leading-snug line-clamp-2 mb-2">
+                                            Notre équipe commerciale présente les offres printemps 2026
+                                            sur le catalogue de composants standards.
+                                        </p>
+                                        <div class="flex items-center gap-3 text-[11px] text-[#8A8886]">
+                                            <span class="inline-flex items-center gap-1">
+                                                <span class="material-symbols-outlined"
+                                                    style="font-size:13px">calendar_today</span>
+                                                Ajoutée le 5 avril 2026
+                                            </span>
+                                            <span class="inline-flex items-center gap-1">
+                                                <span class="material-symbols-outlined"
+                                                    style="font-size:13px">link</span>
+                                                youtu.be/OfferSpring
+                                            </span>
+                                        </div>
+                                    </div>
+                                    <button class="video-delete-btn btn btn-ghost text-[#B91C1C] hover:bg-[#FEF2F2] hover:text-[#991B1B] self-start md:self-center shrink-0"
+                                        aria-label="Supprimer la vidéo">
+                                        <span class="material-symbols-outlined">delete</span>
+                                        <span class="hidden md:inline">Supprimer</span>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- ─── Panel : Astuces (0 vidéo — état vide) ─── -->
+                        <div id="tu-panel-astuces" class="tab-panel" data-panel="astuces">
+                            <div class="py-10 md:py-16 text-center">
+                                <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-[#F5F5F5] mb-4">
+                                    <span class="material-symbols-outlined text-[#8A8886]"
+                                        style="font-size:32px">play_circle</span>
+                                </div>
+                                <h4 class="font-heading font-bold text-[15px] text-[#242424] mb-1">
+                                    Aucune vidéo dans cette catégorie
+                                </h4>
+                                <p class="text-[12.5px] text-[#616161] max-w-md mx-auto mb-5 leading-relaxed">
+                                    Partagez des conseils pratiques ou des tutoriels liés à votre expertise.
+                                    Vos clients apprécieront les contenus utiles.
+                                </p>
+                                <button class="btn btn-primary open-add-video-tab-btn" data-default-category="astuces">
+                                    <span class="material-symbols-outlined">add</span>
+                                    Ajouter votre première vidéo Astuces
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- ─── Panel : Emplois (2 vidéos) ─── -->
+                        <div id="tu-panel-emplois" class="tab-panel" data-panel="emplois">
+                            <div class="space-y-3">
+                                <div class="video-card p-3 flex flex-col md:flex-row items-start md:items-center gap-3 md:gap-4">
+                                    <div class="video-thumb">
+                                        <div class="play-overlay">
+                                            <span class="material-symbols-outlined icon-fill text-white"
+                                                style="font-size:36px">play_circle</span>
+                                        </div>
+                                    </div>
+                                    <div class="min-w-0 flex-1">
+                                        <h4 class="font-heading font-bold text-[14px] text-[#242424] leading-snug mb-1 truncate">
+                                            Rejoignez notre équipe : 5 postes d'ingénieurs à pourvoir
+                                        </h4>
+                                        <p class="text-[12.5px] text-[#616161] leading-snug line-clamp-2 mb-2">
+                                            Visite guidée de nos ateliers et présentation des profils recherchés
+                                            pour les prochains mois.
+                                        </p>
+                                        <div class="flex items-center gap-3 text-[11px] text-[#8A8886]">
+                                            <span class="inline-flex items-center gap-1">
+                                                <span class="material-symbols-outlined"
+                                                    style="font-size:13px">calendar_today</span>
+                                                Ajoutée le 2 avril 2026
+                                            </span>
+                                            <span class="inline-flex items-center gap-1">
+                                                <span class="material-symbols-outlined"
+                                                    style="font-size:13px">link</span>
+                                                youtu.be/Jobs5Pos
+                                            </span>
+                                        </div>
+                                    </div>
+                                    <button class="video-delete-btn btn btn-ghost text-[#B91C1C] hover:bg-[#FEF2F2] hover:text-[#991B1B] self-start md:self-center shrink-0"
+                                        aria-label="Supprimer la vidéo">
+                                        <span class="material-symbols-outlined">delete</span>
+                                        <span class="hidden md:inline">Supprimer</span>
+                                    </button>
+                                </div>
+
+                                <div class="video-card p-3 flex flex-col md:flex-row items-start md:items-center gap-3 md:gap-4">
+                                    <div class="video-thumb">
+                                        <div class="play-overlay">
+                                            <span class="material-symbols-outlined icon-fill text-white"
+                                                style="font-size:36px">play_circle</span>
+                                        </div>
+                                    </div>
+                                    <div class="min-w-0 flex-1">
+                                        <h4 class="font-heading font-bold text-[14px] text-[#242424] leading-snug mb-1 truncate">
+                                            Programme alternance : 10 opportunités pour les étudiants
+                                        </h4>
+                                        <p class="text-[12.5px] text-[#616161] leading-snug line-clamp-2 mb-2">
+                                            Comment nous formons la prochaine génération d'ingénieurs et
+                                            techniciens dans les métiers de l'usinage.
+                                        </p>
+                                        <div class="flex items-center gap-3 text-[11px] text-[#8A8886]">
+                                            <span class="inline-flex items-center gap-1">
+                                                <span class="material-symbols-outlined"
+                                                    style="font-size:13px">calendar_today</span>
+                                                Ajoutée le 20 mars 2026
+                                            </span>
+                                            <span class="inline-flex items-center gap-1">
+                                                <span class="material-symbols-outlined"
+                                                    style="font-size:13px">link</span>
+                                                youtu.be/AltProg10
+                                            </span>
+                                        </div>
+                                    </div>
+                                    <button class="video-delete-btn btn btn-ghost text-[#B91C1C] hover:bg-[#FEF2F2] hover:text-[#991B1B] self-start md:self-center shrink-0"
+                                        aria-label="Supprimer la vidéo">
+                                        <span class="material-symbols-outlined">delete</span>
+                                        <span class="hidden md:inline">Supprimer</span>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <!-- Footer info -->
+                    <div
+                        class="px-5 md:px-6 py-3 bg-[#FAFAFA] border-t border-[#E0E0E0] flex items-start gap-2 text-[11px] text-[#8A8886] leading-snug">
+                        <span class="material-symbols-outlined shrink-0 mt-[1px]" style="font-size:14px">info</span>
+                        <span>
+                            Plateformes acceptées : <strong>YouTube</strong> · <strong>Dailymotion</strong> · <strong>Vimeo</strong>
+                            (URLs publiques). Miniature récupérée automatiquement. L'ajout/suppression ne déclenche pas de
+                            revalidation admin.
+                        </span>
+                    </div>
+
+                </section>
+
+                <!-- ═════ SECTION : RACCOURCIS VISIBILITÉ ═════ -->
+                <section>
+                    <div class="flex items-end justify-between mb-4">
+                        <div>
+                            <h2 class="font-heading font-semibold text-[13px] text-[#242424] uppercase tracking-wider">
+                                Raccourcis visibilité
+                            </h2>
+                            <p class="text-[12px] text-[#616161] mt-0.5">
+                                Accédez rapidement aux outils de mise en avant de votre profil TraceUP
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+
+                        <!-- ─── BOOST (indisponible : profil en attente) ─── -->
+                        <div class="card p-5 flex flex-col">
+                            <div class="flex items-start justify-between mb-4">
+                                <div class="flex items-center gap-3 min-w-0">
+                                    <div
+                                        class="w-10 h-10 rounded-lg bg-[#F5F5F5] flex items-center justify-center shrink-0">
+                                        <span class="material-symbols-outlined text-[#616161]"
+                                            style="font-size:22px">bolt</span>
+                                    </div>
+                                    <div class="min-w-0">
+                                        <h3 class="font-heading font-bold text-[14px] text-[#242424] leading-tight">
+                                            Boost
+                                        </h3>
+                                        <span
+                                            class="inline-flex items-center gap-1 text-[10px] font-semibold text-[#616161] bg-[#F5F5F5] border border-[#E0E0E0] px-1.5 py-0.5 rounded mt-1">
+                                            <span class="w-1.5 h-1.5 bg-[#8A8886] rounded-full"></span>
+                                            Indisponible
+                                        </span>
+                                    </div>
+                                </div>
+                                <span class="text-[10px] font-semibold text-[#8A8886] uppercase tracking-wider">
+                                    30 jours
+                                </span>
+                            </div>
+
+                            <!-- Message bloquant -->
+                            <div class="bg-[#F1F5F9] border border-[#CBD5E1] rounded p-3 mb-4 flex-1">
+                                <div class="flex items-start gap-2">
+                                    <span class="material-symbols-outlined text-[#475569] shrink-0 mt-[1px]" style="font-size:16px">info</span>
+                                    <div class="text-[12px] text-[#334155] leading-relaxed">
+                                        Modifications non soumises.
+                                        <strong>Soumettez votre profil à validation</strong> pour pouvoir le booster.
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- CTA -->
+                            <div class="flex items-end justify-between gap-3 pt-3 border-t border-[#F0F0F0] mt-auto">
+                                <div class="min-w-0">
+                                    <div class="text-[10px] font-bold text-[#8A8886] uppercase tracking-wider">
+                                        Tarif
+                                    </div>
+                                    <div class="text-[12px] text-[#242424] mt-0.5 leading-snug">
+                                        <strong>50 DT HT</strong> / 30 jours · TVA 19 %
+                                    </div>
+                                </div>
+                                <div class="flex items-center gap-2 shrink-0">
+                                    <a href="dashboard_boost.html" class="btn btn-secondary">
+                                        <span class="material-symbols-outlined" style="font-size:14px">visibility</span>
+                                        Voir
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- ─── SPONSORING (état inactif) ─── -->
+                        <div class="card p-5 flex flex-col">
+                            <div class="flex items-start justify-between mb-4">
+                                <div class="flex items-center gap-3 min-w-0">
+                                    <div
+                                        class="w-10 h-10 rounded-lg bg-[#F5F5F5] flex items-center justify-center shrink-0">
+                                        <span class="material-symbols-outlined text-[#616161]"
+                                            style="font-size:22px">campaign</span>
+                                    </div>
+                                    <div class="min-w-0">
+                                        <h3 class="font-heading font-bold text-[14px] text-[#242424] leading-tight">
+                                            Sponsoring
+                                        </h3>
+                                        <span
+                                            class="inline-flex items-center gap-1 text-[10px] font-semibold text-[#616161] bg-[#F5F5F5] border border-[#E0E0E0] px-1.5 py-0.5 rounded mt-1">
+                                            <span class="w-1.5 h-1.5 bg-[#8A8886] rounded-full"></span>
+                                            Aucune campagne
+                                        </span>
+                                    </div>
+                                </div>
+                                <span class="text-[10px] font-semibold text-[#8A8886] uppercase tracking-wider">
+                                    Bannière
+                                </span>
+                            </div>
+
+                            <div class="mb-4">
+                                <div class="flex items-center justify-between mb-1.5">
+                                    <span class="text-[11px] text-[#8A8886]">
+                                        Pas de campagne en cours
+                                    </span>
+                                    <span class="text-[11px] text-[#8A8886]">—</span>
+                                </div>
+                                <div class="h-1.5 bg-[#F0F0F0] rounded-full overflow-hidden">
+                                    <div class="h-full bg-[#E0E0E0] rounded-full" style="width:0%"></div>
+                                </div>
+                            </div>
+
+                            <div class="flex items-end justify-between gap-3 pt-3 border-t border-[#F0F0F0] mt-auto">
+                                <div class="min-w-0">
+                                    <div class="text-[10px] font-bold text-[#8A8886] uppercase tracking-wider">
+                                        Visibilité annuaire
+                                    </div>
+                                    <div class="text-[12px] text-[#616161] mt-0.5 leading-snug">
+                                        Bannière sponsorisée sur le moteur TraceUP
+                                    </div>
+                                </div>
+                                <div class="flex items-center gap-2 shrink-0">
+                                    <a href="dashboard_sponsoring.html?profile=traceup" class="btn btn-primary">
+                                        <span class="material-symbols-outlined" style="font-size:14px">campaign</span>
+                                        Lancer une campagne
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </section>
+
+                <!-- ═════ BANDEAU ALERTE INVISIBILITÉ (avant 1ère soumission) ═════ -->
+                <section
+                    class="bg-[#FFFBEB] border border-[#FDE68A] rounded-lg px-4 py-3 flex items-start gap-3"
+                    role="status">
+                    <span class="material-symbols-outlined icon-fill text-[#D97706] shrink-0 mt-[1px]"
+                        style="font-size:20px">info</span>
+                    <div class="min-w-0 flex-1 text-[12.5px] text-[#92400E] leading-snug">
+                        <strong>Première soumission</strong> — en cliquant sur
+                        <em>Soumettre à validation</em>, votre profil TraceUP sera en revue admin pendant
+                        <strong>24 à 48 h</strong>. Pendant cette période, le profil sera
+                        <strong>en lecture seule</strong> et non visible sur le moteur public.
+                        Vous recevrez un email dès l'acceptation.
+                    </div>
+                </section>
+
+                <!-- ═════ BARRE D'ACTIONS — pattern canon Cluster 2 ═════ -->
+                <section id="tu-action-bar-region"
+                    class="action-bar-sticky md:static flex flex-col md:flex-row md:items-center md:justify-between gap-3 md:gap-4 pt-2 md:pt-0">
+                    <div class="flex items-start md:items-center gap-2 text-[12px] text-[#616161] leading-snug">
+                        <span class="material-symbols-outlined icon-fill shrink-0 mt-[1px] md:mt-0 text-[#92400E]"
+                            style="font-size:15px">schedule</span>
+                        <span>
+                            <strong class="text-[#92400E]">En attente de validation</strong> ·
+                            6 vidéos · validation admin sous 24-48 h
+                        </span>
+                    </div>
+                    <div class="flex items-center gap-2 shrink-0 flex-wrap justify-end">
+                        <button class="btn btn-ghost">
+                            Annuler
+                        </button>
+                        <button class="btn btn-primary">
+                            <span class="material-symbols-outlined">send</span>
+                            Soumettre à validation
+                        </button>
+                    </div>
+                </section>
+
+            </div>
+        </main>
+
+    </div>
+
+    <!-- ═════════════════════════════════════════════════════
+         MODAL : Ajouter une vidéo — multi-plateforme (canon V1)
+         3 sources supportées : YouTube · Dailymotion · Vimeo
+         Patch 20/04/2026 — voir BRIEF_PATCH_VIDEO_SOURCES.md
+         ═════════════════════════════════════════════════════ -->
+    <div id="addVideoModal" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="addVideoTitle"
+        aria-hidden="true">
+        <div class="modal-content">
+
+            <!-- Header modal -->
+            <div class="flex items-start justify-between px-5 py-4 border-b border-[#E0E0E0]">
+                <div class="min-w-0">
+                    <h3 id="addVideoTitle" class="font-heading font-bold text-[15px] text-[#242424] leading-tight">
+                        Ajouter une vidéo
+                    </h3>
+                    <p class="text-[11.5px] text-[#616161] mt-0.5 leading-snug">
+                        La catégorie est pré-sélectionnée selon l'onglet actif.
+                    </p>
+                </div>
+                <button id="closeAddVideoBtn"
+                    class="icon-btn shrink-0 -mr-2 -mt-1 w-8 h-8"
+                    aria-label="Fermer">
+                    <span class="material-symbols-outlined" style="font-size:20px">close</span>
+                </button>
+            </div>
+
+            <!-- Body modal : form -->
+            <div class="p-5 space-y-4">
+
+                <!-- 1. Plateforme (nouveau champ canon V1) -->
+                <div>
+                    <label for="vid-source" class="field-label">
+                        Plateforme <span class="req">*</span>
+                    </label>
+                    <div class="relative">
+                        <span id="vid-source-icon"
+                            class="absolute left-3 top-1/2 -translate-y-1/2 material-symbols-outlined text-[#8A8886] pointer-events-none"
+                            style="font-size:16px">public</span>
+                        <select id="vid-source" class="field-select pl-9">
+                            <option value="" disabled selected>Sélectionnez une plateforme…</option>
+                            <option value="youtube">YouTube</option>
+                            <option value="dailymotion">Dailymotion</option>
+                            <option value="vimeo">Vimeo</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- 2. URL vidéo (dynamique selon plateforme) -->
+                <div>
+                    <label for="vid-url" class="field-label">
+                        URL vidéo <span class="req">*</span>
+                    </label>
+                    <div class="relative">
+                        <span class="absolute left-3 top-1/2 -translate-y-1/2 material-symbols-outlined text-[#8A8886] pointer-events-none"
+                            style="font-size:16px">link</span>
+                        <input id="vid-url" class="field-input pl-9" type="url" disabled
+                            placeholder="Sélectionnez d'abord une plateforme" />
+                    </div>
+                    <div class="field-help">
+                        <span class="material-symbols-outlined">info</span>
+                        <span id="vid-url-help-text">Collez l'URL publique de votre vidéo après avoir choisi la plateforme.</span>
+                    </div>
+                </div>
+
+                <!-- 3. Catégorie (préservé — logique onglet actif conservée) -->
+                <div>
+                    <label for="vid-cat" class="field-label">
+                        Catégorie <span class="req">*</span>
+                    </label>
+                    <select id="vid-cat" class="field-select">
+                        <option value="actualite" selected>Actualité</option>
+                        <option value="offres">Offres</option>
+                        <option value="astuces">Astuces</option>
+                        <option value="emplois">Emplois</option>
+                    </select>
+                </div>
+
+                <!-- 4. Titre + compteur -->
+                <div>
+                    <label for="vid-title" class="field-label">
+                        Titre de la vidéo <span class="req">*</span>
+                    </label>
+                    <input id="vid-title" class="field-input" type="text" maxlength="120"
+                        placeholder="Ex : Inauguration de nos nouveaux ateliers" />
+                    <div class="flex justify-end mt-1">
+                        <span class="text-[10.5px] text-[#8A8886]"><span id="vid-title-count">0</span>/120</span>
+                    </div>
+                </div>
+
+                <!-- 5. Description + compteur (optionnel) -->
+                <div>
+                    <label for="vid-desc" class="field-label">
+                        Description <span class="opt">(optionnel)</span>
+                    </label>
+                    <textarea id="vid-desc" class="field-textarea" rows="3" maxlength="300"
+                        placeholder="Un résumé court affiché sur votre profil public"></textarea>
+                    <div class="flex justify-end mt-1">
+                        <span class="text-[10.5px] text-[#8A8886]"><span id="vid-desc-count">0</span>/300</span>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Footer modal -->
+            <div
+                class="px-5 py-4 bg-[#FAFAFA] border-t border-[#E0E0E0] flex items-center justify-end gap-2 rounded-b-xl">
+                <button id="cancelAddVideoBtn" class="btn btn-secondary">
+                    Annuler
+                </button>
+                <button id="submitAddVideoBtn" class="btn btn-primary" disabled>
+                    <span class="material-symbols-outlined">add</span>
+                    Ajouter la vidéo
+                </button>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- ═════════════════════════════════════════════════════
+         JS — drawer + dropdowns + tabs + modal (multi-plateforme)
+         ═════════════════════════════════════════════════════ -->
+    <script>
+        (function () {
+            const sidebar = document.getElementById('sidebar');
+            const backdrop = document.getElementById('backdrop');
+            const menuBtn = document.getElementById('menuBtn');
+            const bellBtn = document.getElementById('bellBtn');
+            const bellDropdown = document.getElementById('bellDropdown');
+            const avatarBtn = document.getElementById('avatarBtn');
+            const avatarDropdown = document.getElementById('avatarDropdown');
+            const modal = document.getElementById('addVideoModal');
+            const openModalBtn = document.getElementById('openAddVideoBtn');
+            const closeModalBtn = document.getElementById('closeAddVideoBtn');
+            const cancelModalBtn = document.getElementById('cancelAddVideoBtn');
+            const submitModalBtn = document.getElementById('submitAddVideoBtn');
+            const tabButtons = document.querySelectorAll('.tab-btn');
+            const tabPanels = document.querySelectorAll('.tab-panel');
+            const categorySelect = document.getElementById('vid-cat');
+
+            // ─── Modal form fields (multi-plateforme) ─────────────
+            const sourceSel = document.getElementById('vid-source');
+            const sourceIcon = document.getElementById('vid-source-icon');
+            const urlInput = document.getElementById('vid-url');
+            const urlHelp = document.getElementById('vid-url-help-text');
+            const titleInput = document.getElementById('vid-title');
+            const titleCount = document.getElementById('vid-title-count');
+            const descInput = document.getElementById('vid-desc');
+            const descCount = document.getElementById('vid-desc-count');
+
+            // Canon V1 — 3 plateformes supportées (décision 19/04/2026)
+            const SOURCE_CONFIG = {
+                youtube: {
+                    label: 'YouTube',
+                    icon: 'smart_display',
+                    color: '#FF0000',
+                    placeholder: 'https://www.youtube.com/watch?v=...',
+                    help: 'Formats acceptés : youtube.com/watch?v=… · youtu.be/… · youtube.com/shorts/…',
+                    patterns: [
+                        /youtube\.com\/watch\?v=([a-zA-Z0-9_-]{11})/,
+                        /youtu\.be\/([a-zA-Z0-9_-]{11})/,
+                        /youtube\.com\/shorts\/([a-zA-Z0-9_-]{11})/
+                    ]
+                },
+                dailymotion: {
+                    label: 'Dailymotion',
+                    icon: 'play_circle',
+                    color: '#0066DC',
+                    placeholder: 'https://www.dailymotion.com/video/...',
+                    help: 'Formats acceptés : dailymotion.com/video/… · dai.ly/…',
+                    patterns: [
+                        /dailymotion\.com\/video\/([a-zA-Z0-9]+)/,
+                        /dai\.ly\/([a-zA-Z0-9]+)/
+                    ]
+                },
+                vimeo: {
+                    label: 'Vimeo',
+                    icon: 'movie',
+                    color: '#1AB7EA',
+                    placeholder: 'https://vimeo.com/...',
+                    help: 'Format accepté : vimeo.com/… (URL publique — certaines vidéos peuvent être restreintes)',
+                    patterns: [
+                        /vimeo\.com\/(\d+)/,
+                        /vimeo\.com\/channels\/[^\/]+\/(\d+)/
+                    ]
+                }
+            };
+
+            const dropdowns = [
+                { btn: bellBtn, panel: bellDropdown },
+                { btn: avatarBtn, panel: avatarDropdown },
+            ];
+
+            // ─── Dropdowns ─────────────────────
+            function closeAllDropdowns() {
+                dropdowns.forEach(({ btn, panel }) => {
+                    panel.classList.remove('open');
+                    btn.setAttribute('aria-expanded', 'false');
+                });
+            }
+
+            function toggleDropdown(target) {
+                const wasOpen = target.panel.classList.contains('open');
+                closeAllDropdowns();
+                if (!wasOpen) {
+                    target.panel.classList.add('open');
+                    target.btn.setAttribute('aria-expanded', 'true');
+                }
+            }
+
+            // ─── Drawer mobile ─────────────────
+            function openDrawer() {
+                closeAllDropdowns();
+                sidebar.classList.add('open');
+                backdrop.classList.remove('hidden');
+                document.body.style.overflow = 'hidden';
+            }
+
+            function closeDrawer() {
+                sidebar.classList.remove('open');
+                backdrop.classList.add('hidden');
+                document.body.style.overflow = '';
+            }
+
+            // ─── Tabs ──────────────────────────
+            function activateTab(tabId) {
+                tabButtons.forEach((b) => {
+                    const isActive = b.dataset.tab === tabId;
+                    b.classList.toggle('active', isActive);
+                    if (isActive) b.setAttribute('aria-current', 'page');
+                    else b.removeAttribute('aria-current');
+                });
+                tabPanels.forEach((p) => {
+                    p.classList.toggle('active', p.dataset.panel === tabId);
+                });
+            }
+
+            tabButtons.forEach((btn) => {
+                btn.addEventListener('click', () => activateTab(btn.dataset.tab));
+            });
+
+            // ─── Modal multi-plateforme : validation ─────────────
+            function extractVideoId(source, url) {
+                const cfg = SOURCE_CONFIG[source];
+                if (!cfg) return null;
+                for (const pattern of cfg.patterns) {
+                    const m = url.match(pattern);
+                    if (m) return m[1];
+                }
+                return null;
+            }
+
+            function validateForm() {
+                const source = sourceSel.value;
+                const url = (urlInput.value || '').trim();
+                const title = (titleInput.value || '').trim();
+                const hasValidUrl = source && url && extractVideoId(source, url) !== null;
+                const hasTitle = title.length > 0;
+                submitModalBtn.disabled = !(hasValidUrl && hasTitle);
+            }
+
+            // Changement de plateforme → update placeholder / help / icône
+            sourceSel.addEventListener('change', () => {
+                const cfg = SOURCE_CONFIG[sourceSel.value];
+                if (cfg) {
+                    urlInput.disabled = false;
+                    urlInput.placeholder = cfg.placeholder;
+                    urlHelp.textContent = cfg.help;
+                    sourceIcon.textContent = cfg.icon;
+                    sourceIcon.style.color = cfg.color;
+                } else {
+                    urlInput.disabled = true;
+                    urlInput.value = '';
+                    urlInput.placeholder = "Sélectionnez d'abord une plateforme";
+                    urlHelp.textContent = "Collez l'URL publique de votre vidéo après avoir choisi la plateforme.";
+                    sourceIcon.textContent = 'public';
+                    sourceIcon.style.color = '';
+                }
+                validateForm();
+            });
+
+            urlInput.addEventListener('input', validateForm);
+
+            // Compteurs titre + description
+            titleInput.addEventListener('input', () => {
+                titleCount.textContent = titleInput.value.length;
+                validateForm();
+            });
+            descInput.addEventListener('input', () => {
+                descCount.textContent = descInput.value.length;
+            });
+
+            // Reset form helper
+            function resetForm() {
+                sourceSel.value = '';
+                urlInput.value = '';
+                urlInput.disabled = true;
+                urlInput.placeholder = "Sélectionnez d'abord une plateforme";
+                urlHelp.textContent = "Collez l'URL publique de votre vidéo après avoir choisi la plateforme.";
+                sourceIcon.textContent = 'public';
+                sourceIcon.style.color = '';
+                titleInput.value = '';
+                descInput.value = '';
+                titleCount.textContent = '0';
+                descCount.textContent = '0';
+                submitModalBtn.disabled = true;
+            }
+
+            // Submit (démo : log payload canon · à brancher sur POST /api/traceup/videos)
+            submitModalBtn.addEventListener('click', () => {
+                if (submitModalBtn.disabled) return;
+                const payload = {
+                    source: sourceSel.value,
+                    videoId: extractVideoId(sourceSel.value, urlInput.value.trim()),
+                    videoUrl: urlInput.value.trim(),
+                    category: categorySelect.value,
+                    title: titleInput.value.trim(),
+                    description: descInput.value.trim()
+                };
+                console.log('[TraceUP] Nouvelle vidéo :', payload);
+                closeModal();
+            });
+
+            // ─── Modal open/close (canon préservé) ─────────────
+            function getActiveCategory() {
+                const active = document.querySelector('.tab-btn.active');
+                return active ? active.dataset.tab : 'actualite';
+            }
+
+            function openModal(forcedCategory) {
+                const cat = forcedCategory || getActiveCategory();
+                if (categorySelect) categorySelect.value = cat;
+                resetForm();
+                modal.classList.add('open');
+                modal.setAttribute('aria-hidden', 'false');
+                document.body.style.overflow = 'hidden';
+                // focus sur plateforme (premier champ du canon V1)
+                setTimeout(() => {
+                    if (sourceSel) sourceSel.focus();
+                }, 50);
+            }
+
+            function closeModal() {
+                modal.classList.remove('open');
+                modal.setAttribute('aria-hidden', 'true');
+                if (!sidebar.classList.contains('open')) {
+                    document.body.style.overflow = '';
+                }
+            }
+
+            openModalBtn.addEventListener('click', () => openModal());
+            closeModalBtn.addEventListener('click', closeModal);
+            cancelModalBtn.addEventListener('click', closeModal);
+
+            // CTA dans état vide (Astuces) pré-sélectionne la catégorie
+            document.querySelectorAll('.open-add-video-tab-btn').forEach((btn) => {
+                btn.addEventListener('click', () => {
+                    openModal(btn.dataset.defaultCategory);
+                });
+            });
+
+            // Click sur overlay (pas sur content) ferme
+            modal.addEventListener('click', (e) => {
+                if (e.target === modal) closeModal();
+            });
+
+            // ─── Global listeners ──────────────
+            menuBtn.addEventListener('click', openDrawer);
+            backdrop.addEventListener('click', closeDrawer);
+
+            dropdowns.forEach((dd) => {
+                dd.btn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    toggleDropdown(dd);
+                });
+            });
+
+            document.addEventListener('click', (e) => {
+                const clickedInsideDropdown = dropdowns.some(
+                    (dd) => dd.panel.contains(e.target) || dd.btn.contains(e.target)
+                );
+                if (!clickedInsideDropdown) closeAllDropdowns();
+            });
+
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape') {
+                    closeAllDropdowns();
+                    if (sidebar.classList.contains('open')) closeDrawer();
+                    if (modal.classList.contains('open')) closeModal();
+                }
+            });
+
+            let resizeTimer;
+            window.addEventListener('resize', () => {
+                clearTimeout(resizeTimer);
+                resizeTimer = setTimeout(() => {
+                    if (window.innerWidth >= 768 && sidebar.classList.contains('open')) {
+                        closeDrawer();
+                    }
+                }, 100);
+            });
+        })();
+    </script>
+
+    <!-- ════════════════════════════════════════════════════════════════
+         SEED DATA HYDRATION
+         Loads marketup_seed_data.js + dashboard_hydrate_utils.js,
+         then hydrates this page from window.MARKETUP_DATA.
+         ════════════════════════════════════════════════════════════════ -->
+    <script src="marketup_seed_data.js"></script>
+    <script src="dashboard_hydrate_utils.js"></script>
+    <script>
+        // ════════════════════════════════════════════════════════════════
+        // STATE-DRIVEN TRACEUP DASHBOARD
+        // Single page that renders for any of 4 profile statuses, driven
+        // entirely by me.profiles.traceup.status from the seed data.
+        // Statuses: pending | active | rejected | disabled
+        // ════════════════════════════════════════════════════════════════
+
+        const TU_STATUS_CONFIG = {
+            // ─────────── PENDING (En attente de validation admin) ─────
+            pending: {
+                titleSuffix: '(En attente)',
+                sidebarDot: { color: '#D97706', title: 'En attente' },
+                hero: (p, dates, videoCount) => `
+                    <div class="flex items-center gap-2 mt-1.5 flex-wrap">
+                        <span class="status-pill status-pill--pending">
+                            <span class="dot"></span>
+                            En attente
+                        </span>
+                        <span class="text-[11px] text-[#8A8886]">
+                            Soumis pour validation · réponse admin sous 24-48 h
+                        </span>
+                    </div>
+                    <div class="flex items-center gap-1.5 mt-1.5 text-[11.5px] text-[#8A8886]">
+                        <span class="material-symbols-outlined" style="font-size:14px">visibility_off</span>
+                        <span>
+                            Profil <strong class="text-[#92400E]">hors ligne pendant la revue</strong> —
+                            ${videoCount} vidéo${videoCount > 1 ? 's' : ''} en attente de mise en ligne
+                        </span>
+                    </div>`,
+                statusBlock: (p, dates, videoCount) => `
+                    <section class="border border-[#FDE68A] bg-[#FFFBEB] rounded-lg overflow-hidden" role="status" aria-live="polite">
+                        <div class="p-5 flex items-start gap-4">
+                            <div class="w-10 h-10 rounded-lg bg-white border border-[#FDE68A] flex items-center justify-center shrink-0">
+                                <span class="material-symbols-outlined icon-fill text-[#D97706]" style="font-size:22px">schedule</span>
+                            </div>
+                            <div class="min-w-0 flex-1">
+                                <div class="font-heading font-bold text-[14px] text-[#92400E] mb-1">Revue en cours par l'administrateur</div>
+                                <p class="text-[13px] text-[#92400E] leading-relaxed mb-3">
+                                    Vos ${videoCount} vidéo${videoCount > 1 ? 's' : ''} sont en cours d'examen. Pendant cette période :
+                                </p>
+                                <ul class="space-y-1.5 text-[12.5px] text-[#92400E] leading-relaxed mb-3">
+                                    <li class="flex items-start gap-2">
+                                        <span class="material-symbols-outlined shrink-0 mt-[1px] text-[#D97706]" style="font-size:14px">lock</span>
+                                        <span>Vous pouvez encore <strong>ajouter ou retirer des vidéos</strong>, mais aucune nouvelle soumission tant que la revue n'est pas terminée</span>
+                                    </li>
+                                    <li class="flex items-start gap-2">
+                                        <span class="material-symbols-outlined shrink-0 mt-[1px] text-[#D97706]" style="font-size:14px">visibility_off</span>
+                                        <span>Votre profil TraceUP est <strong>invisible</strong> sur le moteur public</span>
+                                    </li>
+                                    <li class="flex items-start gap-2">
+                                        <span class="material-symbols-outlined shrink-0 mt-[1px] text-[#D97706]" style="font-size:14px">mail</span>
+                                        <span>Un email vous sera envoyé dès acceptation ou refus (délai estimé 24-48 h)</span>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </section>`,
+                actionBar: (p, dates, videoCount) => `
+                    <div class="flex items-start md:items-center gap-2 text-[12px] text-[#616161] leading-snug">
+                        <span class="material-symbols-outlined icon-fill shrink-0 mt-[1px] md:mt-0 text-[#92400E]" style="font-size:15px">schedule</span>
+                        <span><strong class="text-[#92400E]">En attente de validation</strong> · ${videoCount} vidéo${videoCount > 1 ? 's' : ''} · validation admin sous 24-48 h</span>
+                    </div>
+                    <div class="flex items-center gap-2 shrink-0 flex-wrap justify-end">
+                        <button class="btn btn-ghost">Annuler la demande</button>
+                    </div>`,
+            },
+            // ─────────── ACTIVE (Profil publié et visible) ────────────
+            active: {
+                titleSuffix: '',
+                sidebarDot: { color: '#107C10', title: 'Actif' },
+                hero: (p, dates, videoCount) => `
+                    <div class="flex items-center gap-2 mt-1.5 flex-wrap">
+                        <span class="status-pill status-pill--active">
+                            <span class="dot"></span>
+                            Profil actif
+                        </span>
+                        <span class="text-[11px] text-[#8A8886]">
+                            Publié le ${dates.publishedAt}
+                        </span>
+                    </div>
+                    <div class="flex items-center gap-1.5 mt-1.5 text-[11.5px] text-[#8A8886]">
+                        <span class="material-symbols-outlined" style="font-size:14px">visibility</span>
+                        <span>
+                            Profil <strong class="text-[#107C10]">visible publiquement</strong> avec
+                            ${videoCount} vidéo${videoCount > 1 ? 's' : ''} sur <span class="text-[#616161]">/traceup</span>
+                        </span>
+                    </div>`,
+                statusBlock: () => '',
+                actionBar: (p, dates, videoCount) => `
+                    <div class="flex items-start md:items-center gap-2 text-[12px] text-[#616161] leading-snug">
+                        <span class="material-symbols-outlined icon-fill shrink-0 mt-[1px] md:mt-0 text-[#107C10]" style="font-size:15px">check_circle</span>
+                        <span><strong class="text-[#107C10]">Profil publié</strong> · les modifications nécessitent une revalidation admin</span>
+                    </div>
+                    <div class="flex items-center gap-2 shrink-0 flex-wrap justify-end">
+                        <button class="btn btn-ghost">Annuler</button>
+                        <button class="btn btn-primary">
+                            <span class="material-symbols-outlined">send</span>
+                            Soumettre les modifications
+                        </button>
+                    </div>`,
+            },
+            // ─────────── REJECTED (Refusé par admin avec motif) ───────
+            rejected: {
+                titleSuffix: '(Refusé)',
+                sidebarDot: { color: '#DC2626', title: 'Refusé' },
+                hero: (p, dates, videoCount) => `
+                    <div class="flex items-center gap-2 mt-1.5 flex-wrap">
+                        <span class="status-pill status-pill--refused">
+                            <span class="dot"></span>
+                            Refusé par l'administrateur
+                        </span>
+                        <span class="text-[11px] text-[#8A8886]">
+                            Soumis le ${dates.submittedAt} · Refusé le ${dates.rejectedAt}
+                        </span>
+                    </div>
+                    <div class="flex items-center gap-1.5 mt-1.5 text-[11.5px] text-[#8A8886]">
+                        <span class="material-symbols-outlined" style="font-size:14px">visibility_off</span>
+                        <span>
+                            Profil actuellement <strong class="text-[#616161]">non visible</strong> sur
+                            <span class="text-[#616161]">/traceup</span>
+                        </span>
+                    </div>`,
+                statusBlock: (p, dates, videoCount) => {
+                    const reason = (typeof p.rejectionReason === 'string')
+                        ? p.rejectionReason
+                        : (p.rejectionReason && p.rejectionReason.fr)
+                            || 'Aucun motif fourni par l\'administrateur.';
+                    return `
+                    <section class="border border-[#FCA5A5] bg-[#FEF2F2] rounded-lg overflow-hidden" role="alert" aria-live="polite">
+                        <div class="p-5 flex items-start gap-4">
+                            <div class="w-10 h-10 rounded-lg bg-white border border-[#FCA5A5] flex items-center justify-center shrink-0">
+                                <span class="material-symbols-outlined icon-fill text-[#DC2626]" style="font-size:22px">report</span>
+                            </div>
+                            <div class="min-w-0 flex-1">
+                                <div class="font-heading font-bold text-[14px] text-[#991B1B] mb-1">Votre soumission a été refusée</div>
+                                <p class="text-[13px] text-[#991B1B] leading-relaxed mb-3">
+                                    L'équipe d'administration a examiné vos vidéos le ${dates.rejectedAt} et n'a pas pu les publier pour la raison suivante :
+                                </p>
+                                <div class="bg-white border border-[#FCA5A5] rounded p-3 mb-3">
+                                    <div class="text-[10px] font-bold text-[#8A8886] uppercase tracking-wider mb-1">Motif de l'administrateur</div>
+                                    <p class="text-[13px] text-[#242424] leading-relaxed italic">« ${reason} »</p>
+                                </div>
+                                <p class="text-[12px] text-[#991B1B] leading-relaxed">
+                                    Corrigez les points mentionnés puis cliquez sur <strong>Enregistrer et resoumettre</strong> en bas de page.
+                                </p>
+                            </div>
+                        </div>
+                    </section>`;
+                },
+                actionBar: (p, dates, videoCount) => `
+                    <div class="flex items-start md:items-center gap-2 text-[12px] text-[#616161] leading-snug">
+                        <span class="material-symbols-outlined icon-fill shrink-0 mt-[1px] md:mt-0 text-[#475569]" style="font-size:15px">edit</span>
+                        <span><strong class="text-[#475569]">Modifications non soumises</strong> · soumettez pour publication</span>
+                    </div>
+                    <div class="flex items-center gap-2 shrink-0 flex-wrap justify-end">
+                        <button class="btn btn-ghost">Annuler</button>
+                        <button class="btn btn-primary">
+                            <span class="material-symbols-outlined">send</span>
+                            Enregistrer et resoumettre
+                        </button>
+                    </div>`,
+            },
+            // ─────────── DISABLED (Désactivé par l'utilisateur) ───────
+            disabled: {
+                titleSuffix: '(Désactivé)',
+                sidebarDot: { color: '#8A8886', title: 'Désactivé' },
+                hero: (p, dates, videoCount) => `
+                    <div class="flex items-center gap-2 mt-1.5 flex-wrap">
+                        <span class="status-pill status-pill--disabled">
+                            <span class="dot"></span>
+                            Profil désactivé
+                        </span>
+                        <span class="text-[11px] text-[#8A8886]">
+                            Désactivé le ${dates.disabledAt}
+                        </span>
+                    </div>
+                    <div class="flex items-center gap-1.5 mt-1.5 text-[11.5px] text-[#8A8886]">
+                        <span class="material-symbols-outlined" style="font-size:14px">visibility_off</span>
+                        <span>
+                            Profil <strong class="text-[#616161]">désactivé</strong> · invisible sur
+                            <span class="text-[#616161]">/traceup</span>
+                        </span>
+                    </div>`,
+                statusBlock: (p, dates, videoCount) => `
+                    <section class="border border-[#E0E0E0] bg-[#F5F5F5] rounded-lg overflow-hidden" role="status">
+                        <div class="p-5 flex items-start gap-4">
+                            <div class="w-10 h-10 rounded-lg bg-white border border-[#E0E0E0] flex items-center justify-center shrink-0">
+                                <span class="material-symbols-outlined icon-fill text-[#616161]" style="font-size:22px">block</span>
+                            </div>
+                            <div class="min-w-0 flex-1">
+                                <div class="font-heading font-bold text-[14px] text-[#424242] mb-1">Profil désactivé</div>
+                                <p class="text-[13px] text-[#616161] leading-relaxed mb-3">
+                                    Vous avez désactivé ce profil le ${dates.disabledAt}. Vos ${videoCount} vidéo${videoCount > 1 ? 's' : ''} ne sont plus visibles sur le moteur public.
+                                </p>
+                                <p class="text-[12px] text-[#616161] leading-relaxed">
+                                    Pour les rendre à nouveau visibles, cliquez sur <strong>Réactiver le profil</strong> en bas de page.
+                                </p>
+                            </div>
+                        </div>
+                    </section>`,
+                actionBar: (p, dates, videoCount) => `
+                    <div class="flex items-start md:items-center gap-2 text-[12px] text-[#616161] leading-snug">
+                        <span class="material-symbols-outlined icon-fill shrink-0 mt-[1px] md:mt-0 text-[#8A8886]" style="font-size:15px">block</span>
+                        <span><strong class="text-[#616161]">Profil désactivé</strong> · réactivez pour publier</span>
+                    </div>
+                    <div class="flex items-center gap-2 shrink-0 flex-wrap justify-end">
+                        <button class="btn btn-primary">
+                            <span class="material-symbols-outlined">play_arrow</span>
+                            Réactiver le profil
+                        </button>
+                    </div>`,
+            },
+        };
+
+        MARKETUP_HYDRATE.bootstrapPage(function (me, H) {
+            const { set, setHTML, setAttr, formatDateLong } = MARKETUP_HYDRATE;
+            const tu = me.profiles.traceup;
+
+            const fullName = me.data.displayName.fr;
+            const channelName = (tu.data.channelName && tu.data.channelName.fr)
+                ? tu.data.channelName.fr
+                : fullName;
+
+            // ─── Public preview link (top-right "Aperçu public" button) ─
+            setAttr('tu-preview-link', 'href', `public_traceup_${me.slug}.html`);
+
+            // ═════════════════════════════════════════════════════════
+            // STATE-DRIVEN HYDRATION
+            // ═════════════════════════════════════════════════════════
+            const status = tu.status || 'pending';
+            const cfg = TU_STATUS_CONFIG[status] || TU_STATUS_CONFIG.pending;
+
+            const fmt = formatDateLong;
+            const dates = {
+                submittedAt: tu.submittedAt ? fmt(tu.submittedAt) : '—',
+                publishedAt: tu.validatedAt ? fmt(tu.validatedAt) : '—',
+                rejectedAt:  tu.rejectedAt  ? fmt(tu.rejectedAt)  : '—',
+                disabledAt:  tu.disabledAt  ? fmt(tu.disabledAt)  : '—',
+            };
+
+            // Count active videos for messages
+            const activeVideos = (tu.data.videos || []).filter(v => v.status === 'active');
+            const videoCount = activeVideos.length;
+
+            // 1. Page title
+            const suffix = cfg.titleSuffix ? ` ${cfg.titleSuffix}` : '';
+            document.title = `MARKET-UP | Profil TraceUP${suffix} — ${channelName}`;
+
+            // 2. Sidebar dot
+            const dot = document.getElementById('tu-sidebar-dot');
+            if (dot) {
+                dot.className = dot.className.replace(/bg-\[#[0-9A-Fa-f]+\]/, `bg-[${cfg.sidebarDot.color}]`);
+                dot.setAttribute('title', cfg.sidebarDot.title);
+            }
+
+            // 3. Hero status region
+            setHTML('tu-hero-status-region', cfg.hero(tu, dates, videoCount));
+
+            // 4. Status block region — hide entirely if active
+            const blockRegion = document.getElementById('tu-status-block-region');
+            const blockHTML = cfg.statusBlock(tu, dates, videoCount);
+            if (blockRegion) {
+                if (!blockHTML.trim()) {
+                    blockRegion.style.display = 'none';
+                } else {
+                    blockRegion.style.display = '';
+                    blockRegion.outerHTML = blockHTML.trim().replace(
+                        /^<section\b/, '<section id="tu-status-block-region"'
+                    );
+                }
+            }
+
+            // 5. Action bar region
+            setHTML('tu-action-bar-region', cfg.actionBar(tu, dates, videoCount));
+
+            // ═════════════════════════════════════════════════════════
+            // VIDEOS — render real videos from tu.data.videos (max 50)
+            // 4 categories: actualite | offres | astuces | emplois.
+            // ═════════════════════════════════════════════════════════
+            const videos = tu.data.videos || [];
+            const escape = (s) => String(s || '')
+                .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+
+            const shortUrl = (u) => String(u || '')
+                .replace(/^https?:\/\/(www\.)?/, '')
+                .replace(/\/$/, '');
+
+            const emptyStateHTML = (cat) => {
+                const labels = {
+                    actualite: { hint: 'Tenez vos clients informés des dernières nouveautés de votre entreprise.', cta: 'Ajouter votre première vidéo Actualité' },
+                    offres:    { hint: 'Présentez vos offres commerciales et promotions du moment.', cta: 'Ajouter votre première vidéo Offres' },
+                    astuces:   { hint: 'Partagez des conseils pratiques ou des tutoriels liés à votre expertise. Vos clients apprécieront les contenus utiles.', cta: 'Ajouter votre première vidéo Astuces' },
+                    emplois:   { hint: 'Présentez vos opportunités professionnelles et votre culture d\'entreprise.', cta: 'Ajouter votre première vidéo Emplois' },
+                };
+                const l = labels[cat];
+                return `<div class="py-10 md:py-16 text-center">
+                    <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-[#F5F5F5] mb-4">
+                        <span class="material-symbols-outlined text-[#8A8886]" style="font-size:32px">play_circle</span>
+                    </div>
+                    <h4 class="font-heading font-bold text-[15px] text-[#242424] mb-1">Aucune vidéo dans cette catégorie</h4>
+                    <p class="text-[12.5px] text-[#616161] max-w-md mx-auto mb-5 leading-relaxed">${l.hint}</p>
+                    <button class="btn btn-primary open-add-video-tab-btn" data-default-category="${cat}">
+                        <span class="material-symbols-outlined">add</span>
+                        ${l.cta}
+                    </button>
+                </div>`;
+            };
+
+            const videoCardHTML = (v) => {
+                const title = escape(v.title && v.title.fr || '');
+                const desc = escape(v.description && v.description.fr || '');
+                const dateStr = formatDateLong(v.publishedAt || v.addedAt);
+                const link = shortUrl(v.videoUrl);
+                const thumbStyle = v.thumbnailUrl
+                    ? `background-image:url('${v.thumbnailUrl}');background-size:cover;background-position:center;`
+                    : '';
+                return `<div class="video-card p-3 flex flex-col md:flex-row items-start md:items-center gap-3 md:gap-4">
+                    <div class="video-thumb" style="${thumbStyle}">
+                        <div class="play-overlay">
+                            <span class="material-symbols-outlined icon-fill text-white" style="font-size:36px">play_circle</span>
+                        </div>
+                    </div>
+                    <div class="min-w-0 flex-1">
+                        <h4 class="font-heading font-bold text-[14px] text-[#242424] leading-snug mb-1 truncate">${title}</h4>
+                        <p class="text-[12.5px] text-[#616161] leading-snug line-clamp-2 mb-2">${desc}</p>
+                        <div class="flex items-center gap-3 text-[11px] text-[#8A8886]">
+                            <span class="inline-flex items-center gap-1">
+                                <span class="material-symbols-outlined" style="font-size:13px">calendar_today</span>
+                                Ajoutée le ${dateStr}
+                            </span>
+                            <span class="inline-flex items-center gap-1">
+                                <span class="material-symbols-outlined" style="font-size:13px">link</span>
+                                ${escape(link)}
+                            </span>
+                        </div>
+                    </div>
+                    <button class="video-delete-btn btn btn-ghost text-[#B91C1C] hover:bg-[#FEF2F2] hover:text-[#991B1B] self-start md:self-center shrink-0" aria-label="Supprimer la vidéo">
+                        <span class="material-symbols-outlined">delete</span>
+                        <span class="hidden md:inline">Supprimer</span>
+                    </button>
+                </div>`;
+            };
+
+            for (const cat of ['actualite', 'offres', 'astuces', 'emplois']) {
+                const catVideos = videos
+                    .filter(v => v.category === cat && v.status === 'active')
+                    .sort((a, b) => (a.order || 0) - (b.order || 0));
+
+                set(`tu-tab-count-${cat}`, catVideos.length);
+
+                if (catVideos.length === 0) {
+                    setHTML(`tu-panel-${cat}`, emptyStateHTML(cat));
+                } else {
+                    setHTML(`tu-panel-${cat}`,
+                        `<div class="space-y-3">${catVideos.map(videoCardHTML).join('')}</div>`);
+                }
+            }
+        });
+    </script>
+
+</body>
+
+</html>

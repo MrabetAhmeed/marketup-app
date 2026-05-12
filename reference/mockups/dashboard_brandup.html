@@ -1,0 +1,1902 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>MARKET-UP | Profil BrandUP — TechnoFab Industries</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap"
+        rel="stylesheet" />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
+        rel="stylesheet" />
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+
+        .font-heading {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+        }
+
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+
+        .icon-fill {
+            font-variation-settings: 'FILL' 1;
+        }
+
+        /* ─────────── SIDEBAR NAV (canon Cluster 1) ─────────── */
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 8px 20px;
+            font-size: 13px;
+            font-weight: 500;
+            color: #616161;
+            border-left: 3px solid transparent;
+            transition: background-color 0.15s ease, color 0.15s ease;
+            cursor: pointer;
+            text-decoration: none;
+            line-height: 1.4;
+        }
+
+        .nav-item .material-symbols-outlined {
+            font-size: 18px;
+            color: #8A8886;
+            transition: color 0.15s ease;
+            flex-shrink: 0;
+        }
+
+        .nav-item:hover {
+            background: #F5F5F5;
+            color: #242424;
+        }
+
+        .nav-item:hover .material-symbols-outlined {
+            color: #616161;
+        }
+
+        .nav-item.active {
+            background: #EFF6FC;
+            border-left-color: #0078D4;
+            color: #0078D4;
+            font-weight: 600;
+        }
+
+        .nav-item.active .material-symbols-outlined {
+            color: #0078D4;
+        }
+
+        .section-label {
+            font-size: 9px;
+            font-weight: 700;
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+            color: #8A8886;
+            padding: 16px 20px 6px;
+            user-select: none;
+        }
+
+        nav::-webkit-scrollbar {
+            width: 4px;
+        }
+
+        nav::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        nav::-webkit-scrollbar-thumb {
+            background: #E0E0E0;
+            border-radius: 2px;
+        }
+
+        nav::-webkit-scrollbar-thumb:hover {
+            background: #C8C6C4;
+        }
+
+        /* ─────────── TOPBAR ─────────── */
+        .icon-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            color: #424242;
+            transition: background-color 0.15s ease;
+            position: relative;
+            background: transparent;
+            border: none;
+            cursor: pointer;
+        }
+
+        .icon-btn:hover {
+            background: #F5F5F5;
+        }
+
+        .icon-btn .material-symbols-outlined {
+            font-size: 22px;
+        }
+
+        /* ─────────── DROPDOWNS ─────────── */
+        .dropdown-panel {
+            position: absolute;
+            top: calc(100% + 8px);
+            right: 0;
+            background: white;
+            border: 1px solid #E0E0E0;
+            border-radius: 12px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.16);
+            opacity: 0;
+            transform: translateY(-4px);
+            pointer-events: none;
+            transition: opacity 0.15s ease, transform 0.15s ease;
+            z-index: 40;
+        }
+
+        .dropdown-panel.open {
+            opacity: 1;
+            transform: translateY(0);
+            pointer-events: auto;
+        }
+
+        .dropdown-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px 16px;
+            font-size: 13px;
+            color: #242424;
+            text-decoration: none;
+            transition: background-color 0.1s ease;
+            cursor: pointer;
+        }
+
+        .dropdown-item:hover {
+            background: #F5F5F5;
+        }
+
+        .dropdown-item .material-symbols-outlined {
+            font-size: 18px;
+            color: #616161;
+            flex-shrink: 0;
+        }
+
+        .dropdown-item .ext-arrow {
+            margin-left: auto;
+            font-size: 14px;
+            color: #8A8886;
+        }
+
+        .dropdown-item--danger {
+            color: #B91C1C;
+        }
+
+        .dropdown-item--danger .material-symbols-outlined {
+            color: #B91C1C;
+        }
+
+        .dropdown-item--danger:hover {
+            background: #FEF2F2;
+        }
+
+        .dropdown-section-label {
+            padding: 12px 16px 6px;
+            font-size: 9px;
+            font-weight: 700;
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+            color: #8A8886;
+            user-select: none;
+        }
+
+        .dropdown-divider {
+            height: 1px;
+            background: #E0E0E0;
+            margin: 4px 0;
+        }
+
+        /* ─────────── CARDS ─────────── */
+        .card {
+            background: white;
+            border: 1px solid #E0E0E0;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.04);
+        }
+
+        /* ─────────── SWITCH (canon Cluster 1) ─────────── */
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 36px;
+            height: 20px;
+            flex-shrink: 0;
+        }
+
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .switch-track {
+            position: absolute;
+            cursor: pointer;
+            inset: 0;
+            background: #C8C6C4;
+            border-radius: 10px;
+            transition: background 0.2s ease;
+        }
+
+        .switch-track::before {
+            content: '';
+            position: absolute;
+            height: 14px;
+            width: 14px;
+            left: 3px;
+            top: 3px;
+            background: white;
+            border-radius: 50%;
+            transition: transform 0.2s ease;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+        }
+
+        .switch input:checked+.switch-track {
+            background: #0078D4;
+        }
+
+        .switch input:checked+.switch-track::before {
+            transform: translateX(16px);
+        }
+
+        /* ─────────── FORM CONTROLS canon Fluent ─────────── */
+        .field-label {
+            display: block;
+            font-size: 11px;
+            font-weight: 600;
+            color: #616161;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            margin-bottom: 6px;
+        }
+
+        .field-label .req {
+            color: #B91C1C;
+            font-weight: 700;
+            margin-left: 2px;
+        }
+
+        .field-label .opt {
+            color: #8A8886;
+            font-weight: 400;
+            text-transform: none;
+            letter-spacing: normal;
+            margin-left: 4px;
+        }
+
+        .field-input,
+        .field-select,
+        .field-textarea {
+            width: 100%;
+            padding: 9px 12px;
+            font-family: inherit;
+            font-size: 13.5px;
+            color: #242424;
+            background: #FFFFFF;
+            border: 1px solid #D1D1D1;
+            border-radius: 4px;
+            transition: border-color 0.15s ease, box-shadow 0.15s ease;
+            outline: none;
+        }
+
+        .field-input::placeholder,
+        .field-textarea::placeholder {
+            color: #8A8886;
+        }
+
+        .field-input:hover,
+        .field-select:hover,
+        .field-textarea:hover {
+            border-color: #8A8886;
+        }
+
+        .field-input:focus,
+        .field-select:focus,
+        .field-textarea:focus {
+            border-color: #0078D4;
+            box-shadow: 0 0 0 2px #EFF6FC;
+        }
+
+        .field-input:disabled,
+        .field-select:disabled,
+        .field-textarea:disabled,
+        .field-input[readonly] {
+            background: #F5F5F5;
+            color: #616161;
+            cursor: not-allowed;
+        }
+
+        .field-textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        .field-help {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            font-size: 11px;
+            color: #8A8886;
+            margin-top: 4px;
+        }
+
+        .field-help .material-symbols-outlined {
+            font-size: 13px;
+        }
+
+        /* ─────────── READONLY BADGE (field lié au compte) ─────────── */
+        .readonly-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            font-size: 10px;
+            font-weight: 600;
+            color: #616161;
+            background: #F5F5F5;
+            border: 1px solid #E0E0E0;
+            padding: 2px 7px;
+            border-radius: 4px;
+        }
+
+        .readonly-badge .material-symbols-outlined {
+            font-size: 12px;
+        }
+
+        /* ─────────── STATUS BADGES (4 états) ─────────── */
+        .status-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 11px;
+            font-weight: 600;
+            padding: 3px 9px;
+            border-radius: 4px;
+            border: 1px solid;
+        }
+
+        .status-pill .dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+        }
+
+        .status-pill--active {
+            color: #107C10;
+            background: #F0FDF4;
+            border-color: #B7EBC0;
+        }
+
+        .status-pill--active .dot {
+            background: #107C10;
+        }
+
+        .status-pill--pending {
+            color: #92400E;
+            background: #FFFBEB;
+            border-color: #FDE68A;
+        }
+
+        .status-pill--pending .dot {
+            background: #D97706;
+        }
+
+        .status-pill--refused {
+            color: #B91C1C;
+            background: #FEF2F2;
+            border-color: #FCA5A5;
+        }
+
+        .status-pill--refused .dot {
+            background: #DC2626;
+        }
+
+        .status-pill--disabled {
+            color: #616161;
+            background: #F5F5F5;
+            border-color: #E0E0E0;
+        }
+
+        .status-pill--disabled .dot {
+            background: #8A8886;
+        }
+
+        /* ─────────── BUTTONS ─────────── */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            padding: 9px 16px;
+            font-size: 13px;
+            font-weight: 600;
+            border-radius: 4px;
+            transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+            cursor: pointer;
+            border: 1px solid transparent;
+            text-decoration: none;
+            line-height: 1.2;
+            white-space: nowrap;
+        }
+
+        .btn .material-symbols-outlined {
+            font-size: 16px;
+        }
+
+        .btn-primary {
+            background: #0078D4;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #106EBE;
+        }
+
+        .btn-primary:disabled {
+            background: #C8C6C4;
+            color: white;
+            cursor: not-allowed;
+        }
+
+        .btn-secondary {
+            background: white;
+            color: #242424;
+            border-color: #D1D1D1;
+        }
+
+        .btn-secondary:hover {
+            background: #F5F5F5;
+            border-color: #8A8886;
+        }
+
+        .btn-ghost {
+            background: transparent;
+            color: #0078D4;
+            border-color: transparent;
+        }
+
+        .btn-ghost:hover {
+            background: #EFF6FC;
+        }
+
+        .btn-danger-ghost {
+            background: transparent;
+            color: #B91C1C;
+            border-color: transparent;
+        }
+
+        .btn-danger-ghost:hover {
+            background: #FEF2F2;
+        }
+
+        /* ─────────── MINI ICON BUTTON (galerie reorder) ─────────── */
+        .mini-icon-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 28px;
+            height: 28px;
+            border-radius: 4px;
+            background: white;
+            border: 1px solid #E0E0E0;
+            color: #616161;
+            cursor: pointer;
+            transition: background-color 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+        }
+
+        .mini-icon-btn:hover {
+            background: #F5F5F5;
+            color: #242424;
+            border-color: #8A8886;
+        }
+
+        .mini-icon-btn:disabled {
+            color: #C8C6C4;
+            background: #FAFAFA;
+            cursor: not-allowed;
+            border-color: #EAEAEA;
+        }
+
+        .mini-icon-btn--danger:hover {
+            color: #B91C1C;
+            background: #FEF2F2;
+            border-color: #FCA5A5;
+        }
+
+        .mini-icon-btn .material-symbols-outlined {
+            font-size: 16px;
+        }
+
+        /* ─────────── GALLERY — role badge ─────────── */
+        .role-badge {
+            position: absolute;
+            top: 6px;
+            left: 6px;
+            display: inline-flex;
+            align-items: center;
+            gap: 3px;
+            font-size: 9.5px;
+            font-weight: 700;
+            padding: 3px 6px;
+            border-radius: 4px;
+            color: white;
+            letter-spacing: 0.02em;
+        }
+
+        .role-badge--principal {
+            background: #0078D4;
+        }
+
+        .role-badge--secondary {
+            background: #374151;
+        }
+
+        .role-badge--gallery {
+            background: #8A8886;
+        }
+
+        /* ─────────── MOBILE DRAWER ─────────── */
+        #sidebar {
+            transition: transform 0.25s ease-out;
+        }
+
+        @media (max-width: 767px) {
+            #sidebar {
+                transform: translateX(-100%);
+            }
+
+            #sidebar.open {
+                transform: translateX(0);
+                box-shadow: 8px 0 32px rgba(0, 0, 0, 0.16);
+            }
+        }
+
+        /* ─────────── STICKY ACTION BAR (mobile) ─────────── */
+        @media (max-width: 767px) {
+            .action-bar-sticky {
+                position: sticky;
+                bottom: 0;
+                z-index: 20;
+                background: white;
+                border-top: 1px solid #E0E0E0;
+                margin: 0 -1rem;
+                padding: 0.75rem 1rem;
+                box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.04);
+            }
+        }
+    </style>
+</head>
+
+<body class="bg-[#F5F5F5] min-h-screen">
+
+    <!-- Backdrop mobile -->
+    <div id="backdrop" class="md:hidden fixed inset-0 bg-gradient-to-b from-black/40 to-black/20 z-40 hidden"
+        aria-hidden="true"></div>
+
+    <!-- ═════════════════════════════════════════════════════
+         SIDEBAR (canon Cluster 1 — item BrandUP actif)
+         ═════════════════════════════════════════════════════ -->
+    <aside id="sidebar"
+        class="fixed top-0 left-0 w-60 h-screen bg-white border-r border-[#E0E0E0] flex flex-col z-50 md:translate-x-0"
+        aria-label="Navigation principale">
+
+        <a href="dashboard_index.html" class="flex items-center gap-2.5 px-5 py-4 border-b border-[#E0E0E0] shrink-0 h-14 hover:bg-[#FAFAFA] transition-colors" title="Retour au tableau de bord">
+            <span class="material-symbols-outlined icon-fill text-[#0078D4]" style="font-size:22px">hexagon</span>
+            <div class="leading-tight min-w-0">
+                <div class="text-[#242424] font-heading font-bold text-[15px] tracking-tight">MARKET-UP</div>
+                <div class="text-[10px] text-[#8A8886] tracking-wide">vivasky.media</div>
+            </div>
+        </a>
+
+        <nav class="flex-1 overflow-y-auto pt-2 pb-3">
+            <div class="section-label">Entreprise</div>
+            <a href="dashboard_index.html" class="nav-item">
+                <span class="material-symbols-outlined">dashboard</span>
+                <span class="flex-1 min-w-0 truncate">Vue d'ensemble</span>
+            </a>
+            <a href="dashboard_account.html" class="nav-item">
+                <span class="material-symbols-outlined">business</span>
+                <span class="flex-1 min-w-0 truncate">Compte</span>
+            </a>
+
+            <div class="section-label">Mes profils</div>
+            <a href="dashboard_brandup.html" class="nav-item active" aria-current="page">
+                <span class="material-symbols-outlined">storefront</span>
+                <span class="flex-1 min-w-0 truncate">BrandUP</span>
+                <span id="bu-sidebar-dot" class="w-1.5 h-1.5 rounded-full bg-[#DC2626] shrink-0" title="Refusé"></span>
+            </a>
+            <a href="dashboard_sponsoring.html" class="nav-item">
+                <span class="material-symbols-outlined">play_circle</span>
+                <span class="flex-1 min-w-0 truncate">TraceUP</span>
+                <span class="w-1.5 h-1.5 rounded-full bg-[#D97706] shrink-0" title="En attente"></span>
+            </a>
+            <a href="dashboard_linkup.html" class="nav-item">
+                <span class="material-symbols-outlined">qr_code_2</span>
+                <span class="flex-1 min-w-0 truncate">LinkUP</span>
+                <span class="w-1.5 h-1.5 rounded-full bg-[#107C10] shrink-0" title="Actif"></span>
+            </a>
+
+            <div class="section-label">Visibilité</div>
+            <a href="dashboard_boost.html" class="nav-item">
+                <span class="material-symbols-outlined">trending_up</span>
+                <span class="flex-1 min-w-0 truncate">Boost</span>
+                <span
+                    class="text-[9px] font-bold tracking-wider text-[#107C10] bg-[#F0FDF4] border border-[#B7EBC0] px-1.5 py-[2px] rounded shrink-0">1 ACTIF</span>
+            </a>
+            <a href="dashboard_sponsoring.html" class="nav-item">
+                <span class="material-symbols-outlined">campaign</span>
+                <span class="flex-1 min-w-0 truncate">Sponsoring</span>
+                <span class="w-1.5 h-1.5 rounded-full bg-[#107C10] shrink-0" title="Campagne active"></span>
+            </a>
+
+            <div class="section-label">Engagement</div>
+            <a href="dashboard_rse.html" class="nav-item">
+                <span class="material-symbols-outlined">volunteer_activism</span>
+                <span class="flex-1 min-w-0 truncate">Badge RSE</span>
+                <span
+                    class="text-[9px] font-bold tracking-wider text-[#107C10] bg-[#F0FDF4] border border-[#B7EBC0] px-1.5 py-[2px] rounded shrink-0">VALIDÉ</span>
+            </a>
+
+            <div class="section-label">Administration</div>
+            <a href="dashboard_billing.html" class="nav-item">
+                <span class="material-symbols-outlined">receipt_long</span>
+                <span class="flex-1 min-w-0 truncate">Facturation</span>
+            </a>
+            <a href="dashboard_notifications.html" class="nav-item">
+                <span class="material-symbols-outlined">notifications</span>
+                <span class="flex-1 min-w-0 truncate">Notifications</span>
+                <span
+                    class="min-w-[18px] h-[18px] px-1 rounded-full bg-[#DC2626] text-white text-[10px] font-bold flex items-center justify-center shrink-0">3</span>
+            </a>
+            <a href="dashboard_settings.html" class="nav-item">
+                <span class="material-symbols-outlined">settings</span>
+                <span class="flex-1 min-w-0 truncate">Paramètres</span>
+            </a>
+        </nav>
+
+        <div class="shrink-0 border-t border-[#E0E0E0]">
+            <div class="flex items-center gap-3 px-4 py-3">
+                <div class="w-9 h-9 rounded-full bg-[#374151] flex items-center justify-center shrink-0">
+                    <span id="sb-avatar-initials" class="text-white font-heading font-bold text-[13px]">TF</span>
+                </div>
+                <div class="min-w-0 flex-1">
+                    <div id="sb-company-name" class="text-[#242424] text-[12px] font-semibold truncate">TechnoFab Industries</div>
+                    <div id="sb-company-meta" class="text-[#8A8886] text-[10px] truncate">B2B · Sousse</div>
+                </div>
+            </div>
+            <div class="flex items-center gap-2.5 px-4 py-2.5 border-t border-[#E0E0E0]">
+                <div
+                    class="w-6 h-6 rounded-full bg-[#F5F5F5] border border-[#E0E0E0] flex items-center justify-center shrink-0">
+                    <span id="sb-user-initials" class="text-[#616161] text-[10px] font-semibold">AM</span>
+                </div>
+                <div class="min-w-0 flex-1">
+                    <div id="sb-user-name" class="text-[#424242] text-[11px] font-medium truncate">Ahmed Mrabet</div>
+                    <div class="text-[#8A8886] text-[9px] truncate">Propriétaire</div>
+                </div>
+                <button
+                    class="w-7 h-7 flex items-center justify-center rounded text-[#8A8886] hover:text-[#242424] hover:bg-[#F5F5F5] transition-colors shrink-0"
+                    title="Se déconnecter" aria-label="Se déconnecter" onclick="window.location.href='auth_connexion.html';">
+                    <span class="material-symbols-outlined" style="font-size:16px">logout</span>
+                </button>
+            </div>
+        </div>
+
+    </aside>
+
+    <!-- ═════════════════════════════════════════════════════
+         SHELL
+         ═════════════════════════════════════════════════════ -->
+    <div class="md:ml-60 min-h-screen flex flex-col">
+
+        <!-- TOPBAR canon Cluster 1 -->
+        <header
+            class="sticky top-0 z-30 h-14 bg-white border-b border-[#E0E0E0] flex items-center justify-between px-4 md:px-6 gap-4"
+            role="banner">
+
+            <div class="flex items-center gap-3 min-w-0 flex-1">
+                <button id="menuBtn" class="icon-btn md:hidden -ml-2 shrink-0"
+                    aria-label="Ouvrir le menu de navigation">
+                    <span class="material-symbols-outlined">menu</span>
+                </button>
+                <div class="min-w-0 leading-tight">
+                    <nav class="hidden md:flex items-center gap-1.5 text-[11px] text-[#8A8886] mb-0.5" aria-label="Fil d'Ariane">
+                        <a href="dashboard_index.html" class="hover:text-[#0078D4] hover:underline transition-colors">Dashboard</a>
+                        <span class="material-symbols-outlined" style="font-size:12px">chevron_right</span>
+                        <span class="text-[#8A8886]">Mes profils</span>
+                        <span class="material-symbols-outlined" style="font-size:12px">chevron_right</span>
+                        <span class="text-[#616161] font-medium">BrandUP</span>
+                    </nav>
+                    <h1 class="font-heading text-[16px] font-bold text-[#242424] truncate">Profil BrandUP</h1>
+                    <p class="hidden md:block text-[12px] text-[#616161] truncate">Éditez les informations affichées sur votre vitrine publique</p>
+                </div>
+            </div>
+
+            <div class="flex items-center gap-1 shrink-0">
+
+                <!-- Cloche notifications -->
+                <div class="relative">
+                    <button id="bellBtn" class="icon-btn" aria-label="Notifications" aria-haspopup="true"
+                        aria-expanded="false">
+                        <span class="material-symbols-outlined">notifications</span>
+                        <span
+                            class="absolute top-1.5 right-1.5 min-w-[16px] h-[16px] px-1 rounded-full bg-[#DC2626] text-white text-[9px] font-bold flex items-center justify-center leading-none ring-2 ring-white">3</span>
+                    </button>
+
+                    <div id="bellDropdown" class="dropdown-panel w-[340px] max-w-[calc(100vw-24px)]">
+                        <div class="flex items-center justify-between px-4 py-3 border-b border-[#E0E0E0]">
+                            <div class="font-heading font-semibold text-[13px] text-[#242424]">Notifications</div>
+                            <div class="text-[11px] text-[#616161]"><span class="text-[#DC2626] font-semibold">3</span> non lues</div>
+                        </div>
+                        <div class="max-h-[320px] overflow-y-auto">
+                            <a href="dashboard_notifications.html" class="block px-4 py-3 hover:bg-[#F5F5F5] transition-colors border-b border-[#F0F0F0]">
+                                <div class="flex items-start gap-3">
+                                    <span class="w-2 h-2 rounded-full bg-[#0078D4] mt-1.5 shrink-0"></span>
+                                    <div class="min-w-0 flex-1">
+                                        <div class="text-[12.5px] text-[#242424] leading-snug mb-1"><span class="font-semibold">Votre boost LinkUP</span> expire dans 3 jours</div>
+                                        <div class="text-[11px] text-[#8A8886]">Il y a 2 heures</div>
+                                    </div>
+                                    <span class="material-symbols-outlined text-[#0078D4] shrink-0 mt-0.5" style="font-size:16px">trending_up</span>
+                                </div>
+                            </a>
+                            <a href="dashboard_notifications.html" class="block px-4 py-3 hover:bg-[#F5F5F5] transition-colors border-b border-[#F0F0F0]">
+                                <div class="flex items-start gap-3">
+                                    <span class="w-2 h-2 rounded-full bg-[#0078D4] mt-1.5 shrink-0"></span>
+                                    <div class="min-w-0 flex-1">
+                                        <div class="text-[12.5px] text-[#242424] leading-snug mb-1"><span class="font-semibold">Votre campagne Sponsoring</span> a généré 1 250 impressions</div>
+                                        <div class="text-[11px] text-[#8A8886]">Il y a 1 jour</div>
+                                    </div>
+                                    <span class="material-symbols-outlined text-[#0078D4] shrink-0 mt-0.5" style="font-size:16px">campaign</span>
+                                </div>
+                            </a>
+                            <a href="dashboard_notifications.html" class="block px-4 py-3 hover:bg-[#F5F5F5] transition-colors">
+                                <div class="flex items-start gap-3">
+                                    <span class="w-2 h-2 rounded-full bg-[#0078D4] mt-1.5 shrink-0"></span>
+                                    <div class="min-w-0 flex-1">
+                                        <div class="text-[12.5px] text-[#242424] leading-snug mb-1"><span class="font-semibold">Reçu RSE soumis</span> — Association Al Ahed en attente de validation</div>
+                                        <div class="text-[11px] text-[#8A8886]">Il y a 1 jour</div>
+                                    </div>
+                                    <span class="material-symbols-outlined text-[#C5A059] shrink-0 mt-0.5" style="font-size:16px">volunteer_activism</span>
+                                </div>
+                            </a>
+                        </div>
+                        <a href="dashboard_notifications.html"
+                            class="flex items-center justify-center gap-1.5 px-4 py-2.5 text-[12px] font-semibold text-[#0078D4] hover:bg-[#EFF6FC] border-t border-[#E0E0E0] transition-colors rounded-b-xl">
+                            Voir toutes les notifications
+                            <span class="material-symbols-outlined" style="font-size:14px">arrow_forward</span>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Avatar entreprise -->
+                <div class="relative">
+                    <button id="avatarBtn"
+                        class="flex items-center gap-1 pl-1 pr-2 py-1 rounded-lg hover:bg-[#F5F5F5] transition-colors ml-1"
+                        aria-label="Menu compte" aria-haspopup="true" aria-expanded="false">
+                        <div class="w-8 h-8 rounded-full bg-[#0078D4] flex items-center justify-center shrink-0">
+                            <span id="avd-trigger-initials" class="text-white font-heading font-bold text-[12px]">TF</span>
+                        </div>
+                        <span class="material-symbols-outlined text-[#8A8886] hidden md:inline"
+                            style="font-size:18px">expand_more</span>
+                    </button>
+
+                    <div id="avatarDropdown" class="dropdown-panel w-[300px] max-w-[calc(100vw-24px)]">
+                        <div class="flex items-center gap-3 px-4 py-3 border-b border-[#E0E0E0]">
+                            <div class="w-10 h-10 rounded-full bg-[#0078D4] flex items-center justify-center shrink-0">
+                                <span id="avd-initials" class="text-white font-heading font-bold text-[13px]">TF</span>
+                            </div>
+                            <div class="min-w-0 flex-1">
+                                <div id="avd-company-name" class="font-heading font-semibold text-[13px] text-[#242424] truncate">TechnoFab
+                                    Industries</div>
+                                <div id="avd-company-meta" class="text-[11px] text-[#616161] truncate">B2B · Sousse · Ahmed Mrabet</div>
+                            </div>
+                        </div>
+                        <div class="dropdown-section-label">Mes profils publics</div>
+                        <a id="avd-link-brandup" href="public_brandup_technofab-industries.html" target="_blank" rel="noopener" class="dropdown-item">
+                            <span class="material-symbols-outlined">storefront</span>
+                            <span class="flex-1">BrandUP</span>
+                            <span class="material-symbols-outlined ext-arrow">open_in_new</span>
+                        </a>
+                        <a id="avd-link-traceup" href="public_traceup_technofab-industries.html" target="_blank" rel="noopener" class="dropdown-item">
+                            <span class="material-symbols-outlined">play_circle</span>
+                            <span class="flex-1">TraceUP</span>
+                            <span class="material-symbols-outlined ext-arrow">open_in_new</span>
+                        </a>
+                        <a id="avd-link-linkup" href="public_linkup_technofab-industries.html" target="_blank" rel="noopener" class="dropdown-item">
+                            <span class="material-symbols-outlined">qr_code_2</span>
+                            <span class="flex-1">LinkUP</span>
+                            <span class="material-symbols-outlined ext-arrow">open_in_new</span>
+                        </a>
+                        <div class="dropdown-divider"></div>
+                        <a href="dashboard_settings.html" class="dropdown-item">
+                            <span class="material-symbols-outlined">settings</span>
+                            <span class="flex-1">Paramètres</span>
+                        </a>
+                        <button class="dropdown-item dropdown-item--danger w-full text-left">
+                            <span class="material-symbols-outlined">logout</span>
+                            <span class="flex-1">Se déconnecter</span>
+                        </button>
+                    </div>
+                </div>
+
+            </div>
+        </header>
+
+        <!-- ═════════════════════════════════════════════════
+             CONTENU — Édition profil BrandUP
+             ═════════════════════════════════════════════════ -->
+        <main class="flex-1 p-4 md:p-8">
+            <div class="max-w-[1120px] mx-auto space-y-6">
+
+                <!-- ═════ PAGE HEADER (inline, pas de card) ═════ -->
+                <section class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+                    <div class="flex items-start gap-3 min-w-0">
+                        <div class="w-11 h-11 rounded-lg bg-[#EFF6FC] flex items-center justify-center shrink-0">
+                            <span class="material-symbols-outlined text-[#0078D4]"
+                                style="font-size:24px">storefront</span>
+                        </div>
+                        <div class="min-w-0">
+                            <h2 class="font-heading font-bold text-[20px] text-[#242424] leading-tight">
+                                Profil BrandUP
+                            </h2>
+                            <!-- Status region (hydrated at runtime by status-driven JS) -->
+                            <div id="bu-hero-status-region">
+                                <div class="flex items-center gap-2 mt-1.5 flex-wrap">
+                                    <span class="status-pill status-pill--refused">
+                                        <span class="dot"></span>
+                                        Refusé par l'administrateur
+                                    </span>
+                                    <span class="text-[11px] text-[#8A8886]">
+                                        Soumis le 16 avril 2026 · Refusé le 18 avril 2026
+                                    </span>
+                                </div>
+                                <div class="flex items-center gap-1.5 mt-1.5 text-[11.5px] text-[#8A8886]">
+                                    <span class="material-symbols-outlined" style="font-size:14px">visibility_off</span>
+                                    <span>
+                                        Profil actuellement <strong class="text-[#616161]">non visible</strong> sur
+                                        <span class="text-[#616161]">/brandup</span>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-2 shrink-0">
+                        <a id="bu-preview-link" href="public_brandup_technofab-industries.html" target="_blank" rel="noopener"
+                            class="btn btn-secondary">
+                            <span class="material-symbols-outlined">open_in_new</span>
+                            Aperçu public
+                        </a>
+                        <a href="dashboard_boost.html" class="btn btn-primary">
+                            <span class="material-symbols-outlined icon-fill">bolt</span>
+                            Booster ce profil
+                        </a>
+                    </div>
+                </section>
+
+                <!-- ═════ STATUS BLOCK REGION (hydrated at runtime — content varies by profile.status) ═════ -->
+                <section id="bu-status-block-region" class="border border-[#FCA5A5] bg-[#FEF2F2] rounded-lg overflow-hidden"
+                    role="alert" aria-live="polite">
+                    <div class="p-5 flex items-start gap-4">
+                        <div class="w-10 h-10 rounded-lg bg-white border border-[#FCA5A5] flex items-center justify-center shrink-0">
+                            <span class="material-symbols-outlined icon-fill text-[#DC2626]"
+                                style="font-size:22px">report</span>
+                        </div>
+                        <div class="min-w-0 flex-1">
+                            <div class="font-heading font-bold text-[14px] text-[#991B1B] mb-1">
+                                Votre soumission a été refusée
+                            </div>
+                            <p class="text-[13px] text-[#991B1B] leading-relaxed mb-3">
+                                L'équipe d'administration a examiné votre profil le 18 avril 2026 et n'a pas pu le
+                                publier pour la raison suivante :
+                            </p>
+                            <div class="bg-white border border-[#FCA5A5] rounded p-3 mb-3">
+                                <div class="text-[10px] font-bold text-[#8A8886] uppercase tracking-wider mb-1">
+                                    Motif de l'administrateur
+                                </div>
+                                <p class="text-[13px] text-[#242424] leading-relaxed italic">
+                                    « Le logo fourni présente une résolution insuffisante (largeur 120 px).
+                                    Merci de fournir une image nette d'au moins 400 px de large au format
+                                    JPG ou PNG. La description du secteur doit également être reformulée
+                                    pour éviter les termes purement promotionnels. »
+                                </p>
+                            </div>
+                            <p class="text-[12px] text-[#991B1B] leading-relaxed">
+                                Corrigez les points mentionnés puis cliquez sur <strong>Enregistrer et resoumettre</strong>
+                                en bas de page. Votre profil repassera en validation sous 24-48 h.
+                            </p>
+                        </div>
+                        <button
+                            class="w-8 h-8 rounded flex items-center justify-center text-[#991B1B] hover:bg-white/60 transition-colors shrink-0 -mt-1 -mr-1"
+                            aria-label="Masquer le message">
+                            <span class="material-symbols-outlined" style="font-size:18px">close</span>
+                        </button>
+                    </div>
+                </section>
+
+                <!-- ═════ BANDEAU CONTEXTUEL — orientation vers /account ═════ -->
+                <section
+                    class="bg-[#EFF6FC] border border-[#C7DDF1] rounded-lg px-4 py-3 flex items-start md:items-center gap-3">
+                    <span class="material-symbols-outlined text-[#0078D4] shrink-0 mt-[1px] md:mt-0"
+                        style="font-size:20px">info</span>
+                    <div class="min-w-0 flex-1 text-[12.5px] text-[#242424] leading-snug">
+                        Cette page ne gère que votre <strong>vitrine BrandUP</strong> (pitch, à propos,
+                        chiffres clés, galerie).
+                        <span class="text-[#616161]">Les informations générales de l'entreprise (nom, logo,
+                            RNE, téléphone, email, adresse) se modifient depuis la page Compte.</span>
+                    </div>
+                    <a href="dashboard_account.html"
+                        class="shrink-0 inline-flex items-center gap-1 text-[12px] font-semibold text-[#0078D4] hover:underline whitespace-nowrap">
+                        Gérer depuis Compte
+                        <span class="material-symbols-outlined" style="font-size:14px">arrow_forward</span>
+                    </a>
+                </section>
+
+                <!-- ═════ CARD TOGGLE VISIBILITÉ ═════ -->
+                <section class="card p-5 flex items-center gap-4">
+                    <div class="w-10 h-10 rounded-lg bg-[#EFF6FC] flex items-center justify-center shrink-0">
+                        <span class="material-symbols-outlined text-[#0078D4]" style="font-size:20px">visibility</span>
+                    </div>
+                    <div class="min-w-0 flex-1">
+                        <div class="font-heading font-semibold text-[14px] text-[#242424] leading-tight">
+                            Profil public visible
+                        </div>
+                        <div class="text-[12px] text-[#616161] mt-0.5 leading-snug">
+                            Quand activé, votre profil apparaît dans les résultats du moteur BrandUP.
+                            <span class="text-[#8A8886]">Actuellement masqué suite au refus.</span>
+                        </div>
+                    </div>
+                    <label class="switch shrink-0" aria-label="Activer la visibilité du profil BrandUP">
+                        <input type="checkbox" />
+                        <span class="switch-track"></span>
+                    </label>
+                </section>
+
+                <!-- ═════ SECTION : PRÉSENTATION ═════ -->
+                <section class="card p-5 md:p-6">
+                    <div class="mb-5">
+                        <h3 class="font-heading font-bold text-[15px] text-[#242424]">Présentation</h3>
+                        <p class="text-[12px] text-[#616161] mt-0.5">
+                            Texte de présentation affiché sur votre vitrine BrandUP
+                        </p>
+                    </div>
+
+                    <div class="space-y-5">
+
+                        <!-- Pitch -->
+                        <div>
+                            <label for="bu-pitch" class="field-label">
+                                Description courte (pitch)
+                                <span class="req">*</span>
+                            </label>
+                            <input id="bu-pitch" class="field-input" type="text" maxlength="150"
+                                value="Fabricant tunisien de composants mécaniques de précision pour l'industrie automobile et aéronautique." />
+                            <div class="field-help">
+                                <span class="material-symbols-outlined">info</span>
+                                Phrase affichée en header de votre profil · 150 caractères max · <span
+                                    class="font-semibold text-[#616161]">105/150</span>
+                            </div>
+                        </div>
+
+                        <!-- À propos -->
+                        <div>
+                            <label for="bu-about" class="field-label">
+                                À propos <span class="req">*</span>
+                            </label>
+                            <textarea id="bu-about" class="field-textarea" rows="6" maxlength="1000">Fondée en 2010 à Sousse, TechnoFab Industries est spécialisée dans la conception et la fabrication de pièces mécaniques usinées haute précision. Nos ateliers de 4 000 m² intègrent des centres d'usinage CNC de dernière génération et une équipe de 45 ingénieurs et techniciens certifiés ISO 9001.
+
+Nous accompagnons plus de 80 clients en Tunisie, Europe et Maghreb, dans les secteurs de l'automobile, de l'aéronautique et de la machine-outil.</textarea>
+                            <div class="field-help">
+                                <span class="material-symbols-outlined">info</span>
+                                Texte complet affiché sur votre profil · 1000 caractères max · <span
+                                    class="font-semibold text-[#616161]">487/1000</span>
+                            </div>
+                        </div>
+
+                    </div>
+                </section>
+
+                <!-- ═════ SECTION : GALERIE ═════ -->
+                <section class="card p-5 md:p-6">
+
+                    <div class="flex items-start justify-between mb-5 flex-wrap gap-2">
+                        <div>
+                            <h3 class="font-heading font-bold text-[15px] text-[#242424]">
+                                Galerie & ordre d'affichage
+                            </h3>
+                            <p class="text-[12px] text-[#616161] mt-0.5 leading-snug">
+                                Organisez jusqu'à 10 images. L'image <strong>#1</strong> est mise en avant,
+                                les <strong>#2</strong> et <strong>#3</strong> en format moyen, les suivantes
+                                en galerie secondaire.
+                            </p>
+                        </div>
+                        <span
+                            class="inline-flex items-center gap-1 text-[11px] font-semibold text-[#616161] bg-[#F5F5F5] border border-[#E0E0E0] px-2.5 py-1 rounded shrink-0">
+                            <span class="material-symbols-outlined" style="font-size:14px">photo_library</span>
+                            <span id="bu-gallery-count">7 / 10 images</span>
+                        </span>
+                    </div>
+
+                    <!-- ─── Aperçu public (disposition réelle) ─── -->
+                    <div class="mb-6">
+                        <div class="flex items-center gap-2 mb-2">
+                            <span class="text-[10px] font-bold text-[#8A8886] uppercase tracking-wider">
+                                Aperçu public
+                            </span>
+                            <span class="text-[11px] text-[#8A8886]">— disposition sur votre profil BrandUP</span>
+                        </div>
+                        <div class="bg-[#F5F5F5] border border-[#E0E0E0] rounded-lg p-3 md:p-4">
+                            <!-- Ligne 1 : 1 grande + 2 moyennes -->
+                            <div id="bu-gallery-row1" class="grid grid-cols-2 md:grid-cols-4 gap-2 md:gap-3 mb-2 md:mb-3">
+                                <div class="col-span-2 md:col-span-2 aspect-[4/3] bg-[#D1D1D1] rounded overflow-hidden relative">
+                                    <div class="absolute inset-0 bg-gradient-to-br from-[#0078D4]/20 to-[#8A8886]/30 flex items-center justify-center">
+                                        <span class="material-symbols-outlined text-white" style="font-size:32px">image</span>
+                                    </div>
+                                    <span class="role-badge role-badge--principal">#1 Principale</span>
+                                </div>
+                                <div class="aspect-[4/3] bg-[#D1D1D1] rounded overflow-hidden relative">
+                                    <div class="absolute inset-0 bg-gradient-to-br from-[#0078D4]/15 to-[#8A8886]/30 flex items-center justify-center">
+                                        <span class="material-symbols-outlined text-white" style="font-size:24px">image</span>
+                                    </div>
+                                    <span class="role-badge role-badge--secondary">#2</span>
+                                </div>
+                                <div class="aspect-[4/3] bg-[#D1D1D1] rounded overflow-hidden relative">
+                                    <div class="absolute inset-0 bg-gradient-to-br from-[#0078D4]/15 to-[#8A8886]/30 flex items-center justify-center">
+                                        <span class="material-symbols-outlined text-white" style="font-size:24px">image</span>
+                                    </div>
+                                    <span class="role-badge role-badge--secondary">#3</span>
+                                </div>
+                            </div>
+                            <!-- Ligne 2 : 7 petites (on n'affiche que 4 cette démo, les 3 autres seraient sur la grille) -->
+                            <div id="bu-gallery-row2" class="grid grid-cols-4 md:grid-cols-7 gap-2 md:gap-3">
+                                <div class="aspect-square bg-[#D1D1D1] rounded relative">
+                                    <span class="role-badge role-badge--gallery">#4</span>
+                                </div>
+                                <div class="aspect-square bg-[#D1D1D1] rounded relative">
+                                    <span class="role-badge role-badge--gallery">#5</span>
+                                </div>
+                                <div class="aspect-square bg-[#D1D1D1] rounded relative">
+                                    <span class="role-badge role-badge--gallery">#6</span>
+                                </div>
+                                <div class="aspect-square bg-[#D1D1D1] rounded relative">
+                                    <span class="role-badge role-badge--gallery">#7</span>
+                                </div>
+                                <div
+                                    class="aspect-square bg-white border border-dashed border-[#C8C6C4] rounded relative hidden md:flex items-center justify-center">
+                                    <span class="text-[10px] text-[#8A8886] text-center leading-tight px-1">Slot<br />libre</span>
+                                </div>
+                                <div
+                                    class="aspect-square bg-white border border-dashed border-[#C8C6C4] rounded relative hidden md:flex items-center justify-center">
+                                    <span class="text-[10px] text-[#8A8886] text-center leading-tight px-1">Slot<br />libre</span>
+                                </div>
+                                <div
+                                    class="aspect-square bg-white border border-dashed border-[#C8C6C4] rounded relative hidden md:flex items-center justify-center">
+                                    <span class="text-[10px] text-[#8A8886] text-center leading-tight px-1">Slot<br />libre</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- ─── Grille d'édition ─── -->
+                    <div>
+                        <div class="flex items-center justify-between mb-3 flex-wrap gap-2">
+                            <span class="text-[10px] font-bold text-[#8A8886] uppercase tracking-wider">
+                                Modifier l'ordre
+                            </span>
+                            <button class="btn btn-secondary">
+                                <span class="material-symbols-outlined">add_photo_alternate</span>
+                                Ajouter une image
+                            </button>
+                        </div>
+
+                        <div id="bu-gallery-grid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3">
+
+                            <!-- Image #1 — Principale -->
+                            <div class="bg-white border border-[#E0E0E0] rounded-lg overflow-hidden flex flex-col">
+                                <div class="aspect-[4/3] bg-gradient-to-br from-[#0078D4]/15 to-[#8A8886]/25 relative flex items-center justify-center">
+                                    <span class="material-symbols-outlined text-white" style="font-size:28px">image</span>
+                                    <span class="role-badge role-badge--principal">#1 Principale</span>
+                                </div>
+                                <div class="p-2 flex items-center justify-between gap-1 bg-[#FAFAFA] border-t border-[#E0E0E0]">
+                                    <div class="flex items-center gap-1">
+                                        <button class="mini-icon-btn" aria-label="Monter" disabled>
+                                            <span class="material-symbols-outlined">arrow_upward</span>
+                                        </button>
+                                        <button class="mini-icon-btn" aria-label="Descendre">
+                                            <span class="material-symbols-outlined">arrow_downward</span>
+                                        </button>
+                                    </div>
+                                    <button class="mini-icon-btn mini-icon-btn--danger" aria-label="Supprimer">
+                                        <span class="material-symbols-outlined">delete</span>
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- Image #2 — Secondaire -->
+                            <div class="bg-white border border-[#E0E0E0] rounded-lg overflow-hidden flex flex-col">
+                                <div class="aspect-[4/3] bg-gradient-to-br from-[#0078D4]/10 to-[#8A8886]/25 relative flex items-center justify-center">
+                                    <span class="material-symbols-outlined text-white" style="font-size:28px">image</span>
+                                    <span class="role-badge role-badge--secondary">#2 Secondaire</span>
+                                </div>
+                                <div class="p-2 flex items-center justify-between gap-1 bg-[#FAFAFA] border-t border-[#E0E0E0]">
+                                    <div class="flex items-center gap-1">
+                                        <button class="mini-icon-btn" aria-label="Monter">
+                                            <span class="material-symbols-outlined">arrow_upward</span>
+                                        </button>
+                                        <button class="mini-icon-btn" aria-label="Descendre">
+                                            <span class="material-symbols-outlined">arrow_downward</span>
+                                        </button>
+                                    </div>
+                                    <button class="mini-icon-btn mini-icon-btn--danger" aria-label="Supprimer">
+                                        <span class="material-symbols-outlined">delete</span>
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- Image #3 — Secondaire -->
+                            <div class="bg-white border border-[#E0E0E0] rounded-lg overflow-hidden flex flex-col">
+                                <div class="aspect-[4/3] bg-gradient-to-br from-[#0078D4]/10 to-[#8A8886]/25 relative flex items-center justify-center">
+                                    <span class="material-symbols-outlined text-white" style="font-size:28px">image</span>
+                                    <span class="role-badge role-badge--secondary">#3 Secondaire</span>
+                                </div>
+                                <div class="p-2 flex items-center justify-between gap-1 bg-[#FAFAFA] border-t border-[#E0E0E0]">
+                                    <div class="flex items-center gap-1">
+                                        <button class="mini-icon-btn" aria-label="Monter">
+                                            <span class="material-symbols-outlined">arrow_upward</span>
+                                        </button>
+                                        <button class="mini-icon-btn" aria-label="Descendre">
+                                            <span class="material-symbols-outlined">arrow_downward</span>
+                                        </button>
+                                    </div>
+                                    <button class="mini-icon-btn mini-icon-btn--danger" aria-label="Supprimer">
+                                        <span class="material-symbols-outlined">delete</span>
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- Image #4 — Galerie -->
+                            <div class="bg-white border border-[#E0E0E0] rounded-lg overflow-hidden flex flex-col">
+                                <div class="aspect-[4/3] bg-gradient-to-br from-[#8A8886]/20 to-[#8A8886]/35 relative flex items-center justify-center">
+                                    <span class="material-symbols-outlined text-white" style="font-size:28px">image</span>
+                                    <span class="role-badge role-badge--gallery">#4 Galerie</span>
+                                </div>
+                                <div class="p-2 flex items-center justify-between gap-1 bg-[#FAFAFA] border-t border-[#E0E0E0]">
+                                    <div class="flex items-center gap-1">
+                                        <button class="mini-icon-btn" aria-label="Monter">
+                                            <span class="material-symbols-outlined">arrow_upward</span>
+                                        </button>
+                                        <button class="mini-icon-btn" aria-label="Descendre">
+                                            <span class="material-symbols-outlined">arrow_downward</span>
+                                        </button>
+                                    </div>
+                                    <button class="mini-icon-btn mini-icon-btn--danger" aria-label="Supprimer">
+                                        <span class="material-symbols-outlined">delete</span>
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- Image #5 — Galerie -->
+                            <div class="bg-white border border-[#E0E0E0] rounded-lg overflow-hidden flex flex-col">
+                                <div class="aspect-[4/3] bg-gradient-to-br from-[#8A8886]/20 to-[#8A8886]/35 relative flex items-center justify-center">
+                                    <span class="material-symbols-outlined text-white" style="font-size:28px">image</span>
+                                    <span class="role-badge role-badge--gallery">#5 Galerie</span>
+                                </div>
+                                <div class="p-2 flex items-center justify-between gap-1 bg-[#FAFAFA] border-t border-[#E0E0E0]">
+                                    <div class="flex items-center gap-1">
+                                        <button class="mini-icon-btn" aria-label="Monter">
+                                            <span class="material-symbols-outlined">arrow_upward</span>
+                                        </button>
+                                        <button class="mini-icon-btn" aria-label="Descendre">
+                                            <span class="material-symbols-outlined">arrow_downward</span>
+                                        </button>
+                                    </div>
+                                    <button class="mini-icon-btn mini-icon-btn--danger" aria-label="Supprimer">
+                                        <span class="material-symbols-outlined">delete</span>
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- Image #6 — Galerie -->
+                            <div class="bg-white border border-[#E0E0E0] rounded-lg overflow-hidden flex flex-col">
+                                <div class="aspect-[4/3] bg-gradient-to-br from-[#8A8886]/20 to-[#8A8886]/35 relative flex items-center justify-center">
+                                    <span class="material-symbols-outlined text-white" style="font-size:28px">image</span>
+                                    <span class="role-badge role-badge--gallery">#6 Galerie</span>
+                                </div>
+                                <div class="p-2 flex items-center justify-between gap-1 bg-[#FAFAFA] border-t border-[#E0E0E0]">
+                                    <div class="flex items-center gap-1">
+                                        <button class="mini-icon-btn" aria-label="Monter">
+                                            <span class="material-symbols-outlined">arrow_upward</span>
+                                        </button>
+                                        <button class="mini-icon-btn" aria-label="Descendre">
+                                            <span class="material-symbols-outlined">arrow_downward</span>
+                                        </button>
+                                    </div>
+                                    <button class="mini-icon-btn mini-icon-btn--danger" aria-label="Supprimer">
+                                        <span class="material-symbols-outlined">delete</span>
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- Image #7 — Galerie -->
+                            <div class="bg-white border border-[#E0E0E0] rounded-lg overflow-hidden flex flex-col">
+                                <div class="aspect-[4/3] bg-gradient-to-br from-[#8A8886]/20 to-[#8A8886]/35 relative flex items-center justify-center">
+                                    <span class="material-symbols-outlined text-white" style="font-size:28px">image</span>
+                                    <span class="role-badge role-badge--gallery">#7 Galerie</span>
+                                </div>
+                                <div class="p-2 flex items-center justify-between gap-1 bg-[#FAFAFA] border-t border-[#E0E0E0]">
+                                    <div class="flex items-center gap-1">
+                                        <button class="mini-icon-btn" aria-label="Monter">
+                                            <span class="material-symbols-outlined">arrow_upward</span>
+                                        </button>
+                                        <button class="mini-icon-btn" aria-label="Descendre" disabled>
+                                            <span class="material-symbols-outlined">arrow_downward</span>
+                                        </button>
+                                    </div>
+                                    <button class="mini-icon-btn mini-icon-btn--danger" aria-label="Supprimer">
+                                        <span class="material-symbols-outlined">delete</span>
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- Slot : Ajouter une image -->
+                            <button
+                                class="aspect-[4/3.5] bg-white border-2 border-dashed border-[#C8C6C4] hover:border-[#0078D4] hover:bg-[#EFF6FC]/30 transition-colors rounded-lg flex flex-col items-center justify-center gap-2 text-[#616161] hover:text-[#0078D4] group">
+                                <span class="material-symbols-outlined group-hover:scale-110 transition-transform"
+                                    style="font-size:28px">add_photo_alternate</span>
+                                <span class="text-[12px] font-semibold">Ajouter</span>
+                                <span class="text-[10px] text-[#8A8886] group-hover:text-[#0078D4]">3 slots restants</span>
+                            </button>
+
+                        </div>
+
+                        <div class="mt-4 flex items-start gap-2 text-[11px] text-[#8A8886] leading-snug">
+                            <span class="material-symbols-outlined shrink-0 mt-[1px]" style="font-size:14px">info</span>
+                            <span>
+                                Formats acceptés : JPG, PNG · 5 Mo max par image · Résolution minimum recommandée :
+                                800 × 600 px. L'ordre est sauvegardé automatiquement à chaque modification.
+                            </span>
+                        </div>
+                    </div>
+
+                </section>
+
+                <!-- ═════ SECTION : RACCOURCIS VISIBILITÉ ═════ -->
+                <section>
+                    <div class="flex items-end justify-between mb-4">
+                        <div>
+                            <h2 class="font-heading font-semibold text-[13px] text-[#242424] uppercase tracking-wider">
+                                Raccourcis visibilité
+                            </h2>
+                            <p class="text-[12px] text-[#616161] mt-0.5">
+                                Accédez rapidement aux outils de mise en avant de votre profil BrandUP
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+
+                        <!-- ─── BOOST (état actif) ─── -->
+                        <div class="card p-5 flex flex-col">
+                            <div class="flex items-start justify-between mb-4">
+                                <div class="flex items-center gap-3 min-w-0">
+                                    <div
+                                        class="w-10 h-10 rounded-lg bg-[#EFF6FC] flex items-center justify-center shrink-0">
+                                        <span class="material-symbols-outlined icon-fill text-[#0078D4]"
+                                            style="font-size:22px">bolt</span>
+                                    </div>
+                                    <div class="min-w-0">
+                                        <h3 class="font-heading font-bold text-[14px] text-[#242424] leading-tight">
+                                            Boost
+                                        </h3>
+                                        <span
+                                            class="inline-flex items-center gap-1 text-[10px] font-semibold text-[#107C10] bg-[#F0FDF4] border border-[#B7EBC0] px-1.5 py-0.5 rounded mt-1">
+                                            <span class="w-1.5 h-1.5 bg-[#107C10] rounded-full"></span>
+                                            Actif
+                                        </span>
+                                    </div>
+                                </div>
+                                <span class="text-[10px] font-semibold text-[#8A8886] uppercase tracking-wider">
+                                    30 jours
+                                </span>
+                            </div>
+
+                            <!-- Progress bar -->
+                            <div class="mb-4">
+                                <div class="flex items-center justify-between mb-1.5">
+                                    <span class="text-[11px] text-[#616161]">
+                                        Expire le <strong class="text-[#242424]">12 mai 2026</strong>
+                                    </span>
+                                    <span class="text-[11px] font-semibold text-[#0078D4]">22 j restants</span>
+                                </div>
+                                <div class="h-1.5 bg-[#F0F0F0] rounded-full overflow-hidden">
+                                    <div class="h-full bg-[#0078D4] rounded-full" style="width:72%"></div>
+                                </div>
+                            </div>
+
+                            <!-- Mini stat + CTA -->
+                            <div class="flex items-end justify-between gap-3 pt-3 border-t border-[#F0F0F0] mt-auto">
+                                <div class="min-w-0">
+                                    <div class="text-[10px] font-bold text-[#8A8886] uppercase tracking-wider">
+                                        Vues générées
+                                    </div>
+                                    <div class="flex items-baseline gap-1 mt-0.5">
+                                        <span class="font-heading font-bold text-[#0078D4] text-[22px] leading-none">
+                                            +247
+                                        </span>
+                                        <span class="text-[11px] text-[#616161]">depuis le début</span>
+                                    </div>
+                                </div>
+                                <div class="flex items-center gap-2 shrink-0">
+                                    <a href="dashboard_boost.html" class="btn btn-ghost">
+                                        Voir détails
+                                    </a>
+                                    <a href="dashboard_boost.html" class="btn btn-primary">
+                                        <span class="material-symbols-outlined icon-fill"
+                                            style="font-size:14px">bolt</span>
+                                        Renouveler
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+
+                                                <!-- ─── SPONSORING (indisponible) ─── -->
+                        <div class="card p-5 flex flex-col">
+                            <div class="flex items-start justify-between mb-4">
+                                <div class="flex items-center gap-3 min-w-0">
+                                    <div
+                                        class="w-10 h-10 rounded-lg bg-[#F5F5F5] flex items-center justify-center shrink-0">
+                                        <span class="material-symbols-outlined text-[#616161]"
+                                            style="font-size:22px">campaign</span>
+                                    </div>
+                                    <div class="min-w-0">
+                                        <h3 class="font-heading font-bold text-[14px] text-[#242424] leading-tight">
+                                            Sponsoring
+                                        </h3>
+                                        <span
+                                            class="inline-flex items-center gap-1 text-[10px] font-semibold text-[#616161] bg-[#F5F5F5] border border-[#E0E0E0] px-1.5 py-0.5 rounded mt-1">
+                                            <span class="w-1.5 h-1.5 bg-[#8A8886] rounded-full"></span>
+                                            Indisponible
+                                        </span>
+                                    </div>
+                                </div>
+                                <span class="text-[10px] font-semibold text-[#8A8886] uppercase tracking-wider">
+                                    Bannière
+                                </span>
+                            </div>
+
+                            <!-- Message bloquant -->
+                            <div class="bg-[#FEF2F2] border border-[#FCA5A5] rounded p-3 mb-4 flex-1">
+                                <div class="flex items-start gap-2">
+                                    <span class="material-symbols-outlined icon-fill text-[#B91C1C] shrink-0 mt-[1px]" style="font-size:16px">info</span>
+                                    <div class="text-[12px] text-[#7F1D1D] leading-relaxed">
+                                        Un profil refusé ne peut pas être mis en avant. <strong>Corrigez les points signalés</strong> et resoumettez-le.
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- CTA -->
+                            <div class="flex items-end justify-between gap-3 pt-3 border-t border-[#F0F0F0] mt-auto">
+                                <div class="min-w-0">
+                                    <div class="text-[10px] font-bold text-[#8A8886] uppercase tracking-wider">
+                                        Visibilité annuaire
+                                    </div>
+                                    <div class="text-[12px] text-[#616161] mt-0.5 leading-snug">
+                                        Bannière sponsorisée · moteur BrandUP
+                                    </div>
+                                </div>
+                                <div class="flex items-center gap-2 shrink-0">
+                                    <a href="dashboard_sponsoring.html" class="btn btn-secondary">
+                                        <span class="material-symbols-outlined" style="font-size:14px">visibility</span>
+                                        Voir
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </section>
+
+                <!-- ═════ BANDEAU ALERTE INVISIBILITÉ (avant resoumission) ═════ -->
+                <section
+                    class="bg-[#FFFBEB] border border-[#FDE68A] rounded-lg px-4 py-3 flex items-start gap-3"
+                    role="status">
+                    <span class="material-symbols-outlined icon-fill text-[#D97706] shrink-0 mt-[1px]"
+                        style="font-size:20px">info</span>
+                    <div class="min-w-0 flex-1 text-[12.5px] text-[#92400E] leading-snug">
+                        <strong>En resoumettant ces modifications</strong>, votre profil BrandUP restera
+                        <strong>invisible</strong> sur le moteur MARKET-UP pendant la période de validation
+                        (24-48 h). Un email vous sera envoyé dès l'acceptation.
+                    </div>
+                </section>
+
+                <!-- ═════ ACTION BAR REGION (hydrated at runtime — content varies by profile.status) ═════ -->
+                <section id="bu-action-bar-region"
+                    class="action-bar-sticky md:static flex flex-col md:flex-row md:items-center md:justify-between gap-3 md:gap-4 pt-2 md:pt-0">
+                    <div class="flex items-start md:items-center gap-2 text-[12px] text-[#616161] leading-snug">
+                        <span class="material-symbols-outlined icon-fill shrink-0 mt-[1px] md:mt-0 text-[#475569]"
+                            style="font-size:15px">draft</span>
+                        <span>
+                            <strong class="text-[#475569]">3 modifications non soumises</strong> · soumettez pour publication
+                        </span>
+                    </div>
+                    <div class="flex items-center gap-2 shrink-0 flex-wrap justify-end">
+                        <button class="btn btn-ghost">
+                            Annuler
+                        </button>
+                        <button class="btn btn-primary">
+                            <span class="material-symbols-outlined">send</span>
+                            Enregistrer et resoumettre
+                        </button>
+                    </div>
+                </section>
+
+            </div>
+        </main>
+
+    </div>
+
+    <!-- ═════════════════════════════════════════════════════
+         JS — drawer + dropdowns exclusifs (canon Cluster 1)
+         ═════════════════════════════════════════════════════ -->
+    <script>
+        (function () {
+            const sidebar = document.getElementById('sidebar');
+            const backdrop = document.getElementById('backdrop');
+            const menuBtn = document.getElementById('menuBtn');
+            const bellBtn = document.getElementById('bellBtn');
+            const bellDropdown = document.getElementById('bellDropdown');
+            const avatarBtn = document.getElementById('avatarBtn');
+            const avatarDropdown = document.getElementById('avatarDropdown');
+
+            const dropdowns = [
+                { btn: bellBtn, panel: bellDropdown },
+                { btn: avatarBtn, panel: avatarDropdown },
+            ];
+
+            function closeAllDropdowns() {
+                dropdowns.forEach(({ btn, panel }) => {
+                    panel.classList.remove('open');
+                    btn.setAttribute('aria-expanded', 'false');
+                });
+            }
+
+            function toggleDropdown(target) {
+                const wasOpen = target.panel.classList.contains('open');
+                closeAllDropdowns();
+                if (!wasOpen) {
+                    target.panel.classList.add('open');
+                    target.btn.setAttribute('aria-expanded', 'true');
+                }
+            }
+
+            function openDrawer() {
+                closeAllDropdowns();
+                sidebar.classList.add('open');
+                backdrop.classList.remove('hidden');
+                document.body.style.overflow = 'hidden';
+            }
+
+            function closeDrawer() {
+                sidebar.classList.remove('open');
+                backdrop.classList.add('hidden');
+                document.body.style.overflow = '';
+            }
+
+            menuBtn.addEventListener('click', openDrawer);
+            backdrop.addEventListener('click', closeDrawer);
+
+            dropdowns.forEach((dd) => {
+                dd.btn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    toggleDropdown(dd);
+                });
+            });
+
+            document.addEventListener('click', (e) => {
+                const clickedInsideDropdown = dropdowns.some(
+                    (dd) => dd.panel.contains(e.target) || dd.btn.contains(e.target)
+                );
+                if (!clickedInsideDropdown) closeAllDropdowns();
+            });
+
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape') {
+                    closeAllDropdowns();
+                    if (sidebar.classList.contains('open')) closeDrawer();
+                }
+            });
+
+            let resizeTimer;
+            window.addEventListener('resize', () => {
+                clearTimeout(resizeTimer);
+                resizeTimer = setTimeout(() => {
+                    if (window.innerWidth >= 768 && sidebar.classList.contains('open')) {
+                        closeDrawer();
+                    }
+                }, 100);
+            });
+        })();
+    </script>
+
+    <!-- ════════════════════════════════════════════════════════════════
+         SEED DATA HYDRATION
+         Loads marketup_seed_data.js + dashboard_hydrate_utils.js,
+         then hydrates this page from window.MARKETUP_DATA.
+         ════════════════════════════════════════════════════════════════ -->
+    <script src="marketup_seed_data.js"></script>
+    <script src="dashboard_hydrate_utils.js"></script>
+    <script>
+        // ════════════════════════════════════════════════════════════════
+        // STATE-DRIVEN BRANDUP DASHBOARD
+        // Single page that renders for any of 4 profile statuses, driven
+        // entirely by me.profiles.brandup.status from the seed data.
+        // Statuses: pending | active | rejected | disabled
+        // ════════════════════════════════════════════════════════════════
+
+        const BU_STATUS_CONFIG = {
+            // ─────────── PENDING (En attente de validation admin) ─────
+            pending: {
+                titleSuffix: '(En attente)',
+                sidebarDot: { color: '#D97706', title: 'En attente' },
+                hero: (p, dates) => `
+                    <div class="flex items-center gap-2 mt-1.5 flex-wrap">
+                        <span class="status-pill status-pill--pending">
+                            <span class="dot"></span>
+                            En attente de validation
+                        </span>
+                        <span class="text-[11px] text-[#8A8886]">
+                            Soumis le ${dates.submittedAt} · Délai estimé 24-48 h
+                        </span>
+                    </div>
+                    <div class="flex items-center gap-1.5 mt-1.5 text-[11.5px] text-[#8A8886]">
+                        <span class="material-symbols-outlined" style="font-size:14px">schedule</span>
+                        <span>
+                            Profil <strong class="text-[#92400E]">hors ligne pendant la revue</strong> —
+                            invisible sur <span class="text-[#616161]">/brandup</span> jusqu'à acceptation
+                        </span>
+                    </div>`,
+                statusBlock: (p, dates) => `
+                    <section class="border border-[#FDE68A] bg-[#FFFBEB] rounded-lg overflow-hidden" role="status" aria-live="polite">
+                        <div class="p-5 flex items-start gap-4">
+                            <div class="w-10 h-10 rounded-lg bg-white border border-[#FDE68A] flex items-center justify-center shrink-0">
+                                <span class="material-symbols-outlined icon-fill text-[#D97706]" style="font-size:22px">schedule</span>
+                            </div>
+                            <div class="min-w-0 flex-1">
+                                <div class="font-heading font-bold text-[14px] text-[#92400E] mb-1">Revue en cours par l'administrateur</div>
+                                <p class="text-[13px] text-[#92400E] leading-relaxed mb-3">Votre soumission est actuellement en cours d'examen. Pendant cette période :</p>
+                                <ul class="space-y-1.5 text-[12.5px] text-[#92400E] leading-relaxed mb-3">
+                                    <li class="flex items-start gap-2">
+                                        <span class="material-symbols-outlined shrink-0 mt-[1px] text-[#D97706]" style="font-size:14px">lock</span>
+                                        <span>Tous les champs du profil sont <strong>en lecture seule</strong></span>
+                                    </li>
+                                    <li class="flex items-start gap-2">
+                                        <span class="material-symbols-outlined shrink-0 mt-[1px] text-[#D97706]" style="font-size:14px">visibility_off</span>
+                                        <span>Votre profil BrandUP est <strong>invisible</strong> sur le moteur public</span>
+                                    </li>
+                                    <li class="flex items-start gap-2">
+                                        <span class="material-symbols-outlined shrink-0 mt-[1px] text-[#D97706]" style="font-size:14px">mail</span>
+                                        <span>Un email vous sera envoyé dès acceptation ou refus (délai estimé 24-48 h)</span>
+                                    </li>
+                                </ul>
+                                <p class="text-[12px] text-[#92400E] leading-relaxed">
+                                    Si vous souhaitez modifier votre soumission, cliquez sur <strong>Annuler la demande</strong> en bas de page.
+                                </p>
+                            </div>
+                        </div>
+                    </section>`,
+                actionBar: (p, dates) => `
+                    <div class="flex items-start md:items-center gap-2 text-[12px] text-[#616161] leading-snug">
+                        <span class="material-symbols-outlined icon-fill shrink-0 mt-[1px] md:mt-0 text-[#92400E]" style="font-size:15px">schedule</span>
+                        <span><strong class="text-[#92400E]">En attente de validation</strong> · réponse admin sous 24-48 h</span>
+                    </div>
+                    <div class="flex items-center gap-2 shrink-0 flex-wrap justify-end">
+                        <button class="btn btn-ghost">Annuler la demande</button>
+                    </div>`,
+            },
+            // ─────────── ACTIVE (Profil publié et visible) ────────────
+            active: {
+                titleSuffix: '',
+                sidebarDot: { color: '#107C10', title: 'Actif' },
+                hero: (p, dates) => `
+                    <div class="flex items-center gap-2 mt-1.5 flex-wrap">
+                        <span class="status-pill status-pill--active">
+                            <span class="dot"></span>
+                            Profil actif
+                        </span>
+                        <span class="text-[11px] text-[#8A8886]">
+                            Publié le ${dates.publishedAt}
+                        </span>
+                    </div>
+                    <div class="flex items-center gap-1.5 mt-1.5 text-[11.5px] text-[#8A8886]">
+                        <span class="material-symbols-outlined" style="font-size:14px">visibility</span>
+                        <span>
+                            Profil <strong class="text-[#107C10]">visible publiquement</strong> sur
+                            <span class="text-[#616161]">/brandup</span>
+                        </span>
+                    </div>`,
+                // Active state: no status block (hide the region)
+                statusBlock: () => '',
+                actionBar: (p, dates) => `
+                    <div class="flex items-start md:items-center gap-2 text-[12px] text-[#616161] leading-snug">
+                        <span class="material-symbols-outlined icon-fill shrink-0 mt-[1px] md:mt-0 text-[#107C10]" style="font-size:15px">check_circle</span>
+                        <span><strong class="text-[#107C10]">Profil publié</strong> · les modifications nécessitent une revalidation admin</span>
+                    </div>
+                    <div class="flex items-center gap-2 shrink-0 flex-wrap justify-end">
+                        <button class="btn btn-ghost">Annuler</button>
+                        <button class="btn btn-primary">
+                            <span class="material-symbols-outlined">send</span>
+                            Soumettre les modifications
+                        </button>
+                    </div>`,
+            },
+            // ─────────── REJECTED (Refusé par admin avec motif) ───────
+            rejected: {
+                titleSuffix: '(Refusé)',
+                sidebarDot: { color: '#DC2626', title: 'Refusé' },
+                hero: (p, dates) => `
+                    <div class="flex items-center gap-2 mt-1.5 flex-wrap">
+                        <span class="status-pill status-pill--refused">
+                            <span class="dot"></span>
+                            Refusé par l'administrateur
+                        </span>
+                        <span class="text-[11px] text-[#8A8886]">
+                            Soumis le ${dates.submittedAt} · Refusé le ${dates.rejectedAt}
+                        </span>
+                    </div>
+                    <div class="flex items-center gap-1.5 mt-1.5 text-[11.5px] text-[#8A8886]">
+                        <span class="material-symbols-outlined" style="font-size:14px">visibility_off</span>
+                        <span>
+                            Profil actuellement <strong class="text-[#616161]">non visible</strong> sur
+                            <span class="text-[#616161]">/brandup</span>
+                        </span>
+                    </div>`,
+                statusBlock: (p, dates) => {
+                    const reason = (typeof p.rejectionReason === 'string')
+                        ? p.rejectionReason
+                        : (p.rejectionReason && p.rejectionReason.fr)
+                            || 'Aucun motif fourni par l\'administrateur.';
+                    return `
+                    <section class="border border-[#FCA5A5] bg-[#FEF2F2] rounded-lg overflow-hidden" role="alert" aria-live="polite">
+                        <div class="p-5 flex items-start gap-4">
+                            <div class="w-10 h-10 rounded-lg bg-white border border-[#FCA5A5] flex items-center justify-center shrink-0">
+                                <span class="material-symbols-outlined icon-fill text-[#DC2626]" style="font-size:22px">report</span>
+                            </div>
+                            <div class="min-w-0 flex-1">
+                                <div class="font-heading font-bold text-[14px] text-[#991B1B] mb-1">Votre soumission a été refusée</div>
+                                <p class="text-[13px] text-[#991B1B] leading-relaxed mb-3">
+                                    L'équipe d'administration a examiné votre profil le ${dates.rejectedAt} et n'a pas pu le publier pour la raison suivante :
+                                </p>
+                                <div class="bg-white border border-[#FCA5A5] rounded p-3 mb-3">
+                                    <div class="text-[10px] font-bold text-[#8A8886] uppercase tracking-wider mb-1">Motif de l'administrateur</div>
+                                    <p class="text-[13px] text-[#242424] leading-relaxed italic">« ${reason} »</p>
+                                </div>
+                                <p class="text-[12px] text-[#991B1B] leading-relaxed">
+                                    Corrigez les points mentionnés puis cliquez sur <strong>Enregistrer et resoumettre</strong> en bas de page. Votre profil repassera en validation sous 24-48 h.
+                                </p>
+                            </div>
+                        </div>
+                    </section>`;
+                },
+                actionBar: (p, dates) => `
+                    <div class="flex items-start md:items-center gap-2 text-[12px] text-[#616161] leading-snug">
+                        <span class="material-symbols-outlined icon-fill shrink-0 mt-[1px] md:mt-0 text-[#475569]" style="font-size:15px">edit</span>
+                        <span><strong class="text-[#475569]">Modifications non soumises</strong> · soumettez pour publication</span>
+                    </div>
+                    <div class="flex items-center gap-2 shrink-0 flex-wrap justify-end">
+                        <button class="btn btn-ghost">Annuler</button>
+                        <button class="btn btn-primary">
+                            <span class="material-symbols-outlined">send</span>
+                            Enregistrer et resoumettre
+                        </button>
+                    </div>`,
+            },
+            // ─────────── DISABLED (Désactivé par l'utilisateur) ───────
+            disabled: {
+                titleSuffix: '(Désactivé)',
+                sidebarDot: { color: '#8A8886', title: 'Désactivé' },
+                hero: (p, dates) => `
+                    <div class="flex items-center gap-2 mt-1.5 flex-wrap">
+                        <span class="status-pill status-pill--disabled">
+                            <span class="dot"></span>
+                            Profil désactivé
+                        </span>
+                        <span class="text-[11px] text-[#8A8886]">
+                            Désactivé le ${dates.disabledAt}
+                        </span>
+                    </div>
+                    <div class="flex items-center gap-1.5 mt-1.5 text-[11.5px] text-[#8A8886]">
+                        <span class="material-symbols-outlined" style="font-size:14px">visibility_off</span>
+                        <span>
+                            Profil <strong class="text-[#616161]">désactivé</strong> · invisible sur
+                            <span class="text-[#616161]">/brandup</span>
+                        </span>
+                    </div>`,
+                statusBlock: (p, dates) => `
+                    <section class="border border-[#E0E0E0] bg-[#F5F5F5] rounded-lg overflow-hidden" role="status">
+                        <div class="p-5 flex items-start gap-4">
+                            <div class="w-10 h-10 rounded-lg bg-white border border-[#E0E0E0] flex items-center justify-center shrink-0">
+                                <span class="material-symbols-outlined icon-fill text-[#616161]" style="font-size:22px">block</span>
+                            </div>
+                            <div class="min-w-0 flex-1">
+                                <div class="font-heading font-bold text-[14px] text-[#424242] mb-1">Profil désactivé</div>
+                                <p class="text-[13px] text-[#616161] leading-relaxed mb-3">
+                                    Vous avez désactivé ce profil le ${dates.disabledAt}. Il n'apparaît plus dans les résultats du moteur public.
+                                </p>
+                                <p class="text-[12px] text-[#616161] leading-relaxed">
+                                    Pour le rendre à nouveau visible, cliquez sur <strong>Réactiver le profil</strong> en bas de page.
+                                </p>
+                            </div>
+                        </div>
+                    </section>`,
+                actionBar: (p, dates) => `
+                    <div class="flex items-start md:items-center gap-2 text-[12px] text-[#616161] leading-snug">
+                        <span class="material-symbols-outlined icon-fill shrink-0 mt-[1px] md:mt-0 text-[#8A8886]" style="font-size:15px">block</span>
+                        <span><strong class="text-[#616161]">Profil désactivé</strong> · réactivez pour publier</span>
+                    </div>
+                    <div class="flex items-center gap-2 shrink-0 flex-wrap justify-end">
+                        <button class="btn btn-primary">
+                            <span class="material-symbols-outlined">play_arrow</span>
+                            Réactiver le profil
+                        </button>
+                    </div>`,
+            },
+        };
+
+        MARKETUP_HYDRATE.bootstrapPage(function (me, H) {
+            const { set, setHTML, setAttr } = MARKETUP_HYDRATE;
+            const bu = me.profiles.brandup;
+            const fullName = me.data.displayName.fr;
+
+            // ─── BrandUP profile fields (pitch + about + preview link) ─
+            set('bu-pitch', bu.data.pitch && bu.data.pitch.fr || '');
+            set('bu-about', bu.data.about && bu.data.about.fr || '');
+            setAttr('bu-preview-link', 'href', `public_brandup_${me.slug}.html`);
+
+            // ═════════════════════════════════════════════════════════
+            // STATE-DRIVEN HYDRATION
+            // ═════════════════════════════════════════════════════════
+            const status = bu.status || 'pending';
+            const cfg = BU_STATUS_CONFIG[status] || BU_STATUS_CONFIG.pending;
+
+            // Format dates from BrandUP profile (with sensible fallbacks)
+            const fmt = MARKETUP_HYDRATE.formatDateLong;
+            const dates = {
+                submittedAt:  bu.submittedAt  ? fmt(bu.submittedAt)  : '—',
+                publishedAt:  bu.validatedAt  ? fmt(bu.validatedAt)  : '—',
+                rejectedAt:   bu.rejectedAt   ? fmt(bu.rejectedAt)   : '—',
+                disabledAt:   bu.disabledAt   ? fmt(bu.disabledAt)   : '—',
+            };
+
+            // 1. Page title
+            const suffix = cfg.titleSuffix ? ` ${cfg.titleSuffix}` : '';
+            document.title = `MARKET-UP | Profil BrandUP${suffix} — ${fullName}`;
+
+            // 2. Sidebar dot — color + tooltip title
+            const dot = document.getElementById('bu-sidebar-dot');
+            if (dot) {
+                // Replace the bg-[#XXX] class with the new color
+                dot.className = dot.className.replace(/bg-\[#[0-9A-Fa-f]+\]/, `bg-[${cfg.sidebarDot.color}]`);
+                dot.setAttribute('title', cfg.sidebarDot.title);
+            }
+
+            // 3. Hero status region
+            setHTML('bu-hero-status-region', cfg.hero(bu, dates));
+
+            // 4. Status block region — hide entirely if active
+            const blockRegion = document.getElementById('bu-status-block-region');
+            const blockHTML = cfg.statusBlock(bu, dates);
+            if (blockRegion) {
+                if (!blockHTML.trim()) {
+                    blockRegion.style.display = 'none';
+                } else {
+                    blockRegion.style.display = '';
+                    // The wrapper is itself the <section>; we need to replace it with the new <section>
+                    // To keep it simple, set innerHTML to the inner content of blockHTML's outer <section>
+                    blockRegion.outerHTML = blockHTML.trim().replace(
+                        /^<section\b/, '<section id="bu-status-block-region"'
+                    );
+                }
+            }
+
+            // 5. Action bar region
+            setHTML('bu-action-bar-region', cfg.actionBar(bu, dates));
+
+            // ═════════════════════════════════════════════════════════
+            // GALLERY — render real images from bu.data.gallery (max 10)
+            // 3 containers : preview row 1 (3 slots), preview row 2 (7 slots),
+            // and management edit grid (one card per image).
+            // ═════════════════════════════════════════════════════════
+            const gallery = (bu.data.projects || []).map(p => ({ url: p.image, caption: p.name }));
+            const escape = (s) => String(s || '')
+                .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+
+            // ─── Preview row 1 (1 large + 2 medium) ───────────────────
+            const row1Slots = [
+                { idx: 0, role: 'principal', label: '#1 Principale', isLarge: true,  iconSize: 32 },
+                { idx: 1, role: 'secondary', label: '#2',            isLarge: false, iconSize: 24 },
+                { idx: 2, role: 'secondary', label: '#3',            isLarge: false, iconSize: 24 },
+            ];
+            setHTML('bu-gallery-row1', row1Slots.map(slot => {
+                const img = gallery[slot.idx];
+                const colSpan = slot.isLarge ? 'col-span-2 md:col-span-2 ' : '';
+                if (img) {
+                    const caption = escape(img.caption && img.caption.fr || '');
+                    return `<div class="${colSpan}aspect-[4/3] bg-[#D1D1D1] rounded overflow-hidden relative">
+                                <img src="${img.url}" alt="${caption}" class="w-full h-full object-cover" />
+                                <span class="role-badge role-badge--${slot.role === 'principal' ? 'principal' : 'secondary'}">${slot.label}</span>
+                            </div>`;
+                }
+                return `<div class="${colSpan}aspect-[4/3] bg-white border border-dashed border-[#C8C6C4] rounded flex items-center justify-center">
+                            <span class="text-[10px] text-[#8A8886]">Slot libre</span>
+                        </div>`;
+            }).join(''));
+
+            // ─── Preview row 2 (7 small squares) ──────────────────────
+            const row2HTML = [];
+            for (let i = 3; i < 10; i++) {
+                const img = gallery[i];
+                if (img) {
+                    const caption = escape(img.caption && img.caption.fr || '');
+                    row2HTML.push(`<div class="aspect-square bg-[#D1D1D1] rounded overflow-hidden relative">
+                                <img src="${img.url}" alt="${caption}" class="w-full h-full object-cover" />
+                                <span class="role-badge role-badge--gallery">#${i + 1}</span>
+                            </div>`);
+                } else {
+                    row2HTML.push(`<div class="aspect-square bg-white border border-dashed border-[#C8C6C4] rounded relative hidden md:flex items-center justify-center">
+                                <span class="text-[10px] text-[#8A8886] text-center leading-tight px-1">Slot<br />libre</span>
+                            </div>`);
+                }
+            }
+            setHTML('bu-gallery-row2', row2HTML.join(''));
+
+            // ─── Management grid (one card per image) ─────────────────
+            setHTML('bu-gallery-grid', gallery.map((img, i) => {
+                const order = i + 1;
+                let role, label;
+                if (order === 1) { role = 'principal'; label = '#1 Principale'; }
+                else if (order <= 3) { role = 'secondary'; label = `#${order} Secondaire`; }
+                else { role = 'gallery'; label = `#${order} Galerie`; }
+                const caption = escape(img.caption && img.caption.fr || '');
+                const isFirst = order === 1;
+                const isLast = order === gallery.length;
+                return `<div class="bg-white border border-[#E0E0E0] rounded-lg overflow-hidden flex flex-col">
+                            <div class="aspect-[4/3] bg-[#D1D1D1] relative overflow-hidden">
+                                <img src="${img.url}" alt="${caption}" class="w-full h-full object-cover" />
+                                <span class="role-badge role-badge--${role}">${label}</span>
+                            </div>
+                            <div class="p-2 flex items-center justify-between gap-1 bg-[#FAFAFA] border-t border-[#E0E0E0]">
+                                <div class="flex items-center gap-1">
+                                    <button class="mini-icon-btn" aria-label="Monter"${isFirst ? ' disabled' : ''}>
+                                        <span class="material-symbols-outlined">arrow_upward</span>
+                                    </button>
+                                    <button class="mini-icon-btn" aria-label="Descendre"${isLast ? ' disabled' : ''}>
+                                        <span class="material-symbols-outlined">arrow_downward</span>
+                                    </button>
+                                </div>
+                                <button class="mini-icon-btn mini-icon-btn--danger" aria-label="Supprimer">
+                                    <span class="material-symbols-outlined">delete</span>
+                                </button>
+                            </div>
+                        </div>`;
+            }).join(''));
+
+            set('bu-gallery-count', `${gallery.length} / 10 images`);
+        });
+    </script>
+
+</body>
+
+</html>

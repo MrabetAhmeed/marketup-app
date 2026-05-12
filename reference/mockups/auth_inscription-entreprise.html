@@ -1,0 +1,556 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Inscription · Étape 1/3 · Entreprise | MARKET-UP</title>
+
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet" />
+
+    <script src="https://cdn.tailwindcss.com?plugins=forms"></script>
+    <script src="marketup_seed_data.js"></script>
+    <script id="tailwind-config">
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        "primary":          "#0078D4",
+                        "primary-hover":    "#106EBE",
+                        "primary-dark":     "#005A9E",
+                        "primary-light":    "#EFF6FC",
+                        "ms-text":          "#242424",
+                        "ms-text-muted":    "#616161",
+                        "ms-border":        "#E0E0E0",
+                        "ms-border-strong": "#D1D1D1",
+                        "ms-surface":       "#F5F5F5",
+                        "ms-placeholder":   "#8A8886",
+                        "ms-success":       "#107C10",
+                        "ms-error":         "#D13438"
+                    },
+                    fontFamily: {
+                        "headline": ["'Plus Jakarta Sans'", "sans-serif"],
+                        "body":     ["Inter", "sans-serif"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.25rem",
+                        "lg":      "0.5rem",
+                        "xl":      "0.75rem",
+                        "full":    "9999px"
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body { font-family: 'Inter', sans-serif; color: #242424; }
+        h1, h2, h3 { font-family: 'Plus Jakarta Sans', sans-serif; }
+        .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+        .material-symbols-outlined.fill { font-variation-settings: 'FILL' 1; }
+
+        /* === Fluent input pattern (4px radius, border 1px, focus ring #EFF6FC) === */
+        .fluent-input, .fluent-select {
+            width: 100%;
+            padding: 10px 14px;
+            background: #FFFFFF;
+            border: 1px solid #D1D1D1;
+            border-radius: 4px;
+            font-size: 14px;
+            color: #242424;
+            transition: border-color 0.15s, box-shadow 0.15s;
+        }
+        .fluent-input:focus, .fluent-select:focus {
+            border-color: #0078D4;
+            outline: none;
+            box-shadow: 0 0 0 2px #EFF6FC;
+        }
+        .fluent-input::placeholder { color: #8A8886; }
+        .fluent-input[readonly], .fluent-input:disabled {
+            background: #F5F5F5;
+            color: #616161;
+            cursor: not-allowed;
+        }
+        .fluent-select {
+            appearance: none;
+            background-image: url("data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23616161' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
+            background-position: right 12px center;
+            background-repeat: no-repeat;
+            background-size: 16px;
+            padding-right: 40px;
+        }
+
+        /* === Market radio group === */
+        .market-radio input:checked + .market-card {
+            border-color: #0078D4;
+            background: #EFF6FC;
+            box-shadow: 0 0 0 1px #0078D4;
+        }
+        .market-radio input:checked + .market-card .market-icon { color: #0078D4; }
+        .market-card { border: 1px solid #E0E0E0; transition: border-color 0.15s, background 0.15s; }
+        .market-radio:hover .market-card { border-color: #D1D1D1; }
+
+        /* === Label + hint === */
+        .fluent-label {
+            display: block;
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            color: #616161;
+            margin-bottom: 6px;
+        }
+        .label-required::after { content: '*'; color: #D13438; margin-left: 4px; }
+        .field-hint { font-size: 12px; color: #8A8886; margin-top: 4px; }
+
+        /* === Upload zone for legal document === */
+        .legal-doc-upload {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding: 14px 16px;
+            background: #F5F5F5;
+            border: 1px dashed #D1D1D1;
+            border-radius: 8px;
+            transition: border-color 0.15s ease, background-color 0.15s ease;
+        }
+        .legal-doc-upload:hover {
+            border-color: #0078D4;
+            background: #EFF6FC;
+        }
+        .legal-doc-upload.has-file {
+            border-style: solid;
+            border-color: #107C10;
+            background: #F0FDF4;
+        }
+        .legal-doc-icon {
+            width: 44px;
+            height: 44px;
+            border-radius: 8px;
+            background: #FFFFFF;
+            border: 1px solid #E0E0E0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            color: #0078D4;
+        }
+        .legal-doc-icon .material-symbols-outlined { font-size: 22px; }
+        .legal-doc-upload.has-file .legal-doc-icon {
+            background: #107C10;
+            border-color: #107C10;
+            color: white;
+        }
+        .legal-doc-text { min-width: 0; flex: 1; }
+        .legal-doc-title {
+            font-weight: 600;
+            font-size: 13px;
+            color: #242424;
+            margin-bottom: 2px;
+        }
+        .legal-doc-meta {
+            font-size: 11.5px;
+            color: #616161;
+        }
+        .btn-upload-mini {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 12px;
+            border: 1px solid #D1D1D1;
+            border-radius: 4px;
+            background: white;
+            color: #242424;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: border-color 0.15s ease;
+        }
+        .btn-upload-mini:hover { border-color: #0078D4; color: #0078D4; }
+        .btn-upload-mini .material-symbols-outlined { font-size: 14px; }
+
+        /* === Buttons === */
+        .btn-primary {
+            background: #0078D4; color: white;
+            padding: 12px 24px; border-radius: 4px;
+            font-weight: 600; font-size: 14px; border: none; cursor: pointer;
+            transition: background 0.15s;
+            display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+        }
+        .btn-primary:hover { background: #106EBE; }
+        .btn-primary:active { background: #005A9E; }
+        .btn-ghost {
+            background: transparent; color: #0078D4;
+            padding: 12px 20px; border-radius: 4px;
+            font-weight: 600; font-size: 14px; border: none; cursor: pointer;
+            transition: background 0.15s;
+            display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+        }
+        .btn-ghost:hover { background: #EFF6FC; }
+
+        /* === Mobile progress bar === */
+        .progress-bar { height: 3px; background: #E0E0E0; border-radius: 2px; overflow: hidden; }
+        .progress-bar-fill { height: 100%; background: #0078D4; transition: width 0.3s ease; }
+    </style>
+</head>
+
+<body class="bg-white min-h-screen">
+    <main class="flex min-h-screen">
+
+        <!-- ============================================================
+             LEFT PANEL CANON — MARKET-UP (40%, desktop lg+ only)
+             ============================================================ -->
+        <aside class="hidden lg:flex lg:w-[40%] bg-[#005A9E] text-white flex-col justify-between p-12 relative">
+            <div>
+                <div class="mb-16">
+                    <span class="text-2xl font-bold tracking-tighter font-headline"><a href="onboarding_onboarding.html">MARKET-UP</a></span>
+                </div>
+                <div class="max-w-sm mb-16">
+                    <h2 class="text-3xl font-semibold leading-tight mb-4 tracking-tight text-white">
+                        La plateforme digitale des entreprises.
+                    </h2>
+                    <p class="text-[#d3e3ff] text-base leading-relaxed">
+                        BrandUP, TraceUP, LinkUP — un seul compte, trois vitrines.
+                    </p>
+                </div>
+
+                <!-- Vertical stepper : Step 1 ACTIVE -->
+                <nav aria-label="Étapes d'inscription" class="space-y-5">
+                    <div class="flex items-center gap-4">
+                        <div class="w-10 h-10 rounded-full bg-white text-[#005A9E] flex items-center justify-center text-sm font-bold shrink-0">1</div>
+                        <div>
+                            <div class="text-[11px] font-bold uppercase tracking-widest text-[#d3e3ff]">Étape 1</div>
+                            <div class="text-base font-semibold text-white">Entreprise</div>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-4 opacity-50">
+                        <div class="w-9 h-9 rounded-full border border-white/40 flex items-center justify-center text-sm font-semibold text-white shrink-0">2</div>
+                        <div>
+                            <div class="text-[11px] font-medium uppercase tracking-widest text-white/70">Étape 2</div>
+                            <div class="text-sm font-medium text-white">Utilisateur</div>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-4 opacity-50">
+                        <div class="w-9 h-9 rounded-full border border-white/40 flex items-center justify-center text-sm font-semibold text-white shrink-0">3</div>
+                        <div>
+                            <div class="text-[11px] font-medium uppercase tracking-widest text-white/70">Étape 3</div>
+                            <div class="text-sm font-medium text-white">Vérification</div>
+                        </div>
+                    </div>
+                </nav>
+            </div>
+
+            <div class="text-xs text-[#d3e3ff]/70">
+                <p>© 2026 MARKET-UP · AGGREGAX SUARL</p>
+                <p class="mt-1">Fait en Tunisie 🇹🇳</p>
+            </div>
+        </aside>
+
+        <!-- ============================================================
+             RIGHT PANEL — Form
+             ============================================================ -->
+        <section class="flex-1 flex flex-col">
+
+            <!-- Mobile header -->
+            <div class="lg:hidden flex items-center justify-between px-6 py-4 border-b border-[#E0E0E0]">
+                <a href="#" class="text-xl font-bold tracking-tighter text-[#0078D4] font-headline">MARKET-UP</a>
+                <span class="text-xs text-[#616161]">Étape <span class="font-bold text-[#242424]">1</span> / 3</span>
+            </div>
+            <div class="lg:hidden px-6 pt-4">
+                <div class="progress-bar"><div class="progress-bar-fill" style="width: 33.33%;"></div></div>
+            </div>
+
+            <!-- Form container -->
+            <div class="flex-1 flex items-start justify-center px-6 md:px-12 py-8 md:py-12 lg:py-16">
+                <div class="w-full max-w-2xl">
+
+                    <header class="mb-10">
+                        <span class="inline-block px-2.5 py-1 bg-[#EFF6FC] text-[#0078D4] text-[10px] font-bold uppercase tracking-widest rounded mb-4">Étape 1 sur 3</span>
+                        <h1 class="text-3xl md:text-[32px] font-semibold text-[#242424] mb-3 tracking-tight">Votre entreprise</h1>
+                        <p class="text-[#616161] text-base">Renseignez les informations légales pour créer votre compte MARKET-UP.</p>
+                    </header>
+
+                    <form id="entrepriseForm" class="space-y-6">
+
+                        <!-- Type de marché -->
+                        <div>
+                            <label class="fluent-label label-required">Type de marché</label>
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                <label class="market-radio relative cursor-pointer block">
+                                    <input type="radio" name="marketType" value="B2B" class="sr-only peer" checked />
+                                    <div class="market-card rounded-lg p-4 flex items-start gap-3 bg-white">
+                                        <span class="material-symbols-outlined market-icon text-[#616161] text-xl shrink-0">business_center</span>
+                                        <div>
+                                            <div class="font-semibold text-sm text-[#242424]">B2B · Professionnel</div>
+                                            <div class="text-xs text-[#616161] mt-0.5 leading-snug">Fournisseurs, partenaires, services industriels</div>
+                                        </div>
+                                    </div>
+                                </label>
+                                <label class="market-radio relative cursor-pointer block">
+                                    <input type="radio" name="marketType" value="B2C" class="sr-only peer" />
+                                    <div class="market-card rounded-lg p-4 flex items-start gap-3 bg-white">
+                                        <span class="material-symbols-outlined market-icon text-[#616161] text-xl shrink-0">storefront</span>
+                                        <div>
+                                            <div class="font-semibold text-sm text-[#242424]">B2C · Grand public</div>
+                                            <div class="text-xs text-[#616161] mt-0.5 leading-snug">Commerces, artisans, consommateurs</div>
+                                        </div>
+                                    </div>
+                                </label>
+                            </div>
+                        </div>
+
+                        <!-- Nom -->
+                        <div>
+                            <label for="companyName" class="fluent-label label-required">Nom de l'entreprise</label>
+                            <input id="companyName" name="companyName" type="text" required class="fluent-input" placeholder="Ex : TechnoFab Industries" />
+                        </div>
+
+                        <!-- Identifiant légal + Document officiel -->
+                        <div class="grid grid-cols-1 gap-5">
+                            <div>
+                                <label for="legalId" class="fluent-label label-required">Identifiant légal</label>
+                                <input id="legalId" name="legalId" type="text" required class="fluent-input" placeholder="Ex : 1234567 / A / 000" />
+                                <p class="field-hint">Registre National des Entreprises (RNE) ou équivalent légal officiel</p>
+                            </div>
+
+                            <div>
+                                <label for="legalDoc" class="fluent-label label-required">Document légal officiel</label>
+                                <div class="legal-doc-upload" id="legalDocZone">
+                                    <div class="legal-doc-icon">
+                                        <span class="material-symbols-outlined">description</span>
+                                    </div>
+                                    <div class="legal-doc-text">
+                                        <div class="legal-doc-title" id="legalDocTitle">Téléverser le document</div>
+                                        <div class="legal-doc-meta" id="legalDocMeta">PDF, JPG ou PNG · 5 Mo max</div>
+                                    </div>
+                                    <label for="legalDoc" class="btn-upload-mini">
+                                        <span class="material-symbols-outlined">upload</span>
+                                        <span id="legalDocBtnLabel">Choisir un fichier</span>
+                                    </label>
+                                    <input id="legalDoc" name="legalDoc" type="file" accept=".pdf,.jpg,.jpeg,.png" required class="sr-only" />
+                                </div>
+                                <p class="field-hint">Extrait RNE, certificat d'immatriculation ou patente — preuve d'existence légale de l'entreprise</p>
+                            </div>
+                        </div>
+
+                        <!-- Email -->
+                        <div>
+                            <label for="email" class="fluent-label label-required">Email professionnel</label>
+                            <input id="email" name="email" type="email" required class="fluent-input" placeholder="contact@votre-entreprise.tn" />
+                            <p class="field-hint">Cet email recevra vos notifications et le code de validation</p>
+                        </div>
+
+                        <!-- Secteur — populated dynamically from seed (sectorsB2B / categoriesB2C) -->
+                        <div>
+                            <label for="sector" class="fluent-label label-required" id="sectorLabel">Secteur d'activité</label>
+                            <select id="sector" name="sector" required class="fluent-select">
+                                <option value="">— Sélectionner —</option>
+                            </select>
+                            <p class="field-hint" id="sectorHint">Choisissez le secteur qui correspond le mieux à votre activité</p>
+                        </div>
+
+                        <!-- Pays + Gouvernorat -->
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                            <div>
+                                <label for="country" class="fluent-label label-required">Pays</label>
+                                <select id="country" name="country" required class="fluent-select">
+                                    <option value="TN" selected>🇹🇳 Tunisie</option>
+                                    <option value="FR" disabled>🇫🇷 France — Bientôt disponible</option>
+                                    <option value="MA" disabled>🇲🇦 Maroc — Bientôt disponible</option>
+                                    <option value="DZ" disabled>🇩🇿 Algérie — Bientôt disponible</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label for="governorate" class="fluent-label label-required">Gouvernorat</label>
+                                <select id="governorate" name="governorate" required class="fluent-select">
+                                    <option value="">— Sélectionner —</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- Ville + Adresse -->
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                            <div>
+                                <label for="city" class="fluent-label label-required">Ville</label>
+                                <input id="city" name="city" type="text" required class="fluent-input" placeholder="Ex : Tunis" />
+                            </div>
+                            <div>
+                                <label for="address" class="fluent-label">Adresse du siège</label>
+                                <input id="address" name="address" type="text" class="fluent-input" placeholder="Ex : 12 rue de Syrie" />
+                            </div>
+                        </div>
+
+                        <!-- Actions -->
+                        <div class="pt-6 flex flex-col-reverse sm:flex-row items-center justify-between gap-3 border-t border-[#E0E0E0]">
+                            <a href="#" class="btn-ghost w-full sm:w-auto">
+                                <span class="material-symbols-outlined text-base">arrow_back</span>
+                                Retour
+                            </a>
+                            <button type="submit" class="btn-primary w-full sm:w-auto">
+                                Continuer
+                                <span class="material-symbols-outlined text-base">arrow_forward</span>
+                            </button>
+                        </div>
+
+                        <!-- Lien connexion -->
+                        <div class="text-center text-sm text-[#616161] pt-2">
+                            Déjà inscrit ? <a href="auth_connexion.html" class="text-[#0078D4] font-semibold hover:underline">Se connecter</a>
+                        </div>
+                    </form>
+
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <script>
+        // ============================================================
+        // 0. Helpers seed
+        // ============================================================
+        function getI18nName(item, lang) {
+            lang = lang || 'fr';
+            if (!item) return '';
+            if (typeof item.name === 'string') return item.name;
+            if (item.name && typeof item.name === 'object') {
+                return item.name[lang] || item.name.fr || item.name.ar || item.name.en || '';
+            }
+            return '';
+        }
+
+        function getSeedReferentials() {
+            var data = window.MARKETUP_DATA;
+            if (!data) return { sectorsB2B: [], categoriesB2C: [], gouvernorats: [] };
+            return {
+                sectorsB2B:    data.sectorsB2B    || [],
+                categoriesB2C: data.categoriesB2C || [],
+                gouvernorats:  data.gouvernorats  || []
+            };
+        }
+
+        // ============================================================
+        // 1. Sector + Governorate hydration from seed
+        //    Sector list switches dynamically based on B2B / B2C market
+        // ============================================================
+        (function () {
+            var ref            = getSeedReferentials();
+            var marketRadios   = document.querySelectorAll('input[name="marketType"]');
+            var sectorSelect   = document.getElementById('sector');
+            var sectorLabel    = document.getElementById('sectorLabel');
+            var sectorHint     = document.getElementById('sectorHint');
+            var governorateSel = document.getElementById('governorate');
+
+            // --- Populate governorate select once (TN only in V1) ---
+            (function populateGouvernorats() {
+                if (!governorateSel) return;
+                ref.gouvernorats
+                    .slice()
+                    .sort(function (a, b) {
+                        return getI18nName(a).localeCompare(getI18nName(b), 'fr');
+                    })
+                    .forEach(function (g) {
+                        var opt = document.createElement('option');
+                        opt.value = g.slug || g.id;
+                        opt.textContent = getI18nName(g);
+                        governorateSel.appendChild(opt);
+                    });
+            })();
+
+            // --- Build sector options dynamically (B2B or B2C) ---
+            function populateSector(market) {
+                if (!sectorSelect) return;
+
+                // Reset (keep first placeholder option)
+                while (sectorSelect.options.length > 1) {
+                    sectorSelect.remove(1);
+                }
+
+                var items = (market === 'B2C') ? ref.categoriesB2C : ref.sectorsB2B;
+                items
+                    .slice()
+                    .sort(function (a, b) {
+                        if (typeof a.order === 'number' && typeof b.order === 'number') {
+                            return a.order - b.order;
+                        }
+                        return getI18nName(a).localeCompare(getI18nName(b), 'fr');
+                    })
+                    .forEach(function (item) {
+                        var opt = document.createElement('option');
+                        opt.value = item.slug || item.id;
+                        opt.textContent = getI18nName(item);
+                        sectorSelect.appendChild(opt);
+                    });
+
+                // Update label + hint copy
+                if (sectorLabel) {
+                    sectorLabel.textContent = (market === 'B2C') ? "Catégorie d'activité" : "Secteur d'activité";
+                }
+                if (sectorHint) {
+                    sectorHint.textContent = (market === 'B2C')
+                        ? "Choisissez la catégorie qui décrit le mieux votre offre"
+                        : "Choisissez le secteur qui correspond le mieux à votre activité";
+                }
+
+                // Reset selected value on market switch
+                sectorSelect.value = '';
+            }
+
+            marketRadios.forEach(function (r) {
+                r.addEventListener('change', function () { populateSector(this.value); });
+            });
+
+            // Pre-fill from ?type= URL parameter (venu de l'onboarding)
+            var params = new URLSearchParams(window.location.search);
+            var presetType = (params.get('type') || '').toUpperCase();
+            if (presetType === 'B2B' || presetType === 'B2C') {
+                var preset = document.querySelector('input[name="marketType"][value="' + presetType + '"]');
+                if (preset) preset.checked = true;
+            }
+            populateSector(document.querySelector('input[name="marketType"]:checked').value);
+        })();
+
+        // ============================================================
+        // 2. Legal document upload handler (UI feedback)
+        // ============================================================
+        (function () {
+            var input = document.getElementById('legalDoc');
+            var zone = document.getElementById('legalDocZone');
+            var titleEl = document.getElementById('legalDocTitle');
+            var metaEl = document.getElementById('legalDocMeta');
+            var btnLabel = document.getElementById('legalDocBtnLabel');
+            if (!input || !zone) return;
+
+            function formatBytes(b) {
+                if (b < 1024) return b + ' o';
+                if (b < 1024 * 1024) return (b / 1024).toFixed(1) + ' Ko';
+                return (b / 1024 / 1024).toFixed(1) + ' Mo';
+            }
+
+            input.addEventListener('change', function () {
+                var f = this.files[0];
+                if (!f) {
+                    zone.classList.remove('has-file');
+                    titleEl.textContent = 'Téléverser le document';
+                    metaEl.textContent = 'PDF, JPG ou PNG · 5 Mo max';
+                    btnLabel.textContent = 'Choisir un fichier';
+                    return;
+                }
+                zone.classList.add('has-file');
+                titleEl.textContent = f.name;
+                metaEl.textContent = formatBytes(f.size) + ' · ' + (f.type || 'fichier');
+                btnLabel.textContent = 'Remplacer';
+            });
+        })();
+
+        // ============================================================
+        // 3. Submit handler
+        //    Production : POST /api/companies puis redirect
+        //    Maquette   : redirect direct vers étape 2
+        // ============================================================
+        document.getElementById('entrepriseForm').addEventListener('submit', function (e) {
+            e.preventDefault();
+            window.location.href = 'auth_inscription-utilisateur.html';
+        });
+    </script>
+</body>
+
+</html>

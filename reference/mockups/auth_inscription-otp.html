@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Inscription · Étape 3/3 · Vérification | MARKET-UP</title>
+
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet" />
+
+    <script src="https://cdn.tailwindcss.com?plugins=forms"></script>
+    <script id="tailwind-config">
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        "primary":          "#0078D4",
+                        "primary-hover":    "#106EBE",
+                        "primary-dark":     "#005A9E",
+                        "primary-light":    "#EFF6FC",
+                        "ms-text":          "#242424",
+                        "ms-text-muted":    "#616161",
+                        "ms-border":        "#E0E0E0",
+                        "ms-border-strong": "#D1D1D1",
+                        "ms-surface":       "#F5F5F5",
+                        "ms-placeholder":   "#8A8886",
+                        "ms-success":       "#107C10",
+                        "ms-error":         "#D13438"
+                    },
+                    fontFamily: {
+                        "headline": ["'Plus Jakarta Sans'", "sans-serif"],
+                        "body":     ["Inter", "sans-serif"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.25rem",
+                        "lg":      "0.5rem",
+                        "xl":      "0.75rem",
+                        "full":    "9999px"
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body { font-family: 'Inter', sans-serif; color: #242424; }
+        h1, h2, h3 { font-family: 'Plus Jakarta Sans', sans-serif; }
+        .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+        .material-symbols-outlined.fill { font-variation-settings: 'FILL' 1; }
+
+        .btn-primary {
+            background: #0078D4; color: white;
+            padding: 12px 24px; border-radius: 4px;
+            font-weight: 600; font-size: 14px; border: none; cursor: pointer;
+            transition: background 0.15s;
+            display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+        }
+        .btn-primary:hover:not(:disabled) { background: #106EBE; }
+        .btn-primary:active:not(:disabled) { background: #005A9E; }
+        .btn-primary:disabled { background: #D1D1D1; cursor: not-allowed; }
+
+        .btn-ghost {
+            background: transparent; color: #0078D4;
+            padding: 12px 20px; border-radius: 4px;
+            font-weight: 600; font-size: 14px; border: none; cursor: pointer;
+            transition: background 0.15s;
+            display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+        }
+        .btn-ghost:hover { background: #EFF6FC; }
+        .btn-ghost:disabled { color: #8A8886; cursor: not-allowed; }
+        .btn-ghost:disabled:hover { background: transparent; }
+
+        /* === OTP input boxes === */
+        .otp-box {
+            width: 44px;
+            height: 56px;
+            text-align: center;
+            font-size: 22px;
+            font-weight: 600;
+            color: #242424;
+            background: white;
+            border: 1px solid #D1D1D1;
+            border-radius: 4px;
+            transition: all 0.15s;
+            padding: 0;
+        }
+        .otp-box:focus {
+            border-color: #0078D4;
+            outline: none;
+            box-shadow: 0 0 0 2px #EFF6FC;
+        }
+        .otp-box.filled { border-color: #0078D4; }
+        .otp-box.error { border-color: #D13438; box-shadow: 0 0 0 2px #FEEBEB; }
+
+        @media (min-width: 768px) {
+            .otp-box {
+                width: 56px;
+                height: 64px;
+                font-size: 26px;
+            }
+        }
+
+        .progress-bar { height: 3px; background: #E0E0E0; border-radius: 2px; overflow: hidden; }
+        .progress-bar-fill { height: 100%; background: #0078D4; transition: width 0.3s ease; }
+    </style>
+</head>
+
+<body class="bg-white min-h-screen">
+    <main class="flex min-h-screen">
+
+        <!-- LEFT PANEL CANON (Step 1 ✓, Step 2 ✓, Step 3 ACTIVE) -->
+        <aside class="hidden lg:flex lg:w-[40%] bg-[#005A9E] text-white flex-col justify-between p-12 relative">
+            <div>
+                <div class="mb-16">
+                    <span class="text-2xl font-bold tracking-tighter font-headline"><a href="onboarding_onboarding.html">MARKET-UP</a></span>
+                </div>
+                <div class="max-w-sm mb-16">
+                    <h2 class="text-3xl font-semibold leading-tight mb-4 tracking-tight text-white">
+                        La plateforme digitale des entreprises.
+                    </h2>
+                    <p class="text-[#d3e3ff] text-base leading-relaxed">
+                        BrandUP, TraceUP, LinkUP — un seul compte, trois vitrines.
+                    </p>
+                </div>
+
+                <nav aria-label="Étapes d'inscription" class="space-y-5">
+                    <div class="flex items-center gap-4 opacity-70">
+                        <div class="w-9 h-9 rounded-full bg-[#d3e3ff] text-[#005A9E] flex items-center justify-center shrink-0">
+                            <span class="material-symbols-outlined text-lg fill">check</span>
+                        </div>
+                        <div>
+                            <div class="text-[11px] font-medium uppercase tracking-widest text-white/70">Étape 1</div>
+                            <div class="text-sm font-medium text-white">Entreprise</div>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-4 opacity-70">
+                        <div class="w-9 h-9 rounded-full bg-[#d3e3ff] text-[#005A9E] flex items-center justify-center shrink-0">
+                            <span class="material-symbols-outlined text-lg fill">check</span>
+                        </div>
+                        <div>
+                            <div class="text-[11px] font-medium uppercase tracking-widest text-white/70">Étape 2</div>
+                            <div class="text-sm font-medium text-white">Utilisateur</div>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-4">
+                        <div class="w-10 h-10 rounded-full bg-white text-[#005A9E] flex items-center justify-center text-sm font-bold shrink-0">3</div>
+                        <div>
+                            <div class="text-[11px] font-bold uppercase tracking-widest text-[#d3e3ff]">Étape 3</div>
+                            <div class="text-base font-semibold text-white">Vérification</div>
+                        </div>
+                    </div>
+                </nav>
+            </div>
+
+            <div class="text-xs text-[#d3e3ff]/70">
+                <p>© 2026 MARKET-UP · AGGREGAX SUARL</p>
+                <p class="mt-1">Fait en Tunisie 🇹🇳</p>
+            </div>
+        </aside>
+
+        <!-- RIGHT PANEL -->
+        <section class="flex-1 flex flex-col">
+
+            <!-- Mobile header -->
+            <div class="lg:hidden flex items-center justify-between px-6 py-4 border-b border-[#E0E0E0]">
+                <a href="#" class="text-xl font-bold tracking-tighter text-[#0078D4] font-headline">MARKET-UP</a>
+                <span class="text-xs text-[#616161]">Étape <span class="font-bold text-[#242424]">3</span> / 3</span>
+            </div>
+            <div class="lg:hidden px-6 pt-4">
+                <div class="progress-bar"><div class="progress-bar-fill" style="width: 100%;"></div></div>
+            </div>
+
+            <div class="flex-1 flex items-center justify-center px-6 md:px-12 py-12 md:py-16">
+                <div class="w-full max-w-md text-center">
+
+                    <!-- Icon -->
+                    <div class="w-16 h-16 rounded-lg bg-[#EFF6FC] mx-auto mb-8 flex items-center justify-center">
+                        <span class="material-symbols-outlined text-[#0078D4] fill" style="font-size: 36px;">mark_email_read</span>
+                    </div>
+
+                    <header class="mb-10">
+                        <span class="inline-block px-2.5 py-1 bg-[#EFF6FC] text-[#0078D4] text-[10px] font-bold uppercase tracking-widest rounded mb-4">Étape 3 sur 3</span>
+                        <h1 class="text-3xl md:text-[32px] font-semibold text-[#242424] mb-3 tracking-tight">Vérifiez votre email</h1>
+                        <p class="text-[#616161] text-base leading-relaxed">
+                            Nous venons d'envoyer un code à 6 chiffres à
+                            <strong id="otpTargetEmail" class="text-[#242424] font-semibold">contact@votre-entreprise.tn</strong>.
+                            Saisissez-le pour activer votre compte.
+                        </p>
+                    </header>
+
+                    <form id="otpForm" novalidate>
+                        <!-- OTP boxes — 3 + séparateur + 3 -->
+                        <div class="flex justify-center items-center gap-2 md:gap-3 mb-6" role="group" aria-label="Code à 6 chiffres">
+                            <input class="otp-box" maxlength="1" type="text" inputmode="numeric" pattern="[0-9]" autocomplete="one-time-code" data-otp-index="0" autofocus />
+                            <input class="otp-box" maxlength="1" type="text" inputmode="numeric" pattern="[0-9]" data-otp-index="1" />
+                            <input class="otp-box" maxlength="1" type="text" inputmode="numeric" pattern="[0-9]" data-otp-index="2" />
+                            <span class="text-[#D1D1D1] font-bold text-xl select-none" aria-hidden="true">–</span>
+                            <input class="otp-box" maxlength="1" type="text" inputmode="numeric" pattern="[0-9]" data-otp-index="3" />
+                            <input class="otp-box" maxlength="1" type="text" inputmode="numeric" pattern="[0-9]" data-otp-index="4" />
+                            <input class="otp-box" maxlength="1" type="text" inputmode="numeric" pattern="[0-9]" data-otp-index="5" />
+                        </div>
+
+                        <!-- Error message -->
+                        <p id="otpError" class="hidden text-sm text-[#D13438] mb-4" role="alert"></p>
+
+                        <!-- Submit -->
+                        <button type="submit" id="submitBtn" class="btn-primary w-full mb-6" disabled>
+                            Valider mon compte
+                            <span class="material-symbols-outlined text-base">check_circle</span>
+                        </button>
+
+                        <!-- Resend with countdown -->
+                        <div class="text-sm text-[#616161]">
+                            <span>Vous n'avez pas reçu le code ?</span>
+                            <button type="button" id="resendBtn" class="text-[#0078D4] font-semibold hover:underline ml-1" disabled>
+                                Renvoyer dans <span id="resendCountdown">60</span> s
+                            </button>
+                        </div>
+                    </form>
+
+                    <!-- Back -->
+                    <div class="mt-10 pt-6 border-t border-[#E0E0E0]">
+                        <a href="auth_inscription-utilisateur.html" class="btn-ghost">
+                            <span class="material-symbols-outlined text-base">arrow_back</span>
+                            Retour à l'étape précédente
+                        </a>
+                    </div>
+
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <script>
+        // ============================================================
+        // OTP HANDLING — 6 boxes with auto-advance, paste, backspace
+        // ============================================================
+        (function () {
+            var boxes   = Array.prototype.slice.call(document.querySelectorAll('.otp-box'));
+            var submit  = document.getElementById('submitBtn');
+            var errorEl = document.getElementById('otpError');
+            var form    = document.getElementById('otpForm');
+
+            function getCode() {
+                return boxes.map(function (b) { return b.value; }).join('');
+            }
+
+            function updateSubmit() {
+                var full = getCode().length === 6 && /^\d{6}$/.test(getCode());
+                submit.disabled = !full;
+                if (full) clearError();
+            }
+
+            function clearError() {
+                errorEl.classList.add('hidden');
+                errorEl.textContent = '';
+                boxes.forEach(function (b) { b.classList.remove('error'); });
+            }
+
+            function showError(msg) {
+                errorEl.textContent = msg;
+                errorEl.classList.remove('hidden');
+                boxes.forEach(function (b) { b.classList.add('error'); });
+            }
+
+            boxes.forEach(function (box, idx) {
+                // Filtre saisie à 1 chiffre
+                box.addEventListener('input', function (e) {
+                    var v = box.value.replace(/[^0-9]/g, '');
+                    if (v.length > 1) v = v.charAt(0);
+                    box.value = v;
+                    if (v) {
+                        box.classList.add('filled');
+                        if (idx < boxes.length - 1) boxes[idx + 1].focus();
+                    } else {
+                        box.classList.remove('filled');
+                    }
+                    updateSubmit();
+                });
+
+                // Backspace revient à la case précédente
+                box.addEventListener('keydown', function (e) {
+                    if (e.key === 'Backspace' && !box.value && idx > 0) {
+                        boxes[idx - 1].focus();
+                        boxes[idx - 1].value = '';
+                        boxes[idx - 1].classList.remove('filled');
+                        updateSubmit();
+                    } else if (e.key === 'ArrowLeft' && idx > 0) {
+                        boxes[idx - 1].focus();
+                    } else if (e.key === 'ArrowRight' && idx < boxes.length - 1) {
+                        boxes[idx + 1].focus();
+                    }
+                });
+
+                // Paste : si on colle 6 chiffres, les distribuer
+                box.addEventListener('paste', function (e) {
+                    e.preventDefault();
+                    var txt = (e.clipboardData || window.clipboardData).getData('text');
+                    var digits = txt.replace(/[^0-9]/g, '').slice(0, 6);
+                    if (!digits) return;
+                    digits.split('').forEach(function (d, i) {
+                        if (boxes[i]) {
+                            boxes[i].value = d;
+                            boxes[i].classList.add('filled');
+                        }
+                    });
+                    var focusIdx = Math.min(digits.length, boxes.length - 1);
+                    boxes[focusIdx].focus();
+                    updateSubmit();
+                });
+            });
+
+            // Submit — en production : POST /api/verify-otp
+            // Maquette : redirect vers page success
+            form.addEventListener('submit', function (e) {
+                e.preventDefault();
+                if (submit.disabled) return;
+                // Simulation : un OTP "000000" est refusé pour démo
+                if (getCode() === '000000') {
+                    showError('Code invalide. Vérifiez votre email et réessayez.');
+                    return;
+                }
+                window.location.href = 'auth_validation-success.html';
+            });
+        })();
+
+        // ============================================================
+        // RESEND COUNTDOWN — 60s puis bouton actif
+        // ============================================================
+        (function () {
+            var btn   = document.getElementById('resendBtn');
+            var timer = document.getElementById('resendCountdown');
+            var secs  = 60;
+
+            var interval = setInterval(function () {
+                secs--;
+                if (secs <= 0) {
+                    clearInterval(interval);
+                    btn.disabled = false;
+                    btn.innerHTML = 'Renvoyer le code';
+                } else {
+                    timer.textContent = secs;
+                }
+            }, 1000);
+
+            btn.addEventListener('click', function () {
+                if (btn.disabled) return;
+                // Maquette : redirige vers la page dédiée (renvoyer code)
+                // En production : POST /api/resend-otp + reset du timer
+                window.location.href = 'auth_validation-email.html';
+            });
+        })();
+    </script>
+</body>
+
+</html>

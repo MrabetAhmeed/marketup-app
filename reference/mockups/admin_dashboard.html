@@ -1,0 +1,967 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Admin · Vue d'ensemble · MARKET-UP</title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap"
+        rel="stylesheet" />
+    <link rel="stylesheet"
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" />
+
+    <style>
+        :root {
+            --admin-primary: #5C2D91;
+            --admin-primary-hover: #4A2375;
+            --admin-primary-dark: #3D1F60;
+            --admin-primary-light: #F3EFFA;
+            --admin-primary-tint: #EBE2F5;
+            --text-primary: #242424;
+            --text-secondary: #616161;
+            --text-tertiary: #8A8886;
+            --border-default: #E0E0E0;
+            --bg-canvas: #F5F5F5;
+            --bg-surface: #FFFFFF;
+        }
+
+        html,
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Inter', sans-serif;
+            color: var(--text-primary);
+            background: var(--bg-canvas);
+        }
+
+        .font-heading {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+        }
+
+        .icon-fill {
+            font-variation-settings: 'FILL' 1;
+        }
+
+        .card {
+            background: var(--bg-surface);
+            border: 1px solid var(--border-default);
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
+            transition: box-shadow 0.15s ease;
+        }
+
+        .card--hover {
+            cursor: pointer;
+        }
+
+        .card--hover:hover {
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+        }
+
+        /* Nav sidebar */
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 8px 12px;
+            border-radius: 6px;
+            color: var(--text-secondary);
+            font-size: 13px;
+            font-weight: 500;
+            transition: background 0.15s ease, color 0.15s ease;
+            cursor: pointer;
+            text-decoration: none;
+        }
+
+        .nav-item:hover {
+            background: #FAFAFA;
+            color: var(--text-primary);
+        }
+
+        .nav-item.active {
+            background: var(--admin-primary-light);
+            color: var(--admin-primary);
+            font-weight: 600;
+        }
+
+        .nav-item.active .material-symbols-outlined {
+            color: var(--admin-primary);
+        }
+
+        .nav-item .material-symbols-outlined {
+            font-size: 18px;
+            color: var(--text-tertiary);
+        }
+
+        .nav-group-label {
+            font-size: 10px;
+            font-weight: 700;
+            color: var(--text-tertiary);
+            letter-spacing: 0.06em;
+            padding: 12px 12px 6px;
+            text-transform: uppercase;
+        }
+
+        .nav-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 3px;
+            font-size: 10px;
+            font-weight: 700;
+            padding: 2px 6px;
+            border-radius: 10px;
+            line-height: 1;
+        }
+
+        .nav-pill--count-amber {
+            background: #D97706;
+            color: white;
+        }
+
+        .nav-pill--count-red {
+            background: #DC2626;
+            color: white;
+        }
+
+        /* Buttons */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            padding: 7px 14px;
+            border-radius: 4px;
+            font-size: 12.5px;
+            font-weight: 600;
+            cursor: pointer;
+            border: 1px solid transparent;
+            transition: all 0.15s ease;
+            text-decoration: none;
+            white-space: nowrap;
+        }
+
+        .btn .material-symbols-outlined {
+            font-size: 16px;
+        }
+
+        .btn-primary {
+            background: var(--admin-primary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--admin-primary-hover);
+        }
+
+        .btn-secondary {
+            background: white;
+            color: var(--text-primary);
+            border: 1px solid #D1D1D1;
+        }
+
+        .btn-secondary:hover {
+            background: #F5F5F5;
+        }
+
+        .btn-ghost {
+            background: transparent;
+            color: var(--text-primary);
+        }
+
+        .btn-ghost:hover {
+            background: #F5F5F5;
+        }
+
+        /* Status pills (mêmes que dashboard entreprise) */
+        .status-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 11px;
+            font-weight: 600;
+            padding: 3px 9px;
+            border-radius: 4px;
+            border: 1px solid;
+        }
+
+        .status-pill .dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+        }
+
+        .status-pill--active {
+            color: #107C10;
+            background: #F0FDF4;
+            border-color: #B7EBC0;
+        }
+
+        .status-pill--active .dot {
+            background: #107C10;
+        }
+
+        .status-pill--pending {
+            color: #92400E;
+            background: #FFFBEB;
+            border-color: #FDE68A;
+        }
+
+        .status-pill--pending .dot {
+            background: #D97706;
+        }
+
+        .status-pill--rejected {
+            color: #B91C1C;
+            background: #FEF2F2;
+            border-color: #FCA5A5;
+        }
+
+        .status-pill--rejected .dot {
+            background: #DC2626;
+        }
+
+        .status-pill--disabled {
+            color: #616161;
+            background: #F5F5F5;
+            border-color: #E0E0E0;
+        }
+
+        .status-pill--disabled .dot {
+            background: #8A8886;
+        }
+
+        /* KPI card */
+        .kpi-card {
+            background: var(--bg-surface);
+            border: 1px solid var(--border-default);
+            border-radius: 8px;
+            padding: 20px;
+        }
+
+        .kpi-card__icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Queue card (file d'attente) */
+        .queue-card {
+            background: var(--bg-surface);
+            border: 1px solid var(--border-default);
+            border-radius: 8px;
+            transition: box-shadow 0.15s ease, transform 0.15s ease;
+            text-decoration: none;
+            color: inherit;
+            display: block;
+        }
+
+        .queue-card:hover {
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+            transform: translateY(-1px);
+        }
+
+        .queue-card__header {
+            border-bottom: 1px solid #F0F0F0;
+            padding: 16px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .queue-card__body {
+            padding: 12px 20px 20px;
+        }
+
+        /* Activity row */
+        .activity-row {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            padding: 10px 0;
+            border-bottom: 1px solid #F5F5F5;
+        }
+
+        .activity-row:last-child {
+            border-bottom: none;
+        }
+
+        .activity-row__icon {
+            width: 32px;
+            height: 32px;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            shrink: 0;
+        }
+
+        /* Focus */
+        *:focus-visible {
+            outline: 2px solid var(--admin-primary);
+            outline-offset: 2px;
+            border-radius: 4px;
+        }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #D1D1D1;
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #A19F9D;
+        }
+
+        /* Mobile */
+        @media (max-width: 768px) {
+            #sidebar {
+                transform: translateX(-100%);
+                transition: transform 0.3s ease;
+            }
+
+            #sidebar.open {
+                transform: translateX(0);
+            }
+
+            #backdrop.show {
+                display: block;
+            }
+        }
+    </style>
+    <!-- Source de données démo (Option B : JS externe, marche en file://) -->
+    <script src="marketup_seed_data.js"></script>
+    <script src="admin_data_bridge.js"></script>
+    <script src="admin_notifications_dropdown.js"></script>
+</head>
+
+<body class="min-h-screen">
+
+    <div id="backdrop" class="fixed inset-0 bg-black/30 z-40 hidden md:hidden"></div>
+
+    <div class="flex">
+
+        <!-- ═════ SIDEBAR ═════ -->
+        <aside id="sidebar"
+            class="fixed top-0 left-0 w-60 h-screen bg-white border-r border-[#E0E0E0] z-50 flex flex-col">
+
+            <a href="admin_dashboard.html"
+                class="flex items-center gap-2.5 px-5 py-4 border-b border-[#E0E0E0] shrink-0 h-14 hover:bg-[#FAFAFA] transition-colors"
+                title="Vue d'ensemble admin">
+                <span class="material-symbols-outlined icon-fill text-[#5C2D91]"
+                    style="font-size:22px">shield_person</span>
+                <div class="leading-tight min-w-0">
+                    <div class="text-[#242424] font-heading font-bold text-[15px] tracking-tight">MARKET-UP</div>
+                    <div class="text-[10px] text-[#5C2D91] tracking-wide font-semibold uppercase">Admin</div>
+                </div>
+            </a>
+
+            <nav class="flex-1 overflow-y-auto px-3 py-2">
+                <div class="nav-group-label">Tableau de bord</div>
+                <a href="admin_dashboard.html" class="nav-item active">
+                    <span class="material-symbols-outlined">dashboard</span>
+                    <span class="flex-1 min-w-0 truncate">Vue d'ensemble</span>
+                </a>
+
+                <div class="nav-group-label">Validations</div>
+                <a href="admin_validation-comptes.html" class="nav-item">
+                    <span class="material-symbols-outlined">person_check</span>
+                    <span class="flex-1 min-w-0 truncate">Comptes</span>
+                    <span class="nav-pill nav-pill--count-amber" id="nav-count-comptes">—</span>
+                </a>
+                <a href="admin_validation-profils.html" class="nav-item">
+                    <span class="material-symbols-outlined">fact_check</span>
+                    <span class="flex-1 min-w-0 truncate">Profils</span>
+                    <span class="nav-pill nav-pill--count-amber" id="nav-count-profils">—</span>
+                </a>
+                <a href="admin_validation-rse.html" class="nav-item">
+                    <span class="material-symbols-outlined">volunteer_activism</span>
+                    <span class="flex-1 min-w-0 truncate">Reçus RSE</span>
+                    <span class="nav-pill nav-pill--count-amber" id="nav-count-rse">—</span>
+                </a>
+
+                <div class="nav-group-label">Gestion</div>
+                <a href="admin_entreprises.html" class="nav-item">
+                    <span class="material-symbols-outlined">business</span>
+                    <span class="flex-1 min-w-0 truncate">Entreprises</span>
+                </a>
+
+
+
+
+                <div class="nav-group-label">Finances</div>
+                <a href="admin_transactions.html" class="nav-item">
+                    <span class="material-symbols-outlined">receipt_long</span>
+                    <span class="flex-1 min-w-0 truncate">Transactions</span>
+                </a>
+
+            </nav>
+
+            <div class="border-t border-[#E0E0E0] p-3">
+                <div class="flex items-center gap-2.5 px-2 py-2 rounded-lg hover:bg-[#FAFAFA] transition-colors">
+                    <div
+                        class="w-8 h-8 rounded-full bg-[#5C2D91] text-white flex items-center justify-center font-bold text-[12px] shrink-0">
+                        BA
+                    </div>
+                    <div class="leading-tight min-w-0 flex-1">
+                        <div class="text-[12.5px] font-semibold text-[#242424] truncate">Bassem Admin</div>
+                        <div class="text-[10px] text-[#8A8886] truncate">Super administrateur</div>
+                    </div>
+                    <button
+                        class="p-1.5 rounded hover:bg-[#F5F5F5] text-[#8A8886] hover:text-[#B91C1C] transition-colors"
+                        title="Se déconnecter" aria-label="Se déconnecter"
+                        onclick="window.location.href='auth_connexion.html';">
+                        <span class="material-symbols-outlined" style="font-size:16px">logout</span>
+                    </button>
+                </div>
+            </div>
+        </aside>
+
+        <!-- ═════ MAIN ═════ -->
+        <div class="flex-1 md:ml-60 min-h-screen flex flex-col">
+
+            <!-- TOPBAR -->
+            <header
+                class="sticky top-0 z-30 bg-white border-b border-[#E0E0E0] h-14 flex items-center px-4 md:px-6 shrink-0">
+                <button id="menuBtn" class="md:hidden mr-3 p-2 rounded hover:bg-[#F5F5F5] transition-colors"
+                    aria-label="Ouvrir le menu">
+                    <span class="material-symbols-outlined text-[#242424]">menu</span>
+                </button>
+
+                <div class="min-w-0 leading-tight flex-1">
+                    <h1 class="font-heading text-[16px] font-bold text-[#242424] truncate">Vue d'ensemble</h1>
+                    <p class="hidden md:block text-[12px] text-[#616161] truncate">
+                        Tableau de bord administrateur · <span id="today-date">—</span>
+                    </p>
+                </div>
+
+                <div class="flex items-center gap-2 ml-3">
+                    <button class="relative p-2 rounded-lg hover:bg-[#F5F5F5] transition-colors"
+                        aria-label="Notifications admin">
+                        <span class="material-symbols-outlined text-[#242424]">notifications</span>
+                        <span
+                            class="absolute top-1 right-1 w-4 h-4 bg-[#DC2626] text-white text-[9px] font-bold rounded-full flex items-center justify-center">5</span>
+                    </button>
+                    <button class="flex items-center gap-2 px-1 py-1 rounded-lg hover:bg-[#F5F5F5] transition-colors"
+                        aria-label="Menu admin">
+                        <div
+                            class="w-8 h-8 rounded-full bg-[#5C2D91] text-white flex items-center justify-center font-bold text-[11px] shrink-0">
+                            BA</div>
+                        <span class="material-symbols-outlined text-[#8A8886] hidden md:inline"
+                            style="font-size:16px">expand_more</span>
+                    </button>
+                </div>
+            </header>
+
+            <!-- MAIN -->
+            <main class="flex-1 p-4 md:p-8">
+                <div class="max-w-[1280px] mx-auto space-y-8">
+
+                    <!-- Hero admin -->
+                    <section>
+                        <div class="flex items-start gap-3 mb-6">
+                            <div class="w-11 h-11 rounded-lg bg-[#F3EFFA] flex items-center justify-center shrink-0">
+                                <span class="material-symbols-outlined icon-fill text-[#5C2D91]"
+                                    style="font-size:24px">shield_person</span>
+                            </div>
+                            <div class="min-w-0">
+                                <h2 class="font-heading font-bold text-[22px] text-[#242424] leading-tight">
+                                    Bienvenue, <span id="admin-name">Bassem</span>
+                                </h2>
+                                <p class="text-[13px] text-[#616161] mt-1">
+                                    <span id="urgent-count">—</span> actions urgentes aujourd'hui · dernière connexion
+                                    il y a 2h
+                                </p>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- ═════ KPIs globaux ═════ -->
+                    <section>
+                        <div class="mb-4">
+                            <h3 class="font-heading font-semibold text-[13px] text-[#242424] uppercase tracking-wider">
+                                Plateforme en un coup d'œil
+                            </h3>
+                            <p class="text-[12px] text-[#616161] mt-0.5">État global de la plateforme MARKET-UP (30
+                                derniers jours)</p>
+                        </div>
+
+                        <div class="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
+
+                            <!-- KPI 1 : Entreprises -->
+                            <a href="admin_entreprises.html" class="kpi-card card--hover block">
+                                <div class="flex items-start justify-between mb-4">
+                                    <div class="kpi-card__icon bg-[#F3EFFA]">
+                                        <span class="material-symbols-outlined text-[#5C2D91]"
+                                            style="font-size:20px">business</span>
+                                    </div>
+                                    <span
+                                        class="inline-flex items-center gap-0.5 text-[11px] font-semibold text-[#107C10]">
+                                        <span class="material-symbols-outlined"
+                                            style="font-size:14px">trending_up</span>
+                                        +3 ce mois
+                                    </span>
+                                </div>
+                                <div class="text-[11px] text-[#616161] font-medium uppercase tracking-wider mb-1">
+                                    Entreprises
+                                </div>
+                                <div class="font-heading font-bold text-[#242424] text-[26px] leading-none"
+                                    id="kpi-companies">—</div>
+                                <div class="text-[11px] text-[#8A8886] mt-1">
+                                    <span id="kpi-companies-active">—</span> actives ·
+                                    <span id="kpi-companies-pending">—</span> en attente
+                                </div>
+                            </a>
+
+                            <!-- KPI 2 : Profils en attente -->
+                            <a href="admin_validation-profils.html" class="kpi-card card--hover block">
+                                <div class="flex items-start justify-between mb-4">
+                                    <div class="kpi-card__icon bg-[#FFFBEB]">
+                                        <span class="material-symbols-outlined text-[#D97706]"
+                                            style="font-size:20px">fact_check</span>
+                                    </div>
+                                    <span
+                                        class="inline-flex items-center gap-1 text-[10px] font-semibold text-[#92400E] bg-[#FFFBEB] border border-[#FDE68A] px-1.5 py-0.5 rounded">
+                                        <span class="w-1.5 h-1.5 bg-[#D97706] rounded-full"></span>
+                                        À traiter
+                                    </span>
+                                </div>
+                                <div class="text-[11px] text-[#616161] font-medium uppercase tracking-wider mb-1">
+                                    Profils en attente
+                                </div>
+                                <div class="font-heading font-bold text-[#242424] text-[26px] leading-none"
+                                    id="kpi-profiles-pending">—</div>
+                                <div class="text-[11px] text-[#8A8886] mt-1">
+                                    SLA : 48h max
+                                </div>
+                            </a>
+
+                            <!-- KPI 3 : CA mensuel -->
+                            <a href="admin_transactions.html" class="kpi-card card--hover block">
+                                <div class="flex items-start justify-between mb-4">
+                                    <div class="kpi-card__icon bg-[#F0FDF4]">
+                                        <span class="material-symbols-outlined text-[#107C10]"
+                                            style="font-size:20px">payments</span>
+                                    </div>
+                                    <span
+                                        class="inline-flex items-center gap-0.5 text-[11px] font-semibold text-[#107C10]">
+                                        <span class="material-symbols-outlined"
+                                            style="font-size:14px">trending_up</span>
+                                        +18%
+                                    </span>
+                                </div>
+                                <div class="text-[11px] text-[#616161] font-medium uppercase tracking-wider mb-1">
+                                    CA mensuel HT
+                                </div>
+                                <div
+                                    class="font-heading font-bold text-[#242424] text-[26px] leading-none flex items-baseline gap-1">
+                                    <span id="kpi-revenue-ht">—</span>
+                                    <span class="text-[12px] font-semibold text-[#616161]">DT</span>
+                                </div>
+                                <div class="text-[11px] text-[#8A8886] mt-1">
+                                    TTC : <span id="kpi-revenue-ttc">—</span> DT
+                                </div>
+                            </a>
+
+                            <!-- KPI 4 : Engagement RSE -->
+                            <a href="admin_validation-rse.html" class="kpi-card card--hover block">
+                                <div class="flex items-start justify-between mb-4">
+                                    <div class="kpi-card__icon bg-[#FEFCE8] border border-[#E8C96A]/40">
+                                        <span class="material-symbols-outlined icon-fill text-[#C5A059]"
+                                            style="font-size:20px">volunteer_activism</span>
+                                    </div>
+                                    <span
+                                        class="inline-flex items-center gap-0.5 text-[11px] font-semibold text-[#8A6A1F]">
+                                        <span class="w-1.5 h-1.5 bg-[#C5A059] rounded-full"></span>
+                                        Attesté
+                                    </span>
+                                </div>
+                                <div class="text-[11px] text-[#616161] font-medium uppercase tracking-wider mb-1">
+                                    Dons RSE validés
+                                </div>
+                                <div
+                                    class="font-heading font-bold text-[#242424] text-[26px] leading-none flex items-baseline gap-1">
+                                    <span id="kpi-rse-amount">—</span>
+                                    <span class="text-[12px] font-semibold text-[#616161]">DT</span>
+                                </div>
+                                <div class="text-[11px] text-[#8A8886] mt-1">
+                                    <span id="kpi-rse-count">—</span> entreprises · 4 associations
+                                </div>
+                            </a>
+
+                        </div>
+                    </section>
+
+                    <!-- ═════ Files d'attente (3 colonnes) ═════ -->
+                    <section>
+                        <div class="flex items-end justify-between mb-4">
+                            <div>
+                                <h3
+                                    class="font-heading font-semibold text-[13px] text-[#242424] uppercase tracking-wider">
+                                    Files d'attente prioritaires
+                                </h3>
+                                <p class="text-[12px] text-[#616161] mt-0.5">
+                                    Actions à réaliser classées par ancienneté (FIFO)
+                                </p>
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+
+                            <!-- Queue 1 : Comptes -->
+                            <a href="admin_validation-comptes.html" class="queue-card">
+                                <div class="queue-card__header">
+                                    <div class="flex items-center gap-2.5">
+                                        <div
+                                            class="w-9 h-9 rounded-lg bg-[#FFFBEB] flex items-center justify-center shrink-0">
+                                            <span class="material-symbols-outlined text-[#D97706]"
+                                                style="font-size:18px">person_check</span>
+                                        </div>
+                                        <div>
+                                            <h4 class="font-heading font-bold text-[14px] text-[#242424] leading-tight">
+                                                Comptes</h4>
+                                            <div class="text-[11px] text-[#616161]">Entreprises à valider</div>
+                                        </div>
+                                    </div>
+                                    <span class="font-heading font-bold text-[22px] text-[#D97706] leading-none"
+                                        id="queue-comptes-count">—</span>
+                                </div>
+                                <div class="queue-card__body space-y-2" id="queue-comptes-items">
+                                    <!-- Injecté via JS : 3 premiers comptes -->
+                                    <div class="text-[11px] text-[#8A8886]">Chargement...</div>
+                                </div>
+                            </a>
+
+                            <!-- Queue 2 : Profils -->
+                            <a href="admin_validation-profils.html" class="queue-card">
+                                <div class="queue-card__header">
+                                    <div class="flex items-center gap-2.5">
+                                        <div
+                                            class="w-9 h-9 rounded-lg bg-[#F3EFFA] flex items-center justify-center shrink-0">
+                                            <span class="material-symbols-outlined text-[#5C2D91]"
+                                                style="font-size:18px">fact_check</span>
+                                        </div>
+                                        <div>
+                                            <h4 class="font-heading font-bold text-[14px] text-[#242424] leading-tight">
+                                                Profils</h4>
+                                            <div class="text-[11px] text-[#616161]">Soumissions à modérer</div>
+                                        </div>
+                                    </div>
+                                    <span class="font-heading font-bold text-[22px] text-[#5C2D91] leading-none"
+                                        id="queue-profils-count">—</span>
+                                </div>
+                                <div class="queue-card__body space-y-2" id="queue-profils-items">
+                                    <div class="text-[11px] text-[#8A8886]">Chargement...</div>
+                                </div>
+                            </a>
+
+                            <!-- Queue 3 : Reçus RSE -->
+                            <a href="admin_validation-rse.html" class="queue-card">
+                                <div class="queue-card__header">
+                                    <div class="flex items-center gap-2.5">
+                                        <div
+                                            class="w-9 h-9 rounded-lg bg-[#FEFCE8] border border-[#E8C96A]/40 flex items-center justify-center shrink-0">
+                                            <span class="material-symbols-outlined icon-fill text-[#C5A059]"
+                                                style="font-size:18px">volunteer_activism</span>
+                                        </div>
+                                        <div>
+                                            <h4 class="font-heading font-bold text-[14px] text-[#242424] leading-tight">
+                                                Reçus RSE</h4>
+                                            <div class="text-[11px] text-[#616161]">Attestations à vérifier</div>
+                                        </div>
+                                    </div>
+                                    <span class="font-heading font-bold text-[22px] text-[#8A6A1F] leading-none"
+                                        id="queue-rse-count">—</span>
+                                </div>
+                                <div class="queue-card__body space-y-2" id="queue-rse-items">
+                                    <div class="text-[11px] text-[#8A8886]">Chargement...</div>
+                                </div>
+                            </a>
+
+                        </div>
+                    </section>
+                </div>
+            </main>
+
+        </div>
+
+    </div>
+
+    <!-- ═══════════════════════════════════════
+         JS — Chargement des données + drawer
+         ═══════════════════════════════════════ -->
+    <script>
+        // ─── Drawer mobile ───
+        (function () {
+            const sidebar = document.getElementById('sidebar');
+            const backdrop = document.getElementById('backdrop');
+            const menuBtn = document.getElementById('menuBtn');
+            menuBtn?.addEventListener('click', () => {
+                sidebar.classList.add('open');
+                backdrop.classList.add('show');
+            });
+            backdrop?.addEventListener('click', () => {
+                sidebar.classList.remove('open');
+                backdrop.classList.remove('show');
+            });
+        })();
+
+        // ─── Helper : formatage date ───
+        function formatDate(iso) {
+            if (!iso) return '—';
+            const d = new Date(iso);
+            const now = new Date();
+            const diffMs = now - d;
+            const diffH = Math.floor(diffMs / (1000 * 60 * 60));
+            const diffD = Math.floor(diffH / 24);
+            if (diffH < 1) return 'il y a < 1h';
+            if (diffH < 24) return `il y a ${diffH}h`;
+            if (diffD < 7) return `il y a ${diffD}j`;
+            return d.toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' });
+        }
+        function formatNumber(n) {
+            return n.toLocaleString('fr-FR').replace(/,/g, ' ');
+        }
+        function todayFormatted() {
+            return new Date().toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+        }
+
+        // ─── Chargement des données ───
+        async function loadAdminData() {
+            // Stratégie 1 : window.MARKETUP_DATA (via marketup_seed_data.js + admin_data_bridge.js)
+            //              → fonctionne en file:// (double-clic) ET en http://
+            if (typeof window.MARKETUP_DATA !== 'undefined') {
+                try {
+                    renderDashboard(window.MARKETUP_DATA);
+                    return;
+                } catch (e) {
+                    console.error('Erreur rendu dashboard:', e);
+                }
+            }
+
+            // Stratégie 2 (fallback) : fetch si le .js externe n'est pas là
+            try {
+                const res = await fetch('admin_data.json'); // legacy fallback (rare)
+                if (!res.ok) throw new Error('Fichier JSON introuvable');
+                const data = await res.json();
+                renderDashboard(data);
+            } catch (err) {
+                console.error('Erreur chargement data:', err);
+                document.getElementById('urgent-count').textContent = '—';
+                document.querySelectorAll('#recent-activity, #queue-comptes-items, #queue-profils-items, #queue-rse-items').forEach(el => {
+                    el.innerHTML = '<div class="text-[11px] text-[#B91C1C]">Erreur : marketup_seed_data.js ou admin_data_bridge.js introuvable. Vérifiez qu\'ils sont dans le même dossier.</div>';
+                });
+            }
+        }
+
+        function renderDashboard(data) {
+            // ─── Topbar date ───
+            document.getElementById('today-date').textContent = todayFormatted();
+            document.getElementById('admin-name').textContent = data._meta.demo_admin.firstName;
+
+            // ─── KPIs globaux ───
+            const kpis = data.kpis_global;
+            document.getElementById('kpi-companies').textContent = formatNumber(kpis.companies_total);
+            document.getElementById('kpi-companies-active').textContent = kpis.companies_active;
+            document.getElementById('kpi-companies-pending').textContent = kpis.companies_pending;
+
+            // Profils pending : somme des 3 types en état "pending"
+            let profilesPending = 0;
+            data.companies.forEach(c => {
+                ['brandup', 'traceup', 'linkup'].forEach(k => {
+                    if (c.profiles[k]?.status === 'pending') profilesPending++;
+                });
+            });
+            document.getElementById('kpi-profiles-pending').textContent = profilesPending;
+
+            document.getElementById('kpi-revenue-ht').textContent = formatNumber(kpis.monthly_revenue_ht);
+            document.getElementById('kpi-revenue-ttc').textContent = formatNumber(kpis.monthly_revenue_ttc);
+            document.getElementById('kpi-rse-amount').textContent = formatNumber(kpis.rse_total);
+            document.getElementById('kpi-rse-count').textContent = kpis.rse_validated_count;
+
+            // ─── Urgent count header ───
+            const rseP = data.rse_receipts.filter(r => r.status === 'pending').length;
+            const comptesNew = data.companies.filter(c => c.status === 'pending').length;
+            const updatesP = data.companies.filter(c => c.pending_updates).length;
+            const comptesP = comptesNew + updatesP;
+            const urgent = comptesP + profilesPending + rseP + kpis.disputes_open;
+            document.getElementById('urgent-count').textContent = urgent;
+
+            // ─── Sidebar counts ───
+            document.getElementById('nav-count-comptes').textContent = comptesP;
+            document.getElementById('nav-count-profils').textContent = profilesPending;
+            document.getElementById('nav-count-rse').textContent = rseP;
+            document.getElementById('nav-count-litiges').textContent = kpis.disputes_open;
+
+            // ─── Queue 1 : Comptes (mix nouveaux + modifs, 3 premiers par ancienneté) ───
+            const newAccounts = data.companies
+                .filter(c => c.status === 'pending')
+                .map(c => ({ kind: 'new', company: c, ts: c.registered_at }));
+            const updateRequests = data.companies
+                .filter(c => c.pending_updates)
+                .map(c => ({ kind: 'update', company: c, ts: c.pending_updates.submitted_at }));
+            const queueComptes = [...newAccounts, ...updateRequests]
+                .sort((a, b) => new Date(a.ts) - new Date(b.ts))
+                .slice(0, 3);
+
+            document.getElementById('queue-comptes-count').textContent = comptesP;
+            document.getElementById('queue-comptes-items').innerHTML = queueComptes.map(item => {
+                const c = item.company;
+                const isUpdate = item.kind === 'update';
+                const badge = isUpdate
+                    ? '<span class="inline-flex items-center px-1.5 rounded text-[9px] font-bold bg-[#F3EFFA] text-[#5C2D91] uppercase tracking-wide">Modif</span>'
+                    : '<span class="inline-flex items-center px-1.5 rounded text-[9px] font-bold bg-[#FEF3C7] text-[#92400E] uppercase tracking-wide">Nouveau</span>';
+                const subtitle = isUpdate
+                    ? `Modif infos · ${formatDate(item.ts)}`
+                    : `${c.type} · ${c.city} · ${formatDate(item.ts)}`;
+                return `
+                <div class="flex items-center gap-2.5 py-2 border-b border-[#F5F5F5] last:border-0">
+                    <div class="w-7 h-7 rounded-full bg-[#F3EFFA] text-[#5C2D91] flex items-center justify-center font-bold text-[10px] shrink-0">
+                        ${c.owner.avatar_initials}
+                    </div>
+                    <div class="min-w-0 flex-1">
+                        <div class="flex items-center gap-1.5">
+                            <div class="text-[12px] font-semibold text-[#242424] truncate leading-tight">${c.name}</div>
+                            ${badge}
+                        </div>
+                        <div class="text-[10.5px] text-[#8A8886] leading-tight">${subtitle}</div>
+                    </div>
+                </div>
+            `;
+            }).join('');
+
+            // ─── Queue 2 : Profils en attente (3 premiers) ───
+            const profilsList = [];
+            data.companies.forEach(c => {
+                ['brandup', 'traceup', 'linkup'].forEach(k => {
+                    const p = c.profiles[k];
+                    if (p?.status === 'pending') {
+                        // submitted_at peut être null si le seed ne l'a pas encore renseigné
+                        // → on garde quand même l'item, tri par registered_at en fallback
+                        profilsList.push({
+                            company: c,
+                            profile: k,
+                            submitted_at: p.submitted_at || c.registered_at
+                        });
+                    }
+                });
+            });
+            profilsList.sort((a, b) => new Date(a.submitted_at) - new Date(b.submitted_at));
+            document.getElementById('queue-profils-count').textContent = profilesPending;
+
+            const profilIcons = { brandup: 'storefront', traceup: 'play_circle', linkup: 'qr_code_2' };
+            const profilColors = { brandup: '#0078D4', traceup: '#8764B8', linkup: '#242424' };
+            document.getElementById('queue-profils-items').innerHTML = profilsList.slice(0, 3).map(p => `
+                <div class="flex items-center gap-2.5 py-2 border-b border-[#F5F5F5] last:border-0">
+                    <div class="w-7 h-7 rounded-lg bg-[#EFEDED] flex items-center justify-center shrink-0">
+                        <span class="material-symbols-outlined" style="font-size:14px; color:${profilColors[p.profile]}">${profilIcons[p.profile]}</span>
+                    </div>
+                    <div class="min-w-0 flex-1">
+                        <div class="text-[12px] font-semibold text-[#242424] truncate leading-tight">${p.company.name}</div>
+                        <div class="text-[10.5px] text-[#8A8886] leading-tight">${p.profile.charAt(0).toUpperCase() + p.profile.slice(1)} · ${formatDate(p.submitted_at)}</div>
+                    </div>
+                </div>
+            `).join('');
+
+            // ─── Queue 3 : RSE (3 premiers) ───
+            const rseP3 = data.rse_receipts
+                .filter(r => r.status === 'pending')
+                .sort((a, b) => new Date(a.submitted_at) - new Date(b.submitted_at))
+                .slice(0, 3);
+            document.getElementById('queue-rse-count').textContent = rseP;
+            document.getElementById('queue-rse-items').innerHTML = rseP3.map(r => `
+                <div class="flex items-center gap-2.5 py-2 border-b border-[#F5F5F5] last:border-0">
+                    <div class="w-7 h-7 rounded-lg bg-[#FEFCE8] border border-[#E8C96A]/40 flex items-center justify-center shrink-0">
+                        <span class="material-symbols-outlined icon-fill text-[#C5A059]" style="font-size:14px">volunteer_activism</span>
+                    </div>
+                    <div class="min-w-0 flex-1">
+                        <div class="text-[12px] font-semibold text-[#242424] truncate leading-tight">${r.company_name}</div>
+                        <div class="text-[10.5px] text-[#8A8886] leading-tight">${formatNumber(r.amount)} DT · ${r.association_name} · ${formatDate(r.submitted_at)}</div>
+                    </div>
+                </div>
+            `).join('');
+
+            // ─── Activité récente (mix tous événements) ───
+            const activities = [];
+            data.companies.forEach(c => {
+                // Inscription récente
+                if (c.status === 'pending') {
+                    activities.push({
+                        date: c.registered_at,
+                        icon: 'how_to_reg',
+                        color: '#5C2D91', bg: '#F3EFFA',
+                        title: `<strong>${c.name}</strong> s'est inscrite`,
+                        meta: `${c.type} · ${c.sector} · ${c.city}`
+                    });
+                }
+                // Profils soumis récemment
+                ['brandup', 'traceup', 'linkup'].forEach(k => {
+                    const p = c.profiles[k];
+                    if (p?.status === 'pending') {
+                        activities.push({
+                            date: p.submitted_at || c.registered_at,
+                            icon: 'upload',
+                            color: '#0078D4', bg: '#EFF6FC',
+                            title: `<strong>${c.name}</strong> a soumis son profil <strong>${k.charAt(0).toUpperCase() + k.slice(1)}</strong>`,
+                            meta: 'En attente de validation'
+                        });
+                    }
+                    if (p?.reviewed_at && p.status === 'rejected') {
+                        activities.push({
+                            date: p.reviewed_at,
+                            icon: 'cancel',
+                            color: '#B91C1C', bg: '#FEF2F2',
+                            title: `Profil <strong>${k.charAt(0).toUpperCase() + k.slice(1)}</strong> de <strong>${c.name}</strong> refusé`,
+                            meta: 'Motif saisi · user notifié'
+                        });
+                    }
+                });
+            });
+            // RSE soumis
+            data.rse_receipts.forEach(r => {
+                if (r.status === 'pending') {
+                    activities.push({
+                        date: r.submitted_at,
+                        icon: 'volunteer_activism',
+                        color: '#C5A059', bg: '#FEFCE8',
+                        title: `<strong>${r.company_name}</strong> a soumis un reçu RSE`,
+                        meta: `${formatNumber(r.amount)} DT · ${r.association_name}`
+                    });
+                }
+            });
+            activities.sort((a, b) => new Date(b.date) - new Date(a.date));
+            document.getElementById('recent-activity').innerHTML = activities.slice(0, 6).map(a => `
+                <div class="activity-row">
+                    <div class="activity-row__icon" style="background:${a.bg}">
+                        <span class="material-symbols-outlined" style="font-size:16px; color:${a.color}">${a.icon}</span>
+                    </div>
+                    <div class="min-w-0 flex-1">
+                        <div class="text-[12.5px] text-[#242424] leading-snug">${a.title}</div>
+                        <div class="text-[11px] text-[#8A8886] mt-0.5">${a.meta} · ${formatDate(a.date)}</div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Launch
+        loadAdminData();
+    </script>
+</body>
+
+</html>

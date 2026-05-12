@@ -1,0 +1,1942 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>MARKET-UP | Profil LinkUP — TechnoFab Industries</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap"
+        rel="stylesheet" />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
+        rel="stylesheet" />
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+
+        .font-heading {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+        }
+
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+
+        .icon-fill {
+            font-variation-settings: 'FILL' 1;
+        }
+
+        /* ─────────── SIDEBAR NAV canon ─────────── */
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 8px 20px;
+            font-size: 13px;
+            font-weight: 500;
+            color: #616161;
+            border-left: 3px solid transparent;
+            transition: background-color 0.15s ease, color 0.15s ease;
+            cursor: pointer;
+            text-decoration: none;
+            line-height: 1.4;
+        }
+
+        .nav-item .material-symbols-outlined {
+            font-size: 18px;
+            color: #8A8886;
+            transition: color 0.15s ease;
+            flex-shrink: 0;
+        }
+
+        .nav-item:hover {
+            background: #F5F5F5;
+            color: #242424;
+        }
+
+        .nav-item:hover .material-symbols-outlined {
+            color: #616161;
+        }
+
+        .nav-item.active {
+            background: #EFF6FC;
+            border-left-color: #0078D4;
+            color: #0078D4;
+            font-weight: 600;
+        }
+
+        .nav-item.active .material-symbols-outlined {
+            color: #0078D4;
+        }
+
+        .section-label {
+            font-size: 9px;
+            font-weight: 700;
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+            color: #8A8886;
+            padding: 16px 20px 6px;
+            user-select: none;
+        }
+
+        nav::-webkit-scrollbar {
+            width: 4px;
+        }
+
+        nav::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        nav::-webkit-scrollbar-thumb {
+            background: #E0E0E0;
+            border-radius: 2px;
+        }
+
+        nav::-webkit-scrollbar-thumb:hover {
+            background: #C8C6C4;
+        }
+
+        /* ─────────── TOPBAR ─────────── */
+        .icon-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            color: #424242;
+            transition: background-color 0.15s ease;
+            position: relative;
+            background: transparent;
+            border: none;
+            cursor: pointer;
+        }
+
+        .icon-btn:hover {
+            background: #F5F5F5;
+        }
+
+        .icon-btn .material-symbols-outlined {
+            font-size: 22px;
+        }
+
+        /* ─────────── DROPDOWNS ─────────── */
+        .dropdown-panel {
+            position: absolute;
+            top: calc(100% + 8px);
+            right: 0;
+            background: white;
+            border: 1px solid #E0E0E0;
+            border-radius: 12px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.16);
+            opacity: 0;
+            transform: translateY(-4px);
+            pointer-events: none;
+            transition: opacity 0.15s ease, transform 0.15s ease;
+            z-index: 40;
+        }
+
+        .dropdown-panel.open {
+            opacity: 1;
+            transform: translateY(0);
+            pointer-events: auto;
+        }
+
+        .dropdown-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px 16px;
+            font-size: 13px;
+            color: #242424;
+            text-decoration: none;
+            transition: background-color 0.1s ease;
+            cursor: pointer;
+        }
+
+        .dropdown-item:hover {
+            background: #F5F5F5;
+        }
+
+        .dropdown-item .material-symbols-outlined {
+            font-size: 18px;
+            color: #616161;
+            flex-shrink: 0;
+        }
+
+        .dropdown-item .ext-arrow {
+            margin-left: auto;
+            font-size: 14px;
+            color: #8A8886;
+        }
+
+        .dropdown-item--danger {
+            color: #B91C1C;
+        }
+
+        .dropdown-item--danger .material-symbols-outlined {
+            color: #B91C1C;
+        }
+
+        .dropdown-item--danger:hover {
+            background: #FEF2F2;
+        }
+
+        .dropdown-section-label {
+            padding: 12px 16px 6px;
+            font-size: 9px;
+            font-weight: 700;
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+            color: #8A8886;
+            user-select: none;
+        }
+
+        .dropdown-divider {
+            height: 1px;
+            background: #E0E0E0;
+            margin: 4px 0;
+        }
+
+        /* ─────────── CARDS ─────────── */
+        .card {
+            background: white;
+            border: 1px solid #E0E0E0;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.04);
+        }
+
+        /* ─────────── SWITCH canon ─────────── */
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 36px;
+            height: 20px;
+            flex-shrink: 0;
+        }
+
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .switch-track {
+            position: absolute;
+            cursor: pointer;
+            inset: 0;
+            background: #C8C6C4;
+            border-radius: 10px;
+            transition: background 0.2s ease;
+        }
+
+        .switch-track::before {
+            content: '';
+            position: absolute;
+            height: 14px;
+            width: 14px;
+            left: 3px;
+            top: 3px;
+            background: white;
+            border-radius: 50%;
+            transition: transform 0.2s ease;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+        }
+
+        .switch input:checked+.switch-track {
+            background: #0078D4;
+        }
+
+        .switch input:checked+.switch-track::before {
+            transform: translateX(16px);
+        }
+
+        /* ─────────── FORM CONTROLS canon ─────────── */
+        .field-label {
+            display: block;
+            font-size: 11px;
+            font-weight: 600;
+            color: #616161;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            margin-bottom: 6px;
+        }
+
+        .field-label .req {
+            color: #B91C1C;
+            font-weight: 700;
+            margin-left: 2px;
+        }
+
+        .field-label .opt {
+            color: #8A8886;
+            font-weight: 400;
+            text-transform: none;
+            letter-spacing: normal;
+            margin-left: 4px;
+        }
+
+        .field-input {
+            width: 100%;
+            padding: 9px 12px;
+            font-family: inherit;
+            font-size: 13.5px;
+            color: #242424;
+            background: #FFFFFF;
+            border: 1px solid #D1D1D1;
+            border-radius: 4px;
+            transition: border-color 0.15s ease, box-shadow 0.15s ease;
+            outline: none;
+        }
+
+        .field-input::placeholder {
+            color: #8A8886;
+        }
+
+        .field-input:hover {
+            border-color: #8A8886;
+        }
+
+        .field-input:focus {
+            border-color: #0078D4;
+            box-shadow: 0 0 0 2px #EFF6FC;
+        }
+
+        .field-input[readonly] {
+            background: #F5F5F5;
+            color: #424242;
+            cursor: default;
+        }
+
+        .field-help {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            font-size: 11px;
+            color: #8A8886;
+            margin-top: 4px;
+        }
+
+        .field-help .material-symbols-outlined {
+            font-size: 13px;
+        }
+
+        /* ─────────── STATUS BADGES ─────────── */
+        .status-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 11px;
+            font-weight: 600;
+            padding: 3px 9px;
+            border-radius: 4px;
+            border: 1px solid;
+        }
+
+        .status-pill .dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+        }
+
+        .status-pill--active {
+            color: #107C10;
+            background: #F0FDF4;
+            border-color: #B7EBC0;
+        }
+
+        .status-pill--active .dot {
+            background: #107C10;
+        }
+
+        /* ─────────── BUTTONS ─────────── */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            padding: 9px 16px;
+            font-size: 13px;
+            font-weight: 600;
+            border-radius: 4px;
+            transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+            cursor: pointer;
+            border: 1px solid transparent;
+            text-decoration: none;
+            line-height: 1.2;
+            white-space: nowrap;
+        }
+
+        .btn .material-symbols-outlined {
+            font-size: 16px;
+        }
+
+        .btn-primary {
+            background: #0078D4;
+            color: white;
+        }
+
+        .btn-primary:hover:not(:disabled) {
+            background: #106EBE;
+        }
+
+        .btn-primary:disabled {
+            background: #E0E0E0;
+            color: #A8A8A8;
+            cursor: not-allowed;
+        }
+
+        .btn-secondary {
+            background: white;
+            color: #242424;
+            border-color: #D1D1D1;
+        }
+
+        .btn-secondary:hover:not(:disabled) {
+            background: #F5F5F5;
+            border-color: #8A8886;
+        }
+
+        .btn-secondary:disabled {
+            color: #A8A8A8;
+            border-color: #E0E0E0;
+            background: #FAFAFA;
+            cursor: not-allowed;
+        }
+
+        .btn-ghost {
+            background: transparent;
+            color: #0078D4;
+            border-color: transparent;
+        }
+
+        .btn-ghost:hover:not(:disabled) {
+            background: #EFF6FC;
+        }
+
+        .btn-ghost:disabled {
+            color: #C8C6C4;
+            cursor: not-allowed;
+        }
+
+        /* ─────────── LINK ROW (patterns pour liens) ─────────── */
+        .link-row {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 0;
+        }
+
+        .link-icon {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 36px;
+            height: 36px;
+            border-radius: 8px;
+            background: #F5F5F5;
+            border: 1px solid #E0E0E0;
+            flex-shrink: 0;
+        }
+
+        .link-icon .material-symbols-outlined {
+            font-size: 18px;
+            color: #616161;
+        }
+
+        /* ─────────── COPY INPUT — pour liens automatiques ─────────── */
+        .copy-group {
+            display: flex;
+            align-items: stretch;
+            gap: 0;
+            border: 1px solid #D1D1D1;
+            border-radius: 4px;
+            background: #F5F5F5;
+            overflow: hidden;
+        }
+
+        .copy-group input {
+            flex: 1;
+            padding: 8px 12px;
+            font-family: inherit;
+            font-size: 12.5px;
+            color: #424242;
+            background: transparent;
+            border: none;
+            outline: none;
+            min-width: 0;
+        }
+
+        .copy-group button {
+            padding: 0 14px;
+            font-size: 12px;
+            font-weight: 600;
+            color: #0078D4;
+            background: white;
+            border: none;
+            border-left: 1px solid #D1D1D1;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            transition: background-color 0.15s ease;
+            white-space: nowrap;
+        }
+
+        .copy-group button:hover {
+            background: #EFF6FC;
+        }
+
+        .copy-group button .material-symbols-outlined {
+            font-size: 14px;
+        }
+
+        /* ─────────── QR CODE placeholder SVG ─────────── */
+        .qr-preview {
+            width: 220px;
+            height: 220px;
+            padding: 14px;
+            background: white;
+            border: 1px solid #E0E0E0;
+            border-radius: 8px;
+            flex-shrink: 0;
+        }
+
+        .qr-preview svg {
+            display: block;
+            width: 100%;
+            height: 100%;
+            shape-rendering: crispEdges;
+        }
+
+        /* ─────────── MOBILE DRAWER ─────────── */
+        #sidebar {
+            transition: transform 0.25s ease-out;
+        }
+
+        @media (max-width: 767px) {
+            #sidebar {
+                transform: translateX(-100%);
+            }
+
+            #sidebar.open {
+                transform: translateX(0);
+                box-shadow: 8px 0 32px rgba(0, 0, 0, 0.16);
+            }
+        }
+
+        /* ─────────── STICKY ACTION BAR (mobile) ─────────── */
+        @media (max-width: 767px) {
+            .action-bar-sticky {
+                position: sticky;
+                bottom: 0;
+                z-index: 20;
+                background: white;
+                border-top: 1px solid #E0E0E0;
+                margin: 0 -1rem;
+                padding: 0.75rem 1rem;
+                box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.04);
+            }
+        }
+
+        /* Toast copy feedback */
+        .toast {
+            position: fixed;
+            bottom: 24px;
+            left: 50%;
+            transform: translateX(-50%) translateY(16px);
+            background: #242424;
+            color: white;
+            padding: 10px 18px;
+            border-radius: 6px;
+            font-size: 12.5px;
+            font-weight: 500;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.2s ease, transform 0.2s ease;
+            z-index: 100;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+        }
+
+        .toast.show {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+        }
+    </style>
+</head>
+
+<body class="bg-[#F5F5F5] min-h-screen">
+
+    <!-- Backdrop mobile -->
+    <div id="backdrop" class="md:hidden fixed inset-0 bg-gradient-to-b from-black/40 to-black/20 z-40 hidden"
+        aria-hidden="true"></div>
+
+    <!-- ═════════════════════════════════════════════════════
+         SIDEBAR (item LinkUP actif)
+         ═════════════════════════════════════════════════════ -->
+    <aside id="sidebar"
+        class="fixed top-0 left-0 w-60 h-screen bg-white border-r border-[#E0E0E0] flex flex-col z-50 md:translate-x-0"
+        aria-label="Navigation principale">
+
+        <a href="dashboard_index.html" class="flex items-center gap-2.5 px-5 py-4 border-b border-[#E0E0E0] shrink-0 h-14 hover:bg-[#FAFAFA] transition-colors" title="Retour au tableau de bord">
+            <span class="material-symbols-outlined icon-fill text-[#0078D4]" style="font-size:22px">hexagon</span>
+            <div class="leading-tight min-w-0">
+                <div class="text-[#242424] font-heading font-bold text-[15px] tracking-tight">MARKET-UP</div>
+                <div class="text-[10px] text-[#8A8886] tracking-wide">vivasky.media</div>
+            </div>
+        </a>
+
+        <nav class="flex-1 overflow-y-auto pt-2 pb-3">
+            <div class="section-label">Entreprise</div>
+            <a href="dashboard_index.html" class="nav-item">
+                <span class="material-symbols-outlined">dashboard</span>
+                <span class="flex-1 min-w-0 truncate">Vue d'ensemble</span>
+            </a>
+            <a href="dashboard_account.html" class="nav-item">
+                <span class="material-symbols-outlined">business</span>
+                <span class="flex-1 min-w-0 truncate">Compte</span>
+            </a>
+
+            <div class="section-label">Mes profils</div>
+            <a href="dashboard_brandup.html" class="nav-item">
+                <span class="material-symbols-outlined">storefront</span>
+                <span class="flex-1 min-w-0 truncate">BrandUP</span>
+                <span class="w-1.5 h-1.5 rounded-full bg-[#DC2626] shrink-0" title="Refusé"></span>
+            </a>
+            <a href="dashboard_sponsoring.html" class="nav-item">
+                <span class="material-symbols-outlined">play_circle</span>
+                <span class="flex-1 min-w-0 truncate">TraceUP</span>
+                <span class="w-1.5 h-1.5 rounded-full bg-[#D97706] shrink-0" title="En attente"></span>
+            </a>
+            <a href="dashboard_linkup.html" class="nav-item active" aria-current="page">
+                <span class="material-symbols-outlined">qr_code_2</span>
+                <span class="flex-1 min-w-0 truncate">LinkUP</span>
+                <span id="lu-sidebar-dot" class="w-1.5 h-1.5 rounded-full bg-[#107C10] shrink-0" title="Actif"></span>
+            </a>
+
+            <div class="section-label">Visibilité</div>
+            <a href="dashboard_boost.html" class="nav-item">
+                <span class="material-symbols-outlined">trending_up</span>
+                <span class="flex-1 min-w-0 truncate">Boost</span>
+                <span
+                    class="text-[9px] font-bold tracking-wider text-[#107C10] bg-[#F0FDF4] border border-[#B7EBC0] px-1.5 py-[2px] rounded shrink-0">1 ACTIF</span>
+            </a>
+            <a href="dashboard_sponsoring.html" class="nav-item">
+                <span class="material-symbols-outlined">campaign</span>
+                <span class="flex-1 min-w-0 truncate">Sponsoring</span>
+                <span class="w-1.5 h-1.5 rounded-full bg-[#107C10] shrink-0" title="Campagne active"></span>
+            </a>
+
+            <div class="section-label">Engagement</div>
+            <a href="dashboard_rse.html" class="nav-item">
+                <span class="material-symbols-outlined">volunteer_activism</span>
+                <span class="flex-1 min-w-0 truncate">Badge RSE</span>
+                <span
+                    class="text-[9px] font-bold tracking-wider text-[#107C10] bg-[#F0FDF4] border border-[#B7EBC0] px-1.5 py-[2px] rounded shrink-0">VALIDÉ</span>
+            </a>
+
+            <div class="section-label">Administration</div>
+            <a href="dashboard_billing.html" class="nav-item">
+                <span class="material-symbols-outlined">receipt_long</span>
+                <span class="flex-1 min-w-0 truncate">Facturation</span>
+            </a>
+            <a href="dashboard_notifications.html" class="nav-item">
+                <span class="material-symbols-outlined">notifications</span>
+                <span class="flex-1 min-w-0 truncate">Notifications</span>
+                <span
+                    class="min-w-[18px] h-[18px] px-1 rounded-full bg-[#DC2626] text-white text-[10px] font-bold flex items-center justify-center shrink-0">3</span>
+            </a>
+            <a href="dashboard_settings.html" class="nav-item">
+                <span class="material-symbols-outlined">settings</span>
+                <span class="flex-1 min-w-0 truncate">Paramètres</span>
+            </a>
+        </nav>
+
+        <div class="shrink-0 border-t border-[#E0E0E0]">
+            <div class="flex items-center gap-3 px-4 py-3">
+                <div class="w-9 h-9 rounded-full bg-[#374151] flex items-center justify-center shrink-0">
+                    <span id="sb-avatar-initials" class="text-white font-heading font-bold text-[13px]">TF</span>
+                </div>
+                <div class="min-w-0 flex-1">
+                    <div id="sb-company-name" class="text-[#242424] text-[12px] font-semibold truncate">TechnoFab Industries</div>
+                    <div id="sb-company-meta" class="text-[#8A8886] text-[10px] truncate">B2B · Sousse</div>
+                </div>
+            </div>
+            <div class="flex items-center gap-2.5 px-4 py-2.5 border-t border-[#E0E0E0]">
+                <div
+                    class="w-6 h-6 rounded-full bg-[#F5F5F5] border border-[#E0E0E0] flex items-center justify-center shrink-0">
+                    <span id="sb-user-initials" class="text-[#616161] text-[10px] font-semibold">AM</span>
+                </div>
+                <div class="min-w-0 flex-1">
+                    <div id="sb-user-name" class="text-[#424242] text-[11px] font-medium truncate">Ahmed Mrabet</div>
+                    <div class="text-[#8A8886] text-[9px] truncate">Propriétaire</div>
+                </div>
+                <button
+                    class="w-7 h-7 flex items-center justify-center rounded text-[#8A8886] hover:text-[#242424] hover:bg-[#F5F5F5] transition-colors shrink-0"
+                    title="Se déconnecter" aria-label="Se déconnecter" onclick="window.location.href='auth_connexion.html';">
+                    <span class="material-symbols-outlined" style="font-size:16px">logout</span>
+                </button>
+            </div>
+        </div>
+
+    </aside>
+
+    <!-- ═════════════════════════════════════════════════════
+         SHELL
+         ═════════════════════════════════════════════════════ -->
+    <div class="md:ml-60 min-h-screen flex flex-col">
+
+        <!-- TOPBAR -->
+        <header
+            class="sticky top-0 z-30 h-14 bg-white border-b border-[#E0E0E0] flex items-center justify-between px-4 md:px-6 gap-4"
+            role="banner">
+
+            <div class="flex items-center gap-3 min-w-0 flex-1">
+                <button id="menuBtn" class="icon-btn md:hidden -ml-2 shrink-0"
+                    aria-label="Ouvrir le menu de navigation">
+                    <span class="material-symbols-outlined">menu</span>
+                </button>
+                <div class="min-w-0 leading-tight">
+                    <nav class="hidden md:flex items-center gap-1.5 text-[11px] text-[#8A8886] mb-0.5" aria-label="Fil d'Ariane">
+                        <a href="dashboard_index.html" class="hover:text-[#0078D4] hover:underline transition-colors">Dashboard</a>
+                        <span class="material-symbols-outlined" style="font-size:12px">chevron_right</span>
+                        <span class="text-[#8A8886]">Mes profils</span>
+                        <span class="material-symbols-outlined" style="font-size:12px">chevron_right</span>
+                        <span class="text-[#616161] font-medium">LinkUP</span>
+                    </nav>
+                    <h1 class="font-heading text-[16px] font-bold text-[#242424] truncate">Profil LinkUP</h1>
+                    <p class="hidden md:block text-[12px] text-[#616161] truncate">Gérez votre carte de contact numérique et son QR code</p>
+                </div>
+            </div>
+
+            <div class="flex items-center gap-1 shrink-0">
+
+                <!-- Cloche notifications -->
+                <div class="relative">
+                    <button id="bellBtn" class="icon-btn" aria-label="Notifications" aria-haspopup="true"
+                        aria-expanded="false">
+                        <span class="material-symbols-outlined">notifications</span>
+                        <span
+                            class="absolute top-1.5 right-1.5 min-w-[16px] h-[16px] px-1 rounded-full bg-[#DC2626] text-white text-[9px] font-bold flex items-center justify-center leading-none ring-2 ring-white">3</span>
+                    </button>
+
+                    <div id="bellDropdown" class="dropdown-panel w-[340px] max-w-[calc(100vw-24px)]">
+                        <div class="flex items-center justify-between px-4 py-3 border-b border-[#E0E0E0]">
+                            <div class="font-heading font-semibold text-[13px] text-[#242424]">Notifications</div>
+                            <div class="text-[11px] text-[#616161]"><span class="text-[#DC2626] font-semibold">3</span> non lues</div>
+                        </div>
+                        <div class="max-h-[320px] overflow-y-auto">
+                            <a href="dashboard_notifications.html" class="block px-4 py-3 hover:bg-[#F5F5F5] transition-colors border-b border-[#F0F0F0]">
+                                <div class="flex items-start gap-3">
+                                    <span class="w-2 h-2 rounded-full bg-[#0078D4] mt-1.5 shrink-0"></span>
+                                    <div class="min-w-0 flex-1">
+                                        <div class="text-[12.5px] text-[#242424] leading-snug mb-1"><span class="font-semibold">Votre boost LinkUP</span> expire dans 3 jours</div>
+                                        <div class="text-[11px] text-[#8A8886]">Il y a 2 heures</div>
+                                    </div>
+                                    <span class="material-symbols-outlined text-[#0078D4] shrink-0 mt-0.5" style="font-size:16px">trending_up</span>
+                                </div>
+                            </a>
+                            <a href="dashboard_notifications.html" class="block px-4 py-3 hover:bg-[#F5F5F5] transition-colors border-b border-[#F0F0F0]">
+                                <div class="flex items-start gap-3">
+                                    <span class="w-2 h-2 rounded-full bg-[#0078D4] mt-1.5 shrink-0"></span>
+                                    <div class="min-w-0 flex-1">
+                                        <div class="text-[12.5px] text-[#242424] leading-snug mb-1"><span class="font-semibold">Votre campagne Sponsoring</span> a généré 1 250 impressions</div>
+                                        <div class="text-[11px] text-[#8A8886]">Il y a 1 jour</div>
+                                    </div>
+                                    <span class="material-symbols-outlined text-[#0078D4] shrink-0 mt-0.5" style="font-size:16px">campaign</span>
+                                </div>
+                            </a>
+                            <a href="dashboard_notifications.html" class="block px-4 py-3 hover:bg-[#F5F5F5] transition-colors">
+                                <div class="flex items-start gap-3">
+                                    <span class="w-2 h-2 rounded-full bg-[#0078D4] mt-1.5 shrink-0"></span>
+                                    <div class="min-w-0 flex-1">
+                                        <div class="text-[12.5px] text-[#242424] leading-snug mb-1"><span class="font-semibold">Reçu RSE soumis</span> — Association Al Ahed en attente de validation</div>
+                                        <div class="text-[11px] text-[#8A8886]">Il y a 1 jour</div>
+                                    </div>
+                                    <span class="material-symbols-outlined text-[#C5A059] shrink-0 mt-0.5" style="font-size:16px">volunteer_activism</span>
+                                </div>
+                            </a>
+                        </div>
+                        <a href="dashboard_notifications.html"
+                            class="flex items-center justify-center gap-1.5 px-4 py-2.5 text-[12px] font-semibold text-[#0078D4] hover:bg-[#EFF6FC] border-t border-[#E0E0E0] transition-colors rounded-b-xl">
+                            Voir toutes les notifications
+                            <span class="material-symbols-outlined" style="font-size:14px">arrow_forward</span>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Avatar -->
+                <div class="relative">
+                    <button id="avatarBtn"
+                        class="flex items-center gap-1 pl-1 pr-2 py-1 rounded-lg hover:bg-[#F5F5F5] transition-colors ml-1"
+                        aria-label="Menu compte" aria-haspopup="true" aria-expanded="false">
+                        <div class="w-8 h-8 rounded-full bg-[#0078D4] flex items-center justify-center shrink-0">
+                            <span id="avd-trigger-initials" class="text-white font-heading font-bold text-[12px]">TF</span>
+                        </div>
+                        <span class="material-symbols-outlined text-[#8A8886] hidden md:inline"
+                            style="font-size:18px">expand_more</span>
+                    </button>
+
+                    <div id="avatarDropdown" class="dropdown-panel w-[300px] max-w-[calc(100vw-24px)]">
+                        <div class="flex items-center gap-3 px-4 py-3 border-b border-[#E0E0E0]">
+                            <div class="w-10 h-10 rounded-full bg-[#0078D4] flex items-center justify-center shrink-0">
+                                <span id="avd-initials" class="text-white font-heading font-bold text-[13px]">TF</span>
+                            </div>
+                            <div class="min-w-0 flex-1">
+                                <div id="avd-company-name" class="font-heading font-semibold text-[13px] text-[#242424] truncate">
+                                    TechnoFab Industries</div>
+                                <div id="avd-company-meta" class="text-[11px] text-[#616161] truncate">B2B · Sousse · Ahmed Mrabet</div>
+                            </div>
+                        </div>
+                        <div class="dropdown-section-label">Mes profils publics</div>
+                        <a id="avd-link-brandup" href="public_brandup_technofab-industries.html" target="_blank" rel="noopener" class="dropdown-item">
+                            <span class="material-symbols-outlined">storefront</span>
+                            <span class="flex-1">BrandUP</span>
+                            <span class="material-symbols-outlined ext-arrow">open_in_new</span>
+                        </a>
+                        <a id="avd-link-traceup" href="public_traceup_technofab-industries.html" target="_blank" rel="noopener" class="dropdown-item">
+                            <span class="material-symbols-outlined">play_circle</span>
+                            <span class="flex-1">TraceUP</span>
+                            <span class="material-symbols-outlined ext-arrow">open_in_new</span>
+                        </a>
+                        <a id="avd-link-linkup" href="public_linkup_technofab-industries.html" target="_blank" rel="noopener" class="dropdown-item">
+                            <span class="material-symbols-outlined">qr_code_2</span>
+                            <span class="flex-1">LinkUP</span>
+                            <span class="material-symbols-outlined ext-arrow">open_in_new</span>
+                        </a>
+                        <div class="dropdown-divider"></div>
+                        <a href="dashboard_settings.html" class="dropdown-item">
+                            <span class="material-symbols-outlined">settings</span>
+                            <span class="flex-1">Paramètres</span>
+                        </a>
+                        <button class="dropdown-item dropdown-item--danger w-full text-left">
+                            <span class="material-symbols-outlined">logout</span>
+                            <span class="flex-1">Se déconnecter</span>
+                        </button>
+                    </div>
+                </div>
+
+            </div>
+        </header>
+
+        <!-- ═════════════════════════════════════════════════
+             CONTENU — Édition profil LinkUP
+             ═════════════════════════════════════════════════ -->
+        <main class="flex-1 p-4 md:p-8">
+            <div class="max-w-[1120px] mx-auto space-y-6">
+
+                <!-- ═════ PAGE HEADER ═════ -->
+                <section class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+                    <div class="flex items-start gap-3 min-w-0">
+                        <div class="w-11 h-11 rounded-lg bg-[#EFF6FC] flex items-center justify-center shrink-0">
+                            <span class="material-symbols-outlined icon-fill text-[#0078D4]"
+                                style="font-size:24px">qr_code_2</span>
+                        </div>
+                        <div class="min-w-0">
+                            <h2 class="font-heading font-bold text-[20px] text-[#242424] leading-tight">
+                                Profil LinkUP
+                            </h2>
+                            <!-- Status region (hydrated at runtime by status-driven JS) -->
+                            <div id="lu-hero-status-region">
+                                <div class="flex items-center gap-2 mt-1.5 flex-wrap">
+                                    <span class="status-pill status-pill--active">
+                                        <span class="dot"></span>
+                                        Actif
+                                    </span>
+                                    <span class="text-[11px] text-[#8A8886]">
+                                        Publié le 12 avril 2026 · Dernière MAJ il y a 3 h
+                                    </span>
+                                </div>
+                                <div class="flex items-center gap-1.5 mt-1.5 text-[11.5px] text-[#8A8886]">
+                                    <span class="material-symbols-outlined text-[#107C10]" style="font-size:14px">visibility</span>
+                                    <span>
+                                        Profil <strong class="text-[#107C10]">en ligne</strong> sur
+                                        <a id="lu-public-link" href="public_linkup_technofab-industries.html" target="_blank" rel="noopener" class="text-[#0078D4] hover:underline font-medium">
+                                            vivasky.media/linkup/technofab-industries
+                                        </a>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-2 shrink-0">
+                        <a id="lu-preview-link" href="public_linkup_technofab-industries.html" target="_blank" rel="noopener"
+                            class="btn btn-secondary">
+                            <span class="material-symbols-outlined">open_in_new</span>
+                            Aperçu public
+                        </a>
+                        <a href="dashboard_boost.html" class="btn btn-primary">
+                            <span class="material-symbols-outlined icon-fill">bolt</span>
+                            Booster ce profil
+                        </a>
+                    </div>
+                </section>
+
+                <!-- ═════ STATUS BLOCK REGION (hydrated at runtime — content varies by profile.status) ═════ -->
+                <section id="lu-status-block-region" style="display:none"></section>
+
+                <!-- ═════ BANDEAU CONTEXTUEL ═════ -->
+                <section
+                    class="bg-[#EFF6FC] border border-[#C7DDF1] rounded-lg px-4 py-3 flex items-start md:items-center gap-3">
+                    <span class="material-symbols-outlined text-[#0078D4] shrink-0 mt-[1px] md:mt-0"
+                        style="font-size:20px">info</span>
+                    <div class="min-w-0 flex-1 text-[12.5px] text-[#242424] leading-snug">
+                        Cette page gère uniquement votre <strong>carte de contact numérique</strong>
+                        (liens, réseaux sociaux, QR code).
+                        <span class="text-[#616161]">Les informations générales de l'entreprise (nom, logo,
+                            contact) se modifient depuis la page Compte.</span>
+                    </div>
+                    <a href="dashboard_account.html"
+                        class="shrink-0 inline-flex items-center gap-1 text-[12px] font-semibold text-[#0078D4] hover:underline whitespace-nowrap">
+                        Gérer depuis Compte
+                        <span class="material-symbols-outlined" style="font-size:14px">arrow_forward</span>
+                    </a>
+                </section>
+
+                <!-- ═════ CARD TOGGLE VISIBILITÉ ═════ -->
+                <section class="card p-5 flex items-center gap-4">
+                    <div class="w-10 h-10 rounded-lg bg-[#EFF6FC] flex items-center justify-center shrink-0">
+                        <span class="material-symbols-outlined text-[#0078D4]"
+                            style="font-size:20px">visibility</span>
+                    </div>
+                    <div class="min-w-0 flex-1">
+                        <div class="font-heading font-semibold text-[14px] text-[#242424] leading-tight">
+                            Profil public visible
+                        </div>
+                        <div class="text-[12px] text-[#616161] mt-0.5 leading-snug">
+                            Votre carte de contact est accessible via le moteur LinkUP et son QR code.
+                        </div>
+                    </div>
+                    <label class="switch shrink-0" aria-label="Activer la visibilité du profil LinkUP">
+                        <input type="checkbox" checked />
+                        <span class="switch-track"></span>
+                    </label>
+                </section>
+
+                <!-- ═════ SECTION : LIENS AUTOMATIQUES (readonly) ═════ -->
+                <section class="card p-5 md:p-6">
+                    <div class="mb-5">
+                        <h3 class="font-heading font-bold text-[15px] text-[#242424]">
+                            Liens automatiques
+                        </h3>
+                        <p class="text-[12px] text-[#616161] mt-0.5 leading-snug">
+                            Générés par MARKET-UP à partir de vos profils BrandUP et TraceUP — non modifiables
+                        </p>
+                    </div>
+
+                    <div class="space-y-4">
+
+                        <!-- BrandUP auto-link -->
+                        <div>
+                            <label class="field-label flex items-center gap-2">
+                                <span class="inline-flex items-center justify-center w-5 h-5 rounded bg-[#EFF6FC] shrink-0">
+                                    <span class="material-symbols-outlined text-[#0078D4]"
+                                        style="font-size:14px">storefront</span>
+                                </span>
+                                Profil BrandUP
+                                <span
+                                    class="inline-flex items-center gap-1 text-[10px] font-semibold text-[#616161] bg-[#F5F5F5] border border-[#E0E0E0] px-1.5 py-0.5 rounded normal-case tracking-normal">
+                                    <span class="material-symbols-outlined"
+                                        style="font-size:11px">lock</span>
+                                    Auto
+                                </span>
+                            </label>
+                            <div class="copy-group">
+                                <input type="text" readonly
+                                    value="https://vivasky.media/brandup/technofab-industries" />
+                                <button type="button" data-copy="https://vivasky.media/brandup/technofab-industries">
+                                    <span class="material-symbols-outlined">content_copy</span>
+                                    Copier
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- TraceUP auto-link -->
+                        <div>
+                            <label class="field-label flex items-center gap-2">
+                                <span class="inline-flex items-center justify-center w-5 h-5 rounded bg-[#EFF6FC] shrink-0">
+                                    <span class="material-symbols-outlined text-[#0078D4]"
+                                        style="font-size:14px">play_circle</span>
+                                </span>
+                                Profil TraceUP
+                                <span
+                                    class="inline-flex items-center gap-1 text-[10px] font-semibold text-[#616161] bg-[#F5F5F5] border border-[#E0E0E0] px-1.5 py-0.5 rounded normal-case tracking-normal">
+                                    <span class="material-symbols-outlined"
+                                        style="font-size:11px">lock</span>
+                                    Auto
+                                </span>
+                            </label>
+                            <div class="copy-group">
+                                <input type="text" readonly
+                                    value="https://vivasky.media/traceup/technofab-industries" />
+                                <button type="button" data-copy="https://vivasky.media/traceup/technofab-industries">
+                                    <span class="material-symbols-outlined">content_copy</span>
+                                    Copier
+                                </button>
+                            </div>
+                        </div>
+
+                    </div>
+                </section>
+
+                <!-- ═════ SECTION : LIENS OBLIGATOIRES ═════ -->
+                <section class="card p-5 md:p-6">
+                    <div class="flex items-start justify-between mb-5 flex-wrap gap-2">
+                        <div>
+                            <h3 class="font-heading font-bold text-[15px] text-[#242424]">
+                                Liens obligatoires
+                            </h3>
+                            <p class="text-[12px] text-[#616161] mt-0.5 leading-snug">
+                                Indispensables pour publier votre profil LinkUP
+                            </p>
+                        </div>
+                        <span
+                            class="inline-flex items-center gap-1 text-[10px] font-semibold text-[#107C10] bg-[#F0FDF4] border border-[#B7EBC0] px-2 py-1 rounded shrink-0">
+                            <span class="material-symbols-outlined icon-fill"
+                                style="font-size:12px">check_circle</span>
+                            Tous renseignés
+                        </span>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+
+                        <!-- WhatsApp -->
+                        <div>
+                            <label for="lnk-whatsapp" class="field-label flex items-center gap-2">
+                                <span
+                                    class="inline-flex items-center justify-center w-5 h-5 rounded bg-[#F0FDF4] border border-[#B7EBC0] shrink-0">
+                                    <span class="material-symbols-outlined icon-fill text-[#107C10]"
+                                        style="font-size:13px">chat</span>
+                                </span>
+                                WhatsApp <span class="req">*</span>
+                            </label>
+                            <div class="relative">
+                                <span
+                                    class="absolute left-3 top-1/2 -translate-y-1/2 material-symbols-outlined text-[#8A8886] pointer-events-none"
+                                    style="font-size:16px">chat</span>
+                                <input id="lnk-whatsapp" class="field-input pl-9" type="url"
+                                    value="https://wa.me/21673123456" />
+                            </div>
+                            <div class="field-help">
+                                <span class="material-symbols-outlined text-[#107C10]"
+                                    style="font-size:13px">check_circle</span>
+                                Lien valide · format accepté : https://wa.me/21673123456
+                            </div>
+                        </div>
+
+                        <!-- GPS / Google Maps -->
+                        <div>
+                            <label for="lnk-gps" class="field-label flex items-center gap-2">
+                                <span
+                                    class="inline-flex items-center justify-center w-5 h-5 rounded bg-[#F0FDF4] border border-[#B7EBC0] shrink-0">
+                                    <span class="material-symbols-outlined icon-fill text-[#107C10]"
+                                        style="font-size:13px">location_on</span>
+                                </span>
+                                Position GPS (Google Maps) <span class="req">*</span>
+                            </label>
+                            <div class="relative">
+                                <span
+                                    class="absolute left-3 top-1/2 -translate-y-1/2 material-symbols-outlined text-[#8A8886] pointer-events-none"
+                                    style="font-size:16px">location_on</span>
+                                <input id="lnk-gps" class="field-input pl-9" type="url"
+                                    value="https://maps.app.goo.gl/TechnoFabKalaaKebira" />
+                            </div>
+                            <div class="field-help">
+                                <span class="material-symbols-outlined text-[#107C10]"
+                                    style="font-size:13px">check_circle</span>
+                                Lien Google Maps validé
+                            </div>
+                        </div>
+
+                    </div>
+                </section>
+
+                <!-- ═════ SECTION : LIENS OPTIONNELS ═════ -->
+                <section class="card p-5 md:p-6">
+                    <div class="flex items-start justify-between mb-5 flex-wrap gap-2">
+                        <div>
+                            <h3 class="font-heading font-bold text-[15px] text-[#242424]">
+                                Liens optionnels
+                            </h3>
+                            <p class="text-[12px] text-[#616161] mt-0.5 leading-snug">
+                                Les liens non renseignés ne s'affichent pas sur votre profil public
+                            </p>
+                        </div>
+                        <span
+                            class="inline-flex items-center gap-1 text-[10px] font-semibold text-[#616161] bg-[#F5F5F5] border border-[#E0E0E0] px-2 py-1 rounded shrink-0">
+                            <span class="material-symbols-outlined" style="font-size:12px">link</span>
+                            3 / 5 renseignés
+                        </span>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+
+                        <!-- Site web (rempli) -->
+                        <div>
+                            <label for="lnk-website" class="field-label flex items-center gap-2">
+                                <span class="link-icon w-5 h-5 border-0 bg-[#F5F5F5]">
+                                    <span class="material-symbols-outlined text-[#616161]"
+                                        style="font-size:13px">language</span>
+                                </span>
+                                Site web <span class="opt">(optionnel)</span>
+                            </label>
+                            <div class="relative">
+                                <span
+                                    class="absolute left-3 top-1/2 -translate-y-1/2 material-symbols-outlined text-[#8A8886] pointer-events-none"
+                                    style="font-size:16px">language</span>
+                                <input id="lnk-website" class="field-input pl-9 pr-9" type="url"
+                                    value="https://www.technofab.tn" />
+                                <button type="button"
+                                    class="absolute right-2 top-1/2 -translate-y-1/2 w-6 h-6 flex items-center justify-center rounded text-[#8A8886] hover:text-[#B91C1C] hover:bg-[#FEF2F2] transition-colors"
+                                    aria-label="Vider le champ">
+                                    <span class="material-symbols-outlined" style="font-size:14px">close</span>
+                                </button>
+                            </div>
+                            <div class="field-help">
+                                <span class="material-symbols-outlined text-[#107C10]"
+                                    style="font-size:13px">check_circle</span>
+                                Sera affiché sur votre profil public
+                            </div>
+                        </div>
+
+                        <!-- LinkedIn (rempli) -->
+                        <div>
+                            <label for="lnk-linkedin" class="field-label flex items-center gap-2">
+                                <span class="link-icon w-5 h-5 border-0 bg-[#F5F5F5]">
+                                    <span class="material-symbols-outlined text-[#616161]"
+                                        style="font-size:13px">work</span>
+                                </span>
+                                LinkedIn <span class="opt">(optionnel)</span>
+                            </label>
+                            <div class="relative">
+                                <span
+                                    class="absolute left-3 top-1/2 -translate-y-1/2 material-symbols-outlined text-[#8A8886] pointer-events-none"
+                                    style="font-size:16px">work</span>
+                                <input id="lnk-linkedin" class="field-input pl-9 pr-9" type="url"
+                                    value="https://www.linkedin.com/company/technofab-industries" />
+                                <button type="button"
+                                    class="absolute right-2 top-1/2 -translate-y-1/2 w-6 h-6 flex items-center justify-center rounded text-[#8A8886] hover:text-[#B91C1C] hover:bg-[#FEF2F2] transition-colors"
+                                    aria-label="Vider le champ">
+                                    <span class="material-symbols-outlined" style="font-size:14px">close</span>
+                                </button>
+                            </div>
+                            <div class="field-help">
+                                <span class="material-symbols-outlined text-[#107C10]"
+                                    style="font-size:13px">check_circle</span>
+                                Sera affiché sur votre profil public
+                            </div>
+                        </div>
+
+                        <!-- Facebook (vide — état masqué) -->
+                        <div>
+                            <label for="lnk-facebook" class="field-label flex items-center gap-2">
+                                <span class="link-icon w-5 h-5 border-0 bg-[#F5F5F5]">
+                                    <span class="material-symbols-outlined text-[#616161]"
+                                        style="font-size:13px">public</span>
+                                </span>
+                                Facebook <span class="opt">(optionnel)</span>
+                            </label>
+                            <div class="relative">
+                                <span
+                                    class="absolute left-3 top-1/2 -translate-y-1/2 material-symbols-outlined text-[#8A8886] pointer-events-none"
+                                    style="font-size:16px">public</span>
+                                <input id="lnk-facebook" class="field-input pl-9" type="url"
+                                    placeholder="https://facebook.com/votre-page" />
+                            </div>
+                            <div class="field-help">
+                                <span class="material-symbols-outlined" style="font-size:13px">visibility_off</span>
+                                Masqué — champ vide
+                            </div>
+                        </div>
+
+                        <!-- Instagram (rempli) -->
+                        <div>
+                            <label for="lnk-instagram" class="field-label flex items-center gap-2">
+                                <span class="link-icon w-5 h-5 border-0 bg-[#F5F5F5]">
+                                    <span class="material-symbols-outlined text-[#616161]"
+                                        style="font-size:13px">photo_camera</span>
+                                </span>
+                                Instagram <span class="opt">(optionnel)</span>
+                            </label>
+                            <div class="relative">
+                                <span
+                                    class="absolute left-3 top-1/2 -translate-y-1/2 material-symbols-outlined text-[#8A8886] pointer-events-none"
+                                    style="font-size:16px">photo_camera</span>
+                                <input id="lnk-instagram" class="field-input pl-9 pr-9" type="url"
+                                    value="https://instagram.com/technofab.tn" />
+                                <button type="button"
+                                    class="absolute right-2 top-1/2 -translate-y-1/2 w-6 h-6 flex items-center justify-center rounded text-[#8A8886] hover:text-[#B91C1C] hover:bg-[#FEF2F2] transition-colors"
+                                    aria-label="Vider le champ">
+                                    <span class="material-symbols-outlined" style="font-size:14px">close</span>
+                                </button>
+                            </div>
+                            <div class="field-help">
+                                <span class="material-symbols-outlined text-[#107C10]"
+                                    style="font-size:13px">check_circle</span>
+                                Sera affiché sur votre profil public
+                            </div>
+                        </div>
+
+                        <!-- YouTube (vide) -->
+                        <div class="md:col-span-2">
+                            <label for="lnk-youtube" class="field-label flex items-center gap-2">
+                                <span class="link-icon w-5 h-5 border-0 bg-[#F5F5F5]">
+                                    <span class="material-symbols-outlined text-[#616161]"
+                                        style="font-size:13px">smart_display</span>
+                                </span>
+                                YouTube <span class="opt">(optionnel)</span>
+                            </label>
+                            <div class="relative">
+                                <span
+                                    class="absolute left-3 top-1/2 -translate-y-1/2 material-symbols-outlined text-[#8A8886] pointer-events-none"
+                                    style="font-size:16px">smart_display</span>
+                                <input id="lnk-youtube" class="field-input pl-9" type="url"
+                                    placeholder="https://youtube.com/@votre-chaine" />
+                            </div>
+                            <div class="field-help">
+                                <span class="material-symbols-outlined" style="font-size:13px">visibility_off</span>
+                                Masqué — champ vide
+                            </div>
+                        </div>
+
+                    </div>
+                </section>
+
+                <!-- ═════ SECTION : QR CODE ═════ -->
+                <section class="card p-5 md:p-6">
+                    <div class="mb-5">
+                        <h3 class="font-heading font-bold text-[15px] text-[#242424]">
+                            QR Code LinkUP
+                        </h3>
+                        <p class="text-[12px] text-[#616161] mt-0.5 leading-snug">
+                            Partagez votre carte de contact en un scan · le QR pointe vers votre profil public
+                        </p>
+                    </div>
+
+                    <div class="flex flex-col md:flex-row items-center md:items-start gap-6">
+
+                        <!-- QR preview (SVG généré dynamiquement) -->
+                        <div class="qr-preview shrink-0">
+                            <svg id="qrPlaceholder" viewBox="0 0 21 21"
+                                xmlns="http://www.w3.org/2000/svg"
+                                aria-label="Aperçu QR code — vivasky.media/linkup/technofab-industries">
+                                <!-- Rendu dynamique en JS ci-dessous -->
+                            </svg>
+                        </div>
+
+                        <!-- Infos + actions -->
+                        <div class="flex-1 min-w-0 w-full">
+
+                            <div class="mb-4">
+                                <div class="field-label">URL encodée dans le QR</div>
+                                <div class="copy-group">
+                                    <input id="lu-qr-url" type="text" readonly
+                                        value="https://vivasky.media/linkup/technofab-industries" />
+                                    <button id="lu-qr-copy" type="button"
+                                        data-copy="https://vivasky.media/linkup/technofab-industries">
+                                        <span class="material-symbols-outlined">content_copy</span>
+                                        Copier
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div class="flex flex-wrap items-center gap-2 mb-5">
+                                <button class="btn btn-primary">
+                                    <span class="material-symbols-outlined">download</span>
+                                    Télécharger PNG
+                                </button>
+                                <button class="btn btn-secondary">
+                                    <span class="material-symbols-outlined">download</span>
+                                    Télécharger SVG
+                                </button>
+                                <button class="btn btn-ghost">
+                                    <span class="material-symbols-outlined">print</span>
+                                    Imprimer
+                                </button>
+                            </div>
+
+                            <!-- Tips intégration -->
+                            <div class="bg-[#F5F5F5] border border-[#E0E0E0] rounded-lg p-3.5">
+                                <div class="text-[11px] font-bold text-[#616161] uppercase tracking-wider mb-2">
+                                    Idées d'usage
+                                </div>
+                                <ul class="space-y-1.5 text-[12px] text-[#424242]">
+                                    <li class="flex items-start gap-2">
+                                        <span class="material-symbols-outlined text-[#0078D4] shrink-0 mt-[1px]"
+                                            style="font-size:14px">badge</span>
+                                        <span>Imprimez-le sur vos cartes de visite et signatures email</span>
+                                    </li>
+                                    <li class="flex items-start gap-2">
+                                        <span class="material-symbols-outlined text-[#0078D4] shrink-0 mt-[1px]"
+                                            style="font-size:14px">storefront</span>
+                                        <span>Affichez-le sur la vitrine de votre point de vente</span>
+                                    </li>
+                                    <li class="flex items-start gap-2">
+                                        <span class="material-symbols-outlined text-[#0078D4] shrink-0 mt-[1px]"
+                                            style="font-size:14px">event</span>
+                                        <span>Intégrez-le à vos supports d'événements et salons professionnels</span>
+                                    </li>
+                                </ul>
+                            </div>
+
+                        </div>
+                    </div>
+                </section>
+
+                <!-- ═════ SECTION : RACCOURCIS VISIBILITÉ ═════ -->
+                <section>
+                    <div class="flex items-end justify-between mb-4">
+                        <div>
+                            <h2 class="font-heading font-semibold text-[13px] text-[#242424] uppercase tracking-wider">
+                                Raccourcis visibilité
+                            </h2>
+                            <p class="text-[12px] text-[#616161] mt-0.5">
+                                Accédez rapidement aux outils de mise en avant de votre profil LinkUP
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+
+                        <!-- Boost (inactif — pour varier des démos BrandUP/TraceUP où il est actif) -->
+                        <div class="card p-5 flex flex-col">
+                            <div class="flex items-start justify-between mb-4">
+                                <div class="flex items-center gap-3 min-w-0">
+                                    <div
+                                        class="w-10 h-10 rounded-lg bg-[#F5F5F5] flex items-center justify-center shrink-0">
+                                        <span class="material-symbols-outlined text-[#616161]"
+                                            style="font-size:22px">bolt</span>
+                                    </div>
+                                    <div class="min-w-0">
+                                        <h3 class="font-heading font-bold text-[14px] text-[#242424] leading-tight">
+                                            Boost
+                                        </h3>
+                                        <span
+                                            class="inline-flex items-center gap-1 text-[10px] font-semibold text-[#616161] bg-[#F5F5F5] border border-[#E0E0E0] px-1.5 py-0.5 rounded mt-1">
+                                            <span class="w-1.5 h-1.5 bg-[#8A8886] rounded-full"></span>
+                                            Aucun boost actif
+                                        </span>
+                                    </div>
+                                </div>
+                                <span class="text-[10px] font-semibold text-[#8A8886] uppercase tracking-wider">
+                                    30 jours
+                                </span>
+                            </div>
+
+                            <div class="mb-4">
+                                <div class="flex items-center justify-between mb-1.5">
+                                    <span class="text-[11px] text-[#8A8886]">
+                                        Pas de boost en cours
+                                    </span>
+                                    <span class="text-[11px] text-[#8A8886]">—</span>
+                                </div>
+                                <div class="h-1.5 bg-[#F0F0F0] rounded-full overflow-hidden">
+                                    <div class="h-full bg-[#E0E0E0] rounded-full" style="width:0%"></div>
+                                </div>
+                            </div>
+
+                            <div class="flex items-end justify-between gap-3 pt-3 border-t border-[#F0F0F0] mt-auto">
+                                <div class="min-w-0">
+                                    <div class="text-[10px] font-bold text-[#8A8886] uppercase tracking-wider">
+                                        Apparition prioritaire
+                                    </div>
+                                    <div class="text-[12px] text-[#616161] mt-0.5 leading-snug">
+                                        En tête des résultats du moteur LinkUP
+                                    </div>
+                                </div>
+                                <div class="flex items-center gap-2 shrink-0">
+                                    <a href="dashboard_boost.html" class="btn btn-primary">
+                                        <span class="material-symbols-outlined icon-fill"
+                                            style="font-size:14px">bolt</span>
+                                        Lancer un boost
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Sponsoring (inactif) -->
+                        <div class="card p-5 flex flex-col">
+                            <div class="flex items-start justify-between mb-4">
+                                <div class="flex items-center gap-3 min-w-0">
+                                    <div
+                                        class="w-10 h-10 rounded-lg bg-[#F5F5F5] flex items-center justify-center shrink-0">
+                                        <span class="material-symbols-outlined text-[#616161]"
+                                            style="font-size:22px">campaign</span>
+                                    </div>
+                                    <div class="min-w-0">
+                                        <h3 class="font-heading font-bold text-[14px] text-[#242424] leading-tight">
+                                            Sponsoring
+                                        </h3>
+                                        <span
+                                            class="inline-flex items-center gap-1 text-[10px] font-semibold text-[#616161] bg-[#F5F5F5] border border-[#E0E0E0] px-1.5 py-0.5 rounded mt-1">
+                                            <span class="w-1.5 h-1.5 bg-[#8A8886] rounded-full"></span>
+                                            Aucune campagne
+                                        </span>
+                                    </div>
+                                </div>
+                                <span class="text-[10px] font-semibold text-[#8A8886] uppercase tracking-wider">
+                                    Bannière
+                                </span>
+                            </div>
+
+                            <div class="mb-4">
+                                <div class="flex items-center justify-between mb-1.5">
+                                    <span class="text-[11px] text-[#8A8886]">
+                                        Pas de campagne en cours
+                                    </span>
+                                    <span class="text-[11px] text-[#8A8886]">—</span>
+                                </div>
+                                <div class="h-1.5 bg-[#F0F0F0] rounded-full overflow-hidden">
+                                    <div class="h-full bg-[#E0E0E0] rounded-full" style="width:0%"></div>
+                                </div>
+                            </div>
+
+                            <div class="flex items-end justify-between gap-3 pt-3 border-t border-[#F0F0F0] mt-auto">
+                                <div class="min-w-0">
+                                    <div class="text-[10px] font-bold text-[#8A8886] uppercase tracking-wider">
+                                        Visibilité annuaire
+                                    </div>
+                                    <div class="text-[12px] text-[#616161] mt-0.5 leading-snug">
+                                        Bannière sponsorisée sur le moteur LinkUP
+                                    </div>
+                                </div>
+                                <div class="flex items-center gap-2 shrink-0">
+                                    <a href="dashboard_sponsoring.html" class="btn btn-primary">
+                                        <span class="material-symbols-outlined" style="font-size:14px">campaign</span>
+                                        Lancer une campagne
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </section>
+
+                <!-- ═════ ACTION BAR REGION (hydrated at runtime — content varies by profile.status) ═════ -->
+                <section id="lu-action-bar-region"
+                    class="action-bar-sticky md:static flex flex-col md:flex-row md:items-center md:justify-between gap-3 md:gap-4 pt-2 md:pt-0">
+                    <div class="flex items-start md:items-center gap-2 text-[12px] text-[#616161] leading-snug">
+                        <span class="material-symbols-outlined icon-fill shrink-0 mt-[1px] md:mt-0 text-[#107C10]"
+                            style="font-size:15px">check_circle</span>
+                        <span>
+                            <strong class="text-[#107C10]">Profil à jour</strong> ·
+                            toutes les modifications sont publiées · dernière mise à jour il y a 3 h
+                        </span>
+                    </div>
+                    <div class="flex items-center gap-2 shrink-0 flex-wrap justify-end">
+                        <button class="btn btn-ghost" disabled>
+                            Annuler
+                        </button>
+                        <button class="btn btn-primary" disabled>
+                            <span class="material-symbols-outlined">send</span>
+                            Soumettre à validation
+                        </button>
+                    </div>
+                </section>
+
+            </div>
+        </main>
+
+    </div>
+
+    <!-- Toast feedback -->
+    <div id="toast" class="toast" role="status" aria-live="polite">Copié dans le presse-papiers</div>
+
+    <!-- ═════════════════════════════════════════════════════
+         JS — drawer + dropdowns + copy + QR pattern generator
+         ═════════════════════════════════════════════════════ -->
+    <script>
+        (function () {
+            const sidebar = document.getElementById('sidebar');
+            const backdrop = document.getElementById('backdrop');
+            const menuBtn = document.getElementById('menuBtn');
+            const bellBtn = document.getElementById('bellBtn');
+            const bellDropdown = document.getElementById('bellDropdown');
+            const avatarBtn = document.getElementById('avatarBtn');
+            const avatarDropdown = document.getElementById('avatarDropdown');
+            const toast = document.getElementById('toast');
+
+            const dropdowns = [
+                { btn: bellBtn, panel: bellDropdown },
+                { btn: avatarBtn, panel: avatarDropdown },
+            ];
+
+            // ─── Dropdowns ─────────────────────
+            function closeAllDropdowns() {
+                dropdowns.forEach(({ btn, panel }) => {
+                    panel.classList.remove('open');
+                    btn.setAttribute('aria-expanded', 'false');
+                });
+            }
+
+            function toggleDropdown(target) {
+                const wasOpen = target.panel.classList.contains('open');
+                closeAllDropdowns();
+                if (!wasOpen) {
+                    target.panel.classList.add('open');
+                    target.btn.setAttribute('aria-expanded', 'true');
+                }
+            }
+
+            // ─── Drawer mobile ─────────────────
+            function openDrawer() {
+                closeAllDropdowns();
+                sidebar.classList.add('open');
+                backdrop.classList.remove('hidden');
+                document.body.style.overflow = 'hidden';
+            }
+
+            function closeDrawer() {
+                sidebar.classList.remove('open');
+                backdrop.classList.add('hidden');
+                document.body.style.overflow = '';
+            }
+
+            // ─── Copy to clipboard ─────────────
+            function showToast(msg) {
+                toast.textContent = msg;
+                toast.classList.add('show');
+                clearTimeout(showToast._t);
+                showToast._t = setTimeout(() => toast.classList.remove('show'), 1800);
+            }
+
+            document.querySelectorAll('[data-copy]').forEach((btn) => {
+                btn.addEventListener('click', async () => {
+                    const text = btn.getAttribute('data-copy');
+                    try {
+                        await navigator.clipboard.writeText(text);
+                        showToast('Lien copié dans le presse-papiers');
+                    } catch (e) {
+                        showToast('Impossible de copier — copie manuelle requise');
+                    }
+                });
+            });
+
+            // ─── Global listeners ──────────────
+            menuBtn.addEventListener('click', openDrawer);
+            backdrop.addEventListener('click', closeDrawer);
+
+            dropdowns.forEach((dd) => {
+                dd.btn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    toggleDropdown(dd);
+                });
+            });
+
+            document.addEventListener('click', (e) => {
+                const clickedInsideDropdown = dropdowns.some(
+                    (dd) => dd.panel.contains(e.target) || dd.btn.contains(e.target)
+                );
+                if (!clickedInsideDropdown) closeAllDropdowns();
+            });
+
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape') {
+                    closeAllDropdowns();
+                    if (sidebar.classList.contains('open')) closeDrawer();
+                }
+            });
+
+            let resizeTimer;
+            window.addEventListener('resize', () => {
+                clearTimeout(resizeTimer);
+                resizeTimer = setTimeout(() => {
+                    if (window.innerWidth >= 768 && sidebar.classList.contains('open')) {
+                        closeDrawer();
+                    }
+                }, 100);
+            });
+
+            // ═════════════════════════════════════════════════
+            //   QR CODE — placeholder SVG généré procéduralement
+            //   (La vraie lib 'qrcode' sera utilisée côté dev Next.js.
+            //    Ce placeholder montre juste un visuel crédible.)
+            // ═════════════════════════════════════════════════
+            (function renderQrPlaceholder() {
+                const svg = document.getElementById('qrPlaceholder');
+                if (!svg) return;
+                const ns = 'http://www.w3.org/2000/svg';
+                const size = 21;
+                const modules = Array.from({ length: size }, () => Array(size).fill(false));
+
+                // Finder patterns 7×7 (coins haut-gauche, haut-droite, bas-gauche)
+                function drawFinder(x0, y0) {
+                    for (let dy = 0; dy < 7; dy++) {
+                        for (let dx = 0; dx < 7; dx++) {
+                            const onBorder = dy === 0 || dy === 6 || dx === 0 || dx === 6;
+                            const onInner = dy >= 2 && dy <= 4 && dx >= 2 && dx <= 4;
+                            modules[y0 + dy][x0 + dx] = onBorder || onInner;
+                        }
+                    }
+                }
+                drawFinder(0, 0);
+                drawFinder(14, 0);
+                drawFinder(0, 14);
+
+                // Timing patterns (lignes pointillées entre finder patterns)
+                for (let i = 8; i <= 12; i++) {
+                    modules[6][i] = (i % 2 === 0);
+                    modules[i][6] = (i % 2 === 0);
+                }
+
+                // Dark module (unique, position canonique QR)
+                modules[13][8] = true;
+
+                // Data modules (pseudo-aléatoire déterministe — pas un vrai QR scannable)
+                for (let y = 0; y < size; y++) {
+                    for (let x = 0; x < size; x++) {
+                        // Skip quiet zones de finder patterns
+                        const inTopLeft = x < 8 && y < 8;
+                        const inTopRight = x > 12 && y < 8;
+                        const inBottomLeft = x < 8 && y > 12;
+                        if (inTopLeft || inTopRight || inBottomLeft) continue;
+                        // Ne pas écraser les timing patterns
+                        if (x === 6 && y >= 8 && y <= 12) continue;
+                        if (y === 6 && x >= 8 && x <= 12) continue;
+                        if (modules[y][x]) continue;
+                        // Pattern déterministe varié
+                        const v = (x * 7 + y * 11 + (x ^ y) * 3 + (y * y) % 5);
+                        modules[y][x] = (v % 7 < 3);
+                    }
+                }
+
+                // Construire le SVG
+                const frag = document.createDocumentFragment();
+                const bg = document.createElementNS(ns, 'rect');
+                bg.setAttribute('x', '0');
+                bg.setAttribute('y', '0');
+                bg.setAttribute('width', size);
+                bg.setAttribute('height', size);
+                bg.setAttribute('fill', '#FFFFFF');
+                frag.appendChild(bg);
+
+                for (let y = 0; y < size; y++) {
+                    for (let x = 0; x < size; x++) {
+                        if (!modules[y][x]) continue;
+                        const rect = document.createElementNS(ns, 'rect');
+                        rect.setAttribute('x', x);
+                        rect.setAttribute('y', y);
+                        rect.setAttribute('width', '1');
+                        rect.setAttribute('height', '1');
+                        rect.setAttribute('fill', '#242424');
+                        frag.appendChild(rect);
+                    }
+                }
+                svg.appendChild(frag);
+            })();
+
+        })();
+    </script>
+
+    <!-- ════════════════════════════════════════════════════════════════
+         SEED DATA HYDRATION
+         Loads marketup_seed_data.js + dashboard_hydrate_utils.js,
+         then hydrates this page from window.MARKETUP_DATA.
+         ════════════════════════════════════════════════════════════════ -->
+    <script src="marketup_seed_data.js"></script>
+    <script src="dashboard_hydrate_utils.js"></script>
+    <script>
+        // ════════════════════════════════════════════════════════════════
+        // STATE-DRIVEN LINKUP DASHBOARD
+        // Single page that renders for any of 4 profile statuses, driven
+        // entirely by me.profiles.linkup.status from the seed data.
+        // Statuses: pending | active | rejected | disabled
+        // ════════════════════════════════════════════════════════════════
+
+        const LU_STATUS_CONFIG = {
+            // ─────────── PENDING ──────────────────────────────────────
+            pending: {
+                titleSuffix: '(En attente)',
+                sidebarDot: { color: '#D97706', title: 'En attente' },
+                hero: (p, dates, slug) => `
+                    <div class="flex items-center gap-2 mt-1.5 flex-wrap">
+                        <span class="status-pill status-pill--pending">
+                            <span class="dot"></span>
+                            En attente
+                        </span>
+                        <span class="text-[11px] text-[#8A8886]">
+                            Soumis pour validation · réponse admin sous 24-48 h
+                        </span>
+                    </div>
+                    <div class="flex items-center gap-1.5 mt-1.5 text-[11.5px] text-[#8A8886]">
+                        <span class="material-symbols-outlined" style="font-size:14px">visibility_off</span>
+                        <span>
+                            Carte de contact <strong class="text-[#92400E]">hors ligne pendant la revue</strong> —
+                            le QR code sera actif après validation
+                        </span>
+                    </div>`,
+                statusBlock: (p, dates, slug) => `
+                    <section class="border border-[#FDE68A] bg-[#FFFBEB] rounded-lg overflow-hidden" role="status" aria-live="polite">
+                        <div class="p-5 flex items-start gap-4">
+                            <div class="w-10 h-10 rounded-lg bg-white border border-[#FDE68A] flex items-center justify-center shrink-0">
+                                <span class="material-symbols-outlined icon-fill text-[#D97706]" style="font-size:22px">schedule</span>
+                            </div>
+                            <div class="min-w-0 flex-1">
+                                <div class="font-heading font-bold text-[14px] text-[#92400E] mb-1">Revue en cours par l'administrateur</div>
+                                <p class="text-[13px] text-[#92400E] leading-relaxed mb-3">Votre carte de contact est en cours d'examen. Pendant cette période :</p>
+                                <ul class="space-y-1.5 text-[12.5px] text-[#92400E] leading-relaxed mb-3">
+                                    <li class="flex items-start gap-2">
+                                        <span class="material-symbols-outlined shrink-0 mt-[1px] text-[#D97706]" style="font-size:14px">qr_code_2</span>
+                                        <span>Le <strong>QR code n'est pas encore actif</strong> — toute personne le scannant verra une page d'attente</span>
+                                    </li>
+                                    <li class="flex items-start gap-2">
+                                        <span class="material-symbols-outlined shrink-0 mt-[1px] text-[#D97706]" style="font-size:14px">visibility_off</span>
+                                        <span>Votre profil LinkUP est <strong>invisible</strong> sur le moteur public</span>
+                                    </li>
+                                    <li class="flex items-start gap-2">
+                                        <span class="material-symbols-outlined shrink-0 mt-[1px] text-[#D97706]" style="font-size:14px">mail</span>
+                                        <span>Un email vous sera envoyé dès acceptation ou refus (délai estimé 24-48 h)</span>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </section>`,
+                actionBar: (p, dates, slug) => `
+                    <div class="flex items-start md:items-center gap-2 text-[12px] text-[#616161] leading-snug">
+                        <span class="material-symbols-outlined icon-fill shrink-0 mt-[1px] md:mt-0 text-[#92400E]" style="font-size:15px">schedule</span>
+                        <span><strong class="text-[#92400E]">En attente de validation</strong> · réponse admin sous 24-48 h</span>
+                    </div>
+                    <div class="flex items-center gap-2 shrink-0 flex-wrap justify-end">
+                        <button class="btn btn-ghost">Annuler la demande</button>
+                    </div>`,
+            },
+            // ─────────── ACTIVE ───────────────────────────────────────
+            active: {
+                titleSuffix: '',
+                sidebarDot: { color: '#107C10', title: 'Actif' },
+                hero: (p, dates, slug) => `
+                    <div class="flex items-center gap-2 mt-1.5 flex-wrap">
+                        <span class="status-pill status-pill--active">
+                            <span class="dot"></span>
+                            Actif
+                        </span>
+                        <span class="text-[11px] text-[#8A8886]">
+                            Publié le ${dates.publishedAt}
+                        </span>
+                    </div>
+                    <div class="flex items-center gap-1.5 mt-1.5 text-[11.5px] text-[#8A8886]">
+                        <span class="material-symbols-outlined text-[#107C10]" style="font-size:14px">visibility</span>
+                        <span>
+                            Profil <strong class="text-[#107C10]">en ligne</strong> sur
+                            <a id="lu-public-link" href="public_linkup_${slug}.html" target="_blank" rel="noopener" class="text-[#0078D4] hover:underline font-medium">
+                                vivasky.media/linkup/${slug}
+                            </a>
+                        </span>
+                    </div>`,
+                statusBlock: () => '',
+                actionBar: (p, dates, slug) => `
+                    <div class="flex items-start md:items-center gap-2 text-[12px] text-[#616161] leading-snug">
+                        <span class="material-symbols-outlined icon-fill shrink-0 mt-[1px] md:mt-0 text-[#107C10]" style="font-size:15px">check_circle</span>
+                        <span><strong class="text-[#107C10]">Profil à jour</strong> · toutes les modifications sont publiées</span>
+                    </div>
+                    <div class="flex items-center gap-2 shrink-0 flex-wrap justify-end">
+                        <button class="btn btn-ghost" disabled>Annuler</button>
+                        <button class="btn btn-primary" disabled>
+                            <span class="material-symbols-outlined">send</span>
+                            Soumettre les modifications
+                        </button>
+                    </div>`,
+            },
+            // ─────────── REJECTED ─────────────────────────────────────
+            rejected: {
+                titleSuffix: '(Refusé)',
+                sidebarDot: { color: '#DC2626', title: 'Refusé' },
+                hero: (p, dates, slug) => `
+                    <div class="flex items-center gap-2 mt-1.5 flex-wrap">
+                        <span class="status-pill status-pill--refused">
+                            <span class="dot"></span>
+                            Refusé par l'administrateur
+                        </span>
+                        <span class="text-[11px] text-[#8A8886]">
+                            Soumis le ${dates.submittedAt} · Refusé le ${dates.rejectedAt}
+                        </span>
+                    </div>
+                    <div class="flex items-center gap-1.5 mt-1.5 text-[11.5px] text-[#8A8886]">
+                        <span class="material-symbols-outlined" style="font-size:14px">visibility_off</span>
+                        <span>
+                            Carte de contact actuellement <strong class="text-[#616161]">non visible</strong> sur
+                            <span class="text-[#616161]">/linkup</span>
+                        </span>
+                    </div>`,
+                statusBlock: (p, dates, slug) => {
+                    const reason = (typeof p.rejectionReason === 'string')
+                        ? p.rejectionReason
+                        : (p.rejectionReason && p.rejectionReason.fr)
+                            || 'Aucun motif fourni par l\'administrateur.';
+                    return `
+                    <section class="border border-[#FCA5A5] bg-[#FEF2F2] rounded-lg overflow-hidden" role="alert" aria-live="polite">
+                        <div class="p-5 flex items-start gap-4">
+                            <div class="w-10 h-10 rounded-lg bg-white border border-[#FCA5A5] flex items-center justify-center shrink-0">
+                                <span class="material-symbols-outlined icon-fill text-[#DC2626]" style="font-size:22px">report</span>
+                            </div>
+                            <div class="min-w-0 flex-1">
+                                <div class="font-heading font-bold text-[14px] text-[#991B1B] mb-1">Votre soumission a été refusée</div>
+                                <p class="text-[13px] text-[#991B1B] leading-relaxed mb-3">
+                                    L'équipe d'administration a examiné votre carte de contact le ${dates.rejectedAt} et n'a pas pu la publier pour la raison suivante :
+                                </p>
+                                <div class="bg-white border border-[#FCA5A5] rounded p-3 mb-3">
+                                    <div class="text-[10px] font-bold text-[#8A8886] uppercase tracking-wider mb-1">Motif de l'administrateur</div>
+                                    <p class="text-[13px] text-[#242424] leading-relaxed italic">« ${reason} »</p>
+                                </div>
+                                <p class="text-[12px] text-[#991B1B] leading-relaxed">
+                                    Corrigez les points mentionnés puis cliquez sur <strong>Enregistrer et resoumettre</strong> en bas de page.
+                                </p>
+                            </div>
+                        </div>
+                    </section>`;
+                },
+                actionBar: (p, dates, slug) => `
+                    <div class="flex items-start md:items-center gap-2 text-[12px] text-[#616161] leading-snug">
+                        <span class="material-symbols-outlined icon-fill shrink-0 mt-[1px] md:mt-0 text-[#475569]" style="font-size:15px">edit</span>
+                        <span><strong class="text-[#475569]">Modifications non soumises</strong> · soumettez pour publication</span>
+                    </div>
+                    <div class="flex items-center gap-2 shrink-0 flex-wrap justify-end">
+                        <button class="btn btn-ghost">Annuler</button>
+                        <button class="btn btn-primary">
+                            <span class="material-symbols-outlined">send</span>
+                            Enregistrer et resoumettre
+                        </button>
+                    </div>`,
+            },
+            // ─────────── DISABLED ─────────────────────────────────────
+            disabled: {
+                titleSuffix: '(Désactivé)',
+                sidebarDot: { color: '#8A8886', title: 'Désactivé' },
+                hero: (p, dates, slug) => `
+                    <div class="flex items-center gap-2 mt-1.5 flex-wrap">
+                        <span class="status-pill status-pill--disabled">
+                            <span class="dot"></span>
+                            Profil désactivé
+                        </span>
+                        <span class="text-[11px] text-[#8A8886]">
+                            Désactivé le ${dates.disabledAt}
+                        </span>
+                    </div>
+                    <div class="flex items-center gap-1.5 mt-1.5 text-[11.5px] text-[#8A8886]">
+                        <span class="material-symbols-outlined" style="font-size:14px">visibility_off</span>
+                        <span>
+                            Carte de contact <strong class="text-[#616161]">désactivée</strong> · QR code inactif
+                        </span>
+                    </div>`,
+                statusBlock: (p, dates, slug) => `
+                    <section class="border border-[#E0E0E0] bg-[#F5F5F5] rounded-lg overflow-hidden" role="status">
+                        <div class="p-5 flex items-start gap-4">
+                            <div class="w-10 h-10 rounded-lg bg-white border border-[#E0E0E0] flex items-center justify-center shrink-0">
+                                <span class="material-symbols-outlined icon-fill text-[#616161]" style="font-size:22px">block</span>
+                            </div>
+                            <div class="min-w-0 flex-1">
+                                <div class="font-heading font-bold text-[14px] text-[#424242] mb-1">Profil désactivé</div>
+                                <p class="text-[13px] text-[#616161] leading-relaxed mb-3">
+                                    Vous avez désactivé ce profil le ${dates.disabledAt}. Le QR code redirige vers une page d'erreur et la carte n'apparaît plus dans le moteur public.
+                                </p>
+                                <p class="text-[12px] text-[#616161] leading-relaxed">
+                                    Pour réactiver le QR code, cliquez sur <strong>Réactiver le profil</strong> en bas de page.
+                                </p>
+                            </div>
+                        </div>
+                    </section>`,
+                actionBar: (p, dates, slug) => `
+                    <div class="flex items-start md:items-center gap-2 text-[12px] text-[#616161] leading-snug">
+                        <span class="material-symbols-outlined icon-fill shrink-0 mt-[1px] md:mt-0 text-[#8A8886]" style="font-size:15px">block</span>
+                        <span><strong class="text-[#616161]">Profil désactivé</strong> · réactivez pour publier</span>
+                    </div>
+                    <div class="flex items-center gap-2 shrink-0 flex-wrap justify-end">
+                        <button class="btn btn-primary">
+                            <span class="material-symbols-outlined">play_arrow</span>
+                            Réactiver le profil
+                        </button>
+                    </div>`,
+            },
+        };
+
+        MARKETUP_HYDRATE.bootstrapPage(function (me, H) {
+            const { set, setHTML, setAttr, formatDateLong } = MARKETUP_HYDRATE;
+            const lu = me.profiles.linkup;
+            const card = lu.data.contactCard || {};
+            const socials = lu.data.socials || [];
+
+            // ─── Helper: find a social URL by platform ──────────────────
+            const social = (platform) => {
+                const found = socials.find(s => s.platform === platform);
+                return found ? found.url : '';
+            };
+
+            // ─── ContactCard fields (already-existing inputs) ──────────
+            set('lnk-website', card.website || '');
+            set('lnk-whatsapp', card.whatsapp ? `https://wa.me/${card.whatsapp.replace(/[^0-9]/g, '')}` : '');
+
+            if (card.gpsPosition && card.gpsPosition.coordinates) {
+                const [lng, lat] = card.gpsPosition.coordinates;
+                set('lnk-gps', `https://maps.google.com/?q=${lat},${lng}`);
+            }
+
+            set('lnk-linkedin', social('linkedin'));
+            set('lnk-facebook', social('facebook'));
+            set('lnk-instagram', social('instagram'));
+            set('lnk-youtube', social('youtube'));
+
+            // ─── Public preview link (top-right "Aperçu public" button) ─
+            setAttr('lu-preview-link', 'href', `public_linkup_${me.slug}.html`);
+
+            // ─── QR URL inputs ────────────────────────────────────────
+            const publicUrl = `https://vivasky.media/linkup/${me.slug}`;
+            set('lu-qr-url', publicUrl);
+            setAttr('lu-qr-url', 'data-copy', publicUrl);
+            setAttr('lu-qr-copy', 'data-copy', publicUrl);
+            const qrSvg = document.getElementById('qrPlaceholder');
+            if (qrSvg) qrSvg.setAttribute('aria-label', `Aperçu QR code — vivasky.media/linkup/${me.slug}`);
+
+            // ═════════════════════════════════════════════════════════
+            // STATE-DRIVEN HYDRATION
+            // ═════════════════════════════════════════════════════════
+            const status = lu.status || 'pending';
+            const cfg = LU_STATUS_CONFIG[status] || LU_STATUS_CONFIG.pending;
+
+            const fmt = formatDateLong;
+            const dates = {
+                submittedAt: lu.submittedAt ? fmt(lu.submittedAt) : '—',
+                publishedAt: lu.validatedAt ? fmt(lu.validatedAt) : '—',
+                rejectedAt:  lu.rejectedAt  ? fmt(lu.rejectedAt)  : '—',
+                disabledAt:  lu.disabledAt  ? fmt(lu.disabledAt)  : '—',
+            };
+
+            // 1. Page title
+            const fullName = me.data.displayName.fr;
+            const suffix = cfg.titleSuffix ? ` ${cfg.titleSuffix}` : '';
+            document.title = `MARKET-UP | Profil LinkUP${suffix} — ${fullName}`;
+
+            // 2. Sidebar dot
+            const dot = document.getElementById('lu-sidebar-dot');
+            if (dot) {
+                dot.className = dot.className.replace(/bg-\[#[0-9A-Fa-f]+\]/, `bg-[${cfg.sidebarDot.color}]`);
+                dot.setAttribute('title', cfg.sidebarDot.title);
+            }
+
+            // 3. Hero status region
+            setHTML('lu-hero-status-region', cfg.hero(lu, dates, me.slug));
+
+            // 4. Status block region — hide if active
+            const blockRegion = document.getElementById('lu-status-block-region');
+            const blockHTML = cfg.statusBlock(lu, dates, me.slug);
+            if (blockRegion) {
+                if (!blockHTML.trim()) {
+                    blockRegion.style.display = 'none';
+                } else {
+                    blockRegion.style.display = '';
+                    blockRegion.outerHTML = blockHTML.trim().replace(
+                        /^<section\b/, '<section id="lu-status-block-region"'
+                    );
+                }
+            }
+
+            // 5. Action bar region
+            setHTML('lu-action-bar-region', cfg.actionBar(lu, dates, me.slug));
+        });
+    </script>
+
+</body>
+
+</html>

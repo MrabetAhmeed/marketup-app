@@ -1,0 +1,1513 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Admin · Profil TraceUP · MARKET-UP</title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap"
+        rel="stylesheet" />
+    <link rel="stylesheet"
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" />
+
+    <script src="marketup_seed_data.js"></script>
+    <script src="admin_data_bridge.js"></script>
+    <script src="admin_notifications_dropdown.js"></script>
+
+    <style>
+        :root {
+            --admin-primary: #5C2D91;
+            --admin-primary-hover: #4A2375;
+            --admin-primary-light: #F3EFFA;
+            --admin-primary-tint: #EBE2F5;
+            --brandup-accent: #8764B8;
+            --text-primary: #242424;
+            --text-secondary: #616161;
+            --text-tertiary: #8A8886;
+            --border-default: #E0E0E0;
+            --bg-canvas: #F5F5F5;
+            --bg-surface: #FFFFFF;
+        }
+
+        html,
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Inter', sans-serif;
+            color: var(--text-primary);
+            background: var(--bg-canvas);
+        }
+
+        .font-heading {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+        }
+
+        .icon-fill {
+            font-variation-settings: 'FILL' 1;
+        }
+
+        .card {
+            background: var(--bg-surface);
+            border: 1px solid var(--border-default);
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
+        }
+
+        /* Nav sidebar */
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 8px 12px;
+            border-radius: 6px;
+            color: var(--text-secondary);
+            font-size: 13px;
+            font-weight: 500;
+            transition: background 0.15s ease, color 0.15s ease;
+            cursor: pointer;
+            text-decoration: none;
+        }
+
+        .nav-item:hover {
+            background: #FAFAFA;
+            color: var(--text-primary);
+        }
+
+        .nav-item.active {
+            background: var(--admin-primary-light);
+            color: var(--admin-primary);
+            font-weight: 600;
+        }
+
+        .nav-item.active .material-symbols-outlined {
+            color: var(--admin-primary);
+        }
+
+        .nav-item .material-symbols-outlined {
+            font-size: 18px;
+            color: var(--text-tertiary);
+        }
+
+        .nav-group-label {
+            font-size: 10px;
+            font-weight: 700;
+            color: var(--text-tertiary);
+            letter-spacing: 0.06em;
+            padding: 12px 12px 6px;
+            text-transform: uppercase;
+        }
+
+        .nav-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 3px;
+            font-size: 10px;
+            font-weight: 700;
+            padding: 2px 6px;
+            border-radius: 10px;
+            line-height: 1;
+        }
+
+        .nav-pill--count-amber {
+            background: #D97706;
+            color: white;
+        }
+
+        .nav-pill--count-red {
+            background: #DC2626;
+            color: white;
+        }
+
+        /* Buttons */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            padding: 7px 14px;
+            border-radius: 4px;
+            font-size: 12.5px;
+            font-weight: 600;
+            cursor: pointer;
+            border: 1px solid transparent;
+            transition: all 0.15s ease;
+            text-decoration: none;
+            white-space: nowrap;
+        }
+
+        .btn .material-symbols-outlined {
+            font-size: 16px;
+        }
+
+        .btn-primary {
+            background: var(--admin-primary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--admin-primary-hover);
+        }
+
+        .btn-primary:disabled {
+            background: #CBD5E1;
+            cursor: not-allowed;
+        }
+
+        .btn-secondary {
+            background: white;
+            color: var(--text-primary);
+            border: 1px solid #D1D1D1;
+        }
+
+        .btn-secondary:hover {
+            background: #F5F5F5;
+        }
+
+        .btn-ghost {
+            background: transparent;
+            color: var(--text-primary);
+        }
+
+        .btn-ghost:hover {
+            background: #F5F5F5;
+        }
+
+        .btn-danger {
+            background: #B91C1C;
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #991B1B;
+        }
+
+        .btn-danger:disabled {
+            background: #FCA5A5;
+            cursor: not-allowed;
+        }
+
+        .btn-success {
+            background: #107C10;
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #0E6A0E;
+        }
+
+        /* Status pills */
+        .status-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 11px;
+            font-weight: 600;
+            padding: 3px 9px;
+            border-radius: 4px;
+            border: 1px solid;
+        }
+
+        .status-pill .dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+        }
+
+        .status-pill--pending {
+            color: #92400E;
+            background: #FFFBEB;
+            border-color: #FDE68A;
+        }
+
+        .status-pill--pending .dot {
+            background: #D97706;
+        }
+
+        .status-pill--sla-exceeded {
+            color: #B91C1C;
+            background: #FEF2F2;
+            border-color: #FCA5A5;
+        }
+
+        .status-pill--sla-exceeded .dot {
+            background: #DC2626;
+        }
+
+        .profile-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 11px;
+            font-weight: 700;
+            padding: 3px 8px;
+            border-radius: 4px;
+            letter-spacing: 0.02em;
+            background: #F3EFFA;
+            color: var(--brandup-accent);
+        }
+
+        .profile-pill .material-symbols-outlined {
+            font-size: 13px;
+        }
+
+        .type-pill {
+            display: inline-flex;
+            align-items: center;
+            font-size: 10.5px;
+            font-weight: 700;
+            padding: 2px 7px;
+            border-radius: 4px;
+            letter-spacing: 0.02em;
+        }
+
+        .type-pill--b2b {
+            background: #EBE2F5;
+            color: #5C2D91;
+        }
+
+        .type-pill--b2c {
+            background: #FEF3C7;
+            color: #92400E;
+        }
+
+        /* Bandeau alerte */
+        .alert-banner {
+            display: flex;
+            align-items: flex-start;
+            gap: 14px;
+            padding: 14px 18px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+
+        .alert-banner--pending {
+            background: #FFFBEB;
+            border: 1px solid #FDE68A;
+        }
+
+        .alert-banner--sla-exceeded {
+            background: #FEF2F2;
+            border: 1px solid #FCA5A5;
+        }
+
+        .alert-banner__icon {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .alert-banner--pending .alert-banner__icon {
+            background: #FDE68A;
+        }
+
+        .alert-banner--pending .alert-banner__icon .material-symbols-outlined {
+            color: #92400E;
+        }
+
+        .alert-banner--sla-exceeded .alert-banner__icon {
+            background: #FCA5A5;
+        }
+
+        .alert-banner--sla-exceeded .alert-banner__icon .material-symbols-outlined {
+            color: #B91C1C;
+        }
+
+        .alert-banner__title {
+            font-size: 14px;
+            font-weight: 700;
+            line-height: 1.3;
+        }
+
+        .alert-banner--pending .alert-banner__title {
+            color: #92400E;
+        }
+
+        .alert-banner--sla-exceeded .alert-banner__title {
+            color: #B91C1C;
+        }
+
+        .alert-banner__sub {
+            font-size: 12px;
+            margin-top: 3px;
+            line-height: 1.5;
+        }
+
+        .alert-banner--pending .alert-banner__sub {
+            color: #78350F;
+        }
+
+        .alert-banner--sla-exceeded .alert-banner__sub {
+            color: #991B1B;
+        }
+
+        /* Header entreprise */
+        .enterprise-header {
+            padding: 20px;
+            display: flex;
+            gap: 16px;
+            align-items: center;
+            border-bottom: 1px solid var(--border-default);
+        }
+
+        .enterprise-avatar {
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            background: var(--admin-primary);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-weight: 800;
+            font-size: 20px;
+            flex-shrink: 0;
+            letter-spacing: -0.02em;
+        }
+
+        /* Section title */
+        .section-title {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-size: 15px;
+            font-weight: 700;
+            color: var(--text-primary);
+            padding: 16px;
+            border-bottom: 1px solid var(--border-default);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .section-title .material-symbols-outlined {
+            font-size: 18px;
+            color: var(--brandup-accent);
+        }
+
+        /* ═════ BRANDUP PREVIEW (canon visuel profil public) ═════ */
+        .brand-hero {
+            background: linear-gradient(135deg, #8764B8 0%, #6B4A9E 100%);
+            padding: 32px 24px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .brand-hero::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(circle at top right, rgba(255, 255, 255, 0.1), transparent 60%);
+        }
+
+        .brand-hero__content {
+            position: relative;
+            z-index: 1;
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            max-width: 100%;
+        }
+
+        .brand-logo {
+            width: 96px;
+            height: 96px;
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-weight: 800;
+            font-size: 32px;
+            color: white;
+            letter-spacing: -0.02em;
+            flex-shrink: 0;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+            border: 3px solid rgba(255, 255, 255, 0.4);
+        }
+
+        .brand-name {
+            color: white;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-size: 28px;
+            font-weight: 800;
+            line-height: 1.1;
+            letter-spacing: -0.02em;
+        }
+        .brand-section {
+            padding: 18px 20px;
+            border-bottom: 1px solid #F5F5F5;
+        }
+
+        .brand-section:last-child {
+            border-bottom: none;
+        }
+
+        .brand-section__label {
+            font-size: 10.5px;
+            font-weight: 700;
+            color: var(--text-tertiary);
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+            margin-bottom: 8px;
+        }
+
+        .brand-pitch {
+            font-size: 14px;
+            line-height: 1.6;
+            color: var(--text-primary);
+        }
+
+        .gallery-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+        }
+
+        .gallery-tile {
+            aspect-ratio: 4/3;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .gallery-tile::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(180deg, transparent 60%, rgba(0, 0, 0, 0.2) 100%);
+        }
+
+        .gallery-tile .material-symbols-outlined {
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 28px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .keyword-pill {
+            display: inline-flex;
+            align-items: center;
+            padding: 4px 10px;
+            background: #EFF6FC;
+            color: var(--brandup-accent);
+            border-radius: 12px;
+            font-size: 11.5px;
+            font-weight: 600;
+            margin-right: 6px;
+            margin-bottom: 6px;
+        }
+
+        /* Info-row (entreprise) */
+        .info-row {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 20px;
+            border-bottom: 1px solid #F5F5F5;
+            font-size: 13px;
+        }
+
+        .info-row:last-child {
+            border-bottom: none;
+        }
+
+        .info-row__icon {
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            background: #F5F5F5;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .info-row__icon .material-symbols-outlined {
+            font-size: 16px;
+            color: var(--text-secondary);
+        }
+
+        .info-row__label {
+            font-size: 11px;
+            color: var(--text-tertiary);
+        }
+
+        .info-row__value {
+            font-size: 13px;
+            color: var(--text-primary);
+            font-weight: 500;
+        }
+
+        /* FAB bar */
+        .fab-bar {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            z-index: 45;
+            display: flex;
+            gap: 10px;
+            padding: 12px;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.16);
+            border: 1px solid var(--border-default);
+        }
+
+        .fab-bar__label {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            padding: 0 6px 0 8px;
+            border-right: 1px solid var(--border-default);
+            margin-right: 6px;
+        }
+
+        .fab-bar__label-title {
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--admin-primary);
+            line-height: 1;
+        }
+
+        .fab-bar__label-sub {
+            font-size: 10px;
+            color: var(--text-tertiary);
+            margin-top: 2px;
+        }
+
+        .fab-bar .btn {
+            padding: 9px 16px;
+            font-size: 13px;
+        }
+
+        /* Modal */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 65;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 16px;
+        }
+
+        .modal-overlay.open {
+            display: flex;
+        }
+
+        .modal {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.16);
+            width: 100%;
+            max-width: 560px;
+            max-height: 90vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .motif-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            padding: 10px 12px;
+            border: 1px solid var(--border-default);
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background 0.1s ease, border-color 0.1s ease;
+            margin-bottom: 8px;
+        }
+
+        .motif-item:hover {
+            background: #FAFAFA;
+            border-color: #CBD5E1;
+        }
+
+        .motif-item input[type="checkbox"] {
+            margin-top: 2px;
+            accent-color: var(--admin-primary);
+            width: 16px;
+            height: 16px;
+            cursor: pointer;
+            flex-shrink: 0;
+        }
+
+        .motif-item.checked {
+            background: var(--admin-primary-light);
+            border-color: var(--admin-primary);
+        }
+
+        .motif-item__label {
+            font-size: 13px;
+            color: var(--text-primary);
+            line-height: 1.4;
+        }
+
+        .motif-item__hint {
+            font-size: 11px;
+            color: var(--text-tertiary);
+            margin-top: 2px;
+            display: block;
+        }
+
+        .textarea-canon {
+            width: 100%;
+            border: 1px solid #D1D1D1;
+            border-radius: 4px;
+            padding: 8px 12px;
+            font-size: 13px;
+            font-family: inherit;
+            color: var(--text-primary);
+            resize: vertical;
+            min-height: 80px;
+            transition: border-color 0.15s ease, box-shadow 0.15s ease;
+        }
+
+        .textarea-canon:focus {
+            outline: none;
+            border-color: var(--admin-primary);
+            box-shadow: 0 0 0 2px var(--admin-primary-light);
+        }
+
+        .info-box {
+            display: flex;
+            gap: 10px;
+            padding: 12px 14px;
+            background: #EFF6FC;
+            border: 1px solid #B8DAEF;
+            border-radius: 6px;
+            font-size: 12.5px;
+            color: #0B4B75;
+            line-height: 1.5;
+        }
+
+        .info-box .material-symbols-outlined {
+            font-size: 18px;
+            color: #0078D4;
+            flex-shrink: 0;
+        }
+
+        /* Toast */
+        #toast {
+            position: fixed;
+            bottom: 24px;
+            left: 50%;
+            transform: translateX(-50%) translateY(16px);
+            background: var(--text-primary);
+            color: white;
+            padding: 10px 18px;
+            border-radius: 6px;
+            font-size: 13px;
+            opacity: 0;
+            pointer-events: none;
+            transition: all 0.2s ease;
+            z-index: 100;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        #toast.show {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+        }
+
+        #toast .material-symbols-outlined {
+            font-size: 16px;
+            color: #4CE67B;
+        }
+
+        *:focus-visible {
+            outline: 2px solid var(--admin-primary);
+            outline-offset: 2px;
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #D1D1D1;
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #A19F9D;
+        }
+
+        @media (max-width: 768px) {
+            #sidebar {
+                transform: translateX(-100%);
+                transition: transform 0.3s ease;
+            }
+
+            #sidebar.open {
+                transform: translateX(0);
+            }
+
+            #backdrop {
+                display: none;
+            }
+
+            #backdrop.show {
+                display: block;
+            }
+
+            .brand-hero__content {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .fab-bar {
+                left: 16px;
+                right: 16px;
+                bottom: 16px;
+                flex-direction: row;
+                padding: 10px;
+            }
+
+            .fab-bar__label {
+                display: none;
+            }
+
+            .fab-bar .btn {
+                flex: 1;
+            }
+        }
+
+        .avatar {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            font-weight: 700;
+            color: white;
+            flex-shrink: 0;
+        }
+
+        .avatar--sm {
+            width: 32px;
+            height: 32px;
+            font-size: 11px;
+        }
+
+        .avatar--md {
+            width: 40px;
+            height: 40px;
+            font-size: 13px;
+        }
+
+        .fab-safe-area {
+            padding-bottom: 100px;
+        }
+
+        /* === Modifs en attente (cas profil active avec pending_data) === */
+        .modifs-banner {
+            display: flex;
+            gap: 14px;
+            align-items: flex-start;
+            background: #FFFBEB;
+            border: 1px solid #FDE68A;
+            border-left: 4px solid #D97706;
+            border-radius: 8px;
+            padding: 14px 18px;
+            margin-bottom: 16px;
+        }
+        .modifs-banner__icon {
+            width: 36px; height: 36px; border-radius: 8px;
+            background: #FEF3C7; color: #92400E;
+            display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0;
+        }
+        .modifs-banner__content { flex: 1; min-width: 0; }
+        .modifs-banner__title { font-weight: 700; color: #92400E; font-size: 14px; margin-bottom: 4px; }
+        .modifs-banner__list { font-size: 13px; color: #424242; line-height: 1.7; }
+        .modifs-banner__field {
+            display: inline-block; background: #FFFFFF; border: 1px solid #FDE68A; color: #92400E;
+            padding: 2px 9px; border-radius: 4px; margin: 0 4px 2px 0; font-weight: 500; font-size: 12px;
+        }
+        .modifs-banner__note { margin-top: 6px; font-size: 12px; color: #92400E; font-style: italic; line-height: 1.4; }
+        .modifs-banner__actions { display: flex; gap: 6px; flex-shrink: 0; align-items: flex-start; }
+        @media (max-width: 720px) {
+            .modifs-banner { flex-direction: column; }
+            .modifs-banner__actions { width: 100%; }
+            .modifs-banner__actions .btn { flex: 1; }
+        }
+    </style>
+</head>
+
+<body class="min-h-screen">
+
+    <div id="backdrop" class="fixed inset-0 bg-black/30 z-40 hidden md:hidden" aria-hidden="true"></div>
+
+    <div class="flex">
+
+        <!-- SIDEBAR -->
+        <aside id="sidebar"
+            class="fixed top-0 left-0 w-60 h-screen bg-white border-r border-[#E0E0E0] z-50 flex flex-col">
+            <a href="admin_dashboard.html"
+                class="flex items-center gap-2.5 px-5 py-4 border-b border-[#E0E0E0] shrink-0 h-14 hover:bg-[#FAFAFA] transition-colors">
+                <span class="material-symbols-outlined icon-fill text-[#5C2D91]"
+                    style="font-size:22px">shield_person</span>
+                <div class="leading-tight min-w-0">
+                    <div class="text-[#242424] font-heading font-bold text-[15px] tracking-tight">MARKET-UP</div>
+                    <div class="text-[10px] text-[#5C2D91] tracking-wide font-semibold uppercase">Admin</div>
+                </div>
+            </a>
+            <nav class="flex-1 overflow-y-auto px-3 py-2">
+                <div class="nav-group-label">Tableau de bord</div>
+                <a href="admin_dashboard.html" class="nav-item"><span class="material-symbols-outlined">dashboard</span><span
+                        class="flex-1 min-w-0 truncate">Vue d'ensemble</span></a>
+                <div class="nav-group-label">Validations</div>
+                <a href="admin_validation-comptes.html" class="nav-item"><span
+                        class="material-symbols-outlined">person_check</span><span
+                        class="flex-1 min-w-0 truncate">Comptes</span><span class="nav-pill nav-pill--count-amber"
+                        data-pill="comptes">11</span></a>
+                <a href="admin_validation-profils.html" class="nav-item active"><span
+                        class="material-symbols-outlined">fact_check</span><span
+                        class="flex-1 min-w-0 truncate">Profils</span><span class="nav-pill nav-pill--count-amber"
+                        data-pill="profils">10</span></a>
+                <a href="admin_validation-rse.html" class="nav-item"><span
+                        class="material-symbols-outlined">volunteer_activism</span><span
+                        class="flex-1 min-w-0 truncate">Reçus RSE</span><span class="nav-pill nav-pill--count-amber"
+                        data-pill="rse">3</span></a>
+                <div class="nav-group-label">Gestion</div>
+                <a href="admin_entreprises.html" class="nav-item"><span
+                        class="material-symbols-outlined">business</span><span
+                        class="flex-1 min-w-0 truncate">Entreprises</span></a>
+                
+                
+                <div class="nav-group-label">Finances</div>
+                <a href="admin_transactions.html" class="nav-item"><span
+                        class="material-symbols-outlined">receipt_long</span><span
+                        class="flex-1 min-w-0 truncate">Transactions</span></a>
+                
+            </nav>
+            <div class="border-t border-[#E0E0E0] p-3">
+                <div class="flex items-center gap-2.5 px-2 py-2 rounded-lg hover:bg-[#FAFAFA] transition-colors">
+                    <div class="avatar avatar--sm" style="background:#5C2D91;">BA</div>
+                    <div class="leading-tight min-w-0 flex-1">
+                        <div class="text-[12.5px] font-semibold text-[#242424] truncate">Bassem Admin</div>
+                        <div class="text-[10px] text-[#8A8886] truncate">Super administrateur</div>
+                    </div>
+                    <button
+                        class="p-1.5 rounded hover:bg-[#F5F5F5] text-[#8A8886] hover:text-[#B91C1C] transition-colors"
+                        aria-label="Se déconnecter" onclick="window.location.href='auth_connexion.html';">
+                        <span class="material-symbols-outlined" style="font-size:16px">logout</span>
+                    </button>
+                </div>
+            </div>
+        </aside>
+
+        <div class="flex-1 md:ml-60 min-h-screen flex flex-col">
+            <header
+                class="sticky top-0 z-30 bg-white border-b border-[#E0E0E0] h-14 flex items-center px-4 md:px-6 shrink-0">
+                <button id="menuBtn" class="md:hidden mr-3 p-2 rounded hover:bg-[#F5F5F5] transition-colors"
+                    aria-label="Ouvrir le menu">
+                    <span class="material-symbols-outlined text-[#242424]">menu</span>
+                </button>
+                <div class="min-w-0 leading-tight flex-1">
+                    <nav class="hidden md:flex items-center gap-1.5 text-[11px] text-[#8A8886] mb-0.5"
+                        aria-label="Fil d'Ariane">
+                        <a href="admin_dashboard.html" class="hover:text-[#5C2D91] hover:underline transition-colors">Dashboard</a>
+                        <span class="material-symbols-outlined" style="font-size:12px">chevron_right</span>
+                        <a href="admin_validation-profils.html"
+                            class="hover:text-[#5C2D91] hover:underline transition-colors">Validations</a>
+                        <span class="material-symbols-outlined" style="font-size:12px">chevron_right</span>
+                        <a href="admin_validation-profils.html"
+                            class="hover:text-[#5C2D91] hover:underline transition-colors">Profils</a>
+                        <span class="material-symbols-outlined" style="font-size:12px">chevron_right</span>
+                        <span class="text-[#616161] font-medium truncate" id="breadcrumb-name">—</span>
+                    </nav>
+                    <h1 class="font-heading text-[16px] font-bold text-[#242424] truncate" id="page-title">Profil
+                        BrandUP</h1>
+                </div>
+                <div class="flex items-center gap-2 ml-3">
+                    <button id="bellBtn" class="relative p-2 rounded-lg hover:bg-[#F5F5F5] transition-colors"
+                        aria-label="Notifications admin">
+                        <span class="material-symbols-outlined text-[#242424]">notifications</span>
+                        <span
+                            class="absolute top-1 right-1 w-4 h-4 bg-[#DC2626] text-white text-[9px] font-bold rounded-full flex items-center justify-center">5</span>
+                    </button>
+                    <button id="avatarBtn"
+                        class="flex items-center gap-2 px-1 py-1 rounded-lg hover:bg-[#F5F5F5] transition-colors"
+                        aria-label="Menu admin">
+                        <div class="avatar avatar--sm" style="background:#5C2D91;">BA</div>
+                        <span class="material-symbols-outlined text-[#8A8886] hidden md:inline"
+                            style="font-size:16px">expand_more</span>
+                    </button>
+                </div>
+            </header>
+
+            <main class="flex-1 p-4 md:p-8 fab-safe-area">
+                <div class="max-w-[1100px] mx-auto">
+
+                    <a href="admin_validation-profils.html"
+                        class="inline-flex items-center gap-1.5 text-[12.5px] text-[#616161] hover:text-[#5C2D91] mb-4 transition-colors">
+                        <span class="material-symbols-outlined" style="font-size:16px">arrow_back</span>
+                        Retour à la file d'attente
+                    </a>
+
+                    <div id="alert-banner-zone"></div>
+
+                    <!-- Info entreprise -->
+                    <div class="card mb-5">
+                        <div class="enterprise-header">
+                            <div class="enterprise-avatar" id="ent-avatar">??</div>
+                            <div class="flex-1 min-w-0">
+                                <div class="flex items-center gap-2 mb-1.5 flex-wrap">
+                                    <span class="profile-pill">
+                                        <span class="material-symbols-outlined icon-fill">play_circle</span>
+                                        TraceUP
+                                    </span>
+                                    <span id="ent-type" class="type-pill type-pill--b2b">B2B</span>
+                                    <span class="status-pill status-pill--pending">
+                                        <span class="dot"></span>En attente de validation
+                                    </span>
+                                </div>
+                                <h2 class="font-heading text-[18px] font-bold text-[#242424] leading-tight"
+                                    id="ent-name">—</h2>
+                                <div class="text-[12px] text-[#616161] mt-0.5" id="ent-meta">—</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- PREVIEW DU PROFIL BRANDUP (canon visuel public) -->
+                    <div class="card overflow-hidden mb-5">
+                        <div class="section-title">
+                            <span class="material-symbols-outlined">preview</span>
+                            Aperçu du profil public
+                        </div>
+
+                        <!-- Hero (logo + nom) -->
+                        <div class="brand-hero">
+                            <div class="brand-hero__content">
+                                <div class="brand-logo" id="brand-logo">??</div>
+                                <div class="min-w-0 flex-1">
+                                    <div class="brand-name" id="brand-name">—</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Pitch -->
+                        <div class="brand-section">
+                            <div class="brand-section__label">
+                                <span class="material-symbols-outlined align-middle"
+                                    style="font-size:13px">description</span>
+                                Pitch descriptif
+                            </div>
+                            <div class="brand-pitch" id="brand-pitch">—</div>
+                        </div>
+
+                        <!-- Vidéos publiées -->
+                        <div class="brand-section">
+                            <div class="brand-section__label">
+                                <span class="material-symbols-outlined align-middle"
+                                    style="font-size:13px">video_library</span>
+                                Vidéos publiées (<span id="videos-count">0</span>)
+                            </div>
+                            <div id="brand-videos" class="space-y-2">
+                                <!-- JS render -->
+                            </div>
+                            <div class="text-[11px] text-[#8A8886] mt-3">
+                                Plateformes supportées : YouTube · Dailymotion · Vimeo. Vérifiez que le contenu de
+                                chaque vidéo respecte la charte de décence.
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Infos complémentaires (secteur, contact public de l'entreprise) -->
+                    <div class="card mb-5">
+                        <div class="section-title">
+                            <span class="material-symbols-outlined">info</span>
+                            Informations chaîne (affichées sur le profil TraceUP)
+                        </div>
+                        <div id="info-fields">
+                            <!-- JS render -->
+                        </div>
+                    </div>
+
+                    <!-- Timeline soumission -->
+                    <div class="card mb-5">
+                        <div class="section-title">
+                            <span class="material-symbols-outlined">schedule</span>
+                            Soumission
+                        </div>
+                        <div class="p-4" id="timeline-body"></div>
+                    </div>
+
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <!-- FAB -->
+    <div class="fab-bar" id="fab-bar">
+        <div class="fab-bar__label">
+            <div class="fab-bar__label-title">Décision requise</div>
+            <div class="fab-bar__label-sub">Profil TraceUP</div>
+        </div>
+        <button class="btn btn-secondary" id="btn-reject" style="color:#B91C1C;border-color:#FCA5A5;">
+            <span class="material-symbols-outlined">close</span>
+            Rejeter
+        </button>
+        <button class="btn btn-primary" id="btn-approve">
+            <span class="material-symbols-outlined">check</span>
+            Approuver
+        </button>
+    </div>
+
+    <!-- MODAL REJET -->
+    <div class="modal-overlay" id="modal-reject" role="dialog" aria-modal="true">
+        <div class="modal">
+            <div class="flex items-center gap-3 p-5 border-b border-[#E0E0E0]">
+                <div class="w-10 h-10 rounded-full bg-[#FEF2F2] flex items-center justify-center shrink-0">
+                    <span class="material-symbols-outlined text-[#B91C1C]">block</span>
+                </div>
+                <div class="flex-1 min-w-0">
+                    <h3 class="font-heading text-[16px] font-bold text-[#242424] leading-tight">Rejeter le profil
+                        TraceUP</h3>
+                    <p class="text-[12px] text-[#616161]" id="modal-reject-subtitle">Nom de l'entreprise</p>
+                </div>
+                <button class="p-1.5 rounded hover:bg-[#F5F5F5]" data-close-modal="modal-reject" aria-label="Fermer">
+                    <span class="material-symbols-outlined text-[#616161]">close</span>
+                </button>
+            </div>
+            <div class="flex-1 overflow-y-auto p-5">
+                <p class="text-[13px] text-[#616161] mb-4">
+                    Sélectionnez au moins un motif. Le propriétaire recevra ce motif par email et pourra modifier puis
+                    resoumettre sa chaîne.
+                </p>
+                <div id="motifs-list"></div>
+                <div class="mt-4">
+                    <label for="reject-comment" class="block text-[12px] font-semibold text-[#242424] mb-1.5">
+                        Commentaire complémentaire <span class="text-[#8A8886] font-normal">(optionnel)</span>
+                    </label>
+                    <textarea id="reject-comment" class="textarea-canon" rows="3"
+                        placeholder="Précisez au propriétaire quels éléments corriger..."></textarea>
+                </div>
+            </div>
+            <div class="flex items-center justify-end gap-2 p-4 border-t border-[#E0E0E0] bg-[#FAFAFA]">
+                <button class="btn btn-ghost" data-close-modal="modal-reject">Annuler</button>
+                <button class="btn btn-danger" id="btn-confirm-reject" disabled>
+                    <span class="material-symbols-outlined">send</span>
+                    Confirmer le rejet
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL APPROBATION -->
+    <div class="modal-overlay" id="modal-approve" role="dialog" aria-modal="true">
+        <div class="modal">
+            <div class="flex items-center gap-3 p-5 border-b border-[#E0E0E0]">
+                <div class="w-10 h-10 rounded-full bg-[#F0FDF4] flex items-center justify-center shrink-0">
+                    <span class="material-symbols-outlined text-[#107C10]">verified</span>
+                </div>
+                <div class="flex-1 min-w-0">
+                    <h3 class="font-heading text-[16px] font-bold text-[#242424] leading-tight">Approuver le profil
+                        TraceUP</h3>
+                    <p class="text-[12px] text-[#616161]" id="modal-approve-subtitle">Nom de l'entreprise</p>
+                </div>
+                <button class="p-1.5 rounded hover:bg-[#F5F5F5]" data-close-modal="modal-approve" aria-label="Fermer">
+                    <span class="material-symbols-outlined text-[#616161]">close</span>
+                </button>
+            </div>
+            <div class="p-5">
+                <p class="text-[13px] text-[#242424] mb-4" id="modal-approve-body">
+                    Confirmez-vous la publication de cette chaîne TraceUP ?
+                </p>
+                <div class="info-box">
+                    <span class="material-symbols-outlined">info</span>
+                    <div>
+                        La chaîne et ses vidéos deviendront immédiatement visibles publiquement dans le moteur TraceUP.
+                        Le propriétaire recevra un email de confirmation.
+                    </div>
+                </div>
+            </div>
+            <div class="flex items-center justify-end gap-2 p-4 border-t border-[#E0E0E0] bg-[#FAFAFA]">
+                <button class="btn btn-ghost" data-close-modal="modal-approve">Annuler</button>
+                <button class="btn btn-success" id="btn-confirm-approve">
+                    <span class="material-symbols-outlined">check</span>
+                    Approuver
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div id="toast" role="status" aria-live="polite">
+        <span class="material-symbols-outlined">check_circle</span>
+        <span id="toast-msg">Action effectuée</span>
+    </div>
+
+    <script>
+        (function () {
+            const data = window.MARKETUP_DATA;
+            if (!data) { console.error('admin_data.js non chargé'); return; }
+
+            const NOW = new Date('2026-04-20T14:00:00Z');
+            const SLA_HOURS = data.platform_settings?.sla?.profile_validation_hours || 48;
+
+            function getHoursElapsed(iso) { return Math.floor((NOW - new Date(iso)) / (1000 * 60 * 60)); }
+            function isSlaExceeded(iso) { return getHoursElapsed(iso) > SLA_HOURS; }
+            function formatDate(iso) {
+                const d = new Date(iso);
+                return d.toLocaleDateString('fr-FR', { day: '2-digit', month: 'long', year: 'numeric' })
+                    + ' à ' + d.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
+            }
+            function escapeHtml(s) {
+                if (s == null) return '';
+                return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+                    .replace(/"/g, '&quot;').replace(/'/g, '&#039;');
+            }
+
+            // ID entreprise (fallback démo : c-004 AgroTunis pour TraceUP)
+            const params = new URLSearchParams(window.location.search);
+            let companyId = params.get('id') || 'c-004';
+            const company = data.companies.find(c => c.id === companyId);
+
+            if (!company || !company.profiles.traceup || (company.profiles.traceup.status !== 'pending' && !company.profiles.traceup.pending_data)) {
+                document.querySelector('main .max-w-\\[1100px\\]').innerHTML = `
+                    <div class="card p-8 text-center">
+                        <span class="material-symbols-outlined text-[#DC2626] mb-2" style="font-size:48px">error</span>
+                        <h2 class="font-heading text-[18px] font-bold text-[#242424] mb-2">Profil TraceUP introuvable</h2>
+                        <p class="text-[13px] text-[#616161] mb-4">Aucun profil TraceUP en attente pour <span class="font-mono">${escapeHtml(companyId)}</span>.</p>
+                        <a href="admin_validation-profils.html" class="btn btn-primary">Retour à la file</a>
+                    </div>
+                `;
+                document.getElementById('fab-bar').style.display = 'none';
+                return;
+            }
+
+            const profile = company.profiles.traceup;
+            const content = profile.content || {};
+            const hours = getHoursElapsed(profile.submitted_at);
+            const slaExc = isSlaExceeded(profile.submitted_at);
+
+            // Sidebar counters
+            (function () {
+                const comptesNew = data.companies.filter(c => c.status === 'pending').length;
+                const updatesP = data.companies.filter(c => c.pending_updates).length;
+                let profilsCount = 0;
+                data.companies.forEach(c => Object.values(c.profiles || {}).forEach(p => { if (p.status === 'pending' && p.submitted_at) profilsCount++; }));
+                const rseCount = data.rse_receipts.filter(r => r.status === 'pending').length;
+                const litigesCount = data.disputes.filter(d => d.status === 'open').length;
+                document.querySelectorAll('[data-pill="comptes"]').forEach(el => el.textContent = comptesNew + updatesP);
+                document.querySelectorAll('[data-pill="profils"]').forEach(el => el.textContent = profilsCount);
+                document.querySelectorAll('[data-pill="rse"]').forEach(el => el.textContent = rseCount);
+                document.querySelectorAll('[data-pill="litiges"]').forEach(el => el.textContent = litigesCount);
+            })();
+
+            // Breadcrumb & title
+            document.getElementById('breadcrumb-name').textContent = company.name;
+            document.getElementById('page-title').textContent = `TraceUP · ${company.name}`;
+
+            // Header entreprise
+            document.getElementById('ent-avatar').textContent = company.name.substring(0, 2).toUpperCase();
+            document.getElementById('ent-name').textContent = company.name;
+
+            const typeEl = document.getElementById('ent-type');
+            typeEl.className = company.type === 'B2B' ? 'type-pill type-pill--b2b' : 'type-pill type-pill--b2c';
+            typeEl.textContent = company.type;
+
+            document.getElementById('ent-meta').textContent = `${company.sector} · ${company.city}, ${company.governorate}`;
+
+            // Bandeau alerte
+            const bannerClass = slaExc ? 'alert-banner--sla-exceeded' : 'alert-banner--pending';
+            const bannerIcon = slaExc ? 'error' : 'schedule';
+            const bannerTitle = slaExc
+                ? `SLA dépassé — chaîne en attente depuis ${hours}h`
+                : `Profil TraceUP en attente de validation — ${hours}h écoulées`;
+            const bannerSub = slaExc
+                ? `Dépassement de ${hours - SLA_HOURS}h sur le SLA réglementaire de ${SLA_HOURS}h. Vérifiez le contenu et prenez une décision rapidement.`
+                : `SLA réglementaire : ${SLA_HOURS}h (reste ${SLA_HOURS - hours}h). Visionnez les vidéos avant publication.`;
+
+            document.getElementById('alert-banner-zone').innerHTML = `
+                <div class="alert-banner ${bannerClass}">
+                    <div class="alert-banner__icon"><span class="material-symbols-outlined">${bannerIcon}</span></div>
+                    <div class="flex-1 min-w-0">
+                        <div class="alert-banner__title">${bannerTitle}</div>
+                        <div class="alert-banner__sub">${bannerSub}</div>
+                    </div>
+                </div>
+            `;
+
+            // TraceUP preview
+            const logoBg = content.logo_bg || '#8764B8';
+            const logoInitials = content.logo_initials || company.name.substring(0, 2).toUpperCase();
+            const brandLogoEl = document.getElementById('brand-logo');
+            brandLogoEl.style.background = logoBg;
+            brandLogoEl.textContent = logoInitials;
+
+            document.getElementById('brand-name').textContent = content.channel_name || company.name;
+            document.getElementById('brand-pitch').textContent = content.pitch || '(Aucun pitch soumis)';
+
+            // Vidéos
+            const videosEl = document.getElementById('brand-videos');
+            const videos = content.videos || [];
+            document.getElementById('videos-count').textContent = videos.length;
+
+            const CATEGORY_META = {
+                actualite: { label: 'Actualité', color: '#0078D4', bg: '#EFF6FC' },
+                offres: { label: 'Offres', color: '#D97706', bg: '#FFFBEB' },
+                astuces: { label: 'Astuces', color: '#107C10', bg: '#F0FDF4' },
+                emplois: { label: 'Emplois', color: '#7C2D12', bg: '#FEF3C7' }
+            };
+            const PLATFORM_META = {
+                youtube: { label: 'YouTube', color: '#FF0000', icon: 'smart_display' },
+                dailymotion: { label: 'Dailymotion', color: '#0066DC', icon: 'smart_display' },
+                vimeo: { label: 'Vimeo', color: '#1AB7EA', icon: 'smart_display' }
+            };
+
+            videosEl.innerHTML = videos.length > 0
+                ? videos.map((v, i) => {
+                    const cat = CATEGORY_META[v.category] || { label: v.category, color: '#616161', bg: '#F5F5F5' };
+                    const plat = PLATFORM_META[v.platform] || { label: v.platform, color: '#616161', icon: 'smart_display' };
+                    return `
+                        <div class="flex items-center gap-3 p-3 border border-[#E0E0E0] rounded-lg hover:bg-[#FAFAFA] transition-colors">
+                            <div class="w-14 h-10 rounded flex items-center justify-center shrink-0" style="background:${plat.color}">
+                                <span class="material-symbols-outlined icon-fill text-white" style="font-size:20px">${plat.icon}</span>
+                            </div>
+                            <div class="flex-1 min-w-0">
+                                <div class="text-[13px] font-semibold text-[#242424] truncate">${escapeHtml(v.title)}</div>
+                                <div class="flex items-center gap-1.5 mt-1 flex-wrap">
+                                    <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-semibold" style="background:${cat.bg};color:${cat.color}">${escapeHtml(cat.label)}</span>
+                                    <span class="text-[10.5px] text-[#8A8886]">${escapeHtml(plat.label)}</span>
+                                    <span class="text-[10.5px] text-[#8A8886]">·</span>
+                                    <span class="text-[10.5px] text-[#8A8886]">${escapeHtml(v.duration || '—')}</span>
+                                </div>
+                            </div>
+                            <button class="btn btn-ghost shrink-0" title="Visionner">
+                                <span class="material-symbols-outlined">play_circle</span>
+                            </button>
+                        </div>
+                    `;
+                }).join('')
+                : '<div class="text-[12px] text-[#8A8886] italic text-center py-4">Aucune vidéo soumise</div>';
+
+            // Infos entreprise
+            document.getElementById('info-fields').innerHTML = `
+                <div class="info-row">
+                    <div class="info-row__icon"><span class="material-symbols-outlined">storefront</span></div>
+                    <div class="flex-1 min-w-0">
+                        <div class="info-row__label">Secteur</div>
+                        <div class="info-row__value">${escapeHtml(company.sector)}</div>
+                    </div>
+                </div>
+                <div class="info-row">
+                    <div class="info-row__icon"><span class="material-symbols-outlined">mail</span></div>
+                    <div class="flex-1 min-w-0">
+                        <div class="info-row__label">Email public</div>
+                        <div class="info-row__value">${escapeHtml(company.email)}</div>
+                    </div>
+                </div>
+                <div class="info-row">
+                    <div class="info-row__icon"><span class="material-symbols-outlined">call</span></div>
+                    <div class="flex-1 min-w-0">
+                        <div class="info-row__label">Téléphone</div>
+                        <div class="info-row__value">${escapeHtml(company.phone)}</div>
+                    </div>
+                </div>
+                <div class="info-row">
+                    <div class="info-row__icon"><span class="material-symbols-outlined">location_on</span></div>
+                    <div class="flex-1 min-w-0">
+                        <div class="info-row__label">Localisation</div>
+                        <div class="info-row__value">${escapeHtml(company.address)} · ${escapeHtml(company.city)}, ${escapeHtml(company.governorate)}</div>
+                    </div>
+                </div>
+            `;
+
+            // Timeline
+            const tlBg = slaExc ? '#FEF2F2' : '#FFFBEB';
+            const tlBorder = slaExc ? '#FCA5A5' : '#FDE68A';
+            const tlColor = slaExc ? '#B91C1C' : '#92400E';
+            document.getElementById('timeline-body').innerHTML = `
+                <div class="p-3 rounded-lg border" style="background:${tlBg};border-color:${tlBorder}">
+                    <div class="flex items-center gap-2 mb-2">
+                        <span class="material-symbols-outlined" style="font-size:18px;color:${slaExc ? '#DC2626' : '#D97706'}">${bannerIcon}</span>
+                        <span class="text-[13px] font-semibold" style="color:${tlColor}">
+                            ${slaExc ? 'SLA dépassé' : 'En attente'} · ${hours}h écoulées
+                        </span>
+                    </div>
+                    <div class="text-[12px] text-[#616161]">Soumis le ${formatDate(profile.submitted_at)}</div>
+                    <div class="text-[11px] text-[#8A8886] mt-1">SLA réglementaire : ${SLA_HOURS}h</div>
+                </div>
+            `;
+
+            // Motifs TraceUP
+            const MOTIFS_BRANDUP = [
+                { key: 'logo', label: 'Logo de chaîne basse résolution', hint: 'Logo inférieur à 512×512 px, flou ou ne respectant pas la charte graphique.' },
+                { key: 'pitch', label: 'Pitch non conforme', hint: 'Contenu inapproprié, promesses trompeuses, ou mentions interdites.' },
+                { key: 'channel_name', label: 'Nom de chaîne trompeur ou usurpé', hint: 'Nom laissant penser à une autre marque, ou ne correspondant pas à l\'activité réelle.' },
+                { key: 'video_content', label: 'Vidéos contenant un contenu inapproprié', hint: 'Violence, sexualité, discrimination, ou tout contenu hors charte de décence.' },
+                { key: 'video_category', label: 'Vidéos mal catégorisées', hint: 'Le contenu des vidéos ne correspond pas à la catégorie déclarée (actualité/offres/astuces/emplois).' },
+                { key: 'other', label: 'Autre (précisez ci-dessous)', hint: 'Un commentaire complémentaire est obligatoire.' }
+            ];
+
+            function renderMotifs() {
+                const container = document.getElementById('motifs-list');
+                container.innerHTML = MOTIFS_BRANDUP.map(m => `
+                    <label class="motif-item" data-motif="${m.key}">
+                        <input type="checkbox" />
+                        <div class="flex-1">
+                            <span class="motif-item__label">${escapeHtml(m.label)}</span>
+                            <span class="motif-item__hint">${escapeHtml(m.hint)}</span>
+                        </div>
+                    </label>
+                `).join('');
+                container.querySelectorAll('.motif-item').forEach(item => {
+                    const cb = item.querySelector('input[type="checkbox"]');
+                    cb.addEventListener('change', () => {
+                        item.classList.toggle('checked', cb.checked);
+                        updateRejectButtonState();
+                    });
+                });
+            }
+
+            function updateRejectButtonState() {
+                const btn = document.getElementById('btn-confirm-reject');
+                const checked = document.querySelectorAll('#motifs-list input[type="checkbox"]:checked');
+                const otherChecked = document.querySelector('.motif-item[data-motif="other"] input:checked');
+                const comment = document.getElementById('reject-comment').value.trim();
+                btn.disabled = !(checked.length > 0 && (!otherChecked || comment.length > 0));
+            }
+            document.getElementById('reject-comment').addEventListener('input', updateRejectButtonState);
+
+            // Modals
+            function openModal(id) { document.getElementById(id).classList.add('open'); document.body.style.overflow = 'hidden'; }
+            function closeModal(id) { document.getElementById(id).classList.remove('open'); document.body.style.overflow = ''; }
+
+            document.querySelectorAll('[data-close-modal]').forEach(btn => {
+                btn.addEventListener('click', () => closeModal(btn.dataset.closeModal));
+            });
+            document.querySelectorAll('.modal-overlay').forEach(ov => {
+                ov.addEventListener('click', (e) => { if (e.target === ov) closeModal(ov.id); });
+            });
+
+            // FAB : Approuver
+            document.getElementById('btn-approve').addEventListener('click', () => {
+                document.getElementById('modal-approve-subtitle').textContent = company.name;
+                document.getElementById('modal-approve-body').innerHTML =
+                    `Confirmez-vous la publication de la chaîne TraceUP de <strong>${escapeHtml(company.name)}</strong> ?`;
+                openModal('modal-approve');
+            });
+            document.getElementById('btn-confirm-approve').addEventListener('click', () => {
+                closeModal('modal-approve');
+                showToast(`Chaîne TraceUP de ${company.name} approuvée · publiée sur vivasky.media`);
+            });
+
+            // FAB : Rejeter
+            document.getElementById('btn-reject').addEventListener('click', () => {
+                document.getElementById('modal-reject-subtitle').textContent = company.name;
+                renderMotifs();
+                document.getElementById('reject-comment').value = '';
+                updateRejectButtonState();
+                openModal('modal-reject');
+            });
+            document.getElementById('btn-confirm-reject').addEventListener('click', () => {
+                closeModal('modal-reject');
+                showToast(`Profil TraceUP de ${company.name} rejeté · motif envoyé par email`);
+            });
+
+            // Toast
+            let toastTimer = null;
+            function showToast(msg) {
+                const t = document.getElementById('toast');
+                document.getElementById('toast-msg').textContent = msg;
+                t.classList.add('show');
+                clearTimeout(toastTimer);
+                toastTimer = setTimeout(() => t.classList.remove('show'), 1800);
+            }
+
+            // Escape
+            document.addEventListener('keydown', (e) => {
+                if (e.key !== 'Escape') return;
+                const om = document.querySelector('.modal-overlay.open');
+                if (om) closeModal(om.id);
+            });
+
+            // Sidebar mobile
+            const sidebar = document.getElementById('sidebar');
+            const backdrop = document.getElementById('backdrop');
+            document.getElementById('menuBtn')?.addEventListener('click', () => {
+                sidebar.classList.add('open'); backdrop.classList.add('show');
+            });
+            backdrop?.addEventListener('click', () => {
+                sidebar.classList.remove('open'); backdrop.classList.remove('show');
+            });
+        })();
+    
+            // === Bandeau Modifs en attente (cas profil active + pending_data) ===
+            (function () {
+                if (!profile.pending_data) return;
+                var pd = profile.pending_data;
+                var fields = (pd.fields || []).map(function (f) { return f.label || f.key; }).filter(Boolean);
+                if (fields.length === 0) return;
+                var container = document.querySelector('main .max-w-\\[1100px\\]');
+                if (!container) return;
+                var fieldChips = fields.map(function (f) {
+                    return '<span class="modifs-banner__field">' + escapeHtml(f) + '</span>';
+                }).join('');
+                var noteHtml = pd.note ? '<div class="modifs-banner__note">« ' + escapeHtml(pd.note) + ' »</div>' : '';
+                var banner = document.createElement('div');
+                banner.className = 'modifs-banner';
+                banner.innerHTML =
+                    '<div class="modifs-banner__icon"><span class="material-symbols-outlined">edit_note</span></div>' +
+                    '<div class="modifs-banner__content">' +
+                        '<div class="modifs-banner__title">Modifications en attente</div>' +
+                        '<div class="modifs-banner__list"><strong>' + escapeHtml(company.name) + '</strong> demande à modifier : ' + fieldChips + '</div>' +
+                        noteHtml +
+                    '</div>' +
+                    '<div class="modifs-banner__actions">' +
+                        '<button type="button" class="btn btn-ghost" data-action="reject-profile-modifs">Rejeter</button>' +
+                        '<button type="button" class="btn btn-primary" data-action="approve-profile-modifs">Approuver</button>' +
+                    '</div>';
+                container.insertBefore(banner, container.firstChild);
+
+                function modifsToast(msg) {
+                    var t = document.getElementById('admin-toast');
+                    if (!t) {
+                        t = document.createElement('div');
+                        t.id = 'admin-toast';
+                        t.style.cssText = 'position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(16px);background:#242424;color:#fff;padding:10px 18px;border-radius:6px;font-size:13px;opacity:0;transition:opacity 0.2s,transform 0.2s;z-index:100;pointer-events:none;max-width:90vw;';
+                        document.body.appendChild(t);
+                    }
+                    t.textContent = msg;
+                    requestAnimationFrame(function () { t.style.opacity = '1'; t.style.transform = 'translateX(-50%) translateY(0)'; });
+                    clearTimeout(t._timer);
+                    t._timer = setTimeout(function () { t.style.opacity = '0'; t.style.transform = 'translateX(-50%) translateY(16px)'; }, 2200);
+                }
+                banner.querySelector('[data-action="approve-profile-modifs"]').addEventListener('click', function () {
+                    banner.style.opacity = '0.4';
+                    banner.querySelectorAll('button').forEach(function (b) { b.disabled = true; });
+                    modifsToast('Modifications approuvées · ' + company.name + ' → TraceUP');
+                });
+                banner.querySelector('[data-action="reject-profile-modifs"]').addEventListener('click', function () {
+                    banner.style.opacity = '0.4';
+                    banner.querySelectorAll('button').forEach(function (b) { b.disabled = true; });
+                    modifsToast('Modifications rejetées · ' + company.name + ' → TraceUP');
+                });
+            })();
+
+    </script>
+</body>
+
+</html>

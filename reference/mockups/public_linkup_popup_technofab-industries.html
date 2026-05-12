@@ -1,0 +1,541 @@
+<!DOCTYPE html>
+
+<html class="light" lang="fr">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>TechnoFab Industries | BrandUP Profile</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;family=Inter:wght@400;500;600&amp;display=swap"
+        rel="stylesheet" />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+        rel="stylesheet" />
+    <script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "tertiary": "#765918",
+                        "surface-bright": "#fbf9f8",
+                        "inverse-surface": "#303031",
+                        "secondary-fixed": "#eddcff",
+                        "outline": "#717783",
+                        "error": "#ba1a1a",
+                        "primary-container": "#0078d4",
+                        "surface-tint": "#0060ab",
+                        "on-tertiary-fixed": "#261900",
+                        "on-surface": "#1b1c1c",
+                        "on-tertiary-fixed-variant": "#5d4201",
+                        "on-primary-fixed": "#001c39",
+                        "secondary-container": "#cba5ff",
+                        "primary": "#0078d4",
+                        "on-secondary-fixed": "#290055",
+                        "tertiary-fixed-dim": "#e9c176",
+                        "secondary-fixed-dim": "#d8baff",
+                        "surface-dim": "#dbdad9",
+                        "surface-variant": "#e4e2e2",
+                        "surface": "#ffffff",
+                        "surface-container-highest": "#e4e2e2",
+                        "inverse-primary": "#a3c9ff",
+                        "on-secondary": "#ffffff",
+                        "on-primary-fixed-variant": "#004883",
+                        "surface-container": "#f3f4f6",
+                        "on-error": "#ffffff",
+                        "surface-container-low": "#f9fafb",
+                        "primary-fixed-dim": "#a3c9ff",
+                        "on-surface-variant": "#4b5563",
+                        "on-tertiary-container": "#ffffff",
+                        "on-primary-container": "#ffffff",
+                        "primary-fixed": "#d3e3ff",
+                        "inverse-on-surface": "#f2f0f0",
+                        "on-tertiary": "#ffffff",
+                        "error-container": "#ffdad6",
+                        "outline-variant": "#e5e7eb",
+                        "on-primary": "#ffffff",
+                        "on-secondary-container": "#573586",
+                        "surface-container-high": "#f3f4f6",
+                        "tertiary-fixed": "#ffdea5",
+                        "background": "#ffffff",
+                        "secondary": "#8764B8",
+                        "tertiary-container": "#92712f",
+                        "on-secondary-fixed-variant": "#573586",
+                        "on-error-container": "#93000a",
+                        "surface-container-lowest": "#ffffff",
+                        "on-background": "#1b1c1c"
+                    },
+                    fontFamily: {
+                        "headline": ["Plus Jakarta Sans"],
+                        "body": ["Inter"],
+                        "label": ["Inter"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.5rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "2xl": "14px",
+                        "full": "9999px"
+                    },
+                },
+            },
+        }
+    </script>
+    <style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            vertical-align: middle;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+
+        h1,
+        h2,
+        h3,
+        h4 {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+        }
+
+        .icon-style {
+            font-size: 2em;
+        }
+    
+    .service-card {
+        border: 1px solid #E0E0E0;
+        transition: all 0.2s ease-in-out;
+        border-radius: 14px;
+    }
+    .service-card:hover {
+        border-color: #C5A059;
+        transform: translateY(-4px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    }
+    .icon-style {
+        font-size: 2em;
+    }
+  </style>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" rel="stylesheet" />
+    <script src="marketup_seed_data.js"></script>
+</head>
+
+<body class="bg-surface text-on-surface antialiased">
+    <!-- Popup Top Bar: name (context) + view full profile + close -->
+    <header
+        class="sticky top-0 w-full z-50 bg-white border-b border-outline-variant h-14 flex items-center justify-between gap-3 px-4 md:px-6">
+        <!-- Left: entreprise context (wayfinding) -->
+        <div class="flex items-center gap-2 min-w-0 flex-1">
+            <div
+                class="w-7 h-7 shrink-0 rounded bg-primary/10 flex items-center justify-center text-primary text-[11px] font-bold">
+                NA
+            </div>
+            <span class="text-sm font-semibold text-on-surface truncate">Nova Architects Group</span>
+        </div>
+        <!-- Right: actions -->
+        <div class="flex items-center gap-1 shrink-0">
+            <a id="lu-popup-full-profile" href="public_traceup_technofab-industries.html"
+                class="flex items-center gap-1.5 px-2 md:px-3 h-9 rounded-lg text-primary text-xs md:text-sm font-semibold hover:bg-primary/5 transition-colors whitespace-nowrap">
+                <span class="hidden md:inline">Voir le profil complet</span>
+                <span class="md:hidden">Voir profil</span>
+                <span class="material-symbols-outlined text-[16px] md:text-[18px]">arrow_forward</span>
+            </a>
+            <span class="w-px h-5 bg-outline-variant mx-0.5"></span>
+            <button aria-label="Fermer"  onclick="window.location.href='public_linkup.html';"
+                class="w-9 h-9 flex items-center justify-center hover:bg-surface-container rounded-lg transition-colors text-on-surface-variant">
+                <span class="material-symbols-outlined text-[20px]">close</span>
+            </button>
+        </div>
+    </header>
+    <main>
+        <div id="lu-404" class="hidden max-w-2xl mx-auto px-6 py-24 text-center">
+            <div class="inline-flex items-center justify-center w-20 h-20 rounded-full bg-[#F5F5F5] mb-6">
+                <span class="material-symbols-outlined text-[#8A8886]" style="font-size:42px">search_off</span>
+            </div>
+            <h1 class="text-3xl font-extrabold text-on-surface mb-3">Profil introuvable</h1>
+            <p id="lu-404-msg" class="text-lg text-on-surface-variant mb-8">Cette page n'est pas disponible.</p>
+            <a href="public_linkup.html" class="inline-flex items-center gap-2 bg-primary text-white px-6 py-3 rounded-lg font-semibold hover:bg-[#106EBE] transition-colors">
+                <span class="material-symbols-outlined">arrow_back</span>
+                Retour au moteur LinkUP
+            </a>
+        </div>
+        <div id="lu-content">
+        <!-- Boost Banner -->
+        <div class="w-full bg-[#EFF6FC] py-3 px-8 flex justify-center items-center border-b border-primary/10">
+            <span class="text-primary font-semibold text-sm">Profil mis en avant</span>
+        </div>
+        <div class="max-w-[1280px] mx-auto px-6 py-8">
+            <!-- Identity Header -->
+            <section class="grid grid-cols-1 md:grid-cols-12 gap-12 items-start mb-12">
+                <div class="md:col-span-4 lg:col-span-3">
+                    <div
+                        class="aspect-square bg-surface-container rounded-2xl overflow-hidden p-8 flex items-center justify-center">
+                        <img id="lu-logo" alt="Company Logo" class="max-w-full h-auto" src="">
+                    </div>
+                </div>
+                <div class="md:col-span-8 lg:col-span-9 space-y-6">
+                    <div class="space-y-2">
+                        <div class="flex flex-wrap gap-2 mb-4">
+                            <div id="lu-rse-badge-hero" class="inline-flex items-center gap-2 bg-[#FEFCE8] text-[#8A6A1F] border border-[#E8C96A] px-3 py-1.5 rounded shadow-sm shrink-0" style="display:none">
+                                <span class="material-symbols-outlined text-[#C5A059] text-[16px]"
+                                    style='font-variation-settings: "FILL" 1;'>star</span>
+                                <span class="text-[11px] font-bold uppercase tracking-wider">Engagement Social
+                                    Attesté</span>
+                            </div>
+                        </div>
+                        <h1 id="lu-name" class="text-5xl font-extrabold tracking-tight text-on-surface">—</h1>
+                        <div class="flex flex-wrap items-center gap-2 mt-2">
+                            <span
+                                class="inline-flex items-center gap-1 bg-[#EFF6FC] border border-primary/20 text-primary text-[11px] font-semibold px-2 py-1 rounded">
+                                <span class="material-symbols-outlined text-[13px]"
+                                    style='font-variation-settings: "FILL" 1;'>verified</span>
+                                RNE · <span id="lu-rne">—</span>
+                            </span>
+                            <span id="lu-sector" class="text-[11px] font-bold text-primary uppercase tracking-wider">—</span>
+                            <span class="text-outline">·</span>
+                            <span id="lu-type" class="inline-flex items-center text-[11px] font-semibold bg-surface-container-low border border-outline-variant text-on-surface px-2 py-0.5 rounded">—</span>
+                        </div>
+                    </div>
+                    <div class="space-y-4">
+                        <div class="flex flex-col md:flex-row flex-wrap gap-6 items-start md:items-center">
+                            <div class="flex items-center space-x-3 text-on-surface">
+                                <span class="material-symbols-outlined text-primary text-[20px]">call</span>
+                                <span id="lu-phone" class="text-sm font-medium">—</span>
+                            </div>
+                            <div class="flex items-center space-x-3 text-on-surface">
+                                <span class="material-symbols-outlined text-[20px] text-primary">chat</span>
+                                <span id="lu-whatsapp" class="text-sm font-medium">—</span>
+                            </div>
+                            <div class="flex items-center space-x-3 text-on-surface">
+                                <span class="material-symbols-outlined text-primary text-[20px]">mail</span>
+                                <span id="lu-email" class="text-sm font-medium">—</span>
+                            </div>
+                        </div>
+                        <div class="w-full flex items-center space-x-3 text-on-surface">
+                            <span class="material-symbols-outlined text-primary text-[20px]">location_on</span>
+                            <span id="lu-address" class="text-sm font-medium">—</span>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            <!-- Services Grid Section -->
+            <div class="mb-20 mx-auto max-w-5xl">
+                <div class="text-center mb-8">
+                    <h2 class="text-xs font-bold uppercase tracking-widest text-on-surface">Canaux &amp; Services
+                        Officiels</h2>
+                </div>
+                <div id="lu-services" class="grid grid-cols-2 md:grid-cols-5 gap-4">
+                    <!-- BrandUP -->
+                    <a id="lu-svc-brandup" data-svc="brandup" class="service-card aspect-square bg-white flex flex-col items-center justify-center text-center group p-2"
+                        href="#">
+                        <div class="flex items-center justify-center mb-2 w-8 h-8">
+                            <i
+                                class="fa-solid fa-layer-group text-on-surface-variant group-hover:text-primary transition-colors icon-style"></i>
+                        </div>
+                        <span class="font-bold text-on-surface text-[11px]">BrandUP</span>
+                    </a>
+                    <!-- TraceUP -->
+                    <a id="lu-svc-traceup" data-svc="traceup" class="service-card aspect-square bg-white flex flex-col items-center justify-center text-center group p-2"
+                        href="#">
+                        <div class="flex items-center justify-center mb-2 w-8 h-8">
+                            <i
+                                class="fa-solid fa-circle-play text-on-surface-variant group-hover:text-primary transition-colors icon-style"></i>
+                        </div>
+                        <span class="font-bold text-on-surface text-[11px]">TraceUP</span>
+                    </a>
+                    <!-- Site Web -->
+                    <a id="lu-svc-website" data-svc="website" class="service-card aspect-square bg-white flex flex-col items-center justify-center text-center group p-2"
+                        href="#">
+                        <div class="flex items-center justify-center mb-2 w-8 h-8">
+                            <i
+                                class="fa-solid fa-globe text-on-surface-variant group-hover:text-primary transition-colors icon-style"></i>
+                        </div>
+                        <span class="font-bold text-on-surface text-[11px]">Site Web</span>
+                    </a>
+                    <!-- WhatsApp -->
+                    <a id="lu-svc-whatsapp" data-svc="whatsapp" class="service-card aspect-square bg-white flex flex-col items-center justify-center text-center group p-2"
+                        href="#">
+                        <div class="flex items-center justify-center mb-2 w-8 h-8">
+                            <i
+                                class="fa-brands fa-whatsapp text-on-surface-variant group-hover:text-primary transition-colors icon-style"></i>
+                        </div>
+                        <span class="font-bold text-on-surface text-[11px]">WhatsApp</span>
+                    </a>
+                    <!-- YouTube -->
+                    <a id="lu-svc-youtube" data-svc="youtube" class="service-card aspect-square bg-white flex flex-col items-center justify-center text-center group p-2"
+                        href="#">
+                        <div class="flex items-center justify-center mb-2 w-8 h-8">
+                            <i
+                                class="fa-brands fa-youtube text-on-surface-variant group-hover:text-primary transition-colors icon-style"></i>
+                        </div>
+                        <span class="font-bold text-on-surface text-[11px]">YouTube</span>
+                    </a>
+                    <!-- Facebook -->
+                    <a id="lu-svc-facebook" data-svc="facebook" class="service-card aspect-square bg-white flex flex-col items-center justify-center text-center group p-2"
+                        href="#">
+                        <div class="flex items-center justify-center mb-2 w-8 h-8">
+                            <i
+                                class="fa-brands fa-facebook text-on-surface-variant group-hover:text-primary transition-colors icon-style"></i>
+                        </div>
+                        <span class="font-bold text-on-surface text-[11px]">Facebook</span>
+                    </a>
+                    <!-- Instagram -->
+                    <a id="lu-svc-instagram" data-svc="instagram" class="service-card aspect-square bg-white flex flex-col items-center justify-center text-center group p-2"
+                        href="#">
+                        <div class="flex items-center justify-center mb-2 w-8 h-8">
+                            <i
+                                class="fa-brands fa-instagram text-on-surface-variant group-hover:text-primary transition-colors icon-style"></i>
+                        </div>
+                        <span class="font-bold text-on-surface text-[11px]">Instagram</span>
+                    </a>
+                    <!-- LinkedIn -->
+                    <a id="lu-svc-linkedin" data-svc="linkedin" class="service-card aspect-square bg-white flex flex-col items-center justify-center text-center group p-2"
+                        href="#">
+                        <div class="flex items-center justify-center mb-2 w-8 h-8">
+                            <i
+                                class="fa-brands fa-linkedin text-on-surface-variant group-hover:text-primary transition-colors icon-style"></i>
+                        </div>
+                        <span class="font-bold text-on-surface text-[11px]">LinkedIn</span>
+                    </a>
+                    <!-- Twitter -->
+                    <a id="lu-svc-twitter" data-svc="twitter" class="service-card aspect-square bg-white flex flex-col items-center justify-center text-center group p-2"
+                        href="#">
+                        <div class="flex items-center justify-center mb-2 w-8 h-8">
+                            <i
+                                class="fa-brands fa-twitter text-on-surface-variant group-hover:text-primary transition-colors icon-style"></i>
+                        </div>
+                        <span class="font-bold text-on-surface text-[11px]">Twitter</span>
+                    </a>
+                    <!-- Maps -->
+                    <a id="lu-svc-maps" data-svc="maps" class="service-card aspect-square bg-white flex flex-col items-center justify-center text-center group p-2"
+                        href="#">
+                        <div class="flex items-center justify-center mb-2 w-8 h-8">
+                            <i
+                                class="fa-solid fa-map-location-dot text-on-surface-variant group-hover:text-primary transition-colors icon-style"></i>
+                        </div>
+                        <span class="font-bold text-on-surface text-[11px]">Maps</span>
+                    </a>
+                </div>
+            </div>
+            <!-- RSE Section -->
+            <div id="lu-rse-section" class="mb-20">
+                <div class="flex items-center gap-4 mb-8">
+                    <h2 class="text-2xl font-extrabold text-on-surface">Traçabilité RSE</h2>
+                    <div class="h-[1px] flex-grow bg-surface-container-highest"></div>
+                </div>
+                <div
+                    class="bg-[#FEFCE8]/30 border border-[#E8C96A]/40 p-8 rounded-2xl mb-8 flex items-center gap-6">
+                    <div class="w-16 h-16 bg-white rounded-full flex items-center justify-center shadow-sm border border-[#E8C96A]">
+                        <span class="material-symbols-outlined text-[#C5A059] text-4xl"
+                            style='font-variation-settings: "FILL" 1;'>star</span>
+                    </div>
+                    <div>
+                        <p class="text-on-surface font-bold text-lg leading-tight">Engagement Social Actif</p>
+                        <p class="text-on-surface-variant text-sm">Nous reversons 1% de notre chiffre d'affaires à des
+                            associations
+                            locales de protection de l'environnement.</p>
+                    </div>
+                </div>
+                <div id="lu-rse-cards" class="flex flex-col md:flex-row gap-6"></div>
+            </div>
+            <!-- Découvrez aussi Section -->
+            <div class="bg-[#0b1120] rounded-3xl p-8 md:p-12 text-white relative overflow-hidden">
+                <div class="absolute top-0 right-0 w-64 h-64 bg-primary/20 blur-[100px]"></div>
+                <div class="relative z-10 mb-10">
+                    <h2 class="text-3xl font-extrabold mb-2 tracking-tight">Découvrez aussi</h2>
+                    <p class="text-slate-400">Explorez l'écosystème complet de l'entreprise sur nos plateformes
+                        partenaires.</p>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 relative z-10">
+                    <!-- TraceUP Card -->
+                    <div
+                        class="bg-slate-800/60 border border-white/10 rounded-2xl p-6 hover:bg-slate-800 transition-colors cursor-pointer group">
+                        <div class="flex items-center gap-4 mb-6">
+                            <div class="w-12 h-12 bg-secondary rounded-lg flex items-center justify-center">
+                                <i class="fa-solid fa-circle-play icon-style"></i>
+                            </div>
+                            <div>
+                                <h3 class="font-bold text-lg">TraceUP</h3>
+                                <p class="text-xs text-secondary-fixed font-bold tracking-widest uppercase">Vidéos &amp;
+                                    Médias</p>
+                            </div>
+                        </div>
+                        <p class="text-sm text-slate-300 mb-6">Explorez les coulisses, les interviews et les
+                            démonstrations
+                            techniques de TechnoFab en vidéo.</p>
+                        <div
+                            class="flex items-center text-secondary text-sm font-bold gap-2 group-hover:translate-x-2 transition-transform">
+                            Visiter le profil <span class="material-symbols-outlined">chevron_right</span>
+                        </div>
+                    </div>
+                    <!-- BrandUP Card -->
+                    <div
+                        class="bg-slate-800/60 border border-white/10 rounded-2xl p-6 hover:bg-slate-800 transition-colors cursor-pointer group">
+                        <div class="flex items-center gap-4 mb-6">
+                            <div class="w-12 h-12 bg-primary rounded-lg flex items-center justify-center">
+                                <i class="fa-solid fa-layer-group icon-style"></i>
+                            </div>
+                            <div>
+                                <h3 class="font-bold text-lg">BrandUP</h3>
+                                <p class="text-xs text-primary-fixed font-bold tracking-widest uppercase">Présentation
+                                    institutionnelle
+                                </p>
+                            </div>
+                        </div>
+                        <p class="text-sm text-slate-300 mb-6">Accédez au catalogue de marque, aux actifs numériques et
+                            à l'identité
+                            visuelle officielle de l'entreprise.</p>
+                        <div
+                            class="flex items-center text-primary-fixed text-sm font-bold gap-2 group-hover:translate-x-2 transition-transform">
+                            Visiter le profil <span class="material-symbols-outlined">chevron_right</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div></main>
+    <!-- ════════════════════════════════════════════════════════════════
+         SLUG-DRIVEN HYDRATION (P2.3 Lot 3) — LinkUP popup
+         ════════════════════════════════════════════════════════════════ -->
+    <script>
+        (function () {
+            const data = window.MARKETUP_DATA;
+            if (!data) { console.error('marketup_seed_data.js not loaded'); return; }
+
+            const fmtName = (i18n) => (i18n && (i18n.fr || i18n.ar || i18n.en)) || '';
+            const escape = (s) => String(s || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+            const setText = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val || '—'; };
+            const setAttr = (id, attr, val) => { const el = document.getElementById(id); if (el && val) el.setAttribute(attr, val); };
+            const formatDate = (iso) => { if (!iso) return ''; try { return new Date(iso).toLocaleDateString('fr-FR'); } catch { return ''; } };
+
+            const path = window.location.pathname;
+            const m = path.match(/public_linkup_popup_(.+?)\.html$/);
+            const slug = m ? m[1] : null;
+
+            function show404(msg) {
+                const c = document.getElementById('lu-content'), e = document.getElementById('lu-404');
+                if (c) c.style.display = 'none';
+                if (e) {
+                    e.classList.remove('hidden');
+                    if (msg) document.getElementById('lu-404-msg').textContent = msg;
+                }
+                document.title = 'Profil introuvable | LinkUP — MARKET-UP';
+            }
+
+            if (!slug) { show404('Slug invalide.'); return; }
+            const company = data.companies.find(c => c.slug === slug);
+            if (!company) { show404(`Aucune entreprise avec le slug "${slug}".`); return; }
+            const lu = company.profiles?.linkup;
+            if (!lu || lu.status !== 'active') { show404('Le profil LinkUP de cette entreprise n\'est pas publié.'); return; }
+
+            const sectorById = {}; (data.sectorsB2B || []).forEach(s => sectorById[s.id] = s);
+            const categoryById = {}; (data.categoriesB2C || []).forEach(c => categoryById[c.id] = c);
+            const gouvById = {}; (data.gouvernorats || []).forEach(g => gouvById[g.id] = g);
+
+            const sector = company.type === 'B2B' ? sectorById[company.liveData.sectorId] : categoryById[company.liveData.sectorId];
+            const sectorName = sector ? fmtName(sector.name) : '—';
+            const card = lu.data.contactCard || {};
+            const socials = lu.data.socials || [];
+            const companyName = fmtName(company.data.displayName) || '—';
+
+            // Top bar
+            const fullProfileLink = document.getElementById('lu-popup-full-profile');
+            if (fullProfileLink) fullProfileLink.setAttribute('href', `public_linkup_${slug}.html`);
+
+            // HERO (company-centric)
+            document.title = `${companyName} | LinkUP Popup`;
+            setAttr('lu-logo', 'src', company.data.logo || `https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(companyName)}&backgroundColor=000000`);
+            setAttr('lu-logo', 'alt', companyName + ' — Logo');
+            if (company.rseBadgeStatus === 'validated') {
+                const rseBadge = document.getElementById('lu-rse-badge-hero');
+                if (rseBadge) rseBadge.style.display = '';
+            }
+            setText('lu-name', companyName);
+            setText('lu-rne', company.legalId);
+            setText('lu-sector', sectorName);
+            setText('lu-type', company.type);
+            setText('lu-phone', card.phone || company.liveData.phone);
+            setText('lu-whatsapp', card.whatsapp || company.liveData.whatsapp);
+            setText('lu-email', card.email || company.accountEmail);
+            const gouvName = gouvById[company.liveData.gouvernorat] ? fmtName(gouvById[company.liveData.gouvernorat].name) : '';
+            setText('lu-address', [company.liveData.address, company.liveData.ville, gouvName, 'Tunisie'].filter(Boolean).join(', '));
+
+            // SERVICES
+            const findSocial = (platform) => socials.find(s => s.platform === platform);
+            const wapNum = (card.whatsapp || company.liveData.whatsapp || '').replace(/[^0-9]/g, '');
+            const services = {
+                brandup:   company.profiles.brandup?.status === 'active' ? `public_brandup_${slug}.html` : null,
+                traceup:   company.profiles.traceup?.status === 'active' ? `public_traceup_${slug}.html` : null,
+                website:   card.website || null,
+                whatsapp:  wapNum ? `https://wa.me/${wapNum}` : null,
+                youtube:   findSocial('youtube')?.url || null,
+                facebook:  findSocial('facebook')?.url || null,
+                instagram: findSocial('instagram')?.url || null,
+                linkedin:  findSocial('linkedin')?.url || null,
+                twitter:   (findSocial('twitter') || findSocial('x'))?.url || null,
+                maps:      card.gpsPosition?.coordinates
+                              ? `https://maps.google.com/?q=${card.gpsPosition.coordinates[1]},${card.gpsPosition.coordinates[0]}`
+                              : (company.liveData.address ? `https://maps.google.com/?q=${encodeURIComponent(company.liveData.address + ' ' + (company.liveData.ville || ''))}` : null),
+            };
+
+            Object.keys(services).forEach(svc => {
+                const el = document.getElementById(`lu-svc-${svc}`);
+                if (!el) return;
+                const url = services[svc];
+                if (url) {
+                    el.setAttribute('href', url);
+                    if (svc !== 'brandup' && svc !== 'traceup') {
+                        el.setAttribute('target', '_blank');
+                        el.setAttribute('rel', 'noopener');
+                    }
+                } else {
+                    el.style.display = 'none';
+                }
+            });
+
+            // RSE
+            const validatedReceipts = (company.rseReceipts || []).filter(r => r.status === 'validated');
+            const rseSection = document.getElementById('lu-rse-section');
+            const rseCards = document.getElementById('lu-rse-cards');
+            if (validatedReceipts.length === 0) {
+                if (rseSection) rseSection.style.display = 'none';
+            } else if (rseCards) {
+                rseCards.innerHTML = validatedReceipts.map((r, i) => {
+                    const assocName = r.associationName || '—';
+                    const receiptNum = r.receiptNumber || `2024-${String(i + 1).padStart(5, '0')}`;
+                    const dateStr = formatDate(r.donationDate);
+                    const amount = (r.amount || 0).toLocaleString('fr-FR');
+                    return `<div class="flex-1 bg-white rounded-2xl overflow-hidden shadow-sm border border-outline-variant group">
+                        <div class="h-32 overflow-hidden bg-gradient-to-br from-primary/10 to-primary/30 flex items-center justify-center">
+                            <span class="material-symbols-outlined text-primary" style="font-size:48px;font-variation-settings:'FILL' 1">volunteer_activism</span>
+                        </div>
+                        <div class="p-5">
+                            <div class="flex justify-between items-start mb-4">
+                                <div>
+                                    <h4 class="font-bold text-on-surface">${escape(assocName)}</h4>
+                                    <p class="text-[11px] text-outline font-medium">Reçu n° ${escape(receiptNum)}</p>
+                                </div>
+                                <div class="bg-primary/10 text-primary px-2 py-1 rounded text-[10px] font-bold flex items-center gap-1">
+                                    <span class="material-symbols-outlined text-xs" style="font-variation-settings:'FILL' 1">verified</span>
+                                    VALIDÉ
+                                </div>
+                            </div>
+                            <div class="flex justify-between items-end">
+                                <div>
+                                    <p class="text-xs text-on-surface-variant">Date: ${escape(dateStr)}</p>
+                                    <p class="text-xl font-bold text-on-surface">${amount} <span class="text-sm text-on-surface-variant">DT</span></p>
+                                </div>
+                                <span class="material-symbols-outlined text-outline">receipt_long</span>
+                            </div>
+                        </div>
+                    </div>`;
+                }).join('');
+            }
+        })();
+    </script>
+
+</body>
+
+</html>

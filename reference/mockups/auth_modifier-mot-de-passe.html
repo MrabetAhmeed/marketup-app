@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Nouveau mot de passe | MARKET-UP</title>
+
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet" />
+
+    <script src="https://cdn.tailwindcss.com?plugins=forms"></script>
+    <script id="tailwind-config">
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        "primary":          "#0078D4",
+                        "primary-hover":    "#106EBE",
+                        "primary-dark":     "#005A9E",
+                        "primary-light":    "#EFF6FC",
+                        "ms-text":          "#242424",
+                        "ms-text-muted":    "#616161",
+                        "ms-border":        "#E0E0E0",
+                        "ms-border-strong": "#D1D1D1",
+                        "ms-surface":       "#F5F5F5",
+                        "ms-placeholder":   "#8A8886",
+                        "ms-success":       "#107C10",
+                        "ms-success-bg":    "#DFF6DD",
+                        "ms-error":         "#D13438"
+                    },
+                    fontFamily: {
+                        "headline": ["'Plus Jakarta Sans'", "sans-serif"],
+                        "body":     ["Inter", "sans-serif"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.25rem",
+                        "lg":      "0.5rem",
+                        "xl":      "0.75rem",
+                        "full":    "9999px"
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body { font-family: 'Inter', sans-serif; color: #242424; }
+        h1, h2, h3 { font-family: 'Plus Jakarta Sans', sans-serif; }
+        .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+        .material-symbols-outlined.fill { font-variation-settings: 'FILL' 1; }
+
+        .fluent-input {
+            width: 100%;
+            padding: 10px 14px;
+            background: #FFFFFF;
+            border: 1px solid #D1D1D1;
+            border-radius: 4px;
+            font-size: 14px;
+            color: #242424;
+            transition: border-color 0.15s, box-shadow 0.15s;
+        }
+        .fluent-input:focus {
+            border-color: #0078D4;
+            outline: none;
+            box-shadow: 0 0 0 2px #EFF6FC;
+        }
+        .fluent-input::placeholder { color: #8A8886; }
+
+        .fluent-label {
+            display: block;
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            color: #616161;
+            margin-bottom: 6px;
+        }
+        .label-required::after { content: '*'; color: #D13438; margin-left: 4px; }
+        .field-hint { font-size: 12px; color: #8A8886; margin-top: 4px; }
+
+        .btn-primary {
+            background: #0078D4; color: white;
+            padding: 12px 24px; border-radius: 4px;
+            font-weight: 600; font-size: 14px; border: none; cursor: pointer;
+            transition: background 0.15s;
+            display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+            text-decoration: none;
+        }
+        .btn-primary:hover:not(:disabled) { background: #106EBE; }
+        .btn-primary:active:not(:disabled) { background: #005A9E; }
+        .btn-primary:disabled { background: #D1D1D1; cursor: not-allowed; }
+
+        .btn-ghost {
+            background: transparent; color: #0078D4;
+            padding: 12px 20px; border-radius: 4px;
+            font-weight: 600; font-size: 14px; border: none; cursor: pointer;
+            transition: background 0.15s;
+            display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+            text-decoration: none;
+        }
+        .btn-ghost:hover { background: #EFF6FC; }
+
+        /* Password strength bars */
+        .pw-bar {
+            height: 4px;
+            background: #E0E0E0;
+            border-radius: 2px;
+            flex: 1;
+            transition: background 0.2s ease;
+        }
+        .pw-bar.level-weak   { background: #D13438; }
+        .pw-bar.level-fair   { background: #F59E0B; }
+        .pw-bar.level-good   { background: #FACC15; }
+        .pw-bar.level-strong { background: #107C10; }
+
+        /* Requirements checklist */
+        .req-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 12px;
+            color: #616161;
+            transition: color 0.2s;
+        }
+        .req-item .req-icon { font-size: 16px; transition: color 0.2s; }
+        .req-item.met { color: #107C10; }
+        .req-item.met .req-icon { color: #107C10; }
+
+        .state-hidden { display: none !important; }
+    </style>
+</head>
+
+<body class="bg-white min-h-screen">
+    <main class="flex min-h-screen">
+
+        <!-- LEFT PANEL CANON -->
+        <aside class="hidden lg:flex lg:w-[40%] bg-[#005A9E] text-white flex-col justify-between p-12 relative">
+            <div>
+                <div class="mb-16">
+                    <span class="text-2xl font-bold tracking-tighter font-headline"><a href="onboarding_onboarding.html">MARKET-UP</a></span>
+                </div>
+                <div class="max-w-sm">
+                    <h2 class="text-3xl font-semibold leading-tight mb-4 tracking-tight text-white">
+                        La plateforme digitale des entreprises.
+                    </h2>
+                    <p class="text-[#d3e3ff] text-base leading-relaxed">
+                        BrandUP, TraceUP, LinkUP — un seul compte, trois vitrines.
+                    </p>
+                </div>
+            </div>
+
+            <div class="text-xs text-[#d3e3ff]/70">
+                <p>© 2026 MARKET-UP · AGGREGAX SUARL</p>
+                <p class="mt-1">Fait en Tunisie 🇹🇳</p>
+            </div>
+        </aside>
+
+        <!-- RIGHT PANEL -->
+        <section class="flex-1 flex flex-col">
+
+            <!-- Mobile header -->
+            <div class="lg:hidden flex items-center justify-between px-6 py-4 border-b border-[#E0E0E0]">
+                <a href="#" class="text-xl font-bold tracking-tighter text-[#0078D4] font-headline">MARKET-UP</a>
+                <a href="auth_connexion.html" class="text-xs text-[#0078D4] font-semibold flex items-center gap-1">
+                    <span class="material-symbols-outlined text-base">arrow_back</span>
+                    Connexion
+                </a>
+            </div>
+
+            <div class="flex-1 flex items-center justify-center px-6 md:px-12 py-12 md:py-16">
+                <div class="w-full max-w-md">
+
+                    <!-- ============================================================
+                         STATE 1 : Form
+                         ============================================================ -->
+                    <div id="formState">
+
+                        <header class="mb-8">
+                            <h1 class="text-3xl md:text-[32px] font-semibold text-[#242424] mb-3 tracking-tight">
+                                Nouveau mot de passe
+                            </h1>
+                            <p class="text-[#616161] text-base leading-relaxed">
+                                Choisissez un mot de passe sécurisé pour votre compte MARKET-UP.
+                            </p>
+                        </header>
+
+                        <form id="newPwForm" class="space-y-6">
+                            <!-- New password -->
+                            <div>
+                                <label for="password" class="fluent-label label-required">Nouveau mot de passe</label>
+                                <div class="relative">
+                                    <input id="password" name="password" type="password" required minlength="8" class="fluent-input pr-12" placeholder="Minimum 8 caractères" />
+                                    <button type="button" id="togglePw1" class="absolute right-3 top-1/2 -translate-y-1/2 w-8 h-8 flex items-center justify-center text-[#616161] hover:text-[#0078D4] rounded transition-colors" aria-label="Afficher le mot de passe">
+                                        <span class="material-symbols-outlined text-xl">visibility</span>
+                                    </button>
+                                </div>
+                                <!-- Strength bar -->
+                                <div class="flex gap-1 mt-2">
+                                    <div class="pw-bar" data-pw-bar="1"></div>
+                                    <div class="pw-bar" data-pw-bar="2"></div>
+                                    <div class="pw-bar" data-pw-bar="3"></div>
+                                    <div class="pw-bar" data-pw-bar="4"></div>
+                                </div>
+                                <p id="pwStrengthLabel" class="field-hint">Saisissez votre nouveau mot de passe</p>
+                            </div>
+
+                            <!-- Confirm -->
+                            <div>
+                                <label for="passwordConfirm" class="fluent-label label-required">Confirmer le mot de passe</label>
+                                <div class="relative">
+                                    <input id="passwordConfirm" name="passwordConfirm" type="password" required class="fluent-input pr-12" placeholder="Ressaisissez le mot de passe" />
+                                    <button type="button" id="togglePw2" class="absolute right-3 top-1/2 -translate-y-1/2 w-8 h-8 flex items-center justify-center text-[#616161] hover:text-[#0078D4] rounded transition-colors" aria-label="Afficher le mot de passe">
+                                        <span class="material-symbols-outlined text-xl">visibility</span>
+                                    </button>
+                                </div>
+                                <p id="pwMatchHint" class="field-hint"></p>
+                            </div>
+
+                            <!-- Requirements checklist -->
+                            <div class="bg-[#F5F5F5] border border-[#E0E0E0] rounded-lg p-4">
+                                <p class="text-[11px] font-bold uppercase tracking-widest text-[#616161] mb-3">Critères de sécurité</p>
+                                <div class="space-y-2">
+                                    <div class="req-item" data-req="length">
+                                        <span class="material-symbols-outlined req-icon">radio_button_unchecked</span>
+                                        <span>Au moins 8 caractères</span>
+                                    </div>
+                                    <div class="req-item" data-req="upper">
+                                        <span class="material-symbols-outlined req-icon">radio_button_unchecked</span>
+                                        <span>Une lettre majuscule</span>
+                                    </div>
+                                    <div class="req-item" data-req="number">
+                                        <span class="material-symbols-outlined req-icon">radio_button_unchecked</span>
+                                        <span>Un chiffre</span>
+                                    </div>
+                                    <div class="req-item" data-req="special">
+                                        <span class="material-symbols-outlined req-icon">radio_button_unchecked</span>
+                                        <span>Un caractère spécial (@, #, $, !...)</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Submit -->
+                            <button type="submit" id="submitBtn" class="btn-primary w-full">
+                                Enregistrer le mot de passe
+                                <span class="material-symbols-outlined text-base">check_circle</span>
+                            </button>
+                        </form>
+
+                        <div class="mt-8 pt-6 border-t border-[#E0E0E0] text-center">
+                            <a href="auth_connexion.html" class="btn-ghost">
+                                <span class="material-symbols-outlined text-base">arrow_back</span>
+                                Retour à la connexion
+                            </a>
+                        </div>
+                    </div>
+
+                    <!-- ============================================================
+                         STATE 2 : Success
+                         ============================================================ -->
+                    <div id="successState" class="state-hidden text-center">
+                        <div class="w-16 h-16 rounded-full bg-[#DFF6DD] mx-auto mb-8 flex items-center justify-center">
+                            <span class="material-symbols-outlined text-[#107C10] fill" style="font-size: 36px;">check_circle</span>
+                        </div>
+
+                        <header class="mb-8">
+                            <h1 class="text-3xl md:text-[32px] font-semibold text-[#242424] mb-3 tracking-tight">
+                                Mot de passe modifié
+                            </h1>
+                            <p class="text-[#616161] text-base leading-relaxed">
+                                Votre mot de passe a été mis à jour avec succès. Vous pouvez maintenant vous connecter.
+                            </p>
+                        </header>
+
+                        <a href="auth_connexion.html" class="btn-primary w-full sm:w-auto">
+                            Se connecter
+                            <span class="material-symbols-outlined text-base">login</span>
+                        </a>
+                    </div>
+
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <script>
+        // ============================================================
+        // 1. Password visibility toggles
+        // ============================================================
+        function wireToggle(btnId, inputId) {
+            var btn = document.getElementById(btnId);
+            var inp = document.getElementById(inputId);
+            if (!btn || !inp) return;
+            btn.addEventListener('click', function () {
+                var show = inp.type === 'password';
+                inp.type = show ? 'text' : 'password';
+                btn.querySelector('.material-symbols-outlined').textContent = show ? 'visibility_off' : 'visibility';
+            });
+        }
+        wireToggle('togglePw1', 'password');
+        wireToggle('togglePw2', 'passwordConfirm');
+
+        // ============================================================
+        // 2. Password strength (4 levels) + live requirements checklist
+        // ============================================================
+        (function () {
+            var pw     = document.getElementById('password');
+            var bars   = document.querySelectorAll('.pw-bar');
+            var label  = document.getElementById('pwStrengthLabel');
+
+            var labels = [
+                'Saisissez votre nouveau mot de passe',
+                'Trop court — complétez les critères',
+                'Faible — ajoutez un chiffre ou un caractère spécial',
+                'Moyen — encore un effort',
+                'Bon — il manque un critère',
+                'Robuste — parfait'
+            ];
+            var levelCls = ['', 'level-weak', 'level-weak', 'level-fair', 'level-good', 'level-strong'];
+
+            function check(p) {
+                var reqs = {
+                    length:  p.length >= 8,
+                    upper:   /[A-Z]/.test(p),
+                    number:  /[0-9]/.test(p),
+                    special: /[^A-Za-z0-9]/.test(p)
+                };
+                // Update checklist
+                Object.keys(reqs).forEach(function (key) {
+                    var item = document.querySelector('[data-req="' + key + '"]');
+                    if (!item) return;
+                    var icon = item.querySelector('.req-icon');
+                    if (reqs[key]) {
+                        item.classList.add('met');
+                        icon.textContent = 'check_circle';
+                        icon.classList.add('fill');
+                    } else {
+                        item.classList.remove('met');
+                        icon.textContent = 'radio_button_unchecked';
+                        icon.classList.remove('fill');
+                    }
+                });
+                return reqs;
+            }
+
+            function scorePassword(p) {
+                if (!p) return 0;
+                var s = 0;
+                if (p.length >= 8)          s++;
+                if (/[A-Z]/.test(p))        s++;
+                if (/[0-9]/.test(p))        s++;
+                if (/[^A-Za-z0-9]/.test(p)) s++;
+                // Bonus : 12+ chars
+                if (p.length >= 12 && s === 4) s++;
+                return s;
+            }
+
+            pw.addEventListener('input', function () {
+                check(pw.value);
+                var s = scorePassword(pw.value);
+                var maxBar = Math.min(s, 4);
+                bars.forEach(function (b, i) {
+                    b.className = 'pw-bar' + (i < maxBar ? ' ' + levelCls[Math.min(s, 5)] : '');
+                });
+                label.textContent = labels[Math.min(s, 5)];
+                label.style.color = s >= 5 ? '#107C10' : (s >= 3 ? '#616161' : '#8A8886');
+            });
+        })();
+
+        // ============================================================
+        // 3. Password match feedback
+        // ============================================================
+        (function () {
+            var pw   = document.getElementById('password');
+            var pwc  = document.getElementById('passwordConfirm');
+            var hint = document.getElementById('pwMatchHint');
+
+            function updateMatch() {
+                if (!pwc.value) { hint.textContent = ''; return; }
+                if (pw.value === pwc.value) {
+                    hint.textContent = '✓ Les mots de passe correspondent';
+                    hint.style.color = '#107C10';
+                } else {
+                    hint.textContent = 'Les mots de passe ne correspondent pas';
+                    hint.style.color = '#D13438';
+                }
+            }
+            pw.addEventListener('input', updateMatch);
+            pwc.addEventListener('input', updateMatch);
+        })();
+
+        // ============================================================
+        // 4. Submit handler
+        //   Production : valide token ?token= via API, PUT /api/new-password
+        //   Maquette   : basculer sur l'état success
+        // ============================================================
+        document.getElementById('newPwForm').addEventListener('submit', function (e) {
+            e.preventDefault();
+            var pw  = document.getElementById('password').value;
+            var pwc = document.getElementById('passwordConfirm').value;
+
+            // Vérifications minimum
+            if (pw !== pwc) {
+                alert('Les mots de passe ne correspondent pas.');
+                return;
+            }
+            if (pw.length < 8) {
+                alert('Le mot de passe doit faire au moins 8 caractères.');
+                return;
+            }
+
+            // Bascule sur success
+            document.getElementById('formState').classList.add('state-hidden');
+            document.getElementById('successState').classList.remove('state-hidden');
+        });
+    </script>
+</body>
+
+</html>

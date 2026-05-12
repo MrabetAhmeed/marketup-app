@@ -1,0 +1,1100 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>MARKET-UP | Tableau de bord — TechnoFab Industries</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap"
+        rel="stylesheet" />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
+        rel="stylesheet" />
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+
+        .font-heading {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+        }
+
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+
+        .icon-fill {
+            font-variation-settings: 'FILL' 1;
+        }
+
+        /* ─────────── SIDEBAR NAV ─────────── */
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 8px 20px;
+            font-size: 13px;
+            font-weight: 500;
+            color: #616161;
+            border-left: 3px solid transparent;
+            transition: background-color 0.15s ease, color 0.15s ease;
+            cursor: pointer;
+            text-decoration: none;
+            line-height: 1.4;
+        }
+
+        .nav-item .material-symbols-outlined {
+            font-size: 18px;
+            color: #8A8886;
+            transition: color 0.15s ease;
+            flex-shrink: 0;
+        }
+
+        .nav-item:hover {
+            background: #F5F5F5;
+            color: #242424;
+        }
+
+        .nav-item:hover .material-symbols-outlined {
+            color: #616161;
+        }
+
+        .nav-item.active {
+            background: #EFF6FC;
+            border-left-color: #0078D4;
+            color: #0078D4;
+            font-weight: 600;
+        }
+
+        .nav-item.active .material-symbols-outlined {
+            color: #0078D4;
+        }
+
+        .section-label {
+            font-size: 9px;
+            font-weight: 700;
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+            color: #8A8886;
+            padding: 16px 20px 6px;
+            user-select: none;
+        }
+
+        nav::-webkit-scrollbar {
+            width: 4px;
+        }
+
+        nav::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        nav::-webkit-scrollbar-thumb {
+            background: #E0E0E0;
+            border-radius: 2px;
+        }
+
+        nav::-webkit-scrollbar-thumb:hover {
+            background: #C8C6C4;
+        }
+
+        /* ─────────── TOPBAR ─────────── */
+        .icon-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            color: #424242;
+            transition: background-color 0.15s ease;
+            position: relative;
+            background: transparent;
+            border: none;
+            cursor: pointer;
+        }
+
+        .icon-btn:hover {
+            background: #F5F5F5;
+        }
+
+        .icon-btn .material-symbols-outlined {
+            font-size: 22px;
+        }
+
+        /* ─────────── DROPDOWNS ─────────── */
+        .dropdown-panel {
+            position: absolute;
+            top: calc(100% + 8px);
+            right: 0;
+            background: white;
+            border: 1px solid #E0E0E0;
+            border-radius: 12px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.16);
+            opacity: 0;
+            transform: translateY(-4px);
+            pointer-events: none;
+            transition: opacity 0.15s ease, transform 0.15s ease;
+            z-index: 40;
+        }
+
+        .dropdown-panel.open {
+            opacity: 1;
+            transform: translateY(0);
+            pointer-events: auto;
+        }
+
+        .dropdown-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px 16px;
+            font-size: 13px;
+            color: #242424;
+            text-decoration: none;
+            transition: background-color 0.1s ease;
+            cursor: pointer;
+        }
+
+        .dropdown-item:hover {
+            background: #F5F5F5;
+        }
+
+        .dropdown-item .material-symbols-outlined {
+            font-size: 18px;
+            color: #616161;
+            flex-shrink: 0;
+        }
+
+        .dropdown-item .ext-arrow {
+            margin-left: auto;
+            font-size: 14px;
+            color: #8A8886;
+        }
+
+        .dropdown-item--danger {
+            color: #B91C1C;
+        }
+
+        .dropdown-item--danger .material-symbols-outlined {
+            color: #B91C1C;
+        }
+
+        .dropdown-item--danger:hover {
+            background: #FEF2F2;
+        }
+
+        .dropdown-section-label {
+            padding: 12px 16px 6px;
+            font-size: 9px;
+            font-weight: 700;
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+            color: #8A8886;
+            user-select: none;
+        }
+
+        .dropdown-divider {
+            height: 1px;
+            background: #E0E0E0;
+            margin: 4px 0;
+        }
+
+        /* ─────────── CARDS DASHBOARD ─────────── */
+        .card {
+            background: white;
+            border: 1px solid #E0E0E0;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.04);
+            transition: box-shadow 0.2s ease, transform 0.2s ease, border-color 0.2s ease;
+        }
+
+        .card--hover:hover {
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+            border-color: #C8C6C4;
+        }
+
+        /* ─────────── SWITCH (toggle visibilité profil) ─────────── */
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 36px;
+            height: 20px;
+            flex-shrink: 0;
+        }
+
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .switch-track {
+            position: absolute;
+            cursor: pointer;
+            inset: 0;
+            background: #C8C6C4;
+            border-radius: 10px;
+            transition: background 0.2s ease;
+        }
+
+        .switch-track::before {
+            content: '';
+            position: absolute;
+            height: 14px;
+            width: 14px;
+            left: 3px;
+            top: 3px;
+            background: white;
+            border-radius: 50%;
+            transition: transform 0.2s ease;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+        }
+
+        .switch input:checked+.switch-track {
+            background: #0078D4;
+        }
+
+        .switch input:checked+.switch-track::before {
+            transform: translateX(16px);
+        }
+
+        /* ─────────── MOBILE DRAWER ─────────── */
+        #sidebar {
+            transition: transform 0.25s ease-out;
+        }
+
+        @media (max-width: 767px) {
+            #sidebar {
+                transform: translateX(-100%);
+            }
+
+            #sidebar.open {
+                transform: translateX(0);
+                box-shadow: 8px 0 32px rgba(0, 0, 0, 0.16);
+            }
+        }
+    </style>
+</head>
+
+<body class="bg-[#F5F5F5] min-h-screen">
+
+    <!-- Backdrop mobile -->
+    <div id="backdrop" class="md:hidden fixed inset-0 bg-gradient-to-b from-black/40 to-black/20 z-40 hidden"
+        aria-hidden="true"></div>
+
+    <!-- ═════════════════════════════════════════════════════
+         SIDEBAR
+         ═════════════════════════════════════════════════════ -->
+    <aside id="sidebar"
+        class="fixed top-0 left-0 w-60 h-screen bg-white border-r border-[#E0E0E0] flex flex-col z-50 md:translate-x-0"
+        aria-label="Navigation principale">
+
+        <a href="dashboard_index.html" class="flex items-center gap-2.5 px-5 py-4 border-b border-[#E0E0E0] shrink-0 h-14 hover:bg-[#FAFAFA] transition-colors" title="Retour au tableau de bord">
+            <span class="material-symbols-outlined icon-fill text-[#0078D4]" style="font-size:22px">hexagon</span>
+            <div class="leading-tight min-w-0">
+                <div class="text-[#242424] font-heading font-bold text-[15px] tracking-tight">MARKET-UP</div>
+                <div class="text-[10px] text-[#8A8886] tracking-wide">vivasky.media</div>
+            </div>
+        </a>
+
+        <nav class="flex-1 overflow-y-auto pt-2 pb-3">
+            <div class="section-label">Entreprise</div>
+            <a href="dashboard_index.html" class="nav-item active" aria-current="page">
+                <span class="material-symbols-outlined">dashboard</span>
+                <span class="flex-1 min-w-0 truncate">Vue d'ensemble</span>
+            </a>
+            <a href="dashboard_account.html" class="nav-item">
+                <span class="material-symbols-outlined">business</span>
+                <span class="flex-1 min-w-0 truncate">Compte</span>
+            </a>
+
+            <div class="section-label">Mes profils</div>
+            <a href="dashboard_brandup.html" class="nav-item">
+                <span class="material-symbols-outlined">storefront</span>
+                <span class="flex-1 min-w-0 truncate">BrandUP</span>
+                <span class="w-1.5 h-1.5 rounded-full bg-[#DC2626] shrink-0" title="Actif"></span>
+            </a>
+            <a href="dashboard_sponsoring.html" class="nav-item">
+                <span class="material-symbols-outlined">play_circle</span>
+                <span class="flex-1 min-w-0 truncate">TraceUP</span>
+                <span class="w-1.5 h-1.5 rounded-full bg-[#D97706] shrink-0" title="En attente"></span>
+            </a>
+            <a href="dashboard_linkup.html" class="nav-item">
+                <span class="material-symbols-outlined">qr_code_2</span>
+                <span class="flex-1 min-w-0 truncate">LinkUP</span>
+                <span class="w-1.5 h-1.5 rounded-full bg-[#107C10] shrink-0" title="Actif"></span>
+            </a>
+
+            <div class="section-label">Visibilité</div>
+            <a href="dashboard_boost.html" class="nav-item">
+                <span class="material-symbols-outlined">trending_up</span>
+                <span class="flex-1 min-w-0 truncate">Boost</span>
+                <span
+                    class="text-[9px] font-bold tracking-wider text-[#107C10] bg-[#F0FDF4] border border-[#B7EBC0] px-1.5 py-[2px] rounded shrink-0">1 ACTIF</span>
+            </a>
+            <a href="dashboard_sponsoring.html" class="nav-item">
+                <span class="material-symbols-outlined">campaign</span>
+                <span class="flex-1 min-w-0 truncate">Sponsoring</span>
+                <span class="w-1.5 h-1.5 rounded-full bg-[#107C10] shrink-0" title="Campagne active"></span>
+            </a>
+
+            <div class="section-label">Engagement</div>
+            <a href="dashboard_rse.html" class="nav-item">
+                <span class="material-symbols-outlined">volunteer_activism</span>
+                <span class="flex-1 min-w-0 truncate">Badge RSE</span>
+                <span
+                    class="text-[9px] font-bold tracking-wider text-[#107C10] bg-[#F0FDF4] border border-[#B7EBC0] px-1.5 py-[2px] rounded shrink-0">VALIDÉ</span>
+            </a>
+
+            <div class="section-label">Administration</div>
+            <a href="dashboard_billing.html" class="nav-item">
+                <span class="material-symbols-outlined">receipt_long</span>
+                <span class="flex-1 min-w-0 truncate">Facturation</span>
+            </a>
+            <a href="dashboard_notifications.html" class="nav-item">
+                <span class="material-symbols-outlined">notifications</span>
+                <span class="flex-1 min-w-0 truncate">Notifications</span>
+                <span
+                    class="min-w-[18px] h-[18px] px-1 rounded-full bg-[#DC2626] text-white text-[10px] font-bold flex items-center justify-center shrink-0">3</span>
+            </a>
+            <a href="dashboard_settings.html" class="nav-item">
+                <span class="material-symbols-outlined">settings</span>
+                <span class="flex-1 min-w-0 truncate">Paramètres</span>
+            </a>
+        </nav>
+
+        <div class="shrink-0 border-t border-[#E0E0E0]">
+            <div class="flex items-center gap-3 px-4 py-3">
+                <div class="w-9 h-9 rounded-full bg-[#374151] flex items-center justify-center shrink-0">
+                    <span id="sb-avatar-initials" class="text-white font-heading font-bold text-[13px]">TF</span>
+                </div>
+                <div class="min-w-0 flex-1">
+                    <div id="sb-company-name" class="text-[#242424] text-[12px] font-semibold truncate">TechnoFab Industries</div>
+                    <div id="sb-company-meta" class="text-[#8A8886] text-[10px] truncate">B2B · Sousse</div>
+                </div>
+            </div>
+            <div class="flex items-center gap-2.5 px-4 py-2.5 border-t border-[#E0E0E0]">
+                <div
+                    class="w-6 h-6 rounded-full bg-[#F5F5F5] border border-[#E0E0E0] flex items-center justify-center shrink-0">
+                    <span id="sb-user-initials" class="text-[#616161] text-[10px] font-semibold">AM</span>
+                </div>
+                <div class="min-w-0 flex-1">
+                    <div id="sb-user-name" class="text-[#424242] text-[11px] font-medium truncate">Ahmed Mrabet</div>
+                    <div class="text-[#8A8886] text-[9px] truncate">Propriétaire</div>
+                </div>
+                <button
+                    class="w-7 h-7 flex items-center justify-center rounded text-[#8A8886] hover:text-[#242424] hover:bg-[#F5F5F5] transition-colors shrink-0"
+                    title="Se déconnecter" aria-label="Se déconnecter" onclick="window.location.href='auth_connexion.html';">
+                    <span class="material-symbols-outlined" style="font-size:16px">logout</span>
+                </button>
+            </div>
+        </div>
+
+    </aside>
+
+    <!-- ═════════════════════════════════════════════════════
+         SHELL : topbar + main
+         ═════════════════════════════════════════════════════ -->
+    <div class="md:ml-60 min-h-screen flex flex-col">
+
+        <!-- TOPBAR -->
+        <header
+            class="sticky top-0 z-30 h-14 bg-white border-b border-[#E0E0E0] flex items-center justify-between px-4 md:px-6 gap-4"
+            role="banner">
+
+            <div class="flex items-center gap-3 min-w-0 flex-1">
+                <button id="menuBtn" class="icon-btn md:hidden -ml-2 shrink-0"
+                    aria-label="Ouvrir le menu de navigation">
+                    <span class="material-symbols-outlined">menu</span>
+                </button>
+                <div class="min-w-0 leading-tight">
+                    <h1 class="font-heading text-[16px] font-bold text-[#242424] truncate">Tableau de bord</h1>
+                    <p id="dx-welcome" class="hidden md:block text-[12px] text-[#616161] truncate">Bienvenue, TechnoFab Industries</p>
+                </div>
+            </div>
+
+            <div class="flex items-center gap-1 shrink-0">
+
+                <!-- Cloche notifications -->
+                <div class="relative">
+                    <button id="bellBtn" class="icon-btn" aria-label="Notifications" aria-haspopup="true"
+                        aria-expanded="false">
+                        <span class="material-symbols-outlined">notifications</span>
+                        <span
+                            class="absolute top-1.5 right-1.5 min-w-[16px] h-[16px] px-1 rounded-full bg-[#DC2626] text-white text-[9px] font-bold flex items-center justify-center leading-none ring-2 ring-white">3</span>
+                    </button>
+
+                    <div id="bellDropdown" class="dropdown-panel w-[340px] max-w-[calc(100vw-24px)]">
+                        <div class="flex items-center justify-between px-4 py-3 border-b border-[#E0E0E0]">
+                            <div class="font-heading font-semibold text-[13px] text-[#242424]">Notifications</div>
+                            <div class="text-[11px] text-[#616161]"><span class="text-[#DC2626] font-semibold">3</span> non lues</div>
+                        </div>
+                        <div class="max-h-[320px] overflow-y-auto">
+                            <a href="dashboard_notifications.html" class="block px-4 py-3 hover:bg-[#F5F5F5] transition-colors border-b border-[#F0F0F0]">
+                                <div class="flex items-start gap-3">
+                                    <span class="w-2 h-2 rounded-full bg-[#0078D4] mt-1.5 shrink-0"></span>
+                                    <div class="min-w-0 flex-1">
+                                        <div class="text-[12.5px] text-[#242424] leading-snug mb-1"><span class="font-semibold">Votre boost LinkUP</span> expire dans 3 jours</div>
+                                        <div class="text-[11px] text-[#8A8886]">Il y a 2 heures</div>
+                                    </div>
+                                    <span class="material-symbols-outlined text-[#0078D4] shrink-0 mt-0.5" style="font-size:16px">trending_up</span>
+                                </div>
+                            </a>
+                            <a href="dashboard_notifications.html" class="block px-4 py-3 hover:bg-[#F5F5F5] transition-colors border-b border-[#F0F0F0]">
+                                <div class="flex items-start gap-3">
+                                    <span class="w-2 h-2 rounded-full bg-[#0078D4] mt-1.5 shrink-0"></span>
+                                    <div class="min-w-0 flex-1">
+                                        <div class="text-[12.5px] text-[#242424] leading-snug mb-1"><span class="font-semibold">Votre campagne Sponsoring</span> a généré 1 250 impressions</div>
+                                        <div class="text-[11px] text-[#8A8886]">Il y a 1 jour</div>
+                                    </div>
+                                    <span class="material-symbols-outlined text-[#0078D4] shrink-0 mt-0.5" style="font-size:16px">campaign</span>
+                                </div>
+                            </a>
+                            <a href="dashboard_notifications.html" class="block px-4 py-3 hover:bg-[#F5F5F5] transition-colors">
+                                <div class="flex items-start gap-3">
+                                    <span class="w-2 h-2 rounded-full bg-[#0078D4] mt-1.5 shrink-0"></span>
+                                    <div class="min-w-0 flex-1">
+                                        <div class="text-[12.5px] text-[#242424] leading-snug mb-1"><span class="font-semibold">Reçu RSE soumis</span> — Association Al Ahed en attente de validation</div>
+                                        <div class="text-[11px] text-[#8A8886]">Il y a 1 jour</div>
+                                    </div>
+                                    <span class="material-symbols-outlined text-[#C5A059] shrink-0 mt-0.5" style="font-size:16px">volunteer_activism</span>
+                                </div>
+                            </a>
+                        </div>
+                        <a href="dashboard_notifications.html"
+                            class="flex items-center justify-center gap-1.5 px-4 py-2.5 text-[12px] font-semibold text-[#0078D4] hover:bg-[#EFF6FC] border-t border-[#E0E0E0] transition-colors rounded-b-xl">
+                            Voir toutes les notifications
+                            <span class="material-symbols-outlined" style="font-size:14px">arrow_forward</span>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Avatar entreprise -->
+                <div class="relative">
+                    <button id="avatarBtn"
+                        class="flex items-center gap-1 pl-1 pr-2 py-1 rounded-lg hover:bg-[#F5F5F5] transition-colors ml-1"
+                        aria-label="Menu compte" aria-haspopup="true" aria-expanded="false">
+                        <div class="w-8 h-8 rounded-full bg-[#0078D4] flex items-center justify-center shrink-0">
+                            <span id="avd-trigger-initials" class="text-white font-heading font-bold text-[12px]">TF</span>
+                        </div>
+                        <span class="material-symbols-outlined text-[#8A8886] hidden md:inline"
+                            style="font-size:18px">expand_more</span>
+                    </button>
+
+                    <div id="avatarDropdown" class="dropdown-panel w-[300px] max-w-[calc(100vw-24px)]">
+                        <div class="flex items-center gap-3 px-4 py-3 border-b border-[#E0E0E0]">
+                            <div class="w-10 h-10 rounded-full bg-[#0078D4] flex items-center justify-center shrink-0">
+                                <span id="avd-initials" class="text-white font-heading font-bold text-[13px]">TF</span>
+                            </div>
+                            <div class="min-w-0 flex-1">
+                                <div id="avd-company-name" class="font-heading font-semibold text-[13px] text-[#242424] truncate">TechnoFab
+                                    Industries</div>
+                                <div id="avd-company-meta" class="text-[11px] text-[#616161] truncate">B2B · Sousse · Ahmed Mrabet</div>
+                            </div>
+                        </div>
+                        <div class="dropdown-section-label">Mes profils publics</div>
+                        <a id="avd-link-brandup" href="public_brandup_technofab-industries.html" target="_blank" rel="noopener" class="dropdown-item">
+                            <span class="material-symbols-outlined">storefront</span>
+                            <span class="flex-1">BrandUP</span>
+                            <span class="material-symbols-outlined ext-arrow">open_in_new</span>
+                        </a>
+                        <a id="avd-link-traceup" href="public_traceup_technofab-industries.html" target="_blank" rel="noopener" class="dropdown-item">
+                            <span class="material-symbols-outlined">play_circle</span>
+                            <span class="flex-1">TraceUP</span>
+                            <span class="material-symbols-outlined ext-arrow">open_in_new</span>
+                        </a>
+                        <a id="avd-link-linkup" href="public_linkup_technofab-industries.html" target="_blank" rel="noopener" class="dropdown-item">
+                            <span class="material-symbols-outlined">qr_code_2</span>
+                            <span class="flex-1">LinkUP</span>
+                            <span class="material-symbols-outlined ext-arrow">open_in_new</span>
+                        </a>
+                        <div class="dropdown-divider"></div>
+                        <a href="dashboard_settings.html" class="dropdown-item">
+                            <span class="material-symbols-outlined">settings</span>
+                            <span class="flex-1">Paramètres</span>
+                        </a>
+                        <button class="dropdown-item dropdown-item--danger w-full text-left">
+                            <span class="material-symbols-outlined">logout</span>
+                            <span class="flex-1">Se déconnecter</span>
+                        </button>
+                    </div>
+                </div>
+
+            </div>
+        </header>
+
+        <!-- ═════════════════════════════════════════════════
+             CONTENU TABLEAU DE BORD
+             ═════════════════════════════════════════════════ -->
+        <main class="flex-1 p-4 md:p-8">
+            <div class="max-w-[1280px] mx-auto space-y-8">
+
+                <!-- ═════ SECTION 1 — STATS ═════ -->
+                <section>
+                    <div class="flex items-end justify-between mb-4">
+                        <div>
+                            <h2 class="font-heading font-semibold text-[14px] text-[#242424] uppercase tracking-wider">
+                                Performances du mois
+                            </h2>
+                            <p class="text-[12px] text-[#616161] mt-0.5">
+                                Vues cumulées sur vos 3 vitrines publiques
+                            </p>
+                        </div>
+                        <span class="hidden sm:inline-flex items-center gap-1 text-[11px] text-[#8A8886]">
+                            <span class="material-symbols-outlined" style="font-size:14px">schedule</span>
+                            Actualisé il y a 5 min
+                        </span>
+                    </div>
+
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
+
+                        <!-- Stat 1 : Vues totales -->
+                        <div class="card card--hover p-5">
+                            <div class="flex items-start justify-between mb-4">
+                                <div
+                                    class="w-10 h-10 rounded-lg bg-[#EFF6FC] flex items-center justify-center">
+                                    <span class="material-symbols-outlined text-[#0078D4]"
+                                        style="font-size:20px">visibility</span>
+                                </div>
+                                <span
+                                    class="inline-flex items-center gap-0.5 text-[11px] font-semibold text-[#107C10]">
+                                    <span class="material-symbols-outlined"
+                                        style="font-size:14px">trending_up</span>
+                                    +212
+                                </span>
+                            </div>
+                            <div class="text-[11px] text-[#616161] font-medium uppercase tracking-wider mb-1">
+                                Vues totales
+                            </div>
+                            <div class="font-heading font-bold text-[#242424] text-[26px] leading-none">260</div>
+                            <div class="text-[11px] text-[#616161] mt-1">Tout les profils · ce mois</div>
+                        </div>
+
+                        <!-- Stat 2 : BrandUP (Refusé = invisible) -->
+                        <a href="dashboard_brandup.html" class="card card--hover p-5 block">
+                            <div class="flex items-start justify-between mb-4">
+                                <div class="w-10 h-10 rounded-lg bg-[#F5F5F5] flex items-center justify-center">
+                                    <span class="material-symbols-outlined text-[#616161]"
+                                        style="font-size:20px">storefront</span>
+                                </div>
+                                <span
+                                    class="inline-flex items-center gap-1 text-[10px] font-semibold text-[#B91C1C]">
+                                    <span class="w-1.5 h-1.5 bg-[#DC2626] rounded-full"></span>
+                                    Refusé
+                                </span>
+                            </div>
+                            <div class="text-[11px] text-[#616161] font-medium uppercase tracking-wider mb-1">BrandUP
+                            </div>
+                            <div class="font-heading font-bold text-[#8A8886] text-[26px] leading-none">—</div>
+                            <div class="text-[11px] text-[#8A8886] mt-1">Profil invisible</div>
+                        </a>
+
+                        <!-- Stat 3 : TraceUP (En attente = en cours de validation) -->
+                        <a href="dashboard_sponsoring.html" class="card card--hover p-5 block">
+                            <div class="flex items-start justify-between mb-4">
+                                <div class="w-10 h-10 rounded-lg bg-[#F5F5F5] flex items-center justify-center">
+                                    <span class="material-symbols-outlined text-[#616161]"
+                                        style="font-size:20px">play_circle</span>
+                                </div>
+                                <span
+                                    class="inline-flex items-center gap-1 text-[10px] font-semibold text-[#92400E]">
+                                    <span class="w-1.5 h-1.5 bg-[#D97706] rounded-full"></span>
+                                    En attente
+                                </span>
+                            </div>
+                            <div class="text-[11px] text-[#616161] font-medium uppercase tracking-wider mb-1">TraceUP
+                            </div>
+                            <div class="font-heading font-bold text-[#8A8886] text-[26px] leading-none">—</div>
+                            <div class="text-[11px] text-[#8A8886] mt-1">Validation en cours</div>
+                        </a>
+
+                        <!-- Stat 4 : LinkUP (Actif + Boosté) -->
+                        <a href="dashboard_linkup.html" class="card card--hover p-5 block">
+                            <div class="flex items-start justify-between mb-4">
+                                <div class="w-10 h-10 rounded-lg bg-[#EFF6FC] flex items-center justify-center">
+                                    <span class="material-symbols-outlined text-[#0078D4]"
+                                        style="font-size:20px">qr_code_2</span>
+                                </div>
+                                <span
+                                    class="inline-flex items-center gap-0.5 text-[11px] font-semibold text-[#107C10]">
+                                    <span class="material-symbols-outlined"
+                                        style="font-size:14px">trending_up</span>
+                                    +212
+                                </span>
+                            </div>
+                            <div class="text-[11px] text-[#616161] font-medium uppercase tracking-wider mb-1">LinkUP
+                            </div>
+                            <div class="font-heading font-bold text-[#242424] text-[26px] leading-none">260</div>
+                            <div class="text-[11px] text-[#0078D4] font-semibold mt-1">
+                                <span class="material-symbols-outlined icon-fill align-middle" style="font-size:11px">bolt</span>
+                                Boost en cours
+                            </div>
+                        </a>
+
+                    </div>
+                </section>
+
+                <!-- ═════ SECTION 2 — MES PROFILS ═════ -->
+                <section>
+                    <div class="mb-4">
+                        <h2 class="font-heading font-semibold text-[14px] text-[#242424] uppercase tracking-wider">
+                            Mes profils
+                        </h2>
+                        <p class="text-[12px] text-[#616161] mt-0.5">
+                            Gérer et booster vos 3 vitrines publiques
+                        </p>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+
+                        <!-- Profile card : BrandUP (Refusé) -->
+                        <div class="card card--hover p-5 flex flex-col">
+                            <div class="flex items-start justify-between mb-4">
+                                <div class="flex items-center gap-3 min-w-0">
+                                    <div
+                                        class="w-10 h-10 rounded-lg bg-[#EFF6FC] flex items-center justify-center shrink-0">
+                                        <span class="material-symbols-outlined text-[#0078D4]"
+                                            style="font-size:22px">storefront</span>
+                                    </div>
+                                    <div class="min-w-0">
+                                        <h3 class="font-heading font-bold text-[15px] text-[#242424] leading-tight">
+                                            BrandUP</h3>
+                                        <span
+                                            class="inline-flex items-center gap-1 text-[10px] font-semibold text-[#B91C1C] bg-[#FEF2F2] border border-[#FCA5A5] px-1.5 py-0.5 rounded mt-1">
+                                            <span class="w-1.5 h-1.5 bg-[#DC2626] rounded-full"></span>
+                                            Refusé
+                                        </span>
+                                    </div>
+                                </div>
+                                <label class="switch" aria-label="Activer le profil BrandUP">
+                                    <input type="checkbox" disabled />
+                                    <span class="switch-track"></span>
+                                </label>
+                            </div>
+                            <p class="text-[12.5px] text-[#616161] leading-relaxed mb-5 flex-1">
+                                Votre vitrine institutionnelle : identité, secteur, coordonnées, galerie.
+                                <strong class="text-[#B91C1C]">Motif de refus à consulter</strong>.
+                            </p>
+                            <div class="flex gap-2">
+                                <a href="dashboard_brandup.html"
+                                    class="flex-1 py-2 px-3 text-[12.5px] font-semibold text-white bg-[#B91C1C] hover:bg-[#991B1B] rounded text-center transition-colors flex items-center justify-center gap-1">
+                                    <span class="material-symbols-outlined"
+                                        style="font-size:14px">error</span>
+                                    Corriger
+                                </a>
+                            </div>
+                        </div>
+
+                        <!-- Profile card : TraceUP (En attente) -->
+                        <div class="card card--hover p-5 flex flex-col">
+                            <div class="flex items-start justify-between mb-4">
+                                <div class="flex items-center gap-3 min-w-0">
+                                    <div
+                                        class="w-10 h-10 rounded-lg bg-[#EFF6FC] flex items-center justify-center shrink-0">
+                                        <span class="material-symbols-outlined text-[#0078D4]"
+                                            style="font-size:22px">play_circle</span>
+                                    </div>
+                                    <div class="min-w-0">
+                                        <h3 class="font-heading font-bold text-[15px] text-[#242424] leading-tight">
+                                            TraceUP</h3>
+                                        <span
+                                            class="inline-flex items-center gap-1 text-[10px] font-semibold text-[#475569] bg-[#F1F5F9] border border-[#CBD5E1] px-1.5 py-0.5 rounded mt-1">
+                                            <span class="w-1.5 h-1.5 bg-[#D97706] rounded-full"></span>
+                                            En attente
+                                        </span>
+                                    </div>
+                                </div>
+                                <label class="switch" aria-label="Activer le profil TraceUP">
+                                    <input type="checkbox" />
+                                    <span class="switch-track"></span>
+                                </label>
+                            </div>
+                            <p class="text-[12.5px] text-[#616161] leading-relaxed mb-5 flex-1">
+                                Votre chaîne média : actualités, offres, astuces, emplois — vidéos YouTube intégrées.
+                                <strong class="text-[#475569]">Modifications non soumises</strong>.
+                            </p>
+                            <div class="flex gap-2">
+                                <a href="dashboard_sponsoring.html"
+                                    class="flex-1 py-2 px-3 text-[12.5px] font-semibold text-white bg-[#0078D4] hover:bg-[#106EBE] rounded text-center transition-colors flex items-center justify-center gap-1">
+                                    <span class="material-symbols-outlined"
+                                        style="font-size:14px">edit</span>
+                                    Continuer l'édition
+                                </a>
+                            </div>
+                        </div>
+
+                        <!-- Profile card : LinkUP (Actif + Boost en cours) -->
+                        <div class="card card--hover p-5 flex flex-col">
+                            <div class="flex items-start justify-between mb-4">
+                                <div class="flex items-center gap-3 min-w-0">
+                                    <div
+                                        class="w-10 h-10 rounded-lg bg-[#EFF6FC] flex items-center justify-center shrink-0">
+                                        <span class="material-symbols-outlined text-[#0078D4]"
+                                            style="font-size:22px">qr_code_2</span>
+                                    </div>
+                                    <div class="min-w-0">
+                                        <h3 class="font-heading font-bold text-[15px] text-[#242424] leading-tight">
+                                            LinkUP</h3>
+                                        <div class="flex items-center gap-1 mt-1 flex-wrap">
+                                            <span
+                                                class="inline-flex items-center gap-1 text-[10px] font-semibold text-[#107C10] bg-[#F0FDF4] border border-[#B7EBC0] px-1.5 py-0.5 rounded">
+                                                <span class="w-1.5 h-1.5 bg-[#107C10] rounded-full"></span>
+                                                Actif
+                                            </span>
+                                            <span
+                                                class="inline-flex items-center gap-1 text-[10px] font-semibold text-[#0078D4] bg-[#EFF6FC] border border-[#C7DDF1] px-1.5 py-0.5 rounded">
+                                                <span class="material-symbols-outlined icon-fill" style="font-size:11px">bolt</span>
+                                                Boosté
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <label class="switch" aria-label="Activer le profil LinkUP">
+                                    <input type="checkbox" checked />
+                                    <span class="switch-track"></span>
+                                </label>
+                            </div>
+                            <p class="text-[12.5px] text-[#616161] leading-relaxed mb-5 flex-1">
+                                Votre carte de contact numérique : QR code, liens réseaux sociaux, partage rapide.
+                            </p>
+                            <div class="flex gap-2">
+                                <a href="dashboard_linkup.html"
+                                    class="flex-1 py-2 px-3 text-[12.5px] font-semibold text-[#242424] bg-white border border-[#D1D1D1] hover:bg-[#F5F5F5] rounded text-center transition-colors">
+                                    Modifier
+                                </a>
+                                <a href="dashboard_boost.html"
+                                    class="flex-1 py-2 px-3 text-[12.5px] font-semibold text-white bg-[#0078D4] hover:bg-[#106EBE] rounded text-center transition-colors flex items-center justify-center gap-1">
+                                    <span class="material-symbols-outlined icon-fill"
+                                        style="font-size:14px">bolt</span>
+                                    Renouveler
+                                </a>
+                            </div>
+                        </div>
+
+                    </div>
+                </section>
+
+                <!-- ═════ SECTION 3 — BOOST + RSE ═════ -->
+                <section>
+                    <div class="mb-4">
+                        <h2 class="font-heading font-semibold text-[14px] text-[#242424] uppercase tracking-wider">
+                            Visibilité & engagement
+                        </h2>
+                        <p class="text-[12px] text-[#616161] mt-0.5">
+                            Suivi de votre boost en cours et de votre activité RSE
+                        </p>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-1 gap-4">
+
+                        <!-- Boost actif -->
+                        <!--<div class="card p-5 flex flex-col">
+                            <div class="flex items-start justify-between mb-4">
+                                <div class="flex items-center gap-3">
+                                    <div
+                                        class="w-10 h-10 rounded-lg bg-[#EFF6FC] flex items-center justify-center shrink-0">
+                                        <span class="material-symbols-outlined icon-fill text-[#0078D4]"
+                                            style="font-size:20px">bolt</span>
+                                    </div>
+                                    <div>
+                                        <h3 class="font-heading font-bold text-[15px] text-[#242424] leading-tight">
+                                            Boost actif</h3>
+                                        <div class="text-[11px] text-[#616161] mt-0.5">LinkUP — campagne en cours
+                                        </div>
+                                    </div>
+                                </div>
+                                <span
+                                    class="inline-flex items-center gap-1 text-[10px] font-semibold text-[#107C10] bg-[#F0FDF4] border border-[#B7EBC0] px-1.5 py-0.5 rounded shrink-0">
+                                    <span class="w-1.5 h-1.5 bg-[#107C10] rounded-full"></span>
+                                    Actif
+                                </span>
+                            </div>
+
+                            <div class="space-y-3 mb-5">
+                                <div class="flex items-center justify-between text-[12px]">
+                                    <span class="text-[#616161]">Temps restant</span>
+                                    <span class="font-semibold text-[#242424]">3 jours sur 30</span>
+                                </div>
+                                <div class="w-full h-2 bg-[#F0F0F0] rounded-full overflow-hidden">
+                                    <div class="h-full bg-[#0078D4] rounded-full" style="width:90%"></div>
+                                </div>
+                                <div class="flex items-center justify-between text-[11px] text-[#8A8886]">
+                                    <span>Début : 24 mars</span>
+                                    <span>Fin : 23 avril</span>
+                                </div>
+                            </div>
+
+                            <div class="flex items-center justify-between pt-4 border-t border-[#E0E0E0]">
+                                <div>
+                                    <div class="text-[11px] text-[#8A8886]">Vues générées</div>
+                                    <div class="font-heading font-bold text-[18px] text-[#0078D4]">+212</div>
+                                </div>
+                                <a href="dashboard_boost.html"
+                                    class="py-2 px-4 text-[12.5px] font-semibold text-[#0078D4] border border-[#0078D4] hover:bg-[#EFF6FC] rounded transition-colors">
+                                    Renouveler
+                                </a>
+                            </div>
+                        </div> -->
+
+                        <!-- Badge RSE -->
+                        <div class="card p-5 flex flex-col">
+                            <div class="flex items-start justify-between mb-4">
+                                <div class="flex items-center gap-3">
+                                    <div
+                                        class="w-10 h-10 rounded-lg bg-[#FEFCE8] border border-[#E8C96A]/50 flex items-center justify-center shrink-0">
+                                        <span class="material-symbols-outlined icon-fill text-[#C5A059]"
+                                            style="font-size:20px">star</span>
+                                    </div>
+                                    <div>
+                                        <h3 class="font-heading font-bold text-[15px] text-[#242424] leading-tight">
+                                            Badge RSE</h3>
+                                        <div class="text-[11px] text-[#616161] mt-0.5">Engagement Social attesté
+                                        </div>
+                                    </div>
+                                </div>
+                                <span
+                                    class="inline-flex items-center gap-1 text-[10px] font-semibold text-[#8A6A1F] bg-[#FEFCE8] border border-[#E8C96A] px-1.5 py-0.5 rounded shrink-0">
+                                    <span class="material-symbols-outlined icon-fill" style="font-size:10px">verified</span>
+                                    Validé
+                                </span>
+                            </div>
+
+                            <div class="bg-[#FEFCE8]/40 border border-[#E8C96A]/30 rounded-lg p-3 mb-5">
+                                <div class="text-[10px] uppercase tracking-wider text-[#8A6A1F] font-semibold mb-1">
+                                    Dernier don attesté
+                                </div>
+                                <div class="flex items-center justify-between gap-3">
+                                    <div class="min-w-0 flex-1">
+                                        <div class="font-heading font-semibold text-[13px] text-[#242424] truncate">
+                                            GBF Solidarité
+                                        </div>
+                                        <div class="text-[11px] text-[#616161]">15 mars 2026</div>
+                                    </div>
+                                    <div class="text-right shrink-0">
+                                        <span
+                                            class="font-heading font-bold text-[16px] text-[#242424]">2 500</span>
+                                        <span class="text-[12px] text-[#616161] ml-0.5">DT</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="flex items-center justify-between pt-4 border-t border-[#E0E0E0] mt-auto">
+                                <div>
+                                    <div class="text-[11px] text-[#8A8886]">Total dons 2026</div>
+                                    <div class="font-heading font-bold text-[18px] text-[#242424]">12 400 <span
+                                            class="text-[12px] text-[#616161] font-semibold">DT</span></div>
+                                </div>
+                                <a href="dashboard_rse.html"
+                                    class="py-2 px-4 text-[12.5px] font-semibold text-white bg-[#C5A059] hover:bg-[#8A6A1F] rounded transition-colors">
+                                    Nouveau don
+                                </a>
+                            </div>
+                        </div>
+
+                    </div>
+                </section>
+
+                <!-- ═════ SECTION 4 — ACCÈS RAPIDES ═════ -->
+                <section>
+                    <div class="mb-4">
+                        <h2 class="font-heading font-semibold text-[14px] text-[#242424] uppercase tracking-wider">
+                            Accès rapides
+                        </h2>
+                        <p class="text-[12px] text-[#616161] mt-0.5">
+                            Actions fréquentes en un clic
+                        </p>
+                    </div>
+
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
+
+                        <a href="dashboard_account.html"
+                            class="card card--hover p-4 flex flex-col gap-2 group">
+                            <div
+                                class="w-10 h-10 rounded-lg bg-[#EFF6FC] flex items-center justify-center group-hover:bg-[#0078D4] transition-colors">
+                                <span
+                                    class="material-symbols-outlined text-[#0078D4] group-hover:text-white transition-colors"
+                                    style="font-size:20px">image</span>
+                            </div>
+                            <div class="font-heading font-semibold text-[13px] text-[#242424] leading-tight mt-1">
+                                Modifier le logo
+                            </div>
+                            <div class="text-[11px] text-[#8A8886] leading-snug">
+                                Mettre à jour l'identité visuelle
+                            </div>
+                        </a>
+
+                        <a href="dashboard_boost.html"
+                            class="card card--hover p-4 flex flex-col gap-2 group">
+                            <div
+                                class="w-10 h-10 rounded-lg bg-[#EFF6FC] flex items-center justify-center group-hover:bg-[#0078D4] transition-colors">
+                                <span
+                                    class="material-symbols-outlined icon-fill text-[#0078D4] group-hover:text-white transition-colors"
+                                    style="font-size:20px">bolt</span>
+                            </div>
+                            <div class="font-heading font-semibold text-[13px] text-[#242424] leading-tight mt-1">
+                                Booster un profil
+                            </div>
+                            <div class="text-[11px] text-[#8A8886] leading-snug">
+                                Mettre en avant 30 jours
+                            </div>
+                        </a>
+
+                        <a href="dashboard_rse.html"
+                            class="card card--hover p-4 flex flex-col gap-2 group">
+                            <div
+                                class="w-10 h-10 rounded-lg bg-[#FEFCE8] border border-[#E8C96A]/40 flex items-center justify-center group-hover:bg-[#C5A059] transition-colors">
+                                <span
+                                    class="material-symbols-outlined text-[#C5A059] group-hover:text-white transition-colors"
+                                    style="font-size:20px">volunteer_activism</span>
+                            </div>
+                            <div class="font-heading font-semibold text-[13px] text-[#242424] leading-tight mt-1">
+                                Soumettre un reçu RSE
+                            </div>
+                            <div class="text-[11px] text-[#8A8886] leading-snug">
+                                Ajouter un don attesté
+                            </div>
+                        </a>
+
+                        <a href="public_linkup_technofab-industries.html" target="_blank" rel="noopener"
+                            class="card card--hover p-4 flex flex-col gap-2 group">
+                            <div
+                                class="w-10 h-10 rounded-lg bg-[#EFF6FC] flex items-center justify-center group-hover:bg-[#0078D4] transition-colors">
+                                <span
+                                    class="material-symbols-outlined text-[#0078D4] group-hover:text-white transition-colors"
+                                    style="font-size:20px">share</span>
+                            </div>
+                            <div class="font-heading font-semibold text-[13px] text-[#242424] leading-tight mt-1 flex items-center gap-1">
+                                Partager mon profil
+                                <span class="material-symbols-outlined text-[#8A8886]"
+                                    style="font-size:12px">open_in_new</span>
+                            </div>
+                            <div class="text-[11px] text-[#8A8886] leading-snug">
+                                Voir la carte publique LinkUP
+                            </div>
+                        </a>
+
+                    </div>
+                </section>
+
+            </div>
+        </main>
+
+    </div>
+
+    <!-- ═════════════════════════════════════════════════════
+         JS — drawer + dropdowns exclusifs
+         ═════════════════════════════════════════════════════ -->
+    <script>
+        (function () {
+            const sidebar = document.getElementById('sidebar');
+            const backdrop = document.getElementById('backdrop');
+            const menuBtn = document.getElementById('menuBtn');
+            const bellBtn = document.getElementById('bellBtn');
+            const bellDropdown = document.getElementById('bellDropdown');
+            const avatarBtn = document.getElementById('avatarBtn');
+            const avatarDropdown = document.getElementById('avatarDropdown');
+
+            const dropdowns = [
+                { btn: bellBtn, panel: bellDropdown },
+                { btn: avatarBtn, panel: avatarDropdown },
+            ];
+
+            function closeAllDropdowns() {
+                dropdowns.forEach(({ btn, panel }) => {
+                    panel.classList.remove('open');
+                    btn.setAttribute('aria-expanded', 'false');
+                });
+            }
+
+            function toggleDropdown(target) {
+                const wasOpen = target.panel.classList.contains('open');
+                closeAllDropdowns();
+                if (!wasOpen) {
+                    target.panel.classList.add('open');
+                    target.btn.setAttribute('aria-expanded', 'true');
+                }
+            }
+
+            function openDrawer() {
+                closeAllDropdowns();
+                sidebar.classList.add('open');
+                backdrop.classList.remove('hidden');
+                document.body.style.overflow = 'hidden';
+            }
+
+            function closeDrawer() {
+                sidebar.classList.remove('open');
+                backdrop.classList.add('hidden');
+                document.body.style.overflow = '';
+            }
+
+            menuBtn.addEventListener('click', openDrawer);
+            backdrop.addEventListener('click', closeDrawer);
+
+            dropdowns.forEach((dd) => {
+                dd.btn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    toggleDropdown(dd);
+                });
+            });
+
+            document.addEventListener('click', (e) => {
+                const clickedInsideDropdown = dropdowns.some(
+                    (dd) => dd.panel.contains(e.target) || dd.btn.contains(e.target)
+                );
+                if (!clickedInsideDropdown) closeAllDropdowns();
+            });
+
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape') {
+                    closeAllDropdowns();
+                    if (sidebar.classList.contains('open')) closeDrawer();
+                }
+            });
+
+            let resizeTimer;
+            window.addEventListener('resize', () => {
+                clearTimeout(resizeTimer);
+                resizeTimer = setTimeout(() => {
+                    if (window.innerWidth >= 768 && sidebar.classList.contains('open')) {
+                        closeDrawer();
+                    }
+                }, 100);
+            });
+        })();
+    </script>
+
+    <!-- ════════════════════════════════════════════════════════════════
+         SEED DATA HYDRATION
+         Loads marketup_seed_data.js + dashboard_hydrate_utils.js,
+         then hydrates this page from window.MARKETUP_DATA.
+         Only common chrome (sidebar + topbar) is hydrated here;
+         page-specific content is hydrated in a follow-up wave.
+         ════════════════════════════════════════════════════════════════ -->
+    <script src="marketup_seed_data.js"></script>
+    <script src="dashboard_hydrate_utils.js"></script>
+    <script>
+        MARKETUP_HYDRATE.bootstrapPage(function (me, H) {
+            const { set } = MARKETUP_HYDRATE;
+            const fullName = me.data.displayName.fr;
+
+            // ─── Welcome message ──────────────────────────────────────
+            set('dx-welcome', `Bienvenue, ${fullName}`);
+
+            // ─── Page title ──────────────────────────────────────────
+            document.title = `MARKET-UP | Tableau de bord — ${fullName}`;
+
+            // NOTE: the stats (vues totales, état des 3 profils, boost, RSE)
+            // are hardcoded for the canon TechnoFab scenario:
+            //   • 260 vues totales (LinkUP boosted)
+            //   • BrandUP Refusé · TraceUP En attente · LinkUP Actif+Boosté
+            //   • RSE badge Validé
+            // Dynamic per-user computation of these will be done in a future
+            // pass that introduces real view-counting and reactive badges.
+        });
+    </script>
+
+</body>
+
+</html>

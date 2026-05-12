@@ -1,0 +1,718 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>LinkUP — Moteur de recherche MARKET-UP</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;family=Inter:wght@400;500;600&amp;display=swap"
+        rel="stylesheet" />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+        rel="stylesheet" />
+    <script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "surface-bright": "#fbf9f8",
+                        "on-error-container": "#93000a",
+                        "surface-container-low": "#f5f3f3",
+                        "inverse-on-surface": "#f2f0f0",
+                        "secondary-fixed-dim": "#d8baff",
+                        "tertiary-fixed": "#ffdea5",
+                        "surface-container-lowest": "#ffffff",
+                        "on-tertiary-fixed-variant": "#5d4201",
+                        "on-primary-container": "#ffffff",
+                        "on-primary": "#ffffff",
+                        "on-secondary-fixed-variant": "#573586",
+                        "on-error": "#ffffff",
+                        "tertiary-fixed-dim": "#e9c176",
+                        "secondary-fixed": "#eddcff",
+                        "primary": "#0078D4",
+                        "on-tertiary-container": "#ffffff",
+                        "secondary-container": "#cba5ff",
+                        "on-tertiary-fixed": "#261900",
+                        "on-surface-variant": "#404752",
+                        "inverse-surface": "#303031",
+                        "surface": "#fbf9f8",
+                        "primary-fixed": "#d3e3ff",
+                        "tertiary": "#765918",
+                        "surface-dim": "#dbdad9",
+                        "on-background": "#1b1c1c",
+                        "on-primary-fixed-variant": "#004883",
+                        "background": "#fbf9f8",
+                        "on-secondary": "#ffffff",
+                        "surface-container": "#efeded",
+                        "error": "#ba1a1a",
+                        "error-container": "#ffdad6",
+                        "on-primary-fixed": "#001c39",
+                        "surface-tint": "#0060ab",
+                        "primary-container": "#0078d4",
+                        "outline": "#717783",
+                        "on-surface": "#1b1c1c",
+                        "on-secondary-fixed": "#290055",
+                        "surface-container-high": "#e9e8e7",
+                        "on-tertiary": "#ffffff",
+                        "secondary": "#6f4d9f",
+                        "primary-fixed-dim": "#a3c9ff",
+                        "surface-variant": "#e4e2e2",
+                        "surface-container-highest": "#e4e2e2",
+                        "tertiary-container": "#92712f",
+                        "inverse-primary": "#a3c9ff",
+                        "outline-variant": "#c0c7d4",
+                        "on-secondary-container": "#573586"
+                    },
+                    fontFamily: {
+                        "headline": ["Plus Jakarta Sans"],
+                        "body": ["Inter"],
+                        "label": ["Inter"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "2xl": "14px",
+                        "full": "9999px"
+                    },
+                },
+            },
+        }
+    </script>
+    <style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            vertical-align: middle;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+
+        h1,
+        h2,
+        h3 {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+        }
+
+        #mobile-menu {
+            transition: transform 0.3s ease-in-out;
+            transform: translateX(100%);
+        }
+
+        #mobile-menu.open {
+            transform: translateX(0);
+        }
+
+        .card-title-clamp {
+            display: -webkit-box;
+            -webkit-line-clamp: 1;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+    
+        .nav-tab-active {
+            background: white;
+            color: #000000;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+            cursor: pointer;
+        }
+        .nav-tab-inactive {
+            background: transparent;
+            color: #64748b;
+            cursor: pointer;
+            transition: color 0.15s;
+        }
+        .nav-tab-inactive:hover { color: #000000; }
+    </style>
+</head>
+
+<body class="bg-surface-bright text-on-surface antialiased">
+    <!-- ============================================================= -->
+    <!-- NAVBAR — country ▾ · B2B/B2C · logo · apps launcher · actions  -->
+    <!-- ============================================================= -->
+    <nav
+        class="fixed top-0 w-full z-50 bg-white shadow-sm px-3 md:px-8 flex items-center justify-between border-b border-outline-variant min-h-[64px] md:h-[72px]">
+        <!-- LEFT col: country + B2B/B2C toggle -->
+        <div class="flex items-center gap-2 md:gap-3 w-1/3">
+            <!-- Country dropdown (desktop only) -->
+            <div class="relative hidden md:block">
+                <button id="country-btn" type="button"
+                    class="flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-sm text-on-surface-variant font-medium hover:bg-surface-container transition-colors">
+                    <span class="text-base leading-none">🇹🇳</span>
+                    <span>Tunisie</span>
+                    <span class="material-symbols-outlined text-[18px]">expand_more</span>
+                </button>
+                <div id="country-menu"
+                    class="hidden absolute top-[calc(100%+6px)] left-0 w-56 bg-white rounded-lg shadow-[0_8px_32px_rgba(0,0,0,0.16)] border border-outline-variant py-1.5 z-[60]">
+                    <button type="button"
+                        class="w-full flex items-center gap-2 px-3 py-2 text-sm text-on-surface hover:bg-surface-container-low">
+                        <span>🇹🇳</span>
+                        <span class="flex-1 text-left">Tunisie</span>
+                        <span class="material-symbols-outlined text-[18px] text-primary"
+                            style="font-variation-settings:'FILL' 1">check_circle</span>
+                    </button>
+                    <div class="my-1 h-px bg-outline-variant"></div>
+                    <p class="px-3 pt-1 pb-1 text-[10px] font-bold uppercase tracking-widest text-on-surface-variant">
+                        Bientôt disponible</p>
+                    <button type="button" disabled
+                        class="w-full flex items-center gap-2 px-3 py-2 text-sm text-on-surface-variant opacity-50 cursor-not-allowed">
+                        <span>🇫🇷</span>
+                        <span class="flex-1 text-left">France</span>
+                    </button>
+                    <button type="button" disabled
+                        class="w-full flex items-center gap-2 px-3 py-2 text-sm text-on-surface-variant opacity-50 cursor-not-allowed">
+                        <span>🇲🇦</span>
+                        <span class="flex-1 text-left">Maroc</span>
+                    </button>
+                    <button type="button" disabled
+                        class="w-full flex items-center gap-2 px-3 py-2 text-sm text-on-surface-variant opacity-50 cursor-not-allowed">
+                        <span>🇩🇿</span>
+                        <span class="flex-1 text-left">Algérie</span>
+                    </button>
+                </div>
+            </div>
+            <!-- B2B/B2C toggle (URL params — refresh on click) -->
+            <div class="flex bg-surface-container rounded-full p-1 h-8 items-center">
+                <button type="button" id="navTabB2B"
+                    class="nav-tab-active flex items-center justify-center px-3 text-[11px] font-bold rounded-full h-6">B2B</button>
+                <button type="button" id="navTabB2C"
+                    class="nav-tab-inactive flex items-center justify-center px-3 text-[11px] font-bold rounded-full h-6">B2C</button>
+            </div>
+        </div>
+        <!-- CENTER col: logo -->
+        <div class="flex items-center justify-center w-1/3">
+            <a class="flex items-center gap-2 hover:opacity-80 transition-opacity" href="public_linkup.html">
+                <img alt="LinkUP" class="h-8 md:h-10 w-auto object-contain" src="shared/logos/logos-linkup.png" />
+            </a>
+        </div>
+        <!-- RIGHT col: app launcher + actions -->
+        <div class="flex items-center justify-end gap-1 md:gap-2 w-1/3">
+            <!-- App launcher (Google/Office 365 style) -->
+            <div class="relative">
+                <button id="app-launcher-btn" type="button" aria-label="Produits MARKET-UP"
+                    class="w-10 h-10 flex items-center justify-center rounded-lg text-on-surface-variant hover:bg-surface-container transition-colors">
+                    <span class="material-symbols-outlined text-[22px]">apps</span>
+                </button>
+                <div id="app-launcher-menu"
+                    class="hidden absolute top-[calc(100%+8px)] right-0 w-[320px] bg-white rounded-lg shadow-[0_8px_32px_rgba(0,0,0,0.16)] border border-outline-variant p-4 z-[60]">
+                    <p class="text-[10px] font-bold uppercase tracking-widest text-on-surface-variant mb-3 px-1">
+                        Produits MARKET-UP</p>
+                    <div class="grid grid-cols-3 gap-2">
+                        <!-- BrandUP -->
+                        <a href="public_brandup.html"
+                            class="flex flex-col items-center gap-2 p-3 rounded-lg hover:bg-surface-container-low transition-colors group border border-transparent">
+                            <div
+                                class="w-11 h-11 rounded-lg bg-[#0078D4] flex items-center justify-center shadow-sm">
+                                <span class="material-symbols-outlined text-white text-[22px]"
+                                    style="font-variation-settings:'FILL' 1">storefront</span>
+                            </div>
+                            <span
+                                class="text-[12px] font-semibold text-on-surface group-hover:text-[#0078D4] transition-colors">BrandUP</span>
+                        </a>
+                        <!-- TraceUP -->
+                        <a href="public_traceup.html"
+                            class="flex flex-col items-center gap-2 p-3 rounded-lg hover:bg-surface-container-low transition-colors group border border-transparent">
+                            <div
+                                class="w-11 h-11 rounded-lg bg-[#8764B8] flex items-center justify-center shadow-sm">
+                                <span class="material-symbols-outlined text-white text-[22px]"
+                                    style="font-variation-settings:'FILL' 1">play_circle</span>
+                            </div>
+                            <span
+                                class="text-[12px] font-semibold text-on-surface group-hover:text-[#8764B8] transition-colors">TraceUP</span>
+                        </a>
+                        <!-- LinkUP — CURRENT -->
+                        <a href="public_linkup.html"
+                            class="flex flex-col items-center gap-2 p-3 rounded-lg bg-[#1A1A1A]/5 border border-[#1A1A1A]/20 hover:bg-[#1A1A1A]/10 transition-colors">
+                            <div
+                                class="w-11 h-11 rounded-lg bg-[#1A1A1A] border border-[#C5A059]/50 flex items-center justify-center shadow-sm">
+                                <span class="material-symbols-outlined text-[#C5A059] text-[22px]"
+                                    style="font-variation-settings:'FILL' 1">qr_code_2</span>
+                            </div>
+                            <span class="text-[12px] font-semibold text-[#1A1A1A]">LinkUP</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <!-- Desktop actions -->
+            <div class="hidden md:flex items-center gap-4 ml-2">
+                <a class="text-sm font-semibold text-on-surface-variant hover:text-primary transition-colors"
+                    href="auth_connexion.html">Connexion</a>
+                <a href="auth_inscription-entreprise.html"
+                    class="px-5 py-2 text-sm font-semibold rounded-lg bg-primary text-white hover:bg-[#106EBE] transition-colors whitespace-nowrap">
+                    Inscrire une marque
+                </a>
+            </div>
+            <!-- Mobile hamburger -->
+            <button class="md:hidden flex items-center p-2 text-on-surface-variant"
+                onclick="document.getElementById('mobile-menu').classList.toggle('open')">
+                <span class="material-symbols-outlined text-2xl">menu</span>
+            </button>
+        </div>
+    </nav>
+
+    <!-- Mobile Slide-out Menu -->
+    <div class="fixed inset-0 z-[70] bg-white md:hidden" id="mobile-menu">
+        <div class="p-6 h-full flex flex-col">
+            <div class="flex justify-end mb-6">
+                <button onclick="document.getElementById('mobile-menu').classList.remove('open')">
+                    <span class="material-symbols-outlined text-3xl">close</span>
+                </button>
+            </div>
+            <div class="flex flex-col gap-5">
+                <!-- Country (mobile, static for now) -->
+                <div class="flex items-center justify-between pb-4 border-b border-outline-variant">
+                    <span class="text-sm text-on-surface-variant">Pays</span>
+                    <div class="flex items-center gap-2 font-semibold text-on-surface">
+                        <span>🇹🇳</span>
+                        <span>Tunisie</span>
+                    </div>
+                </div>
+                <a href="auth_connexion.html"
+                    class="text-lg font-semibold text-on-surface py-2 border-b border-outline-variant">Connexion</a>
+                <a href="onboarding_onboarding.html"
+                    class="bg-primary text-white w-full py-3.5 rounded-lg text-base font-semibold text-center mt-2">Inscrire
+                    une marque</a>
+            </div>
+        </div>
+    </div>
+
+    <main class="pt-[64px] md:pt-[72px]">
+        <!-- ============================================================= -->
+        <!-- ============================================================= -->
+        <!-- SEARCH HERO                                                    -->
+        <!-- ============================================================= -->
+        <section class="bg-white py-12 lg:py-20 px-6">
+            <div class="max-w-4xl mx-auto text-center">
+                <h1 class="text-3xl lg:text-[42px] leading-tight font-bold text-[#242424] mb-4">Trouvez les entreprises
+                    tunisiennes</h1>
+                <p class="text-[#616161] text-base lg:text-lg mb-10">Le carnet de contacts des entreprises tunisiennes</p>
+                <div
+                    class="max-w-[860px] mx-auto bg-white border border-[#D1D1D1] rounded-lg flex flex-col md:flex-row items-stretch p-1 group focus-within:ring-2 focus-within:ring-primary/20 focus-within:border-primary transition-all gap-1 md:gap-0">
+                    <div class="flex items-center flex-1 px-4 md:border-r border-[#D1D1D1]">
+                        <span class="material-symbols-outlined text-[#616161] mr-3">search</span>
+                        <input id="searchInput"
+                            class="w-full border-none focus:ring-0 text-on-surface placeholder-[#616161] py-3 lg:py-4 bg-transparent"
+                            placeholder="Nom, fonction, entreprise, ville…" type="text" />
+                    </div>
+                    <div class="flex items-center px-4 w-full md:w-56 bg-slate-50 md:bg-transparent rounded-lg md:rounded-none">
+                        <span class="material-symbols-outlined text-[#616161] mr-2">location_on</span>
+                        <select id="filterGouvernorat"
+                            class="w-full border-none focus:ring-0 text-on-surface text-sm bg-transparent appearance-none py-3">
+                            <option value="">Toute la Tunisie</option>
+                        </select>
+                    </div>
+                    <button id="searchButton"
+                        class="bg-primary hover:bg-[#106EBE] text-white px-8 py-3 lg:py-4 rounded-lg font-semibold transition-colors w-full md:w-auto">
+                        Rechercher
+                    </button>
+                </div>
+                <div class="mt-8 flex flex-wrap items-center justify-center gap-x-4 gap-y-2 text-sm">
+                    <span class="text-[#616161]">Populaire :</span>
+                    <div class="flex flex-wrap gap-x-3 gap-y-1 justify-center">
+                        <a class="text-primary hover:underline" href="#">Agro-Industrie</a>
+                        <span class="hidden sm:inline text-[#D1D1D1]">·</span>
+                        <a class="text-primary hover:underline" href="#">Textile</a>
+                        <span class="hidden sm:inline text-[#D1D1D1]">·</span>
+                        <a class="text-primary hover:underline" href="#">IT</a>
+                        <span class="hidden sm:inline text-[#D1D1D1]">·</span>
+                        <a class="text-primary hover:underline" href="#">BTP</a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ============================================================= -->
+        <!-- SPONSORING BANNER                                              -->
+        <!-- ============================================================= -->
+        <section class="px-6 pt-6 pb-2 max-w-7xl mx-auto">
+            <div class="relative w-full h-[220px] rounded-lg overflow-hidden bg-slate-900 group">
+                <img alt="Sponsor VERIPRO"
+                    class="absolute inset-0 w-full h-full object-cover opacity-40 transition-transform duration-700 group-hover:scale-105"
+                    src="https://lh3.googleusercontent.com/aida-public/AB6AXuB94zvbAKahDaIIKAlt2KJK3ZL0umsapDo4qlTBpq7PP3tcaFQctEMYUPZ5KzCwl6suvyGViyXtzjOh8bcsdqIgrVRRCYL8s6lcxaW9ZVkWFnn9njsha3Yuy2JlhLcj_w7_XZprx6qoUCyRkM3H39LQ9ib5z4pGc28Xb9wj2LSJ9NDKTzt0t2lXy8qm6_40TFml-DarjcZ4goouWLrd6zGY99Hn_H7gu-eJ4Fa7lq-MUuyY1WbnYfQ0whH8DUry81OprdMuahDwo_U" />
+                <span
+                    class="absolute top-3 left-3 z-10 text-[10px] font-bold tracking-widest uppercase text-white/70 bg-black/30 backdrop-blur-sm px-2 py-0.5 rounded">Sponsorisé</span>
+                <div class="relative z-10 h-full flex flex-col justify-center items-start px-6 md:px-10 max-w-2xl">
+                    <h2 class="text-xl md:text-2xl font-bold text-white mb-1.5">VERIPRO TUNISIE SA</h2>
+                    <p class="text-slate-300 mb-4 text-sm leading-relaxed line-clamp-2">Leader de l'audit et du conseil
+                        stratégique pour l'industrie 4.0 en Afrique du Nord.</p>
+                    <a class="inline-flex items-center text-white font-semibold text-sm hover:translate-x-1 transition-transform"
+                        href="#">
+                        Découvrir
+                        <span class="material-symbols-outlined ml-1 text-lg">arrow_forward</span>
+                    </a>
+                </div>
+            </div>
+        </section>
+
+        <!-- ============================================================= -->
+        <!-- FILTERS BAR — count + secteur only                             -->
+        <!-- ============================================================= -->
+        <div class="sticky top-[64px] md:top-[72px] z-40 bg-[#F5F5F5] border-y border-[#E0E0E0] px-6 py-3">
+            <div class="max-w-7xl mx-auto flex flex-wrap items-center gap-3">
+                <span id="resultsCount" class="text-sm font-semibold text-[#242424]">— résultats</span>
+                <span class="hidden md:inline text-[#D1D1D1]">·</span>
+                <select id="filterSector"
+                    class="bg-white border border-[#D1D1D1] rounded-lg pl-3 pr-8 py-1.5 text-sm font-medium text-[#242424] focus:border-primary focus:ring-2 focus:ring-primary/20 focus:outline-none">
+                    <option value="">Tous secteurs</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- ============================================================= -->
+        <!-- RESULTS GRID — 8 cards, BOOSTED FIRST (server-side sort rule)  -->
+        <!-- Row 1 (1–4): 4 boostées · Row 2 (5–8): 2 RSE + 2 standard      -->
+        <!-- ============================================================= -->
+        <section class="max-w-7xl mx-auto px-6 py-10">
+            <div id="resultsInitial" class="text-center py-16">
+                <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-[#FAFAFA] mb-4">
+                    <span class="material-symbols-outlined text-[#000]" style="font-size:32px">search</span>
+                </div>
+                <h3 class="font-heading font-bold text-[18px] text-[#242424] mb-2">Saisissez votre recherche</h3>
+                <p class="text-[14px] text-[#616161] max-w-md mx-auto">Indiquez le nom, la fonction ou l'entreprise que vous cherchez, puis cliquez sur <strong class="text-[#000]">Rechercher</strong>.</p>
+            </div>
+            <div id="resultsGrid" class="hidden grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5"></div>
+            <div id="resultsEmpty" class="hidden text-center py-16">
+                <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-[#F5F5F5] mb-4">
+                    <span class="material-symbols-outlined text-[#8A8886]" style="font-size:32px">search_off</span>
+                </div>
+                <h3 class="font-heading font-bold text-[18px] text-[#242424] mb-2">Aucun résultat</h3>
+                <p class="text-[14px] text-[#616161] max-w-md mx-auto">Aucune carte de contact ne correspond à votre recherche. Essayez d'autres mots-clés ou élargissez vos filtres.</p>
+            </div>
+        </section>
+    </main>
+
+    <!-- ============================================================= -->
+    <!-- FOOTER — canon master profile                                  -->
+    <!-- ============================================================= -->
+    <footer class="w-full py-12 px-8 mt-8 bg-surface-container-low border-t border-outline-variant">
+        <div class="max-w-[1280px] mx-auto">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-10 mb-10">
+                <div>
+                    <div class="flex items-center gap-2 mb-3">
+                        <span class="material-symbols-outlined text-primary text-[22px]"
+                            style="font-variation-settings:'FILL' 1">hexagon</span>
+                        <span class="text-on-surface font-bold text-lg tracking-tight">MARKET-UP</span>
+                    </div>
+                    <p class="text-xs text-on-surface-variant leading-relaxed">
+                        L'annuaire professionnel des entreprises tunisiennes.<br />
+                        <span class="font-medium">vivasky.media</span>
+                    </p>
+                </div>
+                <div>
+                    <h4 class="text-on-surface font-bold text-[11px] uppercase tracking-widest mb-4">Plateforme</h4>
+                    <ul class="space-y-2 text-xs text-on-surface-variant">
+                        <li><a class="hover:text-primary transition-colors" href="public_brandup.html">BrandUP</a></li>
+                        <li><a class="hover:text-primary transition-colors" href="public_traceup.html">TraceUP</a></li>
+                        <li><a class="hover:text-primary transition-colors" href="public_linkup.html">LinkUP</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="text-on-surface font-bold text-[11px] uppercase tracking-widest mb-4">Entreprise</h4>
+                    <ul class="space-y-2 text-xs text-on-surface-variant">
+                        <li><a class="hover:text-primary transition-colors" href="onboarding_onboarding.html">Inscrire une entreprise</a>
+                        </li>
+                        <li><a class="hover:text-primary transition-colors" href="#">Tarifs Boost &amp; Sponsoring</a>
+                        </li>
+                        <li><a class="hover:text-primary transition-colors" href="#">Programme RSE</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="text-on-surface font-bold text-[11px] uppercase tracking-widest mb-4">Légal</h4>
+                    <ul class="space-y-2 text-xs text-on-surface-variant">
+                        <li><a class="hover:text-primary transition-colors" href="#">Confidentialité</a></li>
+                        <li><a class="hover:text-primary transition-colors" href="#">Conditions générales</a></li>
+                        <li><a class="hover:text-primary transition-colors" href="#">Support</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div
+                class="pt-6 border-t border-outline-variant flex flex-col md:flex-row justify-between items-center gap-3">
+                <p class="text-[11px] text-on-surface-variant">© 2026 MARKET-UP · AGGREGAX SUARL · Tous droits réservés
+                </p>
+                <p class="text-[11px] text-on-surface-variant">Fait en Tunisie 🇹🇳</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- ============================================================= -->
+    <!-- Dropdowns JS — country + app launcher                          -->
+    <!-- ============================================================= -->
+    <script>
+        (function () {
+            const countryBtn = document.getElementById('country-btn');
+            const countryMenu = document.getElementById('country-menu');
+            const appBtn = document.getElementById('app-launcher-btn');
+            const appMenu = document.getElementById('app-launcher-menu');
+
+            function closeAll() {
+                countryMenu && countryMenu.classList.add('hidden');
+                appMenu && appMenu.classList.add('hidden');
+            }
+
+            countryBtn && countryBtn.addEventListener('click', function (e) {
+                e.stopPropagation();
+                const wasOpen = !countryMenu.classList.contains('hidden');
+                closeAll();
+                if (!wasOpen) countryMenu.classList.remove('hidden');
+            });
+
+            appBtn && appBtn.addEventListener('click', function (e) {
+                e.stopPropagation();
+                const wasOpen = !appMenu.classList.contains('hidden');
+                closeAll();
+                if (!wasOpen) appMenu.classList.remove('hidden');
+            });
+
+            // Prevent closing when clicking inside the menus
+            countryMenu && countryMenu.addEventListener('click', function (e) { e.stopPropagation(); });
+            appMenu && appMenu.addEventListener('click', function (e) { e.stopPropagation(); });
+
+            // Close on outside click or Escape
+            document.addEventListener('click', closeAll);
+            document.addEventListener('keydown', function (e) {
+                if (e.key === 'Escape') closeAll();
+            });
+        })();
+    </script>
+    <!-- ════════════════════════════════════════════════════════════════
+         SEED DATA + SEARCH ENGINE (P2.3 v2) — LinkUP
+         B2B/B2C as page-level toggle. Search-pattern (empty initial).
+         ════════════════════════════════════════════════════════════════ -->
+    <script src="marketup_seed_data.js"></script>
+    <script>
+        (function () {
+            const data = window.MARKETUP_DATA;
+            if (!data) { console.error('marketup_seed_data.js not loaded'); return; }
+
+            const norm = (s) => String(s || '').toLowerCase()
+                .normalize('NFD').replace(/[\u0300-\u036f]/g, '').trim();
+            const escape = (s) => String(s || '')
+                .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+            const fmtName = (i18n) => (i18n && (i18n.fr || i18n.ar || i18n.en)) || '—';
+
+            const sectorById = {};
+            (data.sectorsB2B || []).forEach(s => { sectorById[s.id] = s; });
+            const categoryById = {};
+            (data.categoriesB2C || []).forEach(c => { categoryById[c.id] = c; });
+            const gouvById = {};
+            (data.gouvernorats || []).forEach(g => { gouvById[g.id] = g; });
+
+            let currentType = 'B2B';
+            let hasSearched = false;
+
+            const getSectorName = (c) => {
+                const s = c.type === 'B2B' ? sectorById[c.liveData.sectorId] : categoryById[c.liveData.sectorId];
+                return s ? fmtName(s.name) : '';
+            };
+            const getGouvernoratName = (c) => {
+                const g = gouvById[c.liveData.gouvernorat];
+                return g ? fmtName(g.name) : (c.liveData.gouvernorat || '');
+            };
+
+            function getEligibleForType(type) {
+                return data.companies.filter(c =>
+                    c.type === type
+                    && c.profiles && c.profiles.linkup && c.profiles.linkup.status === 'active'
+                );
+            }
+
+            function populateDropdowns() {
+                const eligible = getEligibleForType(currentType);
+
+                const gouvSelect = document.getElementById('filterGouvernorat');
+                gouvSelect.innerHTML = '<option value="">Toute la Tunisie</option>';
+                const gouvSet = new Set();
+                eligible.forEach(c => { if (c.liveData.gouvernorat) gouvSet.add(c.liveData.gouvernorat); });
+                Array.from(gouvSet)
+                    .map(id => ({ id, name: gouvById[id] ? fmtName(gouvById[id].name) : id }))
+                    .sort((a, b) => a.name.localeCompare(b.name, 'fr'))
+                    .forEach(g => {
+                        const opt = document.createElement('option');
+                        opt.value = g.id; opt.textContent = g.name;
+                        gouvSelect.appendChild(opt);
+                    });
+
+                const sectorSelect = document.getElementById('filterSector');
+                const allOptions = currentType === 'B2B' ? data.sectorsB2B : data.categoriesB2C;
+                const labelAll = currentType === 'B2B' ? 'Tous secteurs' : 'Toutes catégories';
+                sectorSelect.innerHTML = `<option value="">${labelAll}</option>`;
+                (allOptions || []).slice().sort((a, b) => fmtName(a.name).localeCompare(fmtName(b.name), 'fr'))
+                    .forEach(s => {
+                        const opt = document.createElement('option');
+                        opt.value = s.id; opt.textContent = fmtName(s.name);
+                        sectorSelect.appendChild(opt);
+                    });
+            }
+
+            function matchesText(c, query) {
+                if (!query.trim()) return true;
+                const lu = c.profiles.linkup;
+                const card = lu.data.contactCard || {};
+                const haystack = [
+                    fmtName(c.data && c.data.displayName),
+                    card.fullName,
+                    card.title && (card.title.fr || ''),
+                    card.bio && (card.bio.fr || ''),
+                    card.company && (card.company.fr || ''),
+                    getSectorName(c),
+                ].map(norm).join(' ');
+                const tokens = norm(query).split(/\s+/).filter(Boolean);
+                return tokens.every(t => haystack.includes(t));
+            }
+
+            function performSearch() {
+                hasSearched = true;
+                const query = document.getElementById('searchInput').value;
+                const gouv = document.getElementById('filterGouvernorat').value;
+                const sector = document.getElementById('filterSector').value;
+
+                let results = getEligibleForType(currentType)
+                    .filter(c => matchesText(c, query))
+                    .filter(c => !gouv || c.liveData.gouvernorat === gouv)
+                    .filter(c => !sector || c.liveData.sectorId === sector);
+
+                results.sort((a, b) => new Date(b.registeredAt || 0) - new Date(a.registeredAt || 0));
+                renderResults(results);
+            }
+
+            function getInitials(name) {
+                const parts = String(name || '').trim().split(/\s+/).slice(0, 2);
+                return parts.map(p => p[0] || '').join('').toUpperCase() || '?';
+            }
+
+            function cardHTML(c) {
+                const name = fmtName(c.data && c.data.displayName);
+                const sector = getSectorName(c);
+                const gouv = getGouvernoratName(c);
+                const slug = c.slug;
+                const initials = getInitials(name);
+
+                // Description : pitch BrandUP si dispo, sinon bio LinkUP
+                const lu = c.profiles.linkup;
+                const card = lu.data.contactCard || {};
+                let description = '';
+                if (c.profiles.brandup && c.profiles.brandup.status === 'active' && c.profiles.brandup.data.pitch && c.profiles.brandup.data.pitch.fr) {
+                    description = c.profiles.brandup.data.pitch.fr;
+                } else if (card.bio && card.bio.fr) {
+                    description = card.bio.fr;
+                } else if (card.fullName) {
+                    description = `Carte de contact — ${card.fullName}`;
+                }
+
+                // Visual : gallery BrandUP si dispo, sinon initiales sur fond noir LinkUP
+                const cover = (c.profiles.brandup && c.profiles.brandup.status === 'active' && c.profiles.brandup.data.projects && c.profiles.brandup.data.projects[0])
+                    ? c.profiles.brandup.data.projects[0].image : null;
+                const visualHTML = cover
+                    ? `<img alt="${escape(name)}"
+                            class="w-full h-full object-cover rounded-[6px] transition-transform duration-300 group-hover:scale-105"
+                            src="${cover}" />`
+                    : `<div class="w-[40px] h-[40px] bg-[#000] rounded-full flex items-center justify-center text-white font-bold text-lg">${escape(initials)}</div>`;
+                const visualWrapClass = cover
+                    ? 'h-[107px] bg-[#F5F5F5] p-2 relative flex-shrink-0'
+                    : 'h-[107px] bg-[#F5F5F5] p-2 relative flex items-center justify-center flex-shrink-0';
+
+                const hasRSE = c.rseBadgeStatus === 'validated';
+                const rseBadge = hasRSE
+                    ? `<div class="flex items-center gap-1 bg-[#FEFCE8] border border-[#E8C96A] px-2 py-1 rounded h-[20px]">
+                            <span class="material-symbols-outlined text-[#C5A059] text-[12px]" style="font-variation-settings:'FILL' 1">star</span>
+                            <span class="text-[10px] font-bold text-[#854D0E]">RSE</span>
+                        </div>`
+                    : '<div></div>';
+
+                return `<a href="public_linkup_popup_${escape(slug)}.html"
+                    class="bg-white border border-[#E0E0E0] rounded-lg flex flex-col min-h-[260px] hover:border-[#000] hover:shadow-[0_4px_16px_rgba(0,0,0,0.12)] transition-all cursor-pointer group shadow-sm overflow-hidden">
+                    <div class="${visualWrapClass}">${visualHTML}</div>
+                    <div class="px-[16px] pt-[14px] pb-[12px] flex-grow flex flex-col">
+                        <h3 class="text-[15px] font-bold text-[#242424] card-title-clamp group-hover:text-[#000] transition-colors mb-2">${escape(name)}</h3>
+                        <p class="text-[13px] text-[#616161] line-clamp-2 leading-[1.6] flex-grow mb-2.5">${escape(description)}</p>
+                        <div>
+                            <span class="inline-block bg-[#F0F0F0] text-[#616161] text-[11px] font-medium px-2 py-0.5 rounded-[4px] mb-2">${escape(sector.toUpperCase())}</span>
+                        </div>
+                    </div>
+                    <div class="border-t border-[#F0F0F0] px-[16px] flex justify-between items-center mt-auto py-2.5">
+                        <div class="flex items-center gap-1 text-[#616161] text-[11px]">
+                            <span class="material-symbols-outlined text-[12px]">location_on</span>${escape(gouv)}
+                        </div>
+                        ${rseBadge}
+                    </div>
+                </a>`;
+            }
+
+            function renderResults(results) {
+                const initial = document.getElementById('resultsInitial');
+                const grid = document.getElementById('resultsGrid');
+                const empty = document.getElementById('resultsEmpty');
+                const count = document.getElementById('resultsCount');
+
+                initial.classList.add('hidden');
+                count.textContent = results.length === 0
+                    ? 'Aucun résultat'
+                    : (results.length === 1 ? '1 résultat' : `${results.length} résultats`);
+
+                if (results.length === 0) {
+                    grid.innerHTML = '';
+                    grid.classList.add('hidden');
+                    empty.classList.remove('hidden');
+                } else {
+                    grid.classList.remove('hidden');
+                    empty.classList.add('hidden');
+                    grid.innerHTML = results.map(cardHTML).join('');
+                }
+            }
+
+            function setType(newType) {
+                if (newType === currentType) return;
+                currentType = newType;
+                hasSearched = false;  // Reset → back to initial state
+
+                // Update navbar tabs visual state
+                const navB2B = document.getElementById('navTabB2B');
+                const navB2C = document.getElementById('navTabB2C');
+                const baseClass = 'flex items-center justify-center px-3 text-[11px] font-bold rounded-full h-6';
+                if (newType === 'B2B') {
+                    navB2B.className = 'nav-tab-active ' + baseClass;
+                    navB2C.className = 'nav-tab-inactive ' + baseClass;
+                } else {
+                    navB2C.className = 'nav-tab-active ' + baseClass;
+                    navB2B.className = 'nav-tab-inactive ' + baseClass;
+                }
+                document.getElementById('searchInput').value = '';
+                document.getElementById('filterGouvernorat').value = '';
+                document.getElementById('filterSector').value = '';
+                populateDropdowns();
+                document.getElementById('resultsInitial').classList.remove('hidden');
+                document.getElementById('resultsGrid').classList.add('hidden');
+                document.getElementById('resultsEmpty').classList.add('hidden');
+                document.getElementById('resultsCount').textContent = '— résultats';
+            }
+
+            document.getElementById('navTabB2B').addEventListener('click', () => setType('B2B'));
+            document.getElementById('navTabB2C').addEventListener('click', () => setType('B2C'));
+
+            // ─── Filter change listeners (re-run search if user has already searched) ─
+            // ─── ONLY filterSector triggers instant filter (on change) ─
+            // City + keyword require user to click "Rechercher"
+            const filterSectorEl = document.getElementById('filterSector');
+            if (filterSectorEl) {
+                filterSectorEl.addEventListener('change', () => {
+                    if (hasSearched) performSearch();
+                });
+            }
+            document.getElementById('searchButton').addEventListener('click', performSearch);
+            document.getElementById('searchInput').addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') performSearch();
+            });
+
+            populateDropdowns();
+        })();
+    </script>
+
+</body>
+
+</html>

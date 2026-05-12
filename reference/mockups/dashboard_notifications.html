@@ -1,0 +1,1184 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>MARKET-UP | Notifications — TechnoFab Industries</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap"
+        rel="stylesheet" />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
+        rel="stylesheet" />
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .font-heading { font-family: 'Plus Jakarta Sans', sans-serif; }
+        .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+        .icon-fill { font-variation-settings: 'FILL' 1; }
+
+        /* SIDEBAR */
+        .nav-item { display: flex; align-items: center; gap: 12px; padding: 8px 20px; font-size: 13px; font-weight: 500; color: #616161; border-left: 3px solid transparent; transition: background-color 0.15s ease, color 0.15s ease; cursor: pointer; text-decoration: none; line-height: 1.4; }
+        .nav-item .material-symbols-outlined { font-size: 18px; color: #8A8886; transition: color 0.15s ease; flex-shrink: 0; }
+        .nav-item:hover { background: #F5F5F5; color: #242424; }
+        .nav-item:hover .material-symbols-outlined { color: #616161; }
+        .nav-item.active { background: #EFF6FC; border-left-color: #0078D4; color: #0078D4; font-weight: 600; }
+        .nav-item.active .material-symbols-outlined { color: #0078D4; }
+        .section-label { font-size: 9px; font-weight: 700; letter-spacing: 0.15em; text-transform: uppercase; color: #8A8886; padding: 16px 20px 6px; user-select: none; }
+        nav::-webkit-scrollbar { width: 4px; }
+        nav::-webkit-scrollbar-track { background: transparent; }
+        nav::-webkit-scrollbar-thumb { background: #E0E0E0; border-radius: 2px; }
+        nav::-webkit-scrollbar-thumb:hover { background: #C8C6C4; }
+
+        /* TOPBAR */
+        .icon-btn { display: inline-flex; align-items: center; justify-content: center; width: 40px; height: 40px; border-radius: 8px; color: #424242; transition: background-color 0.15s ease; position: relative; background: transparent; border: none; cursor: pointer; }
+        .icon-btn:hover { background: #F5F5F5; }
+        .icon-btn .material-symbols-outlined { font-size: 22px; }
+
+        /* DROPDOWN */
+        .dropdown-panel { position: absolute; top: calc(100% + 8px); right: 0; background: white; border: 1px solid #E0E0E0; border-radius: 12px; box-shadow: 0 8px 32px rgba(0, 0, 0, 0.16); opacity: 0; transform: translateY(-4px); pointer-events: none; transition: opacity 0.15s ease, transform 0.15s ease; z-index: 40; }
+        .dropdown-panel.open { opacity: 1; transform: translateY(0); pointer-events: auto; }
+        .dropdown-item { display: flex; align-items: center; gap: 12px; padding: 10px 16px; font-size: 13px; color: #242424; text-decoration: none; transition: background-color 0.1s ease; cursor: pointer; }
+        .dropdown-item:hover { background: #F5F5F5; }
+        .dropdown-item .material-symbols-outlined { font-size: 18px; color: #616161; flex-shrink: 0; }
+        .dropdown-item .ext-arrow { margin-left: auto; font-size: 14px; color: #8A8886; }
+        .dropdown-item--danger { color: #B91C1C; }
+        .dropdown-item--danger .material-symbols-outlined { color: #B91C1C; }
+        .dropdown-item--danger:hover { background: #FEF2F2; }
+        .dropdown-section-label { padding: 12px 16px 6px; font-size: 9px; font-weight: 700; letter-spacing: 0.15em; text-transform: uppercase; color: #8A8886; user-select: none; }
+        .dropdown-divider { height: 1px; background: #E0E0E0; margin: 4px 0; }
+
+        /* CARDS */
+        .card { background: white; border: 1px solid #E0E0E0; border-radius: 8px; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.04); }
+
+        /* BUTTONS */
+        .btn { display: inline-flex; align-items: center; justify-content: center; gap: 6px; padding: 9px 16px; font-size: 13px; font-weight: 600; border-radius: 4px; transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease; cursor: pointer; border: 1px solid transparent; text-decoration: none; line-height: 1.2; white-space: nowrap; }
+        .btn .material-symbols-outlined { font-size: 16px; }
+        .btn-primary { background: #0078D4; color: white; }
+        .btn-primary:hover:not(:disabled) { background: #106EBE; }
+        .btn-primary:disabled { background: #E0E0E0; color: #A8A8A8; cursor: not-allowed; }
+        .btn-secondary { background: white; color: #242424; border-color: #D1D1D1; }
+        .btn-secondary:hover:not(:disabled) { background: #F5F5F5; border-color: #8A8886; }
+        .btn-ghost { background: transparent; color: #0078D4; border-color: transparent; }
+        .btn-ghost:hover:not(:disabled) { background: #EFF6FC; }
+
+        /* TABS (filtre Toutes / Non lues) */
+        .tab-btn { display: inline-flex; align-items: center; gap: 6px; padding: 12px 16px; font-size: 13px; font-weight: 500; color: #616161; border: none; border-bottom: 2px solid transparent; background: transparent; cursor: pointer; white-space: nowrap; transition: color 0.15s ease, border-color 0.15s ease, background-color 0.15s ease; margin-bottom: -1px; }
+        .tab-btn:hover { color: #242424; background: #FAFAFA; }
+        .tab-btn.active { color: #0078D4; font-weight: 600; border-bottom-color: #0078D4; }
+        .tab-btn .tab-count { display: inline-flex; align-items: center; justify-content: center; min-width: 18px; height: 18px; padding: 0 5px; font-size: 10px; font-weight: 700; color: #8A8886; background: #F5F5F5; border-radius: 9px; transition: background-color 0.15s ease, color 0.15s ease; }
+        .tab-btn.active .tab-count { color: #0078D4; background: #EFF6FC; }
+        .tab-btn[data-tab="unread"] .tab-count { color: white; background: #DC2626; }
+        .tab-btn .material-symbols-outlined { font-size: 16px; }
+        .tabs-scroll::-webkit-scrollbar { display: none; }
+        .tabs-scroll { scrollbar-width: none; -ms-overflow-style: none; }
+
+        /* NOTIFICATION ITEM — pattern canon */
+        .notif-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            padding: 16px 20px;
+            border-bottom: 1px solid #F0F0F0;
+            background: white;
+            cursor: pointer;
+            transition: background-color 0.15s ease;
+            text-decoration: none;
+            color: inherit;
+            position: relative;
+        }
+        .notif-item:last-child { border-bottom: none; }
+        .notif-item:hover { background: #FAFAFA; }
+        .notif-item.unread { background: #EFF6FC; }
+        .notif-item.unread:hover { background: #E3EEF9; }
+        .notif-item.unread::before {
+            content: '';
+            position: absolute;
+            left: 6px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 4px;
+            height: 40px;
+            background: #0078D4;
+            border-radius: 2px;
+        }
+
+        .notif-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #0078D4;
+            flex-shrink: 0;
+            margin-top: 7px;
+        }
+        .notif-item:not(.unread) .notif-dot { background: transparent; border: 1.5px solid #E0E0E0; }
+
+        .notif-icon {
+            width: 36px;
+            height: 36px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+        .notif-icon .material-symbols-outlined { font-size: 18px; }
+
+        .notif-icon--primary { background: #EFF6FC; color: #0078D4; }
+        .notif-icon--success { background: #F0FDF4; color: #107C10; }
+        .notif-icon--warning { background: #FFFBEB; color: #D97706; }
+        .notif-icon--danger { background: #FEF2F2; color: #DC2626; }
+        .notif-icon--rse { background: #FEFCE8; color: #C5A059; border: 1px solid #E8C96A; }
+
+        .notif-content { min-width: 0; flex: 1; }
+        .notif-title { font-size: 13.5px; color: #242424; line-height: 1.45; margin-bottom: 3px; }
+        .notif-item.unread .notif-title { font-weight: 600; }
+        .notif-description { font-size: 12px; color: #616161; line-height: 1.45; margin-bottom: 4px; }
+        .notif-meta { display: flex; align-items: center; gap: 8px; font-size: 11px; color: #8A8886; }
+        .notif-meta .material-symbols-outlined { font-size: 13px; }
+        .notif-category-pill { display: inline-flex; align-items: center; gap: 3px; font-size: 10px; font-weight: 600; padding: 1px 6px; border-radius: 3px; border: 1px solid; letter-spacing: 0.02em; }
+
+        .notif-actions {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            flex-shrink: 0;
+            opacity: 0;
+            transition: opacity 0.15s ease;
+        }
+        .notif-item:hover .notif-actions { opacity: 1; }
+        .notif-item .notif-actions { opacity: 1; } /* Toujours visible sur mobile/touch */
+        @media (hover: hover) {
+            .notif-item .notif-actions { opacity: 0; }
+            .notif-item:hover .notif-actions,
+            .notif-item:focus-within .notif-actions { opacity: 1; }
+        }
+
+        .notif-action-btn {
+            width: 32px;
+            height: 32px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            color: #8A8886;
+            background: transparent;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.15s ease, color 0.15s ease;
+        }
+        .notif-action-btn:hover { background: rgba(0, 0, 0, 0.05); color: #242424; }
+        .notif-action-btn .material-symbols-outlined { font-size: 18px; }
+
+        /* EMPTY STATE */
+        .empty-state { padding: 48px 24px; text-align: center; }
+        .empty-state-icon { width: 64px; height: 64px; margin: 0 auto 16px; border-radius: 50%; background: #F5F5F5; display: flex; align-items: center; justify-content: center; }
+        .empty-state-icon .material-symbols-outlined { font-size: 32px; color: #8A8886; }
+
+        /* PAGINATION canon */
+        .pagination { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; padding: 14px 20px; border-top: 1px solid #F0F0F0; }
+        .pagination__info { font-size: 12px; color: #616161; white-space: nowrap; }
+        .pagination__info strong { color: #242424; font-weight: 600; }
+        .pagination__controls { display: inline-flex; align-items: center; gap: 4px; }
+        .pagination__btn { display: inline-flex; align-items: center; justify-content: center; min-width: 32px; height: 32px; padding: 0 8px; font-size: 12.5px; font-weight: 600; color: #424242; background: white; border: 1px solid #D1D1D1; border-radius: 4px; cursor: pointer; transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease; }
+        .pagination__btn:hover:not(:disabled):not(.active) { background: #F5F5F5; border-color: #8A8886; }
+        .pagination__btn.active { background: #0078D4; color: white; border-color: #0078D4; cursor: default; }
+        .pagination__btn:disabled { color: #C8C6C4; background: #FAFAFA; border-color: #E0E0E0; cursor: not-allowed; }
+        .pagination__btn .material-symbols-outlined { font-size: 16px; }
+        .pagination__size { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; color: #616161; white-space: nowrap; }
+        .pagination__size-select { padding: 5px 24px 5px 8px; font-family: inherit; font-size: 12px; color: #242424; background: white; border: 1px solid #D1D1D1; border-radius: 4px; outline: none; cursor: pointer; appearance: auto; }
+        .pagination__size-select:hover { border-color: #8A8886; }
+        .pagination__size-select:focus { border-color: #0078D4; box-shadow: 0 0 0 2px #EFF6FC; }
+        @media (max-width: 640px) {
+            .pagination { flex-direction: column; align-items: stretch; gap: 10px; }
+            .pagination__info { text-align: center; order: 2; }
+            .pagination__controls { justify-content: center; order: 1; flex-wrap: wrap; }
+            .pagination__size { justify-content: center; order: 3; }
+        }
+
+        /* MOBILE DRAWER */
+        #sidebar { transition: transform 0.25s ease-out; }
+        @media (max-width: 767px) {
+            #sidebar { transform: translateX(-100%); }
+            #sidebar.open { transform: translateX(0); box-shadow: 8px 0 32px rgba(0, 0, 0, 0.16); }
+            .notif-item { padding: 14px 16px; padding-left: 20px; }
+            .notif-actions { opacity: 1 !important; }
+        }
+
+        /* Toast */
+        .toast { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(16px); background: #242424; color: white; padding: 10px 18px; border-radius: 6px; font-size: 12.5px; font-weight: 500; opacity: 0; pointer-events: none; transition: opacity 0.2s ease, transform 0.2s ease; z-index: 100; box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2); }
+        .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+    </style>
+</head>
+
+<body class="bg-[#F5F5F5] min-h-screen">
+
+    <div id="backdrop" class="md:hidden fixed inset-0 bg-gradient-to-b from-black/40 to-black/20 z-40 hidden" aria-hidden="true"></div>
+
+    <!-- SIDEBAR -->
+    <aside id="sidebar" class="fixed top-0 left-0 w-60 h-screen bg-white border-r border-[#E0E0E0] flex flex-col z-50 md:translate-x-0" aria-label="Navigation principale">
+        <a href="dashboard_index.html" class="flex items-center gap-2.5 px-5 py-4 border-b border-[#E0E0E0] shrink-0 h-14 hover:bg-[#FAFAFA] transition-colors" title="Retour au tableau de bord">
+            <span class="material-symbols-outlined icon-fill text-[#0078D4]" style="font-size:22px">hexagon</span>
+            <div class="leading-tight min-w-0">
+                <div class="text-[#242424] font-heading font-bold text-[15px] tracking-tight">MARKET-UP</div>
+                <div class="text-[10px] text-[#8A8886] tracking-wide">vivasky.media</div>
+            </div>
+        </a>
+        <nav class="flex-1 overflow-y-auto pt-2 pb-3">
+            <div class="section-label">Entreprise</div>
+            <a href="dashboard_index.html" class="nav-item">
+                <span class="material-symbols-outlined">dashboard</span>
+                <span class="flex-1 min-w-0 truncate">Vue d'ensemble</span>
+            </a>
+            <a href="dashboard_account.html" class="nav-item">
+                <span class="material-symbols-outlined">business</span>
+                <span class="flex-1 min-w-0 truncate">Compte</span>
+            </a>
+            <div class="section-label">Mes profils</div>
+            <a href="dashboard_brandup.html" class="nav-item">
+                <span class="material-symbols-outlined">storefront</span>
+                <span class="flex-1 min-w-0 truncate">BrandUP</span>
+                <span class="w-1.5 h-1.5 rounded-full bg-[#DC2626] shrink-0" title="Actif"></span>
+            </a>
+            <a href="dashboard_sponsoring.html" class="nav-item">
+                <span class="material-symbols-outlined">play_circle</span>
+                <span class="flex-1 min-w-0 truncate">TraceUP</span>
+                <span class="w-1.5 h-1.5 rounded-full bg-[#D97706] shrink-0" title="En attente"></span>
+            </a>
+            <a href="dashboard_linkup.html" class="nav-item">
+                <span class="material-symbols-outlined">qr_code_2</span>
+                <span class="flex-1 min-w-0 truncate">LinkUP</span>
+                <span class="w-1.5 h-1.5 rounded-full bg-[#107C10] shrink-0" title="Actif"></span>
+            </a>
+            <div class="section-label">Visibilité</div>
+            <a href="dashboard_boost.html" class="nav-item">
+                <span class="material-symbols-outlined">trending_up</span>
+                <span class="flex-1 min-w-0 truncate">Boost</span>
+                <span class="text-[9px] font-bold tracking-wider text-[#107C10] bg-[#F0FDF4] border border-[#B7EBC0] px-1.5 py-[2px] rounded shrink-0">1 ACTIF</span>
+            </a>
+            <a href="dashboard_sponsoring.html" class="nav-item">
+                <span class="material-symbols-outlined">campaign</span>
+                <span class="flex-1 min-w-0 truncate">Sponsoring</span>
+                <span class="w-1.5 h-1.5 rounded-full bg-[#107C10] shrink-0" title="Campagne active"></span>
+            </a>
+            <div class="section-label">Engagement</div>
+            <a href="dashboard_rse.html" class="nav-item">
+                <span class="material-symbols-outlined">volunteer_activism</span>
+                <span class="flex-1 min-w-0 truncate">Badge RSE</span>
+                <span class="text-[9px] font-bold tracking-wider text-[#107C10] bg-[#F0FDF4] border border-[#B7EBC0] px-1.5 py-[2px] rounded shrink-0">VALIDÉ</span>
+            </a>
+            <div class="section-label">Administration</div>
+            <a href="dashboard_billing.html" class="nav-item">
+                <span class="material-symbols-outlined">receipt_long</span>
+                <span class="flex-1 min-w-0 truncate">Facturation</span>
+            </a>
+            <a href="dashboard_notifications.html" class="nav-item active" aria-current="page">
+                <span class="material-symbols-outlined">notifications</span>
+                <span class="flex-1 min-w-0 truncate">Notifications</span>
+                <span class="min-w-[18px] h-[18px] px-1 rounded-full bg-[#DC2626] text-white text-[10px] font-bold flex items-center justify-center shrink-0">3</span>
+            </a>
+            <a href="dashboard_settings.html" class="nav-item">
+                <span class="material-symbols-outlined">settings</span>
+                <span class="flex-1 min-w-0 truncate">Paramètres</span>
+            </a>
+        </nav>
+        <div class="shrink-0 border-t border-[#E0E0E0]">
+            <div class="flex items-center gap-3 px-4 py-3">
+                <div class="w-9 h-9 rounded-full bg-[#374151] flex items-center justify-center shrink-0">
+                    <span id="sb-avatar-initials" class="text-white font-heading font-bold text-[13px]">TF</span>
+                </div>
+                <div class="min-w-0 flex-1">
+                    <div id="sb-company-name" class="text-[#242424] text-[12px] font-semibold truncate">TechnoFab Industries</div>
+                    <div id="sb-company-meta" class="text-[#8A8886] text-[10px] truncate">B2B · Sousse</div>
+                </div>
+            </div>
+            <div class="flex items-center gap-2.5 px-4 py-2.5 border-t border-[#E0E0E0]">
+                <div class="w-6 h-6 rounded-full bg-[#F5F5F5] border border-[#E0E0E0] flex items-center justify-center shrink-0">
+                    <span id="sb-user-initials" class="text-[#616161] text-[10px] font-semibold">AM</span>
+                </div>
+                <div class="min-w-0 flex-1">
+                    <div id="sb-user-name" class="text-[#424242] text-[11px] font-medium truncate">Ahmed Mrabet</div>
+                    <div class="text-[#8A8886] text-[9px] truncate">Propriétaire</div>
+                </div>
+                <button class="w-7 h-7 flex items-center justify-center rounded text-[#8A8886] hover:text-[#242424] hover:bg-[#F5F5F5] transition-colors shrink-0" title="Se déconnecter" aria-label="Se déconnecter" onclick="window.location.href='auth_connexion.html';">
+                    <span class="material-symbols-outlined" style="font-size:16px">logout</span>
+                </button>
+            </div>
+        </div>
+    </aside>
+
+    <!-- SHELL -->
+    <div class="md:ml-60 min-h-screen flex flex-col">
+
+        <!-- TOPBAR -->
+        <header class="sticky top-0 z-30 h-14 bg-white border-b border-[#E0E0E0] flex items-center justify-between px-4 md:px-6 gap-4" role="banner">
+            <div class="flex items-center gap-3 min-w-0 flex-1">
+                <button id="menuBtn" class="icon-btn md:hidden -ml-2 shrink-0" aria-label="Ouvrir le menu de navigation">
+                    <span class="material-symbols-outlined">menu</span>
+                </button>
+                <div class="min-w-0 leading-tight">
+                    <nav class="hidden md:flex items-center gap-1.5 text-[11px] text-[#8A8886] mb-0.5" aria-label="Fil d'Ariane">
+                        <a href="dashboard_index.html" class="hover:text-[#0078D4] hover:underline transition-colors">Dashboard</a>
+                        <span class="material-symbols-outlined" style="font-size:12px">chevron_right</span>
+                        <span class="text-[#8A8886]">Administration</span>
+                        <span class="material-symbols-outlined" style="font-size:12px">chevron_right</span>
+                        <span class="text-[#616161] font-medium">Notifications</span>
+                    </nav>
+                    <h1 class="font-heading text-[16px] font-bold text-[#242424] truncate">Notifications</h1>
+                    <p class="hidden md:block text-[12px] text-[#616161] truncate">Centre d'alertes de votre compte</p>
+                </div>
+            </div>
+            <div class="flex items-center gap-1 shrink-0">
+                <div class="relative">
+                    <button id="bellBtn" class="icon-btn" aria-label="Notifications" aria-haspopup="true" aria-expanded="false">
+                        <span class="material-symbols-outlined">notifications</span>
+                        <span class="absolute top-1.5 right-1.5 min-w-[16px] h-[16px] px-1 rounded-full bg-[#DC2626] text-white text-[9px] font-bold flex items-center justify-center leading-none ring-2 ring-white">3</span>
+                    </button>
+                    <div id="bellDropdown" class="dropdown-panel w-[340px] max-w-[calc(100vw-24px)]">
+                        <div class="flex items-center justify-between px-4 py-3 border-b border-[#E0E0E0]">
+                            <div class="font-heading font-semibold text-[13px] text-[#242424]">Notifications</div>
+                            <div class="text-[11px] text-[#616161]"><span class="text-[#DC2626] font-semibold">3</span> non lues</div>
+                        </div>
+                        <div class="max-h-[320px] overflow-y-auto">
+                            <a href="dashboard_notifications.html" class="block px-4 py-3 hover:bg-[#F5F5F5] transition-colors border-b border-[#F0F0F0]">
+                                <div class="flex items-start gap-3">
+                                    <span class="w-2 h-2 rounded-full bg-[#0078D4] mt-1.5 shrink-0"></span>
+                                    <div class="min-w-0 flex-1">
+                                        <div class="text-[12.5px] text-[#242424] leading-snug mb-1"><span class="font-semibold">Votre boost LinkUP</span> expire dans 3 jours</div>
+                                        <div class="text-[11px] text-[#8A8886]">Il y a 2 heures</div>
+                                    </div>
+                                    <span class="material-symbols-outlined text-[#0078D4] shrink-0 mt-0.5" style="font-size:16px">trending_up</span>
+                                </div>
+                            </a>
+                            <a href="dashboard_notifications.html" class="block px-4 py-3 hover:bg-[#F5F5F5] transition-colors border-b border-[#F0F0F0]">
+                                <div class="flex items-start gap-3">
+                                    <span class="w-2 h-2 rounded-full bg-[#0078D4] mt-1.5 shrink-0"></span>
+                                    <div class="min-w-0 flex-1">
+                                        <div class="text-[12.5px] text-[#242424] leading-snug mb-1"><span class="font-semibold">Votre campagne Sponsoring</span> a généré 1 250 impressions</div>
+                                        <div class="text-[11px] text-[#8A8886]">Il y a 1 jour</div>
+                                    </div>
+                                    <span class="material-symbols-outlined text-[#0078D4] shrink-0 mt-0.5" style="font-size:16px">campaign</span>
+                                </div>
+                            </a>
+                            <a href="dashboard_notifications.html" class="block px-4 py-3 hover:bg-[#F5F5F5] transition-colors">
+                                <div class="flex items-start gap-3">
+                                    <span class="w-2 h-2 rounded-full bg-[#0078D4] mt-1.5 shrink-0"></span>
+                                    <div class="min-w-0 flex-1">
+                                        <div class="text-[12.5px] text-[#242424] leading-snug mb-1"><span class="font-semibold">Reçu RSE soumis</span> — Association Al Ahed en attente de validation</div>
+                                        <div class="text-[11px] text-[#8A8886]">Il y a 1 jour</div>
+                                    </div>
+                                    <span class="material-symbols-outlined text-[#C5A059] shrink-0 mt-0.5" style="font-size:16px">volunteer_activism</span>
+                                </div>
+                            </a>
+                        </div>
+                        <a href="dashboard_notifications.html" class="flex items-center justify-center gap-1.5 px-4 py-2.5 text-[12px] font-semibold text-[#0078D4] hover:bg-[#EFF6FC] border-t border-[#E0E0E0] transition-colors rounded-b-xl">
+                            Voir toutes les notifications
+                            <span class="material-symbols-outlined" style="font-size:14px">arrow_forward</span>
+                        </a>
+                    </div>
+                </div>
+                <div class="relative">
+                    <button id="avatarBtn" class="flex items-center gap-1 pl-1 pr-2 py-1 rounded-lg hover:bg-[#F5F5F5] transition-colors ml-1" aria-label="Menu compte" aria-haspopup="true" aria-expanded="false">
+                        <div class="w-8 h-8 rounded-full bg-[#0078D4] flex items-center justify-center shrink-0">
+                            <span id="avd-trigger-initials" class="text-white font-heading font-bold text-[12px]">TF</span>
+                        </div>
+                        <span class="material-symbols-outlined text-[#8A8886] hidden md:inline" style="font-size:18px">expand_more</span>
+                    </button>
+                    <div id="avatarDropdown" class="dropdown-panel w-[300px] max-w-[calc(100vw-24px)]">
+                        <div class="flex items-center gap-3 px-4 py-3 border-b border-[#E0E0E0]">
+                            <div class="w-10 h-10 rounded-full bg-[#0078D4] flex items-center justify-center shrink-0">
+                                <span id="avd-initials" class="text-white font-heading font-bold text-[13px]">TF</span>
+                            </div>
+                            <div class="min-w-0 flex-1">
+                                <div id="avd-company-name" class="font-heading font-semibold text-[13px] text-[#242424] truncate">TechnoFab Industries</div>
+                                <div id="avd-company-meta" class="text-[11px] text-[#616161] truncate">B2B · Sousse · Ahmed Mrabet</div>
+                            </div>
+                        </div>
+                        <div class="dropdown-section-label">Mes profils publics</div>
+                        <a id="avd-link-brandup" href="public_brandup_technofab-industries.html" target="_blank" rel="noopener" class="dropdown-item">
+                            <span class="material-symbols-outlined">storefront</span>
+                            <span class="flex-1">BrandUP</span>
+                            <span class="material-symbols-outlined ext-arrow">open_in_new</span>
+                        </a>
+                        <a id="avd-link-traceup" href="public_traceup_technofab-industries.html" target="_blank" rel="noopener" class="dropdown-item">
+                            <span class="material-symbols-outlined">play_circle</span>
+                            <span class="flex-1">TraceUP</span>
+                            <span class="material-symbols-outlined ext-arrow">open_in_new</span>
+                        </a>
+                        <a id="avd-link-linkup" href="public_linkup_technofab-industries.html" target="_blank" rel="noopener" class="dropdown-item">
+                            <span class="material-symbols-outlined">qr_code_2</span>
+                            <span class="flex-1">LinkUP</span>
+                            <span class="material-symbols-outlined ext-arrow">open_in_new</span>
+                        </a>
+                        <div class="dropdown-divider"></div>
+                        <a href="dashboard_settings.html" class="dropdown-item">
+                            <span class="material-symbols-outlined">settings</span>
+                            <span class="flex-1">Paramètres</span>
+                        </a>
+                        <button class="dropdown-item dropdown-item--danger w-full text-left">
+                            <span class="material-symbols-outlined">logout</span>
+                            <span class="flex-1">Se déconnecter</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- CONTENU -->
+        <main class="flex-1 p-4 md:p-8">
+            <div class="max-w-[880px] mx-auto space-y-5">
+
+                <!-- ═════ PAGE HEADER ═════ -->
+                <section class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                    <div class="flex items-start gap-3 min-w-0">
+                        <div class="w-11 h-11 rounded-lg bg-[#EFF6FC] flex items-center justify-center shrink-0">
+                            <span class="material-symbols-outlined icon-fill text-[#0078D4]" style="font-size:24px">notifications</span>
+                        </div>
+                        <div class="min-w-0">
+                            <h2 class="font-heading font-bold text-[20px] text-[#242424] leading-tight">
+                                Notifications
+                            </h2>
+                            <div class="flex items-center gap-2 mt-1 flex-wrap text-[12px]">
+                                <span class="text-[#DC2626] font-semibold">3 non lues</span>
+                                <span class="text-[#8A8886]">·</span>
+                                <span class="text-[#616161]">15 au total</span>
+                                <span class="text-[#8A8886]">·</span>
+                                <span class="text-[#616161]">7 derniers jours</span>
+                            </div>
+                        </div>
+                    </div>
+                    <button id="markAllReadBtn" class="btn btn-secondary shrink-0">
+                        <span class="material-symbols-outlined">done_all</span>
+                        Tout marquer comme lu
+                    </button>
+                </section>
+
+                <!-- ═════ CARD LISTE — tabs + liste + pagination ═════ -->
+                <section class="card overflow-hidden">
+
+                    <!-- Tabs filtre -->
+                    <div class="border-b border-[#E0E0E0] overflow-x-auto tabs-scroll">
+                        <div class="flex px-2 md:px-4 min-w-max">
+                            <button class="tab-btn active" data-tab="all" aria-current="page">
+                                <span class="material-symbols-outlined">inbox</span>
+                                Toutes
+                                <span class="tab-count">15</span>
+                            </button>
+                            <button class="tab-btn" data-tab="unread">
+                                <span class="material-symbols-outlined">mark_email_unread</span>
+                                Non lues
+                                <span class="tab-count">3</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Liste notifications -->
+                    <div id="notifList" class="divide-y divide-[#F0F0F0]">
+
+                        <!-- ─── NON LUES (3) ─── -->
+
+                        <!-- 1. Boost LinkUP expire -->
+                        <a href="dashboard_boost.html" class="notif-item unread" data-read="false">
+                            <span class="notif-dot" aria-hidden="true"></span>
+                            <div class="notif-icon notif-icon--primary">
+                                <span class="material-symbols-outlined icon-fill">bolt</span>
+                            </div>
+                            <div class="notif-content">
+                                <div class="notif-title">
+                                    Votre <strong>boost LinkUP</strong> expire dans 3 jours
+                                </div>
+                                <div class="notif-description">
+                                    Renouvelez-le pour maintenir votre profil en tête des résultats ·
+                                    +212 vues générées jusqu'ici
+                                </div>
+                                <div class="notif-meta">
+                                    <span class="material-symbols-outlined">schedule</span>
+                                    Il y a 2 heures
+                                    <span>·</span>
+                                    Boost
+                                </div>
+                            </div>
+                            <div class="notif-actions" onclick="event.preventDefault(); event.stopPropagation();">
+                                <button class="notif-action-btn mark-read-btn" title="Marquer comme lu" aria-label="Marquer comme lu">
+                                    <span class="material-symbols-outlined">mark_email_read</span>
+                                </button>
+                            </div>
+                        </a>
+
+                        <!-- 2. Campagne sponsoring stats -->
+                        <a href="dashboard_sponsoring.html" class="notif-item unread" data-read="false">
+                            <span class="notif-dot" aria-hidden="true"></span>
+                            <div class="notif-icon notif-icon--primary">
+                                <span class="material-symbols-outlined">campaign</span>
+                            </div>
+                            <div class="notif-content">
+                                <div class="notif-title">
+                                    Votre <strong>campagne Sponsoring</strong> a généré 1 250 impressions
+                                </div>
+                                <div class="notif-description">
+                                    CTR de 3,36 % · au-dessus de la moyenne du secteur Mécanique
+                                </div>
+                                <div class="notif-meta">
+                                    <span class="material-symbols-outlined">schedule</span>
+                                    Il y a 1 jour
+                                    <span>·</span>
+                                    Sponsoring
+                                </div>
+                            </div>
+                            <div class="notif-actions" onclick="event.preventDefault(); event.stopPropagation();">
+                                <button class="notif-action-btn mark-read-btn" title="Marquer comme lu" aria-label="Marquer comme lu">
+                                    <span class="material-symbols-outlined">mark_email_read</span>
+                                </button>
+                            </div>
+                        </a>
+
+                        <!-- 3. Nouveau reçu RSE en attente (côté user = info) -->
+                        <a href="dashboard_rse.html" class="notif-item unread" data-read="false">
+                            <span class="notif-dot" aria-hidden="true"></span>
+                            <div class="notif-icon notif-icon--rse">
+                                <span class="material-symbols-outlined">volunteer_activism</span>
+                            </div>
+                            <div class="notif-content">
+                                <div class="notif-title">
+                                    Reçu RSE soumis pour validation — <strong>Association Al Ahed</strong>
+                                </div>
+                                <div class="notif-description">
+                                    Don de 5 200 DT en cours de revue admin · délai estimé 24-48 h
+                                </div>
+                                <div class="notif-meta">
+                                    <span class="material-symbols-outlined">schedule</span>
+                                    Il y a 1 jour
+                                    <span>·</span>
+                                    RSE
+                                </div>
+                            </div>
+                            <div class="notif-actions" onclick="event.preventDefault(); event.stopPropagation();">
+                                <button class="notif-action-btn mark-read-btn" title="Marquer comme lu" aria-label="Marquer comme lu">
+                                    <span class="material-symbols-outlined">mark_email_read</span>
+                                </button>
+                            </div>
+                        </a>
+
+                        <!-- ─── LUES (12) ─── -->
+
+                        <!-- 4. Badge RSE validé -->
+                        <a href="dashboard_rse.html" class="notif-item" data-read="true">
+                            <span class="notif-dot" aria-hidden="true"></span>
+                            <div class="notif-icon notif-icon--success">
+                                <span class="material-symbols-outlined icon-fill">verified</span>
+                            </div>
+                            <div class="notif-content">
+                                <div class="notif-title">
+                                    Votre <strong>badge RSE</strong> a été validé par l'administrateur
+                                </div>
+                                <div class="notif-description">
+                                    Le badge « Engagement Social Attesté » est maintenant visible sur vos 3 profils publics
+                                </div>
+                                <div class="notif-meta">
+                                    <span class="material-symbols-outlined">schedule</span>
+                                    Il y a 2 jours
+                                    <span>·</span>
+                                    RSE
+                                </div>
+                            </div>
+                            <div class="notif-actions" onclick="event.preventDefault(); event.stopPropagation();">
+                                <button class="notif-action-btn mark-unread-btn" title="Marquer comme non lu" aria-label="Marquer comme non lu">
+                                    <span class="material-symbols-outlined">mark_email_unread</span>
+                                </button>
+                            </div>
+                        </a>
+
+                        <!-- 5. Profil BrandUP refusé -->
+                        <a href="dashboard_brandup.html" class="notif-item" data-read="true">
+                            <span class="notif-dot" aria-hidden="true"></span>
+                            <div class="notif-icon notif-icon--danger">
+                                <span class="material-symbols-outlined icon-fill">report</span>
+                            </div>
+                            <div class="notif-content">
+                                <div class="notif-title">
+                                    Votre <strong>profil BrandUP</strong> a été refusé — motif à consulter
+                                </div>
+                                <div class="notif-description">
+                                    La soumission du 16 avril n'a pas pu être publiée · corrigez les points mentionnés et resoumettez
+                                </div>
+                                <div class="notif-meta">
+                                    <span class="material-symbols-outlined">schedule</span>
+                                    Il y a 2 jours
+                                    <span>·</span>
+                                    BrandUP
+                                </div>
+                            </div>
+                            <div class="notif-actions" onclick="event.preventDefault(); event.stopPropagation();">
+                                <button class="notif-action-btn mark-unread-btn" title="Marquer comme non lu" aria-label="Marquer comme non lu">
+                                    <span class="material-symbols-outlined">mark_email_unread</span>
+                                </button>
+                            </div>
+                        </a>
+
+                        <!-- 6. Paiement Boost LinkUP réussi -->
+                        <a href="dashboard_billing.html" class="notif-item" data-read="true">
+                            <span class="notif-dot" aria-hidden="true"></span>
+                            <div class="notif-icon notif-icon--success">
+                                <span class="material-symbols-outlined icon-fill">check_circle</span>
+                            </div>
+                            <div class="notif-content">
+                                <div class="notif-title">
+                                    Paiement Boost LinkUP confirmé — <strong>59,50 DT TTC</strong>
+                                </div>
+                                <div class="notif-description">
+                                    Boost actif pour 30 jours · reçu disponible au téléchargement
+                                </div>
+                                <div class="notif-meta">
+                                    <span class="material-symbols-outlined">schedule</span>
+                                    Il y a 3 jours
+                                    <span>·</span>
+                                    Facturation
+                                </div>
+                            </div>
+                            <div class="notif-actions" onclick="event.preventDefault(); event.stopPropagation();">
+                                <button class="notif-action-btn mark-unread-btn" title="Marquer comme non lu" aria-label="Marquer comme non lu">
+                                    <span class="material-symbols-outlined">mark_email_unread</span>
+                                </button>
+                            </div>
+                        </a>
+
+                        <!-- 7. Nouvelle campagne sponsoring lancée -->
+                        <a href="dashboard_sponsoring.html" class="notif-item" data-read="true">
+                            <span class="notif-dot" aria-hidden="true"></span>
+                            <div class="notif-icon notif-icon--primary">
+                                <span class="material-symbols-outlined">rocket_launch</span>
+                            </div>
+                            <div class="notif-content">
+                                <div class="notif-title">
+                                    Campagne Sponsoring <strong>LinkUP · Mécanique</strong> lancée
+                                </div>
+                                <div class="notif-description">
+                                    Durée 7 jours · bannière validée et diffusée sur le moteur LinkUP
+                                </div>
+                                <div class="notif-meta">
+                                    <span class="material-symbols-outlined">schedule</span>
+                                    Il y a 4 jours
+                                    <span>·</span>
+                                    Sponsoring
+                                </div>
+                            </div>
+                            <div class="notif-actions" onclick="event.preventDefault(); event.stopPropagation();">
+                                <button class="notif-action-btn mark-unread-btn" title="Marquer comme non lu" aria-label="Marquer comme non lu">
+                                    <span class="material-symbols-outlined">mark_email_unread</span>
+                                </button>
+                            </div>
+                        </a>
+
+                        <!-- 8. Vidéo TraceUP validée -->
+                        <a href="dashboard_sponsoring.html" class="notif-item" data-read="true">
+                            <span class="notif-dot" aria-hidden="true"></span>
+                            <div class="notif-icon notif-icon--success">
+                                <span class="material-symbols-outlined icon-fill">play_circle</span>
+                            </div>
+                            <div class="notif-content">
+                                <div class="notif-title">
+                                    Vidéo TraceUP validée — <strong>« Atelier usinage CNC »</strong>
+                                </div>
+                                <div class="notif-description">
+                                    Catégorie Actualité · maintenant visible sur votre profil TraceUP
+                                </div>
+                                <div class="notif-meta">
+                                    <span class="material-symbols-outlined">schedule</span>
+                                    Il y a 4 jours
+                                    <span>·</span>
+                                    TraceUP
+                                </div>
+                            </div>
+                            <div class="notif-actions" onclick="event.preventDefault(); event.stopPropagation();">
+                                <button class="notif-action-btn mark-unread-btn" title="Marquer comme non lu" aria-label="Marquer comme non lu">
+                                    <span class="material-symbols-outlined">mark_email_unread</span>
+                                </button>
+                            </div>
+                        </a>
+
+                        <!-- 9. Première connexion détectée (sécurité) -->
+                        <a href="dashboard_settings.html" class="notif-item" data-read="true">
+                            <span class="notif-dot" aria-hidden="true"></span>
+                            <div class="notif-icon notif-icon--warning">
+                                <span class="material-symbols-outlined">devices</span>
+                            </div>
+                            <div class="notif-content">
+                                <div class="notif-title">
+                                    Connexion depuis un nouvel appareil détectée
+                                </div>
+                                <div class="notif-description">
+                                    Tunis, Tunisie · iPhone · 15 avril 2026, 14h23 · si ce n'était pas vous, changez votre mot de passe
+                                </div>
+                                <div class="notif-meta">
+                                    <span class="material-symbols-outlined">schedule</span>
+                                    Il y a 5 jours
+                                    <span>·</span>
+                                    Sécurité
+                                </div>
+                            </div>
+                            <div class="notif-actions" onclick="event.preventDefault(); event.stopPropagation();">
+                                <button class="notif-action-btn mark-unread-btn" title="Marquer comme non lu" aria-label="Marquer comme non lu">
+                                    <span class="material-symbols-outlined">mark_email_unread</span>
+                                </button>
+                            </div>
+                        </a>
+
+                        <!-- 10. Profil TraceUP soumis pour validation -->
+                        <a href="dashboard_sponsoring.html" class="notif-item" data-read="true">
+                            <span class="notif-dot" aria-hidden="true"></span>
+                            <div class="notif-icon notif-icon--primary">
+                                <span class="material-symbols-outlined">edit</span>
+                            </div>
+                            <div class="notif-content">
+                                <div class="notif-title">
+                                    Profil <strong>TraceUP</strong> soumis pour validation
+                                </div>
+                                <div class="notif-description">
+                                    Validation admin en cours · réponse sous 24-48 h
+                                </div>
+                                <div class="notif-meta">
+                                    <span class="material-symbols-outlined">schedule</span>
+                                    Il y a 5 jours
+                                    <span>·</span>
+                                    TraceUP
+                                </div>
+                            </div>
+                            <div class="notif-actions" onclick="event.preventDefault(); event.stopPropagation();">
+                                <button class="notif-action-btn mark-unread-btn" title="Marquer comme non lu" aria-label="Marquer comme non lu">
+                                    <span class="material-symbols-outlined">mark_email_unread</span>
+                                </button>
+                            </div>
+                        </a>
+
+                        <!-- 11. Paiement Sponsoring réussi -->
+                        <a href="dashboard_billing.html" class="notif-item" data-read="true">
+                            <span class="notif-dot" aria-hidden="true"></span>
+                            <div class="notif-icon notif-icon--success">
+                                <span class="material-symbols-outlined icon-fill">check_circle</span>
+                            </div>
+                            <div class="notif-content">
+                                <div class="notif-title">
+                                    Paiement Sponsoring confirmé — <strong>119,00 DT TTC</strong>
+                                </div>
+                                <div class="notif-description">
+                                    Campagne LinkUP · Mécanique · reçu disponible au téléchargement
+                                </div>
+                                <div class="notif-meta">
+                                    <span class="material-symbols-outlined">schedule</span>
+                                    Il y a 5 jours
+                                    <span>·</span>
+                                    Facturation
+                                </div>
+                            </div>
+                            <div class="notif-actions" onclick="event.preventDefault(); event.stopPropagation();">
+                                <button class="notif-action-btn mark-unread-btn" title="Marquer comme non lu" aria-label="Marquer comme non lu">
+                                    <span class="material-symbols-outlined">mark_email_unread</span>
+                                </button>
+                            </div>
+                        </a>
+
+                        <!-- 12. LinkUP activé -->
+                        <a href="dashboard_linkup.html" class="notif-item" data-read="true">
+                            <span class="notif-dot" aria-hidden="true"></span>
+                            <div class="notif-icon notif-icon--success">
+                                <span class="material-symbols-outlined icon-fill">qr_code_2</span>
+                            </div>
+                            <div class="notif-content">
+                                <div class="notif-title">
+                                    Votre profil <strong>LinkUP</strong> est maintenant en ligne
+                                </div>
+                                <div class="notif-description">
+                                    Carte de contact numérique et QR code disponibles à partager
+                                </div>
+                                <div class="notif-meta">
+                                    <span class="material-symbols-outlined">schedule</span>
+                                    Il y a 6 jours
+                                    <span>·</span>
+                                    LinkUP
+                                </div>
+                            </div>
+                            <div class="notif-actions" onclick="event.preventDefault(); event.stopPropagation();">
+                                <button class="notif-action-btn mark-unread-btn" title="Marquer comme non lu" aria-label="Marquer comme non lu">
+                                    <span class="material-symbols-outlined">mark_email_unread</span>
+                                </button>
+                            </div>
+                        </a>
+
+                        <!-- 13. Vidéo TraceUP refusée -->
+                        <a href="dashboard_sponsoring.html" class="notif-item" data-read="true">
+                            <span class="notif-dot" aria-hidden="true"></span>
+                            <div class="notif-icon notif-icon--danger">
+                                <span class="material-symbols-outlined">cancel</span>
+                            </div>
+                            <div class="notif-content">
+                                <div class="notif-title">
+                                    Vidéo TraceUP refusée — <strong>« Promotion flash »</strong>
+                                </div>
+                                <div class="notif-description">
+                                    Contenu jugé trop promotionnel · merci de revoir votre vidéo et la resoumettre
+                                </div>
+                                <div class="notif-meta">
+                                    <span class="material-symbols-outlined">schedule</span>
+                                    Il y a 6 jours
+                                    <span>·</span>
+                                    TraceUP
+                                </div>
+                            </div>
+                            <div class="notif-actions" onclick="event.preventDefault(); event.stopPropagation();">
+                                <button class="notif-action-btn mark-unread-btn" title="Marquer comme non lu" aria-label="Marquer comme non lu">
+                                    <span class="material-symbols-outlined">mark_email_unread</span>
+                                </button>
+                            </div>
+                        </a>
+
+                        <!-- 14. Profil BrandUP modifications validées -->
+                        <a href="dashboard_brandup.html" class="notif-item" data-read="true">
+                            <span class="notif-dot" aria-hidden="true"></span>
+                            <div class="notif-icon notif-icon--success">
+                                <span class="material-symbols-outlined icon-fill">verified</span>
+                            </div>
+                            <div class="notif-content">
+                                <div class="notif-title">
+                                    Modifications <strong>BrandUP</strong> validées et publiées
+                                </div>
+                                <div class="notif-description">
+                                    Votre nouvelle galerie et le pitch mis à jour sont maintenant visibles sur votre profil public
+                                </div>
+                                <div class="notif-meta">
+                                    <span class="material-symbols-outlined">schedule</span>
+                                    Il y a 7 jours
+                                    <span>·</span>
+                                    BrandUP
+                                </div>
+                            </div>
+                            <div class="notif-actions" onclick="event.preventDefault(); event.stopPropagation();">
+                                <button class="notif-action-btn mark-unread-btn" title="Marquer comme non lu" aria-label="Marquer comme non lu">
+                                    <span class="material-symbols-outlined">mark_email_unread</span>
+                                </button>
+                            </div>
+                        </a>
+
+                        <!-- 15. Compte activé -->
+                        <a href="dashboard_account.html" class="notif-item" data-read="true">
+                            <span class="notif-dot" aria-hidden="true"></span>
+                            <div class="notif-icon notif-icon--success">
+                                <span class="material-symbols-outlined icon-fill">business</span>
+                            </div>
+                            <div class="notif-content">
+                                <div class="notif-title">
+                                    Bienvenue ! Votre <strong>compte TechnoFab Industries</strong> est activé
+                                </div>
+                                <div class="notif-description">
+                                    L'administrateur a validé votre inscription · vous pouvez configurer vos 3 profils publics
+                                </div>
+                                <div class="notif-meta">
+                                    <span class="material-symbols-outlined">schedule</span>
+                                    Il y a 7 jours
+                                    <span>·</span>
+                                    Compte
+                                </div>
+                            </div>
+                            <div class="notif-actions" onclick="event.preventDefault(); event.stopPropagation();">
+                                <button class="notif-action-btn mark-unread-btn" title="Marquer comme non lu" aria-label="Marquer comme non lu">
+                                    <span class="material-symbols-outlined">mark_email_unread</span>
+                                </button>
+                            </div>
+                        </a>
+
+                    </div>
+
+                    <!-- Empty state (filtre Non lues après tout marqué lu) -->
+                    <div id="emptyState" class="empty-state hidden">
+                        <div class="empty-state-icon">
+                            <span class="material-symbols-outlined">inbox</span>
+                        </div>
+                        <h3 class="font-heading font-bold text-[15px] text-[#242424] mb-1">
+                            Tout est à jour !
+                        </h3>
+                        <p class="text-[12.5px] text-[#616161] max-w-sm mx-auto">
+                            Vous n'avez aucune notification non lue. Revenez plus tard pour voir les nouveautés.
+                        </p>
+                    </div>
+
+                    <!-- Pagination canon -->
+                    <nav class="pagination" aria-label="Pagination des notifications">
+                        <div class="pagination__info">
+                            Affichage <strong>1–15</strong> sur <strong>15</strong> notifications
+                        </div>
+                        <div class="pagination__controls">
+                            <button class="pagination__btn" disabled aria-label="Page précédente">
+                                <span class="material-symbols-outlined">chevron_left</span>
+                            </button>
+                            <button class="pagination__btn active" aria-current="page" aria-label="Page 1">1</button>
+                            <button class="pagination__btn" disabled aria-label="Page suivante">
+                                <span class="material-symbols-outlined">chevron_right</span>
+                            </button>
+                        </div>
+                        <div class="pagination__size">
+                            <label for="notifPageSize">Par page</label>
+                            <select id="notifPageSize" class="pagination__size-select">
+                                <option>10</option>
+                                <option selected>15</option>
+                                <option>25</option>
+                                <option>50</option>
+                            </select>
+                        </div>
+                    </nav>
+
+                </section>
+
+                <!-- ═════ INFO RÉTENTION ═════ -->
+                <section class="text-[11.5px] text-[#8A8886] text-center">
+                    <span class="material-symbols-outlined align-middle" style="font-size:13px">info</span>
+                    Les notifications sont conservées 90 jours · au-delà, elles sont automatiquement archivées
+                </section>
+
+            </div>
+        </main>
+
+    </div>
+
+    <!-- Toast -->
+    <div id="toast" class="toast" role="status" aria-live="polite">Notification marquée comme lue</div>
+
+    <!-- JS -->
+    <script>
+        (function () {
+            const sidebar = document.getElementById('sidebar');
+            const backdrop = document.getElementById('backdrop');
+            const menuBtn = document.getElementById('menuBtn');
+            const bellBtn = document.getElementById('bellBtn');
+            const bellDropdown = document.getElementById('bellDropdown');
+            const avatarBtn = document.getElementById('avatarBtn');
+            const avatarDropdown = document.getElementById('avatarDropdown');
+            const tabButtons = document.querySelectorAll('.tab-btn');
+            const notifList = document.getElementById('notifList');
+            const emptyState = document.getElementById('emptyState');
+            const markAllReadBtn = document.getElementById('markAllReadBtn');
+            const toast = document.getElementById('toast');
+
+            const dropdowns = [
+                { btn: bellBtn, panel: bellDropdown },
+                { btn: avatarBtn, panel: avatarDropdown },
+            ];
+
+            function closeAllDropdowns() {
+                dropdowns.forEach(({ btn, panel }) => {
+                    panel.classList.remove('open');
+                    btn.setAttribute('aria-expanded', 'false');
+                });
+            }
+
+            function toggleDropdown(target) {
+                const wasOpen = target.panel.classList.contains('open');
+                closeAllDropdowns();
+                if (!wasOpen) {
+                    target.panel.classList.add('open');
+                    target.btn.setAttribute('aria-expanded', 'true');
+                }
+            }
+
+            function openDrawer() {
+                closeAllDropdowns();
+                sidebar.classList.add('open');
+                backdrop.classList.remove('hidden');
+                document.body.style.overflow = 'hidden';
+            }
+
+            function closeDrawer() {
+                sidebar.classList.remove('open');
+                backdrop.classList.add('hidden');
+                document.body.style.overflow = '';
+            }
+
+            function showToast(msg) {
+                toast.textContent = msg;
+                toast.classList.add('show');
+                clearTimeout(showToast._t);
+                showToast._t = setTimeout(() => toast.classList.remove('show'), 1800);
+            }
+
+            // ─── Tabs filtre ─────────────
+            let currentFilter = 'all';
+
+            function activateTab(tabId) {
+                currentFilter = tabId;
+                tabButtons.forEach((b) => {
+                    const isActive = b.dataset.tab === tabId;
+                    b.classList.toggle('active', isActive);
+                    if (isActive) b.setAttribute('aria-current', 'page');
+                    else b.removeAttribute('aria-current');
+                });
+                applyFilter();
+            }
+
+            function applyFilter() {
+                const items = notifList.querySelectorAll('.notif-item');
+                let visibleCount = 0;
+                items.forEach((item) => {
+                    const isUnread = item.dataset.read === 'false';
+                    const show = currentFilter === 'all' || (currentFilter === 'unread' && isUnread);
+                    item.style.display = show ? '' : 'none';
+                    if (show) visibleCount++;
+                });
+                emptyState.classList.toggle('hidden', visibleCount > 0);
+            }
+
+            tabButtons.forEach((btn) => btn.addEventListener('click', () => activateTab(btn.dataset.tab)));
+
+            // ─── Mark as read/unread ────────
+            function setItemRead(item, read) {
+                item.dataset.read = read ? 'true' : 'false';
+                item.classList.toggle('unread', !read);
+                // Swap action button
+                const actionBtn = item.querySelector('.notif-action-btn');
+                const icon = actionBtn.querySelector('.material-symbols-outlined');
+                if (read) {
+                    actionBtn.classList.remove('mark-read-btn');
+                    actionBtn.classList.add('mark-unread-btn');
+                    actionBtn.title = 'Marquer comme non lu';
+                    actionBtn.setAttribute('aria-label', 'Marquer comme non lu');
+                    icon.textContent = 'mark_email_unread';
+                } else {
+                    actionBtn.classList.remove('mark-unread-btn');
+                    actionBtn.classList.add('mark-read-btn');
+                    actionBtn.title = 'Marquer comme lu';
+                    actionBtn.setAttribute('aria-label', 'Marquer comme lu');
+                    icon.textContent = 'mark_email_read';
+                }
+                updateUnreadCounter();
+            }
+
+            function updateUnreadCounter() {
+                const unreadCount = notifList.querySelectorAll('.notif-item[data-read="false"]').length;
+                const unreadTab = document.querySelector('.tab-btn[data-tab="unread"] .tab-count');
+                if (unreadTab) unreadTab.textContent = unreadCount;
+                // Mettre à jour le badge header
+                const headerUnreadText = document.querySelector('h2 + div span.text-\\[\\#DC2626\\]');
+                if (headerUnreadText) {
+                    headerUnreadText.textContent = unreadCount === 0
+                        ? 'Tout est à jour'
+                        : `${unreadCount} non lue${unreadCount > 1 ? 's' : ''}`;
+                }
+                // Disable bouton Tout marquer comme lu
+                markAllReadBtn.disabled = unreadCount === 0;
+                if (currentFilter === 'unread') applyFilter();
+            }
+
+            // Délégation sur tous les boutons d'action
+            notifList.addEventListener('click', (e) => {
+                const btn = e.target.closest('.notif-action-btn');
+                if (!btn) return;
+                e.preventDefault();
+                e.stopPropagation();
+                const item = btn.closest('.notif-item');
+                if (!item) return;
+                const isUnread = item.dataset.read === 'false';
+                setItemRead(item, isUnread);
+                showToast(isUnread ? 'Notification marquée comme lue' : 'Notification marquée comme non lue');
+            });
+
+            // Clic sur l'item → marque automatiquement comme lu avant de suivre le lien
+            notifList.addEventListener('click', (e) => {
+                const item = e.target.closest('.notif-item');
+                if (!item) return;
+                // Si le clic vient d'un bouton action, on a déjà géré ça au-dessus
+                if (e.target.closest('.notif-action-btn')) return;
+                // Marque comme lu visuellement (navigation ira chercher la page liée)
+                if (item.dataset.read === 'false') {
+                    setItemRead(item, true);
+                }
+            });
+
+            // ─── Tout marquer comme lu ─────
+            markAllReadBtn.addEventListener('click', () => {
+                const unreadItems = notifList.querySelectorAll('.notif-item[data-read="false"]');
+                unreadItems.forEach((item) => setItemRead(item, true));
+                showToast(`${unreadItems.length} notification${unreadItems.length > 1 ? 's' : ''} marquée${unreadItems.length > 1 ? 's' : ''} comme lue${unreadItems.length > 1 ? 's' : ''}`);
+            });
+
+            // ─── Pagination (mockup visual feedback) ─────
+            document.querySelectorAll('.pagination').forEach((nav) => {
+                const numberButtons = nav.querySelectorAll('.pagination__btn[aria-label^="Page "]:not([aria-label*="suivante"]):not([aria-label*="précédente"])');
+                const prevBtn = nav.querySelector('.pagination__btn[aria-label*="précédente"]');
+                const nextBtn = nav.querySelector('.pagination__btn[aria-label*="suivante"]');
+                const totalPages = numberButtons.length;
+                function setActive(idx) {
+                    numberButtons.forEach((b, i) => {
+                        const active = i === idx;
+                        b.classList.toggle('active', active);
+                        if (active) b.setAttribute('aria-current', 'page');
+                        else b.removeAttribute('aria-current');
+                    });
+                    if (prevBtn) prevBtn.disabled = idx === 0;
+                    if (nextBtn) nextBtn.disabled = idx === totalPages - 1;
+                }
+                numberButtons.forEach((btn, idx) => btn.addEventListener('click', () => setActive(idx)));
+            });
+
+            // ─── Global listeners ──────────
+            menuBtn.addEventListener('click', openDrawer);
+            backdrop.addEventListener('click', closeDrawer);
+
+            dropdowns.forEach((dd) => {
+                dd.btn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    toggleDropdown(dd);
+                });
+            });
+
+            document.addEventListener('click', (e) => {
+                const clickedInsideDropdown = dropdowns.some((dd) => dd.panel.contains(e.target) || dd.btn.contains(e.target));
+                if (!clickedInsideDropdown) closeAllDropdowns();
+            });
+
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape') {
+                    closeAllDropdowns();
+                    if (sidebar.classList.contains('open')) closeDrawer();
+                }
+            });
+
+            let resizeTimer;
+            window.addEventListener('resize', () => {
+                clearTimeout(resizeTimer);
+                resizeTimer = setTimeout(() => {
+                    if (window.innerWidth >= 768 && sidebar.classList.contains('open')) closeDrawer();
+                }, 100);
+            });
+
+            // Deep link ?filter=unread
+            const urlParams = new URLSearchParams(window.location.search);
+            const filterParam = urlParams.get('filter');
+            if (filterParam === 'unread') activateTab('unread');
+        })();
+    </script>
+
+    <!-- ════════════════════════════════════════════════════════════════
+         SEED DATA HYDRATION
+         Loads marketup_seed_data.js + dashboard_hydrate_utils.js,
+         then hydrates this page from window.MARKETUP_DATA.
+         Only common chrome (sidebar + topbar) is hydrated here;
+         page-specific content is hydrated in a follow-up wave.
+         ════════════════════════════════════════════════════════════════ -->
+    <script src="marketup_seed_data.js"></script>
+    <script src="dashboard_hydrate_utils.js"></script>
+    <script>
+        MARKETUP_HYDRATE.bootstrapPage(function (me, H) {
+            // Page title
+            const fullName = me.data.displayName.fr;
+            document.title = `MARKET-UP | Notifications — ${fullName}`;
+
+            // NOTE: the seed (P2.1 phase) does not yet include a notifications[]
+            // collection per company. The 15 canon notifications stay hardcoded
+            // for the TechnoFab demo (3 unread, all related to the canon scenario:
+            // LinkUP boost expiring, sponsoring impressions, RSE pending).
+            // When the seed grows a notifications[] field, replace this block
+            // with a renderList over me.notifications + filter/pagination.
+        });
+    </script>
+
+</body>
+
+</html>

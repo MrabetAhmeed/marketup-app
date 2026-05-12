@@ -1,0 +1,1099 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>MARKET-UP | Badge RSE — TechnoFab Industries</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap"
+        rel="stylesheet" />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
+        rel="stylesheet" />
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .font-heading { font-family: 'Plus Jakarta Sans', sans-serif; }
+        .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+        .icon-fill { font-variation-settings: 'FILL' 1; }
+
+        /* SIDEBAR */
+        .nav-item { display: flex; align-items: center; gap: 12px; padding: 8px 20px; font-size: 13px; font-weight: 500; color: #616161; border-left: 3px solid transparent; transition: background-color 0.15s ease, color 0.15s ease; cursor: pointer; text-decoration: none; line-height: 1.4; }
+        .nav-item .material-symbols-outlined { font-size: 18px; color: #8A8886; transition: color 0.15s ease; flex-shrink: 0; }
+        .nav-item:hover { background: #F5F5F5; color: #242424; }
+        .nav-item:hover .material-symbols-outlined { color: #616161; }
+        .nav-item.active { background: #EFF6FC; border-left-color: #0078D4; color: #0078D4; font-weight: 600; }
+        .nav-item.active .material-symbols-outlined { color: #0078D4; }
+        .section-label { font-size: 9px; font-weight: 700; letter-spacing: 0.15em; text-transform: uppercase; color: #8A8886; padding: 16px 20px 6px; user-select: none; }
+        nav::-webkit-scrollbar { width: 4px; }
+        nav::-webkit-scrollbar-track { background: transparent; }
+        nav::-webkit-scrollbar-thumb { background: #E0E0E0; border-radius: 2px; }
+        nav::-webkit-scrollbar-thumb:hover { background: #C8C6C4; }
+
+        /* TOPBAR */
+        .icon-btn { display: inline-flex; align-items: center; justify-content: center; width: 40px; height: 40px; border-radius: 8px; color: #424242; transition: background-color 0.15s ease; position: relative; background: transparent; border: none; cursor: pointer; }
+        .icon-btn:hover { background: #F5F5F5; }
+        .icon-btn .material-symbols-outlined { font-size: 22px; }
+
+        /* DROPDOWNS */
+        .dropdown-panel { position: absolute; top: calc(100% + 8px); right: 0; background: white; border: 1px solid #E0E0E0; border-radius: 12px; box-shadow: 0 8px 32px rgba(0, 0, 0, 0.16); opacity: 0; transform: translateY(-4px); pointer-events: none; transition: opacity 0.15s ease, transform 0.15s ease; z-index: 40; }
+        .dropdown-panel.open { opacity: 1; transform: translateY(0); pointer-events: auto; }
+        .dropdown-item { display: flex; align-items: center; gap: 12px; padding: 10px 16px; font-size: 13px; color: #242424; text-decoration: none; transition: background-color 0.1s ease; cursor: pointer; }
+        .dropdown-item:hover { background: #F5F5F5; }
+        .dropdown-item .material-symbols-outlined { font-size: 18px; color: #616161; flex-shrink: 0; }
+        .dropdown-item .ext-arrow { margin-left: auto; font-size: 14px; color: #8A8886; }
+        .dropdown-item--danger { color: #B91C1C; }
+        .dropdown-item--danger .material-symbols-outlined { color: #B91C1C; }
+        .dropdown-item--danger:hover { background: #FEF2F2; }
+        .dropdown-section-label { padding: 12px 16px 6px; font-size: 9px; font-weight: 700; letter-spacing: 0.15em; text-transform: uppercase; color: #8A8886; user-select: none; }
+        .dropdown-divider { height: 1px; background: #E0E0E0; margin: 4px 0; }
+
+        /* CARDS */
+        .card { background: white; border: 1px solid #E0E0E0; border-radius: 8px; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.04); }
+
+        /* BUTTONS */
+        .btn { display: inline-flex; align-items: center; justify-content: center; gap: 6px; padding: 9px 16px; font-size: 13px; font-weight: 600; border-radius: 4px; transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease; cursor: pointer; border: 1px solid transparent; text-decoration: none; line-height: 1.2; white-space: nowrap; }
+        .btn .material-symbols-outlined { font-size: 16px; }
+        .btn-primary { background: #0078D4; color: white; }
+        .btn-primary:hover:not(:disabled) { background: #106EBE; }
+        .btn-primary:disabled { background: #E0E0E0; color: #A8A8A8; cursor: not-allowed; }
+        .btn-secondary { background: white; color: #242424; border-color: #D1D1D1; }
+        .btn-secondary:hover:not(:disabled) { background: #F5F5F5; border-color: #8A8886; }
+        .btn-ghost { background: transparent; color: #0078D4; border-color: transparent; }
+        .btn-ghost:hover:not(:disabled) { background: #EFF6FC; }
+
+        /* BTN GOLD pour actions RSE (CTA nouveau don) */
+        .btn-gold { background: #C5A059; color: white; border-color: #C5A059; }
+        .btn-gold:hover:not(:disabled) { background: #8A6A1F; border-color: #8A6A1F; }
+        .btn-gold:disabled { background: #E8C96A; border-color: #E8C96A; cursor: not-allowed; }
+
+        /* STATUS PILLS */
+        .status-pill { display: inline-flex; align-items: center; gap: 5px; font-size: 11px; font-weight: 600; padding: 3px 9px; border-radius: 4px; border: 1px solid; }
+        .status-pill .dot { width: 6px; height: 6px; border-radius: 50%; }
+        .status-pill--validated { color: #8A6A1F; background: #FEFCE8; border-color: #E8C96A; }
+        .status-pill--validated .dot { background: #C5A059; }
+        .status-pill--pending { color: #92400E; background: #FFFBEB; border-color: #FDE68A; }
+        .status-pill--pending .dot { background: #D97706; }
+
+        /* BADGE HERO — carte principale RSE */
+        .rse-hero {
+            position: relative;
+            background: linear-gradient(135deg, #FEFCE8 0%, #FFF7D4 100%);
+            border: 1px solid #E8C96A;
+            border-radius: 12px;
+            padding: 24px;
+            overflow: hidden;
+        }
+        .rse-hero::before {
+            content: '';
+            position: absolute;
+            top: -60px;
+            right: -60px;
+            width: 240px;
+            height: 240px;
+            background: radial-gradient(circle, rgba(197, 160, 89, 0.15) 0%, transparent 70%);
+            pointer-events: none;
+        }
+        .rse-hero::after {
+            content: '';
+            position: absolute;
+            bottom: -80px;
+            left: -80px;
+            width: 200px;
+            height: 200px;
+            background: radial-gradient(circle, rgba(232, 201, 106, 0.12) 0%, transparent 70%);
+            pointer-events: none;
+        }
+        .rse-hero-badge {
+            width: 88px;
+            height: 88px;
+            border-radius: 50%;
+            background: white;
+            border: 2px solid #E8C96A;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 16px rgba(197, 160, 89, 0.25);
+            flex-shrink: 0;
+        }
+        .rse-hero-badge .material-symbols-outlined {
+            font-size: 48px;
+            color: #C5A059;
+        }
+
+        /* RECEIPT CARD */
+        .receipt-card {
+            background: white;
+            border: 1px solid #E0E0E0;
+            border-radius: 8px;
+            padding: 16px;
+            transition: border-color 0.15s ease, box-shadow 0.15s ease;
+        }
+        .receipt-card:hover { border-color: #E8C96A; box-shadow: 0 2px 8px rgba(197, 160, 89, 0.12); }
+
+        /* FORM (modal) */
+        .field-label { display: block; font-size: 11px; font-weight: 600; color: #616161; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 6px; }
+        .field-label .req { color: #B91C1C; font-weight: 700; margin-left: 2px; }
+        .field-input, .field-select, .field-textarea { width: 100%; padding: 9px 12px; font-family: inherit; font-size: 13.5px; color: #242424; background: #FFFFFF; border: 1px solid #D1D1D1; border-radius: 4px; transition: border-color 0.15s ease, box-shadow 0.15s ease; outline: none; }
+        .field-input::placeholder, .field-textarea::placeholder { color: #8A8886; }
+        .field-input:hover:not([readonly]), .field-select:hover:not(:disabled), .field-textarea:hover:not([readonly]) { border-color: #8A8886; }
+        .field-input:focus, .field-select:focus, .field-textarea:focus { border-color: #0078D4; box-shadow: 0 0 0 2px #EFF6FC; }
+        .field-help { display: flex; align-items: center; gap: 4px; font-size: 11px; color: #8A8886; margin-top: 4px; }
+        .field-help .material-symbols-outlined { font-size: 13px; }
+
+        /* UPLOAD ZONE */
+        .upload-zone { border: 2px dashed #D1D1D1; border-radius: 6px; padding: 20px 16px; background: #F5F5F5; text-align: center; transition: border-color 0.15s ease, background-color 0.15s ease; cursor: pointer; }
+        .upload-zone:hover { border-color: #C5A059; background: #FEFCE8; }
+
+        /* MODAL */
+        .modal-overlay { position: fixed; inset: 0; z-index: 60; background: rgba(0, 0, 0, 0.5); display: flex; align-items: flex-end; justify-content: center; padding: 0; opacity: 0; pointer-events: none; transition: opacity 0.2s ease; }
+        @media (min-width: 640px) { .modal-overlay { align-items: center; padding: 16px; } }
+        .modal-overlay.open { opacity: 1; pointer-events: auto; }
+        .modal-content { background: white; border-radius: 12px 12px 0 0; box-shadow: 0 8px 32px rgba(0, 0, 0, 0.16); width: 100%; max-width: 560px; max-height: 90vh; overflow-y: auto; transform: translateY(20px); transition: transform 0.25s ease; }
+        @media (min-width: 640px) { .modal-content { border-radius: 12px; } }
+        .modal-overlay.open .modal-content { transform: translateY(0); }
+
+        /* MOBILE DRAWER */
+        #sidebar { transition: transform 0.25s ease-out; }
+        @media (max-width: 767px) {
+            #sidebar { transform: translateX(-100%); }
+            #sidebar.open { transform: translateX(0); box-shadow: 8px 0 32px rgba(0, 0, 0, 0.16); }
+        }
+
+        /* Toast */
+        .toast { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(16px); background: #242424; color: white; padding: 10px 18px; border-radius: 6px; font-size: 12.5px; font-weight: 500; opacity: 0; pointer-events: none; transition: opacity 0.2s ease, transform 0.2s ease; z-index: 100; box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2); }
+        .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+        /* ─────────── PAGINATION canon (partagée Boost/Sponsoring/RSE/Billing) ─────────── */
+        .pagination { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; padding: 14px 0 4px; border-top: 1px solid #F0F0F0; }
+        .pagination__info { font-size: 12px; color: #616161; white-space: nowrap; }
+        .pagination__info strong { color: #242424; font-weight: 600; }
+        .pagination__controls { display: inline-flex; align-items: center; gap: 4px; }
+        .pagination__btn { display: inline-flex; align-items: center; justify-content: center; min-width: 32px; height: 32px; padding: 0 8px; font-size: 12.5px; font-weight: 600; color: #424242; background: white; border: 1px solid #D1D1D1; border-radius: 4px; cursor: pointer; transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease; }
+        .pagination__btn:hover:not(:disabled):not(.active) { background: #F5F5F5; border-color: #8A8886; }
+        .pagination__btn.active { background: #0078D4; color: white; border-color: #0078D4; cursor: default; }
+        .pagination__btn:disabled { color: #C8C6C4; background: #FAFAFA; border-color: #E0E0E0; cursor: not-allowed; }
+        .pagination__btn .material-symbols-outlined { font-size: 16px; }
+        .pagination__size { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; color: #616161; white-space: nowrap; }
+        .pagination__size-select { padding: 5px 24px 5px 8px; font-family: inherit; font-size: 12px; color: #242424; background: white; border: 1px solid #D1D1D1; border-radius: 4px; outline: none; cursor: pointer; appearance: auto; }
+        .pagination__size-select:hover { border-color: #8A8886; }
+        .pagination__size-select:focus { border-color: #0078D4; box-shadow: 0 0 0 2px #EFF6FC; }
+        @media (max-width: 640px) {
+            .pagination { flex-direction: column; align-items: stretch; gap: 10px; }
+            .pagination__info { text-align: center; order: 2; }
+            .pagination__controls { justify-content: center; order: 1; flex-wrap: wrap; }
+            .pagination__size { justify-content: center; order: 3; }
+        }
+    </style>
+</head>
+
+<body class="bg-[#F5F5F5] min-h-screen">
+
+    <div id="backdrop" class="md:hidden fixed inset-0 bg-gradient-to-b from-black/40 to-black/20 z-40 hidden" aria-hidden="true"></div>
+
+    <!-- SIDEBAR -->
+    <aside id="sidebar" class="fixed top-0 left-0 w-60 h-screen bg-white border-r border-[#E0E0E0] flex flex-col z-50 md:translate-x-0" aria-label="Navigation principale">
+        <a href="dashboard_index.html" class="flex items-center gap-2.5 px-5 py-4 border-b border-[#E0E0E0] shrink-0 h-14 hover:bg-[#FAFAFA] transition-colors" title="Retour au tableau de bord">
+            <span class="material-symbols-outlined icon-fill text-[#0078D4]" style="font-size:22px">hexagon</span>
+            <div class="leading-tight min-w-0">
+                <div class="text-[#242424] font-heading font-bold text-[15px] tracking-tight">MARKET-UP</div>
+                <div class="text-[10px] text-[#8A8886] tracking-wide">vivasky.media</div>
+            </div>
+        </a>
+        <nav class="flex-1 overflow-y-auto pt-2 pb-3">
+            <div class="section-label">Entreprise</div>
+            <a href="dashboard_index.html" class="nav-item">
+                <span class="material-symbols-outlined">dashboard</span>
+                <span class="flex-1 min-w-0 truncate">Vue d'ensemble</span>
+            </a>
+            <a href="dashboard_account.html" class="nav-item">
+                <span class="material-symbols-outlined">business</span>
+                <span class="flex-1 min-w-0 truncate">Compte</span>
+            </a>
+            <div class="section-label">Mes profils</div>
+            <a href="dashboard_brandup.html" class="nav-item">
+                <span class="material-symbols-outlined">storefront</span>
+                <span class="flex-1 min-w-0 truncate">BrandUP</span>
+                <span class="w-1.5 h-1.5 rounded-full bg-[#DC2626] shrink-0" title="Actif"></span>
+            </a>
+            <a href="dashboard_sponsoring.html" class="nav-item">
+                <span class="material-symbols-outlined">play_circle</span>
+                <span class="flex-1 min-w-0 truncate">TraceUP</span>
+                <span class="w-1.5 h-1.5 rounded-full bg-[#D97706] shrink-0" title="En attente"></span>
+            </a>
+            <a href="dashboard_linkup.html" class="nav-item">
+                <span class="material-symbols-outlined">qr_code_2</span>
+                <span class="flex-1 min-w-0 truncate">LinkUP</span>
+                <span class="w-1.5 h-1.5 rounded-full bg-[#107C10] shrink-0" title="Actif"></span>
+            </a>
+            <div class="section-label">Visibilité</div>
+            <a href="dashboard_boost.html" class="nav-item">
+                <span class="material-symbols-outlined">trending_up</span>
+                <span class="flex-1 min-w-0 truncate">Boost</span>
+                <span class="text-[9px] font-bold tracking-wider text-[#107C10] bg-[#F0FDF4] border border-[#B7EBC0] px-1.5 py-[2px] rounded shrink-0">1 ACTIF</span>
+            </a>
+            <a href="dashboard_sponsoring.html" class="nav-item">
+                <span class="material-symbols-outlined">campaign</span>
+                <span class="flex-1 min-w-0 truncate">Sponsoring</span>
+                <span class="w-1.5 h-1.5 rounded-full bg-[#107C10] shrink-0" title="Campagne active"></span>
+            </a>
+            <div class="section-label">Engagement</div>
+            <a href="dashboard_rse.html" class="nav-item active" aria-current="page">
+                <span class="material-symbols-outlined">volunteer_activism</span>
+                <span class="flex-1 min-w-0 truncate">Badge RSE</span>
+                <span class="text-[9px] font-bold tracking-wider text-[#107C10] bg-[#F0FDF4] border border-[#B7EBC0] px-1.5 py-[2px] rounded shrink-0">VALIDÉ</span>
+            </a>
+            <div class="section-label">Administration</div>
+            <a href="dashboard_billing.html" class="nav-item">
+                <span class="material-symbols-outlined">receipt_long</span>
+                <span class="flex-1 min-w-0 truncate">Facturation</span>
+            </a>
+            <a href="dashboard_notifications.html" class="nav-item">
+                <span class="material-symbols-outlined">notifications</span>
+                <span class="flex-1 min-w-0 truncate">Notifications</span>
+                <span class="min-w-[18px] h-[18px] px-1 rounded-full bg-[#DC2626] text-white text-[10px] font-bold flex items-center justify-center shrink-0">3</span>
+            </a>
+            <a href="dashboard_settings.html" class="nav-item">
+                <span class="material-symbols-outlined">settings</span>
+                <span class="flex-1 min-w-0 truncate">Paramètres</span>
+            </a>
+        </nav>
+        <div class="shrink-0 border-t border-[#E0E0E0]">
+            <div class="flex items-center gap-3 px-4 py-3">
+                <div class="w-9 h-9 rounded-full bg-[#374151] flex items-center justify-center shrink-0">
+                    <span id="sb-avatar-initials" class="text-white font-heading font-bold text-[13px]">TF</span>
+                </div>
+                <div class="min-w-0 flex-1">
+                    <div id="sb-company-name" class="text-[#242424] text-[12px] font-semibold truncate">TechnoFab Industries</div>
+                    <div id="sb-company-meta" class="text-[#8A8886] text-[10px] truncate">B2B · Sousse</div>
+                </div>
+            </div>
+            <div class="flex items-center gap-2.5 px-4 py-2.5 border-t border-[#E0E0E0]">
+                <div class="w-6 h-6 rounded-full bg-[#F5F5F5] border border-[#E0E0E0] flex items-center justify-center shrink-0">
+                    <span id="sb-user-initials" class="text-[#616161] text-[10px] font-semibold">AM</span>
+                </div>
+                <div class="min-w-0 flex-1">
+                    <div id="sb-user-name" class="text-[#424242] text-[11px] font-medium truncate">Ahmed Mrabet</div>
+                    <div class="text-[#8A8886] text-[9px] truncate">Propriétaire</div>
+                </div>
+                <button class="w-7 h-7 flex items-center justify-center rounded text-[#8A8886] hover:text-[#242424] hover:bg-[#F5F5F5] transition-colors shrink-0" title="Se déconnecter" aria-label="Se déconnecter" onclick="window.location.href='auth_connexion.html';">
+                    <span class="material-symbols-outlined" style="font-size:16px">logout</span>
+                </button>
+            </div>
+        </div>
+    </aside>
+
+    <!-- SHELL -->
+    <div class="md:ml-60 min-h-screen flex flex-col">
+
+        <!-- TOPBAR -->
+        <header class="sticky top-0 z-30 h-14 bg-white border-b border-[#E0E0E0] flex items-center justify-between px-4 md:px-6 gap-4" role="banner">
+            <div class="flex items-center gap-3 min-w-0 flex-1">
+                <button id="menuBtn" class="icon-btn md:hidden -ml-2 shrink-0" aria-label="Ouvrir le menu de navigation">
+                    <span class="material-symbols-outlined">menu</span>
+                </button>
+                <div class="min-w-0 leading-tight">
+                    <nav class="hidden md:flex items-center gap-1.5 text-[11px] text-[#8A8886] mb-0.5" aria-label="Fil d'Ariane">
+                        <a href="dashboard_index.html" class="hover:text-[#0078D4] hover:underline transition-colors">Dashboard</a>
+                        <span class="material-symbols-outlined" style="font-size:12px">chevron_right</span>
+                        <span class="text-[#8A8886]">Engagement</span>
+                        <span class="material-symbols-outlined" style="font-size:12px">chevron_right</span>
+                        <span class="text-[#616161] font-medium">Badge RSE</span>
+                    </nav>
+                    <h1 class="font-heading text-[16px] font-bold text-[#242424] truncate">Badge RSE</h1>
+                    <p class="hidden md:block text-[12px] text-[#616161] truncate">Engagement social attesté · historique de vos dons</p>
+                </div>
+            </div>
+            <div class="flex items-center gap-1 shrink-0">
+                <div class="relative">
+                    <button id="bellBtn" class="icon-btn" aria-label="Notifications" aria-haspopup="true" aria-expanded="false">
+                        <span class="material-symbols-outlined">notifications</span>
+                        <span class="absolute top-1.5 right-1.5 min-w-[16px] h-[16px] px-1 rounded-full bg-[#DC2626] text-white text-[9px] font-bold flex items-center justify-center leading-none ring-2 ring-white">3</span>
+                    </button>
+                    <div id="bellDropdown" class="dropdown-panel w-[340px] max-w-[calc(100vw-24px)]">
+                        <div class="flex items-center justify-between px-4 py-3 border-b border-[#E0E0E0]">
+                            <div class="font-heading font-semibold text-[13px] text-[#242424]">Notifications</div>
+                            <div class="text-[11px] text-[#616161]"><span class="text-[#DC2626] font-semibold">3</span> non lues</div>
+                        </div>
+                        <div class="max-h-[320px] overflow-y-auto">
+                            <a href="dashboard_notifications.html" class="block px-4 py-3 hover:bg-[#F5F5F5] transition-colors border-b border-[#F0F0F0]">
+                                <div class="flex items-start gap-3">
+                                    <span class="w-2 h-2 rounded-full bg-[#0078D4] mt-1.5 shrink-0"></span>
+                                    <div class="min-w-0 flex-1">
+                                        <div class="text-[12.5px] text-[#242424] leading-snug mb-1"><span class="font-semibold">Votre boost LinkUP</span> expire dans 3 jours</div>
+                                        <div class="text-[11px] text-[#8A8886]">Il y a 2 heures</div>
+                                    </div>
+                                    <span class="material-symbols-outlined text-[#0078D4] shrink-0 mt-0.5" style="font-size:16px">trending_up</span>
+                                </div>
+                            </a>
+                            <a href="dashboard_notifications.html" class="block px-4 py-3 hover:bg-[#F5F5F5] transition-colors border-b border-[#F0F0F0]">
+                                <div class="flex items-start gap-3">
+                                    <span class="w-2 h-2 rounded-full bg-[#0078D4] mt-1.5 shrink-0"></span>
+                                    <div class="min-w-0 flex-1">
+                                        <div class="text-[12.5px] text-[#242424] leading-snug mb-1"><span class="font-semibold">Votre campagne Sponsoring</span> a généré 1 250 impressions</div>
+                                        <div class="text-[11px] text-[#8A8886]">Il y a 1 jour</div>
+                                    </div>
+                                    <span class="material-symbols-outlined text-[#0078D4] shrink-0 mt-0.5" style="font-size:16px">campaign</span>
+                                </div>
+                            </a>
+                            <a href="dashboard_notifications.html" class="block px-4 py-3 hover:bg-[#F5F5F5] transition-colors">
+                                <div class="flex items-start gap-3">
+                                    <span class="w-2 h-2 rounded-full bg-[#0078D4] mt-1.5 shrink-0"></span>
+                                    <div class="min-w-0 flex-1">
+                                        <div class="text-[12.5px] text-[#242424] leading-snug mb-1"><span class="font-semibold">Reçu RSE soumis</span> — Association Al Ahed en attente de validation</div>
+                                        <div class="text-[11px] text-[#8A8886]">Il y a 1 jour</div>
+                                    </div>
+                                    <span class="material-symbols-outlined text-[#C5A059] shrink-0 mt-0.5" style="font-size:16px">volunteer_activism</span>
+                                </div>
+                            </a>
+                        </div>
+                        <a href="dashboard_notifications.html" class="flex items-center justify-center gap-1.5 px-4 py-2.5 text-[12px] font-semibold text-[#0078D4] hover:bg-[#EFF6FC] border-t border-[#E0E0E0] transition-colors rounded-b-xl">
+                            Voir toutes les notifications
+                            <span class="material-symbols-outlined" style="font-size:14px">arrow_forward</span>
+                        </a>
+                    </div>
+                </div>
+                <div class="relative">
+                    <button id="avatarBtn" class="flex items-center gap-1 pl-1 pr-2 py-1 rounded-lg hover:bg-[#F5F5F5] transition-colors ml-1" aria-label="Menu compte" aria-haspopup="true" aria-expanded="false">
+                        <div class="w-8 h-8 rounded-full bg-[#0078D4] flex items-center justify-center shrink-0">
+                            <span id="avd-trigger-initials" class="text-white font-heading font-bold text-[12px]">TF</span>
+                        </div>
+                        <span class="material-symbols-outlined text-[#8A8886] hidden md:inline" style="font-size:18px">expand_more</span>
+                    </button>
+                    <div id="avatarDropdown" class="dropdown-panel w-[300px] max-w-[calc(100vw-24px)]">
+                        <div class="flex items-center gap-3 px-4 py-3 border-b border-[#E0E0E0]">
+                            <div class="w-10 h-10 rounded-full bg-[#0078D4] flex items-center justify-center shrink-0">
+                                <span id="avd-initials" class="text-white font-heading font-bold text-[13px]">TF</span>
+                            </div>
+                            <div class="min-w-0 flex-1">
+                                <div id="avd-company-name" class="font-heading font-semibold text-[13px] text-[#242424] truncate">TechnoFab Industries</div>
+                                <div id="avd-company-meta" class="text-[11px] text-[#616161] truncate">B2B · Sousse · Ahmed Mrabet</div>
+                            </div>
+                        </div>
+                        <div class="dropdown-section-label">Mes profils publics</div>
+                        <a id="avd-link-brandup" href="public_brandup_technofab-industries.html" target="_blank" rel="noopener" class="dropdown-item">
+                            <span class="material-symbols-outlined">storefront</span>
+                            <span class="flex-1">BrandUP</span>
+                            <span class="material-symbols-outlined ext-arrow">open_in_new</span>
+                        </a>
+                        <a id="avd-link-traceup" href="public_traceup_technofab-industries.html" target="_blank" rel="noopener" class="dropdown-item">
+                            <span class="material-symbols-outlined">play_circle</span>
+                            <span class="flex-1">TraceUP</span>
+                            <span class="material-symbols-outlined ext-arrow">open_in_new</span>
+                        </a>
+                        <a id="avd-link-linkup" href="public_linkup_technofab-industries.html" target="_blank" rel="noopener" class="dropdown-item">
+                            <span class="material-symbols-outlined">qr_code_2</span>
+                            <span class="flex-1">LinkUP</span>
+                            <span class="material-symbols-outlined ext-arrow">open_in_new</span>
+                        </a>
+                        <div class="dropdown-divider"></div>
+                        <a href="dashboard_settings.html" class="dropdown-item">
+                            <span class="material-symbols-outlined">settings</span>
+                            <span class="flex-1">Paramètres</span>
+                        </a>
+                        <button class="dropdown-item dropdown-item--danger w-full text-left">
+                            <span class="material-symbols-outlined">logout</span>
+                            <span class="flex-1">Se déconnecter</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- CONTENU -->
+        <main class="flex-1 p-4 md:p-8">
+            <div class="max-w-[1120px] mx-auto space-y-6">
+
+                <!-- ═════ HERO BADGE RSE ═════ -->
+                <section class="rse-hero">
+                    <div class="relative flex flex-col md:flex-row items-start md:items-center gap-5 md:gap-6">
+                        <!-- Badge médaillon -->
+                        <div class="rse-hero-badge">
+                            <span class="material-symbols-outlined icon-fill">workspace_premium</span>
+                        </div>
+                        <!-- Texte -->
+                        <div class="min-w-0 flex-1">
+                            <div class="flex items-center gap-2 mb-2">
+                                <span class="status-pill status-pill--validated">
+                                    <span class="dot"></span>
+                                    Engagement Social Attesté
+                                </span>
+                                <span class="text-[11px] text-[#8A6A1F]">Validé le 5 décembre 2025</span>
+                            </div>
+                            <h2 class="font-heading font-bold text-[22px] text-[#5D4201] leading-tight mb-1">
+                                Votre badge RSE est actif
+                            </h2>
+                            <p class="text-[13.5px] text-[#8A6A1F] leading-relaxed max-w-2xl mb-4">
+                                Le badge « Engagement Social Attesté » est visible sur vos profils BrandUP,
+                                TraceUP et LinkUP. Il témoigne de votre contribution auprès des associations
+                                tunisiennes reconnues.
+                            </p>
+                            <div class="flex flex-wrap items-center gap-2">
+                                <button id="openDonationModalBtn" class="btn btn-gold">
+                                    <span class="material-symbols-outlined icon-fill">add_circle</span>
+                                    Soumettre un nouveau reçu
+                                </button>
+                                <a href="public_brandup_technofab-industries.html" target="_blank" rel="noopener" class="btn btn-secondary">
+                                    <span class="material-symbols-outlined">visibility</span>
+                                    Voir sur BrandUP
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- ═════ SECTION STATS ENGAGEMENT ═════ -->
+                <section class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <!-- Total dons -->
+                    <div class="card p-4">
+                        <div class="flex items-center gap-3 mb-2">
+                            <div class="w-9 h-9 rounded-lg bg-[#FEFCE8] border border-[#E8C96A] flex items-center justify-center shrink-0">
+                                <span class="material-symbols-outlined icon-fill text-[#C5A059]" style="font-size:18px">payments</span>
+                            </div>
+                            <div class="text-[10px] font-bold text-[#8A8886] uppercase tracking-wider">Total validé</div>
+                        </div>
+                        <div class="font-heading font-bold text-[#242424] text-[24px] leading-none">
+                            7 200 <span class="text-[14px] text-[#616161] font-semibold">DT</span>
+                        </div>
+                        <div class="text-[11px] text-[#616161] mt-1.5">
+                            <span class="text-[#92400E]">+ 5 200 DT en attente</span>
+                        </div>
+                    </div>
+                    <!-- Nb de dons -->
+                    <div class="card p-4">
+                        <div class="flex items-center gap-3 mb-2">
+                            <div class="w-9 h-9 rounded-lg bg-[#FEFCE8] border border-[#E8C96A] flex items-center justify-center shrink-0">
+                                <span class="material-symbols-outlined icon-fill text-[#C5A059]" style="font-size:18px">volunteer_activism</span>
+                            </div>
+                            <div class="text-[10px] font-bold text-[#8A8886] uppercase tracking-wider">Reçus validés</div>
+                        </div>
+                        <div class="font-heading font-bold text-[#242424] text-[24px] leading-none">
+                            2 <span class="text-[14px] text-[#616161] font-semibold">/ 3</span>
+                        </div>
+                        <div class="text-[11px] text-[#616161] mt-1.5">1 en attente de validation</div>
+                    </div>
+                    <!-- Dernier don validé -->
+                    <div class="card p-4">
+                        <div class="flex items-center gap-3 mb-2">
+                            <div class="w-9 h-9 rounded-lg bg-[#FEFCE8] border border-[#E8C96A] flex items-center justify-center shrink-0">
+                                <span class="material-symbols-outlined text-[#C5A059]" style="font-size:18px">event</span>
+                            </div>
+                            <div class="text-[10px] font-bold text-[#8A8886] uppercase tracking-wider">Dernier don validé</div>
+                        </div>
+                        <div class="font-heading font-bold text-[#242424] text-[15px] leading-tight">
+                            12 janvier 2026
+                        </div>
+                        <div class="text-[11px] text-[#616161] mt-1.5">Tunisie Verte</div>
+                    </div>
+                </section>
+
+                <!-- ═════ SECTION HISTORIQUE ═════ -->
+                <section class="card p-5 md:p-6">
+                    <div class="flex items-start justify-between mb-5 flex-wrap gap-2">
+                        <div>
+                            <h3 class="font-heading font-bold text-[15px] text-[#242424]">
+                                Historique de mes reçus
+                            </h3>
+                            <p class="text-[12px] text-[#616161] mt-0.5 leading-snug">
+                                Tous vos dons validés · téléchargeables en PDF
+                            </p>
+                        </div>
+                        <span class="inline-flex items-center gap-1 text-[10px] font-semibold text-[#8A6A1F] bg-[#FEFCE8] border border-[#E8C96A] px-2 py-1 rounded shrink-0">
+                            <span class="material-symbols-outlined icon-fill" style="font-size:12px">check_circle</span>
+                            2 validés
+                        </span>
+                    </div>
+
+                    <div id="rse-receipts-list" class="space-y-3">
+
+                        <!-- Reçu 1 — le plus récent (EN ATTENTE) -->
+                        <div class="receipt-card">
+                            <div class="flex flex-col sm:flex-row sm:items-center gap-4">
+                                <!-- Infos -->
+                                <div class="min-w-0 flex-1">
+                                    <div class="flex items-center gap-2 mb-1 flex-wrap">
+                                        <h4 class="font-heading font-bold text-[14px] text-[#242424] leading-tight">
+                                            Association Al Ahed
+                                        </h4>
+                                        <span class="status-pill status-pill--pending">
+                                            <span class="dot"></span>
+                                            En attente de validation
+                                        </span>
+                                    </div>
+                                    <div class="text-[12px] text-[#616161] leading-snug">
+                                        Don pour l'éducation des enfants défavorisés ·
+                                        <strong class="text-[#424242]">18 avril 2026</strong>
+                                    </div>
+                                    <div class="text-[11px] text-[#8A8886] mt-0.5">
+                                        Soumis il y a 1 jour · validation admin sous 24-48 h
+                                    </div>
+                                </div>
+                                <!-- Montant + actions -->
+                                <div class="flex sm:flex-col items-end justify-between sm:justify-start gap-2 shrink-0">
+                                    <div class="text-right">
+                                        <div class="font-heading font-bold text-[#242424] text-[18px] leading-none">
+                                            5 200 <span class="text-[12px] text-[#616161]">DT</span>
+                                        </div>
+                                    </div>
+                                    <div class="flex items-center gap-1">
+                                        <button class="icon-btn w-8 h-8" title="Voir détails" aria-label="Voir détails">
+                                            <span class="material-symbols-outlined" style="font-size:18px">visibility</span>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Reçu 2 -->
+                        <div class="receipt-card">
+                            <div class="flex flex-col sm:flex-row sm:items-center gap-4">
+                                <div class="min-w-0 flex-1">
+                                    <div class="flex items-center gap-2 mb-1 flex-wrap">
+                                        <h4 class="font-heading font-bold text-[14px] text-[#242424] leading-tight">
+                                            Tunisie Verte
+                                        </h4>
+                                        <span class="status-pill status-pill--validated">
+                                            <span class="dot"></span>
+                                            Validé
+                                        </span>
+                                    </div>
+                                    <div class="text-[12px] text-[#616161] leading-snug">
+                                        Plantation d'arbres en zone rurale ·
+                                        <strong class="text-[#424242]">12 janvier 2026</strong>
+                                    </div>
+                                    <div class="text-[11px] text-[#8A8886] mt-0.5">
+                                        Reçu n° <span class="font-mono">RSE-2026-002</span>
+                                    </div>
+                                </div>
+                                <div class="flex sm:flex-col items-end justify-between sm:justify-start gap-2 shrink-0">
+                                    <div class="text-right">
+                                        <div class="font-heading font-bold text-[#242424] text-[18px] leading-none">
+                                            4 000 <span class="text-[12px] text-[#616161]">DT</span>
+                                        </div>
+                                    </div>
+                                    <div class="flex items-center gap-1">
+                                        <button class="btn btn-ghost !px-2 !py-1.5" title="Télécharger le PDF">
+                                            <span class="material-symbols-outlined">download</span>
+                                            PDF
+                                        </button>
+                                        <button class="icon-btn w-8 h-8" title="Voir détails">
+                                            <span class="material-symbols-outlined" style="font-size:18px">visibility</span>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Reçu 3 -->
+                        <div class="receipt-card">
+                            <div class="flex flex-col sm:flex-row sm:items-center gap-4">
+                                <div class="min-w-0 flex-1">
+                                    <div class="flex items-center gap-2 mb-1 flex-wrap">
+                                        <h4 class="font-heading font-bold text-[14px] text-[#242424] leading-tight">
+                                            Croissant Rouge Tunisien
+                                        </h4>
+                                        <span class="status-pill status-pill--validated">
+                                            <span class="dot"></span>
+                                            Validé
+                                        </span>
+                                    </div>
+                                    <div class="text-[12px] text-[#616161] leading-snug">
+                                        Aide médicale d'urgence ·
+                                        <strong class="text-[#424242]">5 décembre 2025</strong>
+                                    </div>
+                                    <div class="text-[11px] text-[#8A8886] mt-0.5">
+                                        Reçu n° <span class="font-mono">RSE-2025-001</span>
+                                    </div>
+                                </div>
+                                <div class="flex sm:flex-col items-end justify-between sm:justify-start gap-2 shrink-0">
+                                    <div class="text-right">
+                                        <div class="font-heading font-bold text-[#242424] text-[18px] leading-none">
+                                            3 200 <span class="text-[12px] text-[#616161]">DT</span>
+                                        </div>
+                                    </div>
+                                    <div class="flex items-center gap-1">
+                                        <button class="btn btn-ghost !px-2 !py-1.5" title="Télécharger le PDF">
+                                            <span class="material-symbols-outlined">download</span>
+                                            PDF
+                                        </button>
+                                        <button class="icon-btn w-8 h-8" title="Voir détails">
+                                            <span class="material-symbols-outlined" style="font-size:18px">visibility</span>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <!-- Pagination canon -->
+                    <nav class="pagination mt-5" aria-label="Pagination des reçus RSE">
+                        <div class="pagination__info">
+                            Affichage <strong>1–3</strong> sur <strong>3</strong> reçus
+                        </div>
+                        <div class="pagination__controls">
+                            <button class="pagination__btn" disabled aria-label="Page précédente">
+                                <span class="material-symbols-outlined">chevron_left</span>
+                            </button>
+                            <button class="pagination__btn active" aria-current="page" aria-label="Page 1">1</button>
+                            <button class="pagination__btn" disabled aria-label="Page suivante">
+                                <span class="material-symbols-outlined">chevron_right</span>
+                            </button>
+                        </div>
+                        <div class="pagination__size">
+                            <label for="rsePageSize">Par page</label>
+                            <select id="rsePageSize" class="pagination__size-select">
+                                <option selected>5</option>
+                                <option>10</option>
+                                <option>20</option>
+                            </select>
+                        </div>
+                    </nav>
+
+                    <!-- Footer récap -->
+                    <div class="mt-4 pt-4 border-t border-[#F0F0F0] flex flex-col sm:flex-row sm:items-center sm:justify-between flex-wrap gap-3">
+                        <div class="text-[12px] text-[#616161]">
+                            <strong class="text-[#242424]">Total dons validés :</strong>
+                            <span class="text-[#8A6A1F] font-bold">7 200 DT</span>
+                            <span class="text-[#8A8886]"> · hors champ TVA</span>
+                        </div>
+                        <div class="text-[11.5px] text-[#92400E]">
+                            <span class="material-symbols-outlined align-middle" style="font-size:13px">schedule</span>
+                            <strong class="ml-0.5">5 200 DT</strong> en attente de validation
+                        </div>
+                    </div>
+                </section>
+
+                <!-- ═════ SECTION COMMENT ÇA MARCHE ═════ -->
+                <section class="card p-5 md:p-6">
+                    <div class="mb-4">
+                        <h3 class="font-heading font-bold text-[15px] text-[#242424]">
+                            Comment obtenir et maintenir votre badge ?
+                        </h3>
+                        <p class="text-[12px] text-[#616161] mt-0.5 leading-snug">
+                            MARKET-UP atteste uniquement la réalité du don, sans intervenir dans le flux financier
+                        </p>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <!-- Étape 1 -->
+                        <div class="flex items-start gap-3 p-3 bg-[#FAFAFA] border border-[#F0F0F0] rounded-lg">
+                            <div class="w-8 h-8 rounded-full bg-[#FEFCE8] border border-[#E8C96A] flex items-center justify-center shrink-0">
+                                <span class="font-heading font-bold text-[13px] text-[#8A6A1F]">1</span>
+                            </div>
+                            <div class="min-w-0">
+                                <div class="font-heading font-semibold text-[13px] text-[#242424] mb-0.5">
+                                    Faites votre don
+                                </div>
+                                <p class="text-[11.5px] text-[#616161] leading-snug">
+                                    Directement auprès d'une association tunisienne reconnue. MARKET-UP
+                                    ne gère pas les fonds.
+                                </p>
+                            </div>
+                        </div>
+                        <!-- Étape 2 -->
+                        <div class="flex items-start gap-3 p-3 bg-[#FAFAFA] border border-[#F0F0F0] rounded-lg">
+                            <div class="w-8 h-8 rounded-full bg-[#FEFCE8] border border-[#E8C96A] flex items-center justify-center shrink-0">
+                                <span class="font-heading font-bold text-[13px] text-[#8A6A1F]">2</span>
+                            </div>
+                            <div class="min-w-0">
+                                <div class="font-heading font-semibold text-[13px] text-[#242424] mb-0.5">
+                                    Soumettez le reçu
+                                </div>
+                                <p class="text-[11.5px] text-[#616161] leading-snug">
+                                    Uploadez le reçu officiel signé par l'association (PDF ou image).
+                                </p>
+                            </div>
+                        </div>
+                        <!-- Étape 3 -->
+                        <div class="flex items-start gap-3 p-3 bg-[#FAFAFA] border border-[#F0F0F0] rounded-lg">
+                            <div class="w-8 h-8 rounded-full bg-[#FEFCE8] border border-[#E8C96A] flex items-center justify-center shrink-0">
+                                <span class="font-heading font-bold text-[13px] text-[#8A6A1F]">3</span>
+                            </div>
+                            <div class="min-w-0">
+                                <div class="font-heading font-semibold text-[13px] text-[#242424] mb-0.5">
+                                    Badge visible
+                                </div>
+                                <p class="text-[11.5px] text-[#616161] leading-snug">
+                                    Après validation admin (24-48 h), le badge apparaît sur vos 3 profils publics.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mt-4 bg-[#EFF6FC] border border-[#C7DDF1] rounded-lg px-4 py-3 flex items-start gap-3">
+                        <span class="material-symbols-outlined text-[#0078D4] shrink-0 mt-[1px]" style="font-size:18px">info</span>
+                        <div class="text-[12px] text-[#242424] leading-snug">
+                            <strong>Les dons ne sont pas comptabilisés dans la facturation MARKET-UP</strong> —
+                            ils vont directement à l'association. MARKET-UP atteste uniquement de la réalité
+                            du don via vérification documentaire.
+                        </div>
+                    </div>
+                </section>
+
+            </div>
+        </main>
+
+    </div>
+
+    <!-- ═════════════════════════════════════════════════════
+         MODAL : Nouveau reçu de don
+         ═════════════════════════════════════════════════════ -->
+    <div id="donationModal" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="donationModalTitle" aria-hidden="true">
+        <div class="modal-content">
+
+            <!-- Header -->
+            <div class="flex items-start justify-between px-5 py-4 border-b border-[#E0E0E0]">
+                <div class="flex items-start gap-3 min-w-0">
+                    <div class="w-10 h-10 rounded-lg bg-[#FEFCE8] border border-[#E8C96A] flex items-center justify-center shrink-0">
+                        <span class="material-symbols-outlined icon-fill text-[#C5A059]" style="font-size:22px">volunteer_activism</span>
+                    </div>
+                    <div class="min-w-0">
+                        <h3 id="donationModalTitle" class="font-heading font-bold text-[15px] text-[#242424] leading-tight">
+                            Soumettre un reçu de don
+                        </h3>
+                        <p class="text-[11.5px] text-[#616161] mt-0.5 leading-snug">
+                            Validation admin sous 24 à 48 h après soumission
+                        </p>
+                    </div>
+                </div>
+                <button id="closeDonationBtn" class="icon-btn shrink-0 -mr-2 -mt-1 w-8 h-8" aria-label="Fermer">
+                    <span class="material-symbols-outlined" style="font-size:20px">close</span>
+                </button>
+            </div>
+
+            <!-- Body -->
+            <div class="p-5 space-y-5">
+
+                <!-- Association (select fermé — liste gérée par super admin) -->
+                <div>
+                    <label for="don-association" class="field-label">
+                        Association bénéficiaire <span class="req">*</span>
+                    </label>
+                    <select id="don-association" class="field-select">
+                        <option value="" disabled selected>— Sélectionnez une association —</option>
+                        <option value="al-ahed">Association Al Ahed</option>
+                        <option value="tunisie-verte">Tunisie Verte</option>
+                        <option value="croissant-rouge">Croissant Rouge Tunisien</option>
+                    </select>
+                    <div class="field-help">
+                        <span class="material-symbols-outlined">info</span>
+                        Associations tunisiennes reconnues et partenaires de MARKET-UP ·
+                        une association manquante ? Contactez
+                        <a href="mailto:support@vivasky.media" class="text-[#0078D4] hover:underline font-medium ml-1">support@vivasky.media</a>
+                    </div>
+                </div>
+
+                <!-- Montant + Date -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                        <label for="don-amount" class="field-label">
+                            Montant (DT) <span class="req">*</span>
+                        </label>
+                        <div class="relative">
+                            <input id="don-amount" class="field-input pr-12" type="number" min="100" placeholder="1000" />
+                            <span class="absolute right-3 top-1/2 -translate-y-1/2 text-[12px] font-semibold text-[#8A8886] pointer-events-none">DT</span>
+                        </div>
+                        <div class="field-help">
+                            <span class="material-symbols-outlined">info</span>
+                            Minimum 100 DT
+                        </div>
+                    </div>
+                    <div>
+                        <label for="don-date" class="field-label">
+                            Date du don <span class="req">*</span>
+                        </label>
+                        <input id="don-date" class="field-input" type="date" value="2026-04-19" />
+                    </div>
+                </div>
+
+                <!-- Objet -->
+                <div>
+                    <label for="don-purpose" class="field-label">
+                        Objet / cause soutenue <span class="req">*</span>
+                    </label>
+                    <textarea id="don-purpose" class="field-textarea" rows="2" maxlength="160" placeholder="Ex : Soutien aux enfants défavorisés, plantation d'arbres, aide médicale..."></textarea>
+                    <div class="field-help">
+                        <span class="material-symbols-outlined">info</span>
+                        160 caractères max · affiché sur vos profils publics
+                    </div>
+                </div>
+
+                <!-- Upload reçu -->
+                <div>
+                    <label class="field-label">
+                        Reçu officiel signé <span class="req">*</span>
+                    </label>
+                    <div class="upload-zone">
+                        <div class="flex flex-col items-center gap-2">
+                            <div class="w-10 h-10 rounded-full bg-white border border-[#E8C96A] flex items-center justify-center">
+                                <span class="material-symbols-outlined text-[#C5A059]" style="font-size:22px">upload_file</span>
+                            </div>
+                            <div>
+                                <div class="font-heading font-semibold text-[13px] text-[#242424]">
+                                    Glissez votre reçu ou cliquez pour parcourir
+                                </div>
+                                <div class="text-[11px] text-[#616161] mt-0.5">
+                                    PDF, JPG ou PNG · 5 Mo max · scan du reçu original
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="field-help">
+                        <span class="material-symbols-outlined">shield</span>
+                        Document vérifié manuellement par l'équipe MARKET-UP
+                    </div>
+                </div>
+
+                <!-- Info validation -->
+                <div class="bg-[#FFFBEB] border border-[#FDE68A] rounded p-3 flex items-start gap-2">
+                    <span class="material-symbols-outlined icon-fill text-[#D97706] shrink-0 mt-[1px]" style="font-size:16px">info</span>
+                    <div class="text-[12px] text-[#92400E] leading-snug">
+                        Après soumission, votre reçu sera revu par l'administrateur.
+                        <strong>Le badge RSE reste actif</strong> pendant ce délai — seul le nouveau reçu
+                        est en attente de validation.
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Footer -->
+            <div class="px-5 py-4 bg-[#FAFAFA] border-t border-[#E0E0E0] flex items-center justify-end gap-2 rounded-b-xl flex-wrap">
+                <button id="cancelDonationBtn" class="btn btn-secondary">
+                    Annuler
+                </button>
+                <button class="btn btn-gold">
+                    <span class="material-symbols-outlined">send</span>
+                    Soumettre pour validation
+                </button>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Toast -->
+    <div id="toast" class="toast" role="status" aria-live="polite">Action effectuée</div>
+
+    <!-- JS -->
+    <script>
+        (function () {
+            const sidebar = document.getElementById('sidebar');
+            const backdrop = document.getElementById('backdrop');
+            const menuBtn = document.getElementById('menuBtn');
+            const bellBtn = document.getElementById('bellBtn');
+            const bellDropdown = document.getElementById('bellDropdown');
+            const avatarBtn = document.getElementById('avatarBtn');
+            const avatarDropdown = document.getElementById('avatarDropdown');
+            const donationModal = document.getElementById('donationModal');
+            const openDonationBtn = document.getElementById('openDonationModalBtn');
+            const closeDonationBtn = document.getElementById('closeDonationBtn');
+            const cancelDonationBtn = document.getElementById('cancelDonationBtn');
+
+            const dropdowns = [
+                { btn: bellBtn, panel: bellDropdown },
+                { btn: avatarBtn, panel: avatarDropdown },
+            ];
+
+            function closeAllDropdowns() {
+                dropdowns.forEach(({ btn, panel }) => {
+                    panel.classList.remove('open');
+                    btn.setAttribute('aria-expanded', 'false');
+                });
+            }
+
+            function toggleDropdown(target) {
+                const wasOpen = target.panel.classList.contains('open');
+                closeAllDropdowns();
+                if (!wasOpen) {
+                    target.panel.classList.add('open');
+                    target.btn.setAttribute('aria-expanded', 'true');
+                }
+            }
+
+            function openDrawer() {
+                closeAllDropdowns();
+                sidebar.classList.add('open');
+                backdrop.classList.remove('hidden');
+                document.body.style.overflow = 'hidden';
+            }
+
+            function closeDrawer() {
+                sidebar.classList.remove('open');
+                backdrop.classList.add('hidden');
+                document.body.style.overflow = '';
+            }
+
+            function openDonationModal() {
+                closeAllDropdowns();
+                donationModal.classList.add('open');
+                donationModal.setAttribute('aria-hidden', 'false');
+                document.body.style.overflow = 'hidden';
+            }
+
+            function closeDonationModal() {
+                donationModal.classList.remove('open');
+                donationModal.setAttribute('aria-hidden', 'true');
+                if (!sidebar.classList.contains('open')) {
+                    document.body.style.overflow = '';
+                }
+            }
+
+            openDonationBtn.addEventListener('click', openDonationModal);
+            closeDonationBtn.addEventListener('click', closeDonationModal);
+            cancelDonationBtn.addEventListener('click', closeDonationModal);
+            donationModal.addEventListener('click', (e) => { if (e.target === donationModal) closeDonationModal(); });
+
+            menuBtn.addEventListener('click', openDrawer);
+            backdrop.addEventListener('click', closeDrawer);
+
+            dropdowns.forEach((dd) => {
+                dd.btn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    toggleDropdown(dd);
+                });
+            });
+
+            document.addEventListener('click', (e) => {
+                const clickedInsideDropdown = dropdowns.some((dd) => dd.panel.contains(e.target) || dd.btn.contains(e.target));
+                if (!clickedInsideDropdown) closeAllDropdowns();
+            });
+
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape') {
+                    closeAllDropdowns();
+                    if (sidebar.classList.contains('open')) closeDrawer();
+                    if (donationModal.classList.contains('open')) closeDonationModal();
+                }
+            });
+
+            let resizeTimer;
+            window.addEventListener('resize', () => {
+                clearTimeout(resizeTimer);
+                resizeTimer = setTimeout(() => {
+                    if (window.innerWidth >= 768 && sidebar.classList.contains('open')) closeDrawer();
+                }, 100);
+            });
+
+            // ─── Pagination visual feedback (mockup) ───
+            document.querySelectorAll('.pagination').forEach((nav) => {
+                const numberButtons = nav.querySelectorAll('.pagination__btn[aria-label^="Page "]:not([aria-label*="suivante"]):not([aria-label*="précédente"])');
+                const prevBtn = nav.querySelector('.pagination__btn[aria-label*="précédente"]');
+                const nextBtn = nav.querySelector('.pagination__btn[aria-label*="suivante"]');
+                const totalPages = numberButtons.length;
+
+                function setActive(targetIdx) {
+                    numberButtons.forEach((b, i) => {
+                        const active = i === targetIdx;
+                        b.classList.toggle('active', active);
+                        if (active) b.setAttribute('aria-current', 'page');
+                        else b.removeAttribute('aria-current');
+                    });
+                    if (prevBtn) prevBtn.disabled = targetIdx === 0;
+                    if (nextBtn) nextBtn.disabled = targetIdx === totalPages - 1;
+                }
+
+                numberButtons.forEach((btn, idx) => {
+                    btn.addEventListener('click', () => setActive(idx));
+                });
+                if (prevBtn) prevBtn.addEventListener('click', () => {
+                    const current = Array.from(numberButtons).findIndex((b) => b.classList.contains('active'));
+                    if (current > 0) setActive(current - 1);
+                });
+                if (nextBtn) nextBtn.addEventListener('click', () => {
+                    const current = Array.from(numberButtons).findIndex((b) => b.classList.contains('active'));
+                    if (current < totalPages - 1) setActive(current + 1);
+                });
+            });
+        })();
+    </script>
+
+    <!-- ════════════════════════════════════════════════════════════════
+         SEED DATA HYDRATION
+         Loads marketup_seed_data.js + dashboard_hydrate_utils.js,
+         then hydrates this page from window.MARKETUP_DATA.
+         Only common chrome (sidebar + topbar) is hydrated here;
+         page-specific content is hydrated in a follow-up wave.
+         ════════════════════════════════════════════════════════════════ -->
+    <script src="marketup_seed_data.js"></script>
+    <script src="dashboard_hydrate_utils.js"></script>
+    <script>
+        MARKETUP_HYDRATE.bootstrapPage(function (me, H) {
+            const { setHTML } = MARKETUP_HYDRATE;
+            const receipts = (me.rseReceipts || []).slice().sort(
+                (a, b) => new Date(b.donationDate) - new Date(a.donationDate)
+            );
+
+            const escape = (s) => String(s || '')
+                .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+
+            // Format French amount with thousand separator: 5200 → "5 200"
+            const moneyFr = (n) => String(n).replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
+
+            // ─── Receipts list (3 cards) ──────────────────────────────
+            const receiptHTML = (r) => {
+                const assoc = H.getAssociationById ? H.getAssociationById(r.associationId) : null;
+                const assocName = assoc ? assoc.name.fr : r.associationId;
+
+                const isPending = r.status === 'pending';
+                const statusLabel = isPending ? 'En attente de validation' : 'Validé';
+                const statusClass = isPending ? 'pending' : 'validated';
+
+                const dateStr = MARKETUP_HYDRATE.formatDateLong(r.donationDate);
+                const subText = isPending
+                    ? `Soumis le ${dateStr} · validation admin sous 24-48 h`
+                    : `Validé le ${MARKETUP_HYDRATE.formatDateLong(r.validatedAt || r.donationDate)}`;
+
+                const purpose = r.purpose && r.purpose.fr ? r.purpose.fr : '';
+
+                return `<div class="receipt-card">
+                    <div class="flex flex-col sm:flex-row sm:items-center gap-4">
+                        <div class="min-w-0 flex-1">
+                            <div class="flex items-center gap-2 mb-1 flex-wrap">
+                                <h4 class="font-heading font-bold text-[14px] text-[#242424] leading-tight">
+                                    ${escape(assocName)}
+                                </h4>
+                                <span class="status-pill status-pill--${statusClass}">
+                                    <span class="dot"></span>
+                                    ${statusLabel}
+                                </span>
+                            </div>
+                            <div class="text-[12px] text-[#616161] leading-snug">
+                                ${escape(purpose)} ·
+                                <strong class="text-[#424242]">${dateStr}</strong>
+                            </div>
+                            <div class="text-[11px] text-[#8A8886] mt-0.5">
+                                ${escape(subText)}
+                            </div>
+                        </div>
+                        <div class="flex sm:flex-col items-end justify-between sm:justify-start gap-2 shrink-0">
+                            <div class="text-right">
+                                <div class="font-heading font-bold text-[#242424] text-[18px] leading-none">
+                                    ${moneyFr(r.amount)} <span class="text-[12px] text-[#616161]">DT</span>
+                                </div>
+                            </div>
+                            <div class="flex items-center gap-1">
+                                <button class="icon-btn w-8 h-8" title="Voir détails" aria-label="Voir détails">
+                                    <span class="material-symbols-outlined" style="font-size:18px">visibility</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>`;
+            };
+
+            setHTML('rse-receipts-list', receipts.map(receiptHTML).join(''));
+
+            // Page title
+            const fullName = me.data.displayName.fr;
+            document.title = `MARKET-UP | RSE — ${fullName}`;
+
+            // NOTE: hero badge ("Validé le ..." or "En attente"), stats above
+            // ("Total des dons", "Associations soutenues") are kept hardcoded
+            // for the TechnoFab canon and refreshed on data import only.
+        });
+    </script>
+
+</body>
+
+</html>

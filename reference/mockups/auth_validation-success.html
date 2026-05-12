@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Compte créé · Validation en cours | MARKET-UP</title>
+
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet" />
+
+    <script src="https://cdn.tailwindcss.com?plugins=forms"></script>
+    <script id="tailwind-config">
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        "primary":          "#0078D4",
+                        "primary-hover":    "#106EBE",
+                        "primary-dark":     "#005A9E",
+                        "primary-light":    "#EFF6FC",
+                        "ms-text":          "#242424",
+                        "ms-text-muted":    "#616161",
+                        "ms-border":        "#E0E0E0",
+                        "ms-border-strong": "#D1D1D1",
+                        "ms-surface":       "#F5F5F5",
+                        "ms-placeholder":   "#8A8886",
+                        "ms-success":       "#107C10",
+                        "ms-success-bg":    "#DFF6DD",
+                        "ms-error":         "#D13438"
+                    },
+                    fontFamily: {
+                        "headline": ["'Plus Jakarta Sans'", "sans-serif"],
+                        "body":     ["Inter", "sans-serif"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.25rem",
+                        "lg":      "0.5rem",
+                        "xl":      "0.75rem",
+                        "full":    "9999px"
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body { font-family: 'Inter', sans-serif; color: #242424; }
+        h1, h2, h3 { font-family: 'Plus Jakarta Sans', sans-serif; }
+        .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+        .material-symbols-outlined.fill { font-variation-settings: 'FILL' 1; }
+
+        .btn-primary {
+            background: #0078D4; color: white;
+            padding: 12px 24px; border-radius: 4px;
+            font-weight: 600; font-size: 14px; border: none; cursor: pointer;
+            transition: background 0.15s;
+            display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+            text-decoration: none;
+        }
+        .btn-primary:hover { background: #106EBE; }
+        .btn-primary:active { background: #005A9E; }
+
+        .btn-ghost {
+            background: transparent; color: #0078D4;
+            padding: 12px 20px; border-radius: 4px;
+            font-weight: 600; font-size: 14px; border: 1px solid #0078D4; cursor: pointer;
+            transition: background 0.15s;
+            display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+            text-decoration: none;
+        }
+        .btn-ghost:hover { background: #EFF6FC; }
+
+        /* Subtle spin for "validation en cours" icon */
+        @keyframes slow-spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+        .icon-spin { animation: slow-spin 3s linear infinite; }
+    </style>
+</head>
+
+<body class="bg-white min-h-screen">
+    <main class="flex min-h-screen">
+
+        <!-- LEFT PANEL CANON avec status timeline -->
+        <aside class="hidden lg:flex lg:w-[40%] bg-[#005A9E] text-white flex-col justify-between p-12 relative">
+            <div>
+                <div class="mb-16">
+                    <span class="text-2xl font-bold tracking-tighter font-headline"><a href="onboarding_onboarding.html">MARKET-UP</a></span>
+                </div>
+                <div class="max-w-sm mb-10">
+                    <h2 class="text-3xl font-semibold leading-tight mb-4 tracking-tight text-white">
+                        La plateforme digitale des entreprises.
+                    </h2>
+                    <p class="text-[#d3e3ff] text-base leading-relaxed">
+                        BrandUP, TraceUP, LinkUP — un seul compte, trois vitrines.
+                    </p>
+                </div>
+
+                <!-- Status timeline -->
+                <div class="space-y-5">
+                    <div class="text-[11px] font-bold uppercase tracking-widest text-[#d3e3ff] mb-1">Prochaines étapes</div>
+
+                    <!-- Step: Email confirmed (DONE) -->
+                    <div class="flex items-start gap-4">
+                        <div class="w-9 h-9 rounded-full bg-[#DFF6DD] flex items-center justify-center shrink-0">
+                            <span class="material-symbols-outlined text-[#107C10] text-lg fill">check</span>
+                        </div>
+                        <div class="pt-1">
+                            <div class="text-sm font-semibold text-white">Email confirmé</div>
+                            <div class="text-xs text-[#d3e3ff]/80 mt-0.5">Votre adresse est vérifiée</div>
+                        </div>
+                    </div>
+
+                    <!-- Step: Admin validation (IN PROGRESS) -->
+                    <div class="flex items-start gap-4">
+                        <div class="w-9 h-9 rounded-full bg-white/15 border border-white/40 flex items-center justify-center shrink-0">
+                            <span class="material-symbols-outlined text-white text-lg icon-spin">sync</span>
+                        </div>
+                        <div class="pt-1">
+                            <div class="text-sm font-semibold text-white">Validation par notre équipe</div>
+                            <div class="text-xs text-[#d3e3ff]/80 mt-0.5">En cours — 24 à 48h</div>
+                        </div>
+                    </div>
+
+                    <!-- Step: Dashboard access (PENDING) -->
+                    <div class="flex items-start gap-4 opacity-50">
+                        <div class="w-9 h-9 rounded-full border border-white/40 flex items-center justify-center shrink-0">
+                            <span class="material-symbols-outlined text-white text-lg">lock</span>
+                        </div>
+                        <div class="pt-1">
+                            <div class="text-sm font-medium text-white">Accès à votre dashboard</div>
+                            <div class="text-xs text-white/60 mt-0.5">Dès activation de votre compte</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="text-xs text-[#d3e3ff]/70">
+                <p>© 2026 MARKET-UP · AGGREGAX SUARL</p>
+                <p class="mt-1">Fait en Tunisie 🇹🇳</p>
+            </div>
+        </aside>
+
+        <!-- RIGHT PANEL -->
+        <section class="flex-1 flex flex-col">
+
+            <!-- Mobile header -->
+            <div class="lg:hidden flex items-center justify-between px-6 py-4 border-b border-[#E0E0E0]">
+                <a href="#" class="text-xl font-bold tracking-tighter text-[#0078D4] font-headline">MARKET-UP</a>
+                <span class="inline-block px-2.5 py-1 bg-[#DFF6DD] text-[#107C10] text-[10px] font-bold uppercase tracking-widest rounded">Inscription terminée</span>
+            </div>
+
+            <div class="flex-1 flex items-center justify-center px-6 md:px-12 py-12 md:py-16">
+                <div class="w-full max-w-lg text-center">
+
+                    <!-- Success icon -->
+                    <div class="w-20 h-20 rounded-full bg-[#DFF6DD] mx-auto mb-8 flex items-center justify-center">
+                        <span class="material-symbols-outlined text-[#107C10] fill" style="font-size: 44px;">check_circle</span>
+                    </div>
+
+                    <header class="mb-8">
+                        <span class="hidden lg:inline-block px-3 py-1 bg-[#DFF6DD] text-[#107C10] text-[10px] font-bold uppercase tracking-widest rounded mb-4">Inscription terminée</span>
+                        <h1 class="text-3xl md:text-[32px] font-semibold text-[#242424] mb-4 tracking-tight">
+                            Votre email est confirmé
+                        </h1>
+                        <p class="text-[#616161] text-base leading-relaxed">
+                            Bienvenue sur MARKET-UP. Votre compte est en attente de validation manuelle par notre équipe pour garantir l'intégrité de la plateforme.
+                        </p>
+                    </header>
+
+                    <!-- Info card -->
+                    <div class="bg-[#EFF6FC] border border-[#0078D4]/20 rounded-lg p-5 mb-8 text-left">
+                        <div class="flex items-start gap-3">
+                            <span class="material-symbols-outlined text-[#0078D4] shrink-0 mt-0.5">schedule</span>
+                            <div>
+                                <p class="text-sm font-bold text-[#242424] mb-1">Validation sous 24 à 48 heures</p>
+                                <p class="text-sm text-[#616161] leading-relaxed">
+                                    Vous recevrez un email de confirmation dès que votre compte sera activé. Vous pourrez alors vous connecter et compléter vos profils BrandUP, TraceUP et LinkUP.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Mobile status timeline (alternative au left panel caché sur mobile) -->
+                    <div class="lg:hidden bg-[#F5F5F5] border border-[#E0E0E0] rounded-lg p-5 mb-8 text-left">
+                        <div class="text-[11px] font-bold uppercase tracking-widest text-[#616161] mb-3">Prochaines étapes</div>
+                        <div class="space-y-3">
+                            <div class="flex items-center gap-3">
+                                <div class="w-7 h-7 rounded-full bg-[#DFF6DD] flex items-center justify-center shrink-0">
+                                    <span class="material-symbols-outlined text-[#107C10] fill" style="font-size: 16px;">check</span>
+                                </div>
+                                <div class="text-sm font-medium text-[#242424]">Email confirmé</div>
+                            </div>
+                            <div class="flex items-center gap-3">
+                                <div class="w-7 h-7 rounded-full bg-[#EFF6FC] border border-[#0078D4]/30 flex items-center justify-center shrink-0">
+                                    <span class="material-symbols-outlined text-[#0078D4] icon-spin" style="font-size: 16px;">sync</span>
+                                </div>
+                                <div class="text-sm font-medium text-[#242424]">Validation admin en cours</div>
+                            </div>
+                            <div class="flex items-center gap-3 opacity-50">
+                                <div class="w-7 h-7 rounded-full border border-[#D1D1D1] flex items-center justify-center shrink-0">
+                                    <span class="material-symbols-outlined text-[#616161]" style="font-size: 16px;">lock</span>
+                                </div>
+                                <div class="text-sm font-medium text-[#242424]">Accès dashboard</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- CTAs -->
+                    <div class="flex flex-col sm:flex-row gap-3 justify-center">
+                        <a href="onboarding_onboarding.html" class="btn-primary w-full sm:w-auto">
+                            <span class="material-symbols-outlined text-base">home</span>
+                            Retour à l'accueil
+                        </a>
+                    </div>
+
+                    <!-- Support -->
+                    <p class="mt-10 text-xs text-[#8A8886]">
+                        Une question ? Contactez-nous à <a href="mailto:support@marketup.tn" class="text-[#0078D4] font-semibold hover:underline">support@marketup.tn</a>
+                    </p>
+
+                </div>
+            </div>
+        </section>
+    </main>
+</body>
+
+</html>

@@ -1,0 +1,914 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Admin · Transactions · MARKET-UP</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap"
+        rel="stylesheet" />
+    <link rel="stylesheet"
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" />
+    <script src="marketup_seed_data.js"></script>
+    <script src="admin_data_bridge.js"></script>
+    <script src="admin_notifications_dropdown.js"></script>
+    <style>
+        :root {
+            --admin-primary: #5C2D91;
+            --admin-primary-hover: #4A2375;
+            --admin-primary-light: #F3EFFA;
+            --text-primary: #242424;
+            --text-secondary: #616161;
+            --text-tertiary: #8A8886;
+            --border-default: #E0E0E0;
+            --bg-canvas: #F5F5F5;
+        }
+
+        html,
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Inter', sans-serif;
+            color: var(--text-primary);
+            background: var(--bg-canvas);
+        }
+
+        .font-heading {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+        }
+
+        .icon-fill {
+            font-variation-settings: 'FILL' 1;
+        }
+
+        .card {
+            background: white;
+            border: 1px solid var(--border-default);
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 8px 12px;
+            border-radius: 6px;
+            color: var(--text-secondary);
+            font-size: 13px;
+            font-weight: 500;
+            transition: background 0.15s ease, color 0.15s ease;
+            cursor: pointer;
+            text-decoration: none;
+        }
+
+        .nav-item:hover {
+            background: #FAFAFA;
+            color: var(--text-primary);
+        }
+
+        .nav-item.active {
+            background: var(--admin-primary-light);
+            color: var(--admin-primary);
+            font-weight: 600;
+        }
+
+        .nav-item.active .material-symbols-outlined {
+            color: var(--admin-primary);
+        }
+
+        .nav-item .material-symbols-outlined {
+            font-size: 18px;
+            color: var(--text-tertiary);
+        }
+
+        .nav-group-label {
+            font-size: 10px;
+            font-weight: 700;
+            color: var(--text-tertiary);
+            letter-spacing: 0.06em;
+            padding: 12px 12px 6px;
+            text-transform: uppercase;
+        }
+
+        .nav-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 3px;
+            font-size: 10px;
+            font-weight: 700;
+            padding: 2px 6px;
+            border-radius: 10px;
+            line-height: 1;
+        }
+
+        .nav-pill--count-amber {
+            background: #D97706;
+            color: white;
+        }
+
+        .nav-pill--count-red {
+            background: #DC2626;
+            color: white;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            padding: 7px 14px;
+            border-radius: 4px;
+            font-size: 12.5px;
+            font-weight: 600;
+            cursor: pointer;
+            border: 1px solid transparent;
+            transition: all 0.15s ease;
+            text-decoration: none;
+            white-space: nowrap;
+        }
+
+        .btn .material-symbols-outlined {
+            font-size: 16px;
+        }
+
+        .btn-primary {
+            background: var(--admin-primary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--admin-primary-hover);
+        }
+
+        .btn-secondary {
+            background: white;
+            color: var(--text-primary);
+            border: 1px solid #D1D1D1;
+        }
+
+        .btn-secondary:hover {
+            background: #F5F5F5;
+        }
+
+        .btn-ghost {
+            background: transparent;
+            color: var(--text-primary);
+        }
+
+        .btn-ghost:hover {
+            background: #F5F5F5;
+        }
+
+        /* Action button (icon-only, table row) — violet admin */
+        .btn-icon {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 30px;
+            height: 30px;
+            border-radius: 6px;
+            border: 1px solid #E0E0E0;
+            background: #FFFFFF;
+            color: var(--admin-primary);
+            cursor: pointer;
+            transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+            padding: 0;
+        }
+        .btn-icon:hover {
+            background: var(--admin-primary-light);
+            border-color: var(--admin-primary);
+            color: var(--admin-primary-hover);
+        }
+        .btn-icon:focus-visible {
+            outline: 2px solid var(--admin-primary);
+            outline-offset: 2px;
+        }
+        .btn-icon .material-symbols-outlined {
+            font-size: 17px;
+        }
+
+        .status-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 11px;
+            font-weight: 600;
+            padding: 3px 9px;
+            border-radius: 4px;
+            border: 1px solid;
+        }
+
+        .status-pill .dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+        }
+
+        .status-pill--paid {
+            color: #107C10;
+            background: #F0FDF4;
+            border-color: #B7EBC0;
+        }
+
+        .status-pill--paid .dot {
+            background: #107C10;
+        }
+
+        .status-pill--refunded {
+            color: #B91C1C;
+            background: #FEF2F2;
+            border-color: #FCA5A5;
+        }
+
+        .status-pill--refunded .dot {
+            background: #DC2626;
+        }
+
+        .type-chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 0.02em;
+        }
+
+        .type-chip .material-symbols-outlined {
+            font-size: 13px;
+        }
+
+        .type-chip--boost {
+            background: #EFF6FC;
+            color: #0078D4;
+        }
+
+        .type-chip--sponsoring {
+            background: #F3EFFA;
+            color: #5C2D91;
+        }
+
+        .kpi-inline {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 12px 14px;
+            background: white;
+            border: 1px solid var(--border-default);
+            border-radius: 8px;
+            min-width: 0;
+            flex: 1;
+        }
+
+        .kpi-inline__value {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--text-primary);
+            line-height: 1;
+        }
+
+        .kpi-inline__label {
+            font-size: 11px;
+            color: var(--text-secondary);
+            line-height: 1.2;
+        }
+
+        .queue-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .queue-table thead th {
+            background: #FAFAFA;
+            border-bottom: 1px solid var(--border-default);
+            padding: 10px 16px;
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--text-secondary);
+            text-align: left;
+            letter-spacing: 0.04em;
+            text-transform: uppercase;
+            white-space: nowrap;
+        }
+
+        .queue-table tbody tr {
+            border-bottom: 1px solid #F0F0F0;
+            transition: background 0.1s ease;
+        }
+
+        .queue-table tbody tr:hover {
+            background: #FAFAFA;
+        }
+
+        .queue-table tbody tr:last-child {
+            border-bottom: none;
+        }
+
+        .queue-table tbody td {
+            padding: 12px 16px;
+            font-size: 13px;
+            color: var(--text-primary);
+            vertical-align: middle;
+        }
+
+        .avatar {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            font-weight: 700;
+            color: white;
+            flex-shrink: 0;
+        }
+
+        .avatar--sm {
+            width: 32px;
+            height: 32px;
+            font-size: 11px;
+        }
+
+        .amount-value {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .amount-unit {
+            font-size: 10.5px;
+            color: var(--text-secondary);
+            margin-left: 2px;
+        }
+
+        .search-bar {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 8px 12px;
+            background: white;
+            border: 1px solid var(--border-default);
+            border-radius: 6px;
+            transition: border-color 0.15s ease, box-shadow 0.15s ease;
+        }
+
+        .search-bar:focus-within {
+            border-color: var(--admin-primary);
+            box-shadow: 0 0 0 2px var(--admin-primary-light);
+        }
+
+        .search-bar input {
+            flex: 1;
+            border: none;
+            outline: none;
+            font-size: 13px;
+            font-family: inherit;
+            background: transparent;
+            min-width: 0;
+        }
+
+        .filter-select {
+            padding: 8px 12px;
+            border: 1px solid var(--border-default);
+            border-radius: 6px;
+            font-size: 12.5px;
+            background: white;
+            color: var(--text-primary);
+            cursor: pointer;
+            min-width: 140px;
+        }
+
+        .filter-select:focus {
+            outline: none;
+            border-color: var(--admin-primary);
+            box-shadow: 0 0 0 2px var(--admin-primary-light);
+        }
+
+        .pagination {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 16px;
+            border-top: 1px solid var(--border-default);
+            background: #FAFAFA;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .pagination__info {
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+
+        .pagination__controls {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .pagination__btn {
+            width: 32px;
+            height: 32px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid var(--border-default);
+            background: white;
+            border-radius: 4px;
+            color: var(--text-primary);
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: 600;
+            transition: background 0.1s ease, border-color 0.1s ease;
+        }
+
+        .pagination__btn:hover:not(:disabled):not(.active) {
+            background: #F5F5F5;
+            border-color: #CBD5E1;
+        }
+
+        .pagination__btn.active {
+            background: var(--admin-primary);
+            color: white;
+            border-color: var(--admin-primary);
+        }
+
+        .pagination__btn:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+        }
+
+        .empty-state {
+            padding: 48px 24px;
+            text-align: center;
+        }
+
+        .empty-state .material-symbols-outlined {
+            font-size: 48px;
+            color: var(--text-tertiary);
+        }
+
+        #toast {
+            position: fixed;
+            bottom: 24px;
+            left: 50%;
+            transform: translateX(-50%) translateY(16px);
+            background: var(--text-primary);
+            color: white;
+            padding: 10px 18px;
+            border-radius: 6px;
+            font-size: 13px;
+            opacity: 0;
+            pointer-events: none;
+            transition: all 0.2s ease;
+            z-index: 100;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        #toast.show {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+        }
+
+        #toast .material-symbols-outlined {
+            font-size: 16px;
+            color: #4CE67B;
+        }
+
+        *:focus-visible {
+            outline: 2px solid var(--admin-primary);
+            outline-offset: 2px;
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #D1D1D1;
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #A19F9D;
+        }
+
+        @media (max-width: 768px) {
+            #sidebar {
+                transform: translateX(-100%);
+                transition: transform 0.3s ease;
+            }
+
+            #sidebar.open {
+                transform: translateX(0);
+            }
+
+            #backdrop {
+                display: none;
+            }
+
+            #backdrop.show {
+                display: block;
+            }
+
+            .queue-table thead {
+                display: none;
+            }
+
+            .queue-table,
+            .queue-table tbody,
+            .queue-table tr,
+            .queue-table td {
+                display: block;
+                width: 100%;
+            }
+
+            .queue-table tbody tr {
+                border: 1px solid var(--border-default);
+                border-radius: 8px;
+                margin-bottom: 12px;
+                padding: 8px;
+            }
+
+            .queue-table td {
+                padding: 6px 8px;
+                border: none !important;
+            }
+
+            .queue-table td[data-label]::before {
+                content: attr(data-label);
+                display: block;
+                font-size: 10px;
+                font-weight: 700;
+                color: var(--text-tertiary);
+                text-transform: uppercase;
+                letter-spacing: 0.04em;
+                margin-bottom: 2px;
+            }
+        }
+    </style>
+</head>
+
+<body class="min-h-screen">
+    <div id="backdrop" class="fixed inset-0 bg-black/30 z-40 hidden md:hidden"></div>
+    <div class="flex">
+        <aside id="sidebar"
+            class="fixed top-0 left-0 w-60 h-screen bg-white border-r border-[#E0E0E0] z-50 flex flex-col">
+            <a href="admin_dashboard.html"
+                class="flex items-center gap-2.5 px-5 py-4 border-b border-[#E0E0E0] shrink-0 h-14 hover:bg-[#FAFAFA] transition-colors">
+                <span class="material-symbols-outlined icon-fill text-[#5C2D91]"
+                    style="font-size:22px">shield_person</span>
+                <div class="leading-tight min-w-0">
+                    <div class="text-[#242424] font-heading font-bold text-[15px] tracking-tight">MARKET-UP</div>
+                    <div class="text-[10px] text-[#5C2D91] tracking-wide font-semibold uppercase">Admin</div>
+                </div>
+            </a>
+            <nav class="flex-1 overflow-y-auto px-3 py-2">
+                <div class="nav-group-label">Tableau de bord</div>
+                <a href="admin_dashboard.html" class="nav-item"><span class="material-symbols-outlined">dashboard</span><span
+                        class="flex-1 truncate">Vue d'ensemble</span></a>
+                <div class="nav-group-label">Validations</div>
+                <a href="admin_validation-comptes.html" class="nav-item"><span
+                        class="material-symbols-outlined">person_check</span><span
+                        class="flex-1 truncate">Comptes</span><span class="nav-pill nav-pill--count-amber"
+                        data-pill="comptes">11</span></a>
+                <a href="admin_validation-profils.html" class="nav-item"><span
+                        class="material-symbols-outlined">fact_check</span><span
+                        class="flex-1 truncate">Profils</span><span class="nav-pill nav-pill--count-amber"
+                        data-pill="profils">10</span></a>
+                <a href="admin_validation-rse.html" class="nav-item"><span
+                        class="material-symbols-outlined">volunteer_activism</span><span class="flex-1 truncate">Reçus
+                        RSE</span><span class="nav-pill nav-pill--count-amber" data-pill="rse">3</span></a>
+                <div class="nav-group-label">Gestion</div>
+                <a href="admin_entreprises.html" class="nav-item"><span
+                        class="material-symbols-outlined">business</span><span
+                        class="flex-1 truncate">Entreprises</span></a>
+                
+                
+                <div class="nav-group-label">Finances</div>
+                <a href="admin_transactions.html" class="nav-item active"><span
+                        class="material-symbols-outlined">receipt_long</span><span
+                        class="flex-1 truncate">Transactions</span></a>
+                
+            </nav>
+            <div class="border-t border-[#E0E0E0] p-3">
+                <div class="flex items-center gap-2.5 px-2 py-2 rounded-lg hover:bg-[#FAFAFA]">
+                    <div class="avatar avatar--sm" style="background:#5C2D91;">BA</div>
+                    <div class="leading-tight min-w-0 flex-1">
+                        <div class="text-[12.5px] font-semibold text-[#242424] truncate">Bassem Admin</div>
+                        <div class="text-[10px] text-[#8A8886] truncate">Super administrateur</div>
+                    </div>
+                    <button class="p-1.5 rounded hover:bg-[#F5F5F5] text-[#8A8886] hover:text-[#B91C1C]"
+                        aria-label="Se déconnecter" onclick="window.location.href='auth_connexion.html';"><span class="material-symbols-outlined"
+                            style="font-size:16px">logout</span></button>
+                </div>
+            </div>
+        </aside>
+
+        <div class="flex-1 md:ml-60 min-h-screen flex flex-col">
+            <header
+                class="sticky top-0 z-30 bg-white border-b border-[#E0E0E0] h-14 flex items-center px-4 md:px-6 shrink-0">
+                <button id="menuBtn" class="md:hidden mr-3 p-2 rounded hover:bg-[#F5F5F5]"><span
+                        class="material-symbols-outlined">menu</span></button>
+                <div class="min-w-0 leading-tight flex-1">
+                    <nav class="hidden md:flex items-center gap-1.5 text-[11px] text-[#8A8886] mb-0.5">
+                        <a href="admin_dashboard.html" class="hover:text-[#5C2D91] hover:underline">Dashboard</a>
+                        <span class="material-symbols-outlined" style="font-size:12px">chevron_right</span>
+                        <span>Finances</span>
+                        <span class="material-symbols-outlined" style="font-size:12px">chevron_right</span>
+                        <span class="text-[#616161] font-medium">Transactions</span>
+                    </nav>
+                    <h1 class="font-heading text-[16px] font-bold text-[#242424] truncate">Transactions financières</h1>
+                </div>
+                <div class="flex items-center gap-2 ml-3">
+                    <button class="relative p-2 rounded-lg hover:bg-[#F5F5F5]" aria-label="Notifications admin"><span
+                            class="material-symbols-outlined">notifications</span><span
+                            class="absolute top-1 right-1 w-4 h-4 bg-[#DC2626] text-white text-[9px] font-bold rounded-full flex items-center justify-center">5</span></button>
+                    <button class="flex items-center gap-2 px-1 py-1 rounded-lg hover:bg-[#F5F5F5]">
+                        <div class="avatar avatar--sm" style="background:#5C2D91;">BA</div><span
+                            class="material-symbols-outlined text-[#8A8886] hidden md:inline"
+                            style="font-size:16px">expand_more</span>
+                    </button>
+                </div>
+            </header>
+
+            <main class="flex-1 p-4 md:p-8">
+                <div class="max-w-[1280px] mx-auto">
+                    <div class="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3 mb-6">
+                        <div>
+                            <h2 class="font-heading text-[22px] md:text-[26px] font-bold text-[#242424] mb-1">
+                                Transactions Boost & Sponsoring</h2>
+                            <p class="text-[13px] text-[#616161]">Vue globale des revenus générés par les modules Boost
+                                et Sponsoring</p>
+                        </div>
+                        <button class="btn btn-primary" id="btn-export">
+                            <span class="material-symbols-outlined">download</span>
+                            Exporter CSV
+                        </button>
+                    </div>
+
+                    <!-- KPI BAR (4 cellules) -->
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
+                        <div class="kpi-inline">
+                            <span class="material-symbols-outlined text-[#5C2D91]"
+                                style="font-size:26px">receipt_long</span>
+                            <div class="min-w-0">
+                                <div class="kpi-inline__value" id="kpi-count">12</div>
+                                <div class="kpi-inline__label">transactions</div>
+                            </div>
+                        </div>
+                        <div class="kpi-inline">
+                            <span class="material-symbols-outlined text-[#0078D4]"
+                                style="font-size:26px">trending_up</span>
+                            <div class="min-w-0">
+                                <div class="kpi-inline__value"><span id="kpi-ht">800</span><span
+                                        class="text-[11px] font-semibold text-[#8A8886] ml-1">DT HT</span></div>
+                                <div class="kpi-inline__label">CA hors taxes</div>
+                            </div>
+                        </div>
+                        <div class="kpi-inline">
+                            <span class="material-symbols-outlined text-[#107C10]"
+                                style="font-size:26px">payments</span>
+                            <div class="min-w-0">
+                                <div class="kpi-inline__value"><span id="kpi-ttc">952</span><span
+                                        class="text-[11px] font-semibold text-[#8A8886] ml-1">DT TTC</span></div>
+                                <div class="kpi-inline__label">CA toutes taxes</div>
+                            </div>
+                        </div>
+                        <div class="kpi-inline">
+                            <span class="material-symbols-outlined text-[#D97706]" style="font-size:26px">percent</span>
+                            <div class="min-w-0">
+                                <div class="kpi-inline__value"><span id="kpi-vat">152</span><span
+                                        class="text-[11px] font-semibold text-[#8A8886] ml-1">DT</span></div>
+                                <div class="kpi-inline__label">TVA collectée (19%)</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Filtres -->
+                    <div class="card p-4 mb-4">
+                        <div class="flex flex-col md:flex-row gap-3">
+                            <div class="search-bar flex-1">
+                                <span class="material-symbols-outlined text-[#8A8886]"
+                                    style="font-size:18px">search</span>
+                                <input type="search" id="search-input"
+                                    placeholder="Rechercher par entreprise, description, n° de reçu…" />
+                            </div>
+                            <select class="filter-select" id="filter-type">
+                                <option value="all">Tous types</option>
+                                <option value="boost">Boost uniquement</option>
+                                <option value="sponsoring">Sponsoring uniquement</option>
+                            </select>
+                            <select class="filter-select" id="filter-period">
+                                <option value="all">Toutes périodes</option>
+                                <option value="2026-04">Avril 2026</option>
+                                <option value="2026-03">Mars 2026</option>
+                                <option value="2026-02">Février 2026</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Table -->
+                    <div class="card overflow-hidden">
+                        <div class="overflow-x-auto">
+                            <table class="queue-table">
+                                <thead>
+                                    <tr>
+                                        <th>Date</th>
+                                        <th>Entreprise</th>
+                                        <th>Type</th>
+                                        <th>Description</th>
+                                        <th style="text-align:right">HT</th>
+                                        <th style="text-align:right">TVA</th>
+                                        <th style="text-align:right">TTC</th>
+                                        <th>N° reçu</th>
+                                        <th>Statut</th>
+                                        <th style="text-align:center">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="queue-body"></tbody>
+                            </table>
+                        </div>
+                        <div id="empty-state" class="empty-state" style="display:none">
+                            <span class="material-symbols-outlined">search_off</span>
+                            <div class="font-heading text-[16px] font-bold mt-2">Aucune transaction trouvée</div>
+                        </div>
+                        <div class="pagination" id="pagination">
+                            <div class="pagination__info"><span id="page-info-text">—</span></div>
+                            <div class="pagination__controls" id="pagination-controls"></div>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <div id="toast"><span class="material-symbols-outlined">check_circle</span><span id="toast-msg">—</span></div>
+
+    <script>
+        (function () {
+            const data = window.MARKETUP_DATA;
+            if (!data) return;
+
+            function formatAmount(n) { return Number(n).toLocaleString('fr-FR', { minimumFractionDigits: (n % 1 !== 0 ? 2 : 0), maximumFractionDigits: 2 }).replace(/\u202F/g, '\u00A0'); }
+            function formatDate(iso) { return new Date(iso).toLocaleDateString('fr-FR', { day: '2-digit', month: 'short', year: 'numeric' }); }
+            function escapeHtml(s) { if (s == null) return ''; return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#039;'); }
+
+            // Counters sidebar
+            (function () {
+                const comptesNew = data.companies.filter(c => c.status === 'pending').length;
+                const updatesP = data.companies.filter(c => c.pending_updates).length;
+                let profilsCount = 0;
+                data.companies.forEach(c => Object.values(c.profiles || {}).forEach(p => { if (p.status === 'pending' && p.submitted_at) profilsCount++; }));
+                const rseCount = data.rse_receipts.filter(r => r.status === 'pending').length;
+                const litigesCount = data.disputes.filter(d => d.status === 'open').length;
+                document.querySelectorAll('[data-pill="comptes"]').forEach(el => el.textContent = comptesNew + updatesP);
+                document.querySelectorAll('[data-pill="profils"]').forEach(el => el.textContent = profilsCount);
+                document.querySelectorAll('[data-pill="rse"]').forEach(el => el.textContent = rseCount);
+                document.querySelectorAll('[data-pill="litiges"]').forEach(el => el.textContent = litigesCount);
+            })();
+
+            // KPIs
+            const transactions = data.transactions.slice().sort((a, b) => new Date(b.date) - new Date(a.date));
+            const totalHT = transactions.reduce((s, t) => s + t.amount_ht, 0);
+            const totalTTC = transactions.reduce((s, t) => s + t.amount_ttc, 0);
+            const totalVAT = transactions.reduce((s, t) => s + t.vat, 0);
+            document.getElementById('kpi-count').textContent = transactions.length;
+            document.getElementById('kpi-ht').textContent = formatAmount(totalHT);
+            document.getElementById('kpi-ttc').textContent = formatAmount(totalTTC);
+            document.getElementById('kpi-vat').textContent = formatAmount(totalVAT);
+
+            // Filters
+            let state = { search: '', type: 'all', period: 'all', page: 1, pageSize: 20 };
+
+            function applyFilters() {
+                const q = state.search.trim().toLowerCase();
+                return transactions.filter(t => {
+                    if (q && !`${t.company_name} ${t.description} ${t.receipt_id}`.toLowerCase().includes(q)) return false;
+                    if (state.type !== 'all' && t.type !== state.type) return false;
+                    if (state.period !== 'all' && !t.date.startsWith(state.period)) return false;
+                    return true;
+                });
+            }
+
+            function render() {
+                const filtered = applyFilters();
+                const totalPages = Math.max(1, Math.ceil(filtered.length / state.pageSize));
+                if (state.page > totalPages) state.page = totalPages;
+                const items = filtered.slice((state.page - 1) * state.pageSize, state.page * state.pageSize);
+                const tbody = document.getElementById('queue-body');
+                const emptyEl = document.getElementById('empty-state');
+                const paginEl = document.getElementById('pagination');
+                if (filtered.length === 0) {
+                    tbody.innerHTML = ''; emptyEl.style.display = ''; paginEl.style.display = 'none'; return;
+                }
+                emptyEl.style.display = 'none'; paginEl.style.display = '';
+                tbody.innerHTML = '';
+                items.forEach(t => {
+                    const company = data.companies.find(c => c.id === t.company_id);
+                    const typeChip = t.type === 'boost'
+                        ? '<span class="type-chip type-chip--boost"><span class="material-symbols-outlined">trending_up</span>Boost</span>'
+                        : '<span class="type-chip type-chip--sponsoring"><span class="material-symbols-outlined">campaign</span>Sponsoring</span>';
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `
+                    <td data-label="Date"><div class="text-[12.5px] text-[#242424]">${formatDate(t.date)}</div></td>
+                    <td data-label="Entreprise">
+                        <div class="flex items-center gap-2 min-w-0">
+                            <div class="avatar avatar--sm" style="background:#5C2D91;">${escapeHtml(t.company_name.substring(0, 2).toUpperCase())}</div>
+                            <div class="min-w-0">
+                                <div class="font-semibold text-[#242424] truncate text-[12.5px]">${escapeHtml(t.company_name)}</div>
+                                <div class="text-[10.5px] text-[#8A8886] truncate">${escapeHtml(company?.sector || '—')}</div>
+                            </div>
+                        </div>
+                    </td>
+                    <td data-label="Type">${typeChip}</td>
+                    <td data-label="Description"><div class="text-[12.5px] text-[#616161]">${escapeHtml(t.description)}</div></td>
+                    <td data-label="HT" style="text-align:right"><span class="amount-value">${formatAmount(t.amount_ht)}</span><span class="amount-unit">DT</span></td>
+                    <td data-label="TVA" style="text-align:right"><span class="text-[12px] text-[#8A8886]">${formatAmount(t.vat)}</span></td>
+                    <td data-label="TTC" style="text-align:right"><span class="amount-value" style="font-size:14px">${formatAmount(t.amount_ttc)}</span><span class="amount-unit">DT</span></td>
+                    <td data-label="N° reçu"><span class="text-[11px] font-mono text-[#616161]">${escapeHtml(t.receipt_id)}</span></td>
+                    <td data-label="Statut"><span class="status-pill status-pill--paid"><span class="dot"></span>Payée</span></td>
+                    <td data-label="Actions" style="text-align:center">
+                        <button type="button" class="btn-icon" data-action="download-invoice" data-receipt-id="${escapeHtml(t.receipt_id)}" data-company="${escapeHtml(t.company_name)}" aria-label="Télécharger la facture ${escapeHtml(t.receipt_id)}" title="Télécharger la facture">
+                            <span class="material-symbols-outlined">download</span>
+                        </button>
+                    </td>
+                `;
+                    tbody.appendChild(tr);
+                });
+                renderPagination(filtered.length, totalPages);
+            }
+
+            function renderPagination(total, totalPages) {
+                const start = (state.page - 1) * state.pageSize + 1;
+                const end = Math.min(state.page * state.pageSize, total);
+                document.getElementById('page-info-text').textContent = `Affichage ${start}-${end} sur ${total} transaction(s)`;
+                const controls = document.getElementById('pagination-controls');
+                const btns = [];
+                btns.push(`<button class="pagination__btn" data-page="${state.page - 1}" ${state.page === 1 ? 'disabled' : ''}><span class="material-symbols-outlined" style="font-size:16px">chevron_left</span></button>`);
+                for (let p = 1; p <= totalPages; p++) {
+                    btns.push(`<button class="pagination__btn${p === state.page ? ' active' : ''}" data-page="${p}">${p}</button>`);
+                }
+                btns.push(`<button class="pagination__btn" data-page="${state.page + 1}" ${state.page === totalPages ? 'disabled' : ''}><span class="material-symbols-outlined" style="font-size:16px">chevron_right</span></button>`);
+                controls.innerHTML = btns.join('');
+                controls.querySelectorAll('.pagination__btn').forEach(b => {
+                    b.addEventListener('click', () => {
+                        const p = parseInt(b.dataset.page, 10);
+                        if (!isNaN(p) && p >= 1 && p <= totalPages) { state.page = p; render(); }
+                    });
+                });
+            }
+
+            document.getElementById('search-input').addEventListener('input', e => { state.search = e.target.value; state.page = 1; render(); });
+            document.getElementById('filter-type').addEventListener('change', e => { state.type = e.target.value; state.page = 1; render(); });
+            document.getElementById('filter-period').addEventListener('change', e => { state.period = e.target.value; state.page = 1; render(); });
+
+            document.getElementById('btn-export').addEventListener('click', () => {
+                showToast('Export CSV généré · transactions-export-2026-04-20.csv');
+            });
+
+            // Download facture individuelle (event delegation — survit aux re-renders)
+            document.getElementById('queue-body').addEventListener('click', (e) => {
+                const btn = e.target.closest('[data-action="download-invoice"]');
+                if (!btn) return;
+                const receiptId = btn.dataset.receiptId || 'inconnu';
+                const company   = btn.dataset.company   || '';
+                const filename  = `facture-${receiptId}.pdf`;
+                // Production : window.open(`/api/admin/invoices/${receiptId}.pdf`, '_blank')
+                showToast(`Facture téléchargée · ${filename}${company ? ' · ' + company : ''}`);
+            });
+
+            let toastTimer = null;
+            function showToast(msg) {
+                const t = document.getElementById('toast');
+                document.getElementById('toast-msg').textContent = msg;
+                t.classList.add('show');
+                clearTimeout(toastTimer);
+                toastTimer = setTimeout(() => t.classList.remove('show'), 2200);
+            }
+
+            // Sidebar mobile
+            document.getElementById('menuBtn')?.addEventListener('click', () => {
+                document.getElementById('sidebar').classList.add('open');
+                document.getElementById('backdrop').classList.add('show');
+            });
+            document.getElementById('backdrop')?.addEventListener('click', () => {
+                document.getElementById('sidebar').classList.remove('open');
+                document.getElementById('backdrop').classList.remove('show');
+            });
+
+            render();
+        })();
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,568 @@
+<!DOCTYPE html>
+
+<html class="light" lang="fr">
+
+<head>
+  <meta charset="utf-8" />
+  <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+  <title>Nova Architects Group | LinkUP Profile</title>
+  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;family=Inter:wght@400;500;600&amp;display=swap"
+    rel="stylesheet" />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+    rel="stylesheet" />
+  <script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            "tertiary": "#765918",
+            "surface-bright": "#fbf9f8",
+            "inverse-surface": "#303031",
+            "secondary-fixed": "#eddcff",
+            "outline": "#717783",
+            "error": "#ba1a1a",
+            "primary-container": "#0078d4",
+            "surface-tint": "#0060ab",
+            "on-tertiary-fixed": "#261900",
+            "on-surface": "#1b1c1c",
+            "on-tertiary-fixed-variant": "#5d4201",
+            "on-primary-fixed": "#001c39",
+            "secondary-container": "#cba5ff",
+            "primary": "#0078d4",
+            "on-secondary-fixed": "#290055",
+            "tertiary-fixed-dim": "#e9c176",
+            "secondary-fixed-dim": "#d8baff",
+            "surface-dim": "#dbdad9",
+            "surface-variant": "#e4e2e2",
+            "surface": "#fbf9f8",
+            "surface-container-highest": "#e4e2e2",
+            "inverse-primary": "#a3c9ff",
+            "on-secondary": "#ffffff",
+            "on-primary-fixed-variant": "#004883",
+            "surface-container": "#efeded",
+            "on-error": "#ffffff",
+            "surface-container-low": "#f5f3f3",
+            "primary-fixed-dim": "#a3c9ff",
+            "on-surface-variant": "#404752",
+            "on-tertiary-container": "#ffffff",
+            "on-primary-container": "#ffffff",
+            "primary-fixed": "#d3e3ff",
+            "inverse-on-surface": "#f2f0f0",
+            "on-tertiary": "#ffffff",
+            "error-container": "#ffdad6",
+            "outline-variant": "#c0c7d4",
+            "on-primary": "#ffffff",
+            "on-secondary-container": "#573586",
+            "surface-container-high": "#e9e8e7",
+            "tertiary-fixed": "#ffdea5",
+            "background": "#fbf9f8",
+            "secondary": "#8764B8",
+            "tertiary-container": "#92712f",
+            "on-secondary-fixed-variant": "#573586",
+            "on-error-container": "#93000a",
+            "surface-container-lowest": "#ffffff",
+            "on-background": "#1b1c1c"
+          },
+          fontFamily: {
+            "headline": ["Plus Jakarta Sans"],
+            "body": ["Inter"],
+            "label": ["Inter"]
+          },
+          borderRadius: {
+            "DEFAULT": "0.5rem",
+            "lg": "0.5rem",
+            "xl": "0.75rem",
+            "2xl": "14px",
+            "full": "9999px"
+          },
+        },
+      },
+    }
+  </script>
+  <style>
+    .material-symbols-outlined {
+      font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+      vertical-align: middle;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+    }
+
+    h1,
+    h2,
+    h3,
+    h4 {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+    }
+
+    .service-card {
+      border: 1px solid #E0E0E0;
+      transition: all 0.2s ease-in-out;
+      border-radius: 14px;
+    }
+
+    .service-card:hover {
+      border-color: #C5A059;
+      transform: translateY(-4px);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    }
+
+    .icon-style {
+      font-size: 2em;
+    }
+  </style>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" rel="stylesheet" />
+    <script src="marketup_seed_data.js"></script>
+</head>
+
+<body class="bg-surface text-on-surface antialiased">
+  <!-- Sticky Navbar -->
+  <nav
+    class="fixed top-0 w-full z-50 bg-surface shadow-sm px-4 md:px-8 flex items-center justify-between border-b border-surface-variant/30 min-h-[64px] md:h-[72px]">
+    <div class="flex items-center w-1/3">
+      <a class="flex items-center gap-1 md:gap-2 text-primary hover:opacity-80 transition-opacity font-semibold text-sm"
+        href="public_linkup.html">
+        <span class="material-symbols-outlined text-lg">arrow_back</span>
+        <span class="hidden md:inline">Retour</span>
+      </a>
+    </div>
+    <div class="flex items-center justify-center w-1/3">
+      <a class="flex items-center gap-2 hover:opacity-80 transition-opacity" href="#">
+        <img alt="LinkUP" class="h-8 md:h-10 w-auto object-contain" src="shared/logos/logos-linkup.png" />
+      </a>
+    </div>
+    <div class="flex items-center justify-end gap-3 md:gap-6 w-1/3">
+      <div class="hidden md:flex items-center gap-6">
+        <a class="text-sm font-semibold text-on-surface-variant hover:text-primary transition-colors"
+          href="auth_connexion.html">Connexion</a>
+        <a href="auth_inscription-entreprise.html"
+          class="px-5 py-2 text-sm font-semibold rounded-lg bg-primary text-white hover:bg-[#106EBE] transition-colors whitespace-nowrap">
+          Inscrire une marque
+        </a>
+      </div>
+      <button class="md:hidden flex items-center p-2 text-on-surface-variant">
+        <span class="material-symbols-outlined text-2xl">menu</span>
+      </button>
+    </div>
+  </nav>
+  <main class="pt-[64px] md:pt-[72px]">
+      <div id="lu-404" class="hidden max-w-2xl mx-auto px-6 py-24 text-center">
+        <div class="inline-flex items-center justify-center w-20 h-20 rounded-full bg-[#F5F5F5] mb-6">
+          <span class="material-symbols-outlined text-[#8A8886]" style="font-size:42px">search_off</span>
+        </div>
+        <h1 class="text-3xl font-extrabold text-on-surface mb-3">Profil introuvable</h1>
+        <p id="lu-404-msg" class="text-lg text-on-surface-variant mb-8">Cette page n'est pas disponible.</p>
+        <a href="public_linkup.html" class="inline-flex items-center gap-2 bg-primary text-white px-6 py-3 rounded-lg font-semibold hover:bg-[#106EBE] transition-colors">
+          <span class="material-symbols-outlined">arrow_back</span>
+          Retour au moteur LinkUP
+        </a>
+      </div>
+      <div id="lu-content">
+    <!-- Boost Banner -->
+    <div class="w-full bg-[#EFF6FC] py-3 px-8 flex justify-center items-center border-b border-primary/10">
+      <span class="text-primary font-semibold text-sm">Profil mis en avant</span>
+    </div>
+    <div class="max-w-[1280px] mx-auto px-6 py-8">
+      <!-- Identity Header -->
+      <section class="grid grid-cols-1 md:grid-cols-12 gap-12 items-start mb-12">
+        <div class="md:col-span-4 lg:col-span-3">
+          <div
+            class="aspect-square bg-surface-container rounded-2xl overflow-hidden p-8 flex items-center justify-center">
+            <img id="lu-logo" alt="Photo" class="max-w-full h-auto" src="">
+          </div>
+        </div>
+        <div class="md:col-span-8 lg:col-span-9 space-y-6">
+          <div class="space-y-2">
+            <div class="flex flex-wrap gap-2 mb-4">
+              <div id="lu-rse-badge" class="inline-flex items-center gap-2 bg-[#FEFCE8] text-[#8A6A1F] border border-[#E8C96A] px-3 py-1.5 rounded shadow-sm shrink-0" style="display:none">
+                <span class="material-symbols-outlined text-[#C5A059] text-[16px]"
+                  style='font-variation-settings: "FILL" 1;'>star</span>
+                <span class="text-[11px] font-bold uppercase tracking-wider">Engagement Social Attesté</span>
+              </div>
+            </div>
+            <h1 id="lu-name" class="text-5xl font-extrabold tracking-tight text-on-surface">—</h1>
+            <div class="flex flex-wrap items-center gap-2 mt-2">
+              <span
+                class="inline-flex items-center gap-1 bg-[#EFF6FC] border border-primary/20 text-primary text-[11px] font-semibold px-2 py-1 rounded">
+                <span class="material-symbols-outlined text-[13px]"
+                  style='font-variation-settings: "FILL" 1;'>verified</span>
+                RNE · <span id="lu-rne">—</span>
+              </span>
+              <span id="lu-sector" class="text-[11px] font-bold text-primary uppercase tracking-wider">—</span>
+              <span class="text-outline">·</span>
+              <span id="lu-type" class="inline-flex items-center text-[11px] font-semibold bg-surface-container-low border border-outline-variant text-on-surface px-2 py-0.5 rounded">—</span>
+            </div>
+          </div>
+          <div class="space-y-4">
+            <div class="flex flex-col md:flex-row flex-wrap gap-6 items-start md:items-center">
+              <div class="flex items-center space-x-3 text-on-surface">
+                <span class="material-symbols-outlined text-primary text-[20px]">call</span>
+                <span id="lu-phone" class="text-sm font-medium">—</span>
+              </div>
+              <div class="flex items-center space-x-3 text-on-surface">
+                <span class="material-symbols-outlined text-[20px] text-primary">chat</span>
+                <span id="lu-whatsapp" class="text-sm font-medium">—</span>
+              </div>
+              <div class="flex items-center space-x-3 text-on-surface">
+                <span class="material-symbols-outlined text-primary text-[20px]">mail</span>
+                <span id="lu-email" class="text-sm font-medium">—</span>
+              </div>
+            </div>
+            <div class="w-full flex items-center space-x-3 text-on-surface">
+              <span class="material-symbols-outlined text-primary text-[20px]">location_on</span>
+              <span id="lu-address" class="text-sm font-medium">—</span>
+            </div>
+          </div>
+        </div>
+      </section>
+      <!-- Services Grid (hydraté depuis le seed) -->
+      <div class="mb-20 mx-auto max-w-5xl">
+        <div class="text-center mb-8">
+          <h2 class="text-xs font-bold uppercase tracking-widest text-on-surface">Canaux &amp; Services Officiels</h2>
+        </div>
+        <div id="lu-services" class="grid grid-cols-2 md:grid-cols-5 gap-4"></div>
+      </div>
+      <!-- RSE Section (hidden) --><div style="display:none">
+      <div class="mb-20">
+        <div class="flex items-center gap-4 mb-8">
+          <h2 class="text-2xl font-extrabold text-on-surface">Traçabilité RSE</h2>
+          <div class="h-[1px] flex-grow bg-surface-container-highest"></div>
+        </div>
+        <div class="bg-[#FEFCE8]/30 border border-[#E8C96A]/40 p-8 rounded-2xl mb-8 flex items-center gap-6">
+          <div
+            class="w-16 h-16 bg-white rounded-full flex items-center justify-center shadow-sm border border-[#E8C96A]">
+            <span class="material-symbols-outlined text-[#C5A059] text-4xl"
+              style='font-variation-settings: "FILL" 1;'>star</span>
+          </div>
+          <div>
+            <p class="text-on-surface font-bold text-lg leading-tight">Engagement Social Actif</p>
+            <p class="text-on-surface-variant text-sm">Nous reversons 1% de notre chiffre d'affaires à des associations
+              locales de protection de l'environnement.</p>
+          </div>
+        </div>
+        <div class="flex flex-col md:flex-row gap-6">
+          <!-- Donation Card 1 -->
+          <div
+            class="flex-1 bg-surface-container-lowest rounded-xl overflow-hidden shadow-sm border border-outline-variant/30">
+            <div class="h-32 overflow-hidden">
+              <img alt="Community garden and green urban space" class="w-full h-full object-cover"
+                src="https://lh3.googleusercontent.com/aida-public/AB6AXuDsrK3UwQswGuonLU4BtFl4Vpb36aQMQDObiEPd7hRktrB7QLmKFRpX4TUBN15SBSDg5JkjugdC9_l_oiGud1Axfll3Z2Kl4hhRHGMpS3gxWs726v5rkuRKY9m_Ad18aLJp76QcWfLOKOR5Go1nLM88nBGRe9iYsbIHtqF-nq8yc0eKpQXSBsp0_jH_ovqY8hP76T8dxXcgt6ztx3AlKBf7CKYevs_pbR2KQKquw6G0VUx4MWZUBZHxEAbOxvaisSRErmRIAO0ifDM" />
+            </div>
+            <div class="p-5">
+              <div class="flex justify-between items-start mb-4">
+                <div>
+                  <h4 class="font-bold text-on-surface">Green City Initiative</h4>
+                  <p class="text-[11px] text-outline font-medium">Reçu n° 2024-00128</p>
+                </div>
+                <div class="bg-primary/10 text-primary px-2 py-1 rounded text-[10px] font-bold flex items-center gap-1">
+                  <span class="material-symbols-outlined text-xs"
+                    style='font-variation-settings: "FILL" 1;'>verified</span>
+                  VALIDÉ
+                </div>
+              </div>
+              <div class="flex justify-between items-end">
+                <div>
+                  <p class="text-xs text-on-surface-variant">Date: 15/09/2024</p>
+                  <p class="text-xl font-bold text-on-surface">12 400 <span
+                      class="text-sm text-on-surface-variant">DT</span></p>
+                </div>
+                <span class="material-symbols-outlined text-outline">receipt_long</span>
+              </div>
+            </div>
+          </div>
+          <!-- Donation Card 2 -->
+          <div
+            class="flex-1 bg-surface-container-lowest rounded-xl overflow-hidden shadow-sm border border-outline-variant/30">
+            <div class="h-32 overflow-hidden">
+              <img alt="Dense forest with sunrays through branches" class="w-full h-full object-cover"
+                src="https://lh3.googleusercontent.com/aida-public/AB6AXuAQTn5unDTaqfpz2R7C89h3MQT169xAgzjeE2yCwVlEGlaoKxHk9_Zwzz7vVrrMUJOo148sBkqbOMomVZyJgvbztpDxSvkhMbxnrTTDOohm1onTaTbxpJBvG6ynzF9nheHlEHIUhLMgC9dw7ph1pBA6haasuyfbrv32N7sOf7iuJAM2GgZxLMuC_Fi-FZSgyxeSyl6Xmjk02s-GEDVebjXLaLCWy7fQc042cIO1Ra1oA6dL1ahSmH_J4YOyIzjdBb2HOnERKclTlWg" />
+            </div>
+            <div class="p-5">
+              <div class="flex justify-between items-start mb-4">
+                <div>
+                  <h4 class="font-bold text-on-surface">Forêt Durable</h4>
+                  <p class="text-[11px] text-outline font-medium">Reçu n° 2024-00142</p>
+                </div>
+                <div class="bg-primary/10 text-primary px-2 py-1 rounded text-[10px] font-bold flex items-center gap-1">
+                  <span class="material-symbols-outlined text-xs"
+                    style='font-variation-settings: "FILL" 1;'>verified</span>
+                  VALIDÉ
+                </div>
+              </div>
+              <div class="flex justify-between items-end">
+                <div>
+                  <p class="text-xs text-on-surface-variant">Date: 02/10/2024</p>
+                  <p class="text-xl font-bold text-on-surface">8 750 <span
+                      class="text-sm text-on-surface-variant">DT</span></p>
+                </div>
+                <span class="material-symbols-outlined text-outline">receipt_long</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      </div><!-- /RSE -->
+      <!-- Découvrez aussi Section -->
+      <div class="bg-[#0b1120] rounded-3xl p-8 md:p-12 text-white relative overflow-hidden">
+        <div class="absolute top-0 right-0 w-64 h-64 bg-primary/20 blur-[100px]"></div>
+        <div class="relative z-10 mb-10">
+          <h2 class="text-3xl font-extrabold mb-2 tracking-tight">Découvrez aussi</h2>
+          <p class="text-slate-400">Explorez l'écosystème complet de l'entreprise sur nos plateformes partenaires.</p>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 relative z-10">
+          <!-- TraceUP Card -->
+          <div
+            class="bg-slate-800/60 border border-white/10 rounded-2xl p-6 hover:bg-slate-800 transition-colors cursor-pointer group">
+            <div class="flex items-center gap-4 mb-6">
+              <div class="w-12 h-12 bg-secondary rounded-lg flex items-center justify-center">
+                <i class="fa-solid fa-circle-play icon-style"></i>
+              </div>
+              <div>
+                <h3 class="font-bold text-lg">TraceUP</h3>
+                <p class="text-xs text-secondary-fixed font-bold tracking-widest uppercase">Vidéos &amp; Médias</p>
+              </div>
+            </div>
+            <p class="text-sm text-slate-300 mb-6">Explorez les coulisses, les interviews et les démonstrations
+              techniques de TechnoFab en vidéo.</p>
+            <div
+              class="flex items-center text-secondary text-sm font-bold gap-2 group-hover:translate-x-2 transition-transform">
+              Visiter le profil <span class="material-symbols-outlined">chevron_right</span>
+            </div>
+          </div>
+          <!-- BrandUP Card -->
+          <div
+            class="bg-slate-800/60 border border-white/10 rounded-2xl p-6 hover:bg-slate-800 transition-colors cursor-pointer group">
+            <div class="flex items-center gap-4 mb-6">
+              <div class="w-12 h-12 bg-primary rounded-lg flex items-center justify-center">
+                <i class="fa-solid fa-layer-group icon-style"></i>
+              </div>
+              <div>
+                <h3 class="font-bold text-lg">BrandUP</h3>
+                <p class="text-xs text-primary-fixed font-bold tracking-widest uppercase">Présentation institutionnelle
+                </p>
+              </div>
+            </div>
+            <p class="text-sm text-slate-300 mb-6">Accédez au catalogue de marque, aux actifs numériques et à l'identité
+              visuelle officielle de l'entreprise.</p>
+            <div
+              class="flex items-center text-primary-fixed text-sm font-bold gap-2 group-hover:translate-x-2 transition-transform">
+              Visiter le profil <span class="material-symbols-outlined">chevron_right</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div></main>
+  <footer class="w-full py-12 px-8 mt-20 bg-surface-container-low border-t border-outline-variant">
+    <div class="max-w-[1280px] mx-auto">
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-10 mb-10">
+        <div>
+          <div class="flex items-center gap-2 mb-3">
+            <span class="material-symbols-outlined text-primary text-[22px]"
+              style="font-variation-settings:'FILL' 1">hexagon</span>
+            <span class="text-on-surface font-bold text-lg tracking-tight">MARKET-UP</span>
+          </div>
+          <p class="text-xs text-on-surface-variant leading-relaxed">
+            L'annuaire professionnel des entreprises tunisiennes.<br />
+            <span class="font-medium">vivasky.media</span>
+          </p>
+        </div>
+        <div>
+          <h4 class="text-on-surface font-bold text-[11px] uppercase tracking-widest mb-4">Plateforme</h4>
+          <ul class="space-y-2 text-xs text-on-surface-variant">
+            <li><a class="hover:text-primary transition-colors" href="public_brandup.html">BrandUP</a></li>
+            <li><a class="hover:text-primary transition-colors" href="public_traceup.html">TraceUP</a></li>
+            <li><a class="hover:text-primary transition-colors" href="public_linkup.html">LinkUP</a></li>
+          </ul>
+        </div>
+        <div>
+          <h4 class="text-on-surface font-bold text-[11px] uppercase tracking-widest mb-4">Entreprise</h4>
+          <ul class="space-y-2 text-xs text-on-surface-variant">
+            <li><a class="hover:text-primary transition-colors" href="auth_inscription-entreprise.html">Inscrire
+                une entreprise</a></li>
+            <li><a class="hover:text-primary transition-colors" href="#">Tarifs Boost &amp; Sponsoring</a></li>
+            <li><a class="hover:text-primary transition-colors" href="#">Programme RSE</a></li>
+          </ul>
+        </div>
+        <div>
+          <h4 class="text-on-surface font-bold text-[11px] uppercase tracking-widest mb-4">Légal</h4>
+          <ul class="space-y-2 text-xs text-on-surface-variant">
+            <li><a class="hover:text-primary transition-colors" href="#">Confidentialité</a></li>
+            <li><a class="hover:text-primary transition-colors" href="#">Conditions générales</a></li>
+            <li><a class="hover:text-primary transition-colors" href="#">Support</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="pt-6 border-t border-outline-variant flex flex-col md:flex-row justify-between items-center gap-3">
+        <p class="text-[11px] text-on-surface-variant">© 2026 MARKET-UP · AGGREGAX SUARL · Tous droits réservés</p>
+        <p class="text-[11px] text-on-surface-variant">Fait en Tunisie 🇹🇳</p>
+      </div>
+    </div>
+  </footer>
+    <!-- ════════════════════════════════════════════════════════════════
+         SLUG-DRIVEN HYDRATION (P2.3 Lot 2) — LinkUP profile
+         ════════════════════════════════════════════════════════════════ -->
+    <script>
+        (function () {
+            const data = window.MARKETUP_DATA;
+            if (!data) { console.error('marketup_seed_data.js not loaded'); return; }
+
+            const fmtName = (i18n) => (i18n && (i18n.fr || i18n.ar || i18n.en)) || '—';
+            const escape = (s) => String(s || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+            const setText = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val || '—'; };
+            const setAttr = (id, attr, val) => { const el = document.getElementById(id); if (el && val) el.setAttribute(attr, val); };
+
+            const path = window.location.pathname;
+            const m = path.match(/public_linkup_(.+?)\.html$/);
+            const slug = m ? m[1] : null;
+
+            function show404(msg) {
+                const c = document.getElementById('lu-content'), e = document.getElementById('lu-404');
+                if (c) c.style.display = 'none';
+                if (e) {
+                    e.classList.remove('hidden');
+                    if (msg) document.getElementById('lu-404-msg').textContent = msg;
+                }
+                document.title = 'Profil introuvable | LinkUP — MARKET-UP';
+            }
+
+            if (!slug) { show404('Slug invalide.'); return; }
+            const company = data.companies.find(c => c.slug === slug);
+            if (!company) { show404(`Aucune entreprise avec le slug "${slug}".`); return; }
+            const lu = company.profiles && company.profiles.linkup;
+            if (!lu || lu.status !== 'active') { show404('Le profil LinkUP de cette entreprise n\'est pas publié.'); return; }
+
+            // Lookups
+            const sectorById = {};
+            (data.sectorsB2B || []).forEach(s => { sectorById[s.id] = s; });
+            const categoryById = {};
+            (data.categoriesB2C || []).forEach(c => { categoryById[c.id] = c; });
+            const gouvById = {};
+            (data.gouvernorats || []).forEach(g => { gouvById[g.id] = g; });
+
+            const sector = company.type === 'B2B' ? sectorById[company.liveData.sectorId] : categoryById[company.liveData.sectorId];
+            const sectorName = sector ? fmtName(sector.name) : '—';
+            const card = lu.data.contactCard || {};
+            const socials = lu.data.socials || [];
+            const companyName = fmtName(company.data.displayName);
+            // Hero is COMPANY-centric (logo + name = company, not contact person)
+            // contactCard info (fullName, photo, title, bio) is still used elsewhere if needed
+
+            // Title + hero — COMPANY logo and COMPANY name (not contact person)
+            document.title = `${companyName} | LinkUP — MARKET-UP`;
+            const companyLogo = company.data.logo || `https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(companyName)}&backgroundColor=000000`;
+            setAttr('lu-logo', 'src', companyLogo);
+            setAttr('lu-logo', 'alt', companyName + ' — Logo');
+            if (company.rseBadgeStatus === 'validated') {
+                const rseBadge = document.getElementById('lu-rse-badge');
+                if (rseBadge) rseBadge.style.display = '';
+            }
+            setText('lu-name', companyName);
+            setText('lu-rne', company.legalId || '—');
+            setText('lu-sector', sectorName);
+            setText('lu-type', company.type);
+            setText('lu-phone', card.phone || company.liveData.phone);
+            setText('lu-whatsapp', card.whatsapp || company.liveData.whatsapp);
+            setText('lu-email', card.email || company.accountEmail);
+            const gouvName = gouvById[company.liveData.gouvernorat] ? fmtName(gouvById[company.liveData.gouvernorat].name) : '';
+            setText('lu-address', [company.liveData.address, company.liveData.ville, gouvName, 'Tunisie'].filter(Boolean).join(', '));
+
+            // Build services grid
+            const findSocial = (platform) => socials.find(s => s.platform === platform);
+            const services = [
+                {
+                    id: 'brandup',
+                    label: 'BrandUP',
+                    icon: '<i class="fa-solid fa-layer-group icon-style"></i>',
+                    href: (company.profiles.brandup && company.profiles.brandup.status === 'active') ? `public_brandup_${slug}.html` : null,
+                },
+                {
+                    id: 'traceup',
+                    label: 'TraceUP',
+                    icon: '<i class="fa-solid fa-circle-play icon-style"></i>',
+                    href: (company.profiles.traceup && company.profiles.traceup.status === 'active') ? `public_traceup_${slug}.html` : null,
+                },
+                {
+                    id: 'website',
+                    label: 'Site Web',
+                    icon: '<i class="fa-solid fa-globe icon-style"></i>',
+                    href: card.website,
+                    target: '_blank',
+                },
+                {
+                    id: 'whatsapp',
+                    label: 'WhatsApp',
+                    icon: '<i class="fa-brands fa-whatsapp icon-style"></i>',
+                    href: (card.whatsapp || company.liveData.whatsapp) ? `https://wa.me/${(card.whatsapp || company.liveData.whatsapp).replace(/[^0-9]/g, '')}` : null,
+                    target: '_blank',
+                },
+                {
+                    id: 'youtube',
+                    label: 'YouTube',
+                    icon: '<i class="fa-brands fa-youtube icon-style"></i>',
+                    href: findSocial('youtube')?.url,
+                    target: '_blank',
+                },
+                {
+                    id: 'facebook',
+                    label: 'Facebook',
+                    icon: '<i class="fa-brands fa-facebook icon-style"></i>',
+                    href: findSocial('facebook')?.url,
+                    target: '_blank',
+                },
+                {
+                    id: 'instagram',
+                    label: 'Instagram',
+                    icon: '<i class="fa-brands fa-instagram icon-style"></i>',
+                    href: findSocial('instagram')?.url,
+                    target: '_blank',
+                },
+                {
+                    id: 'linkedin',
+                    label: 'LinkedIn',
+                    icon: '<i class="fa-brands fa-linkedin icon-style"></i>',
+                    href: findSocial('linkedin')?.url,
+                    target: '_blank',
+                },
+                {
+                    id: 'twitter',
+                    label: 'Twitter',
+                    icon: '<i class="fa-brands fa-x-twitter icon-style"></i>',
+                    href: findSocial('twitter')?.url || findSocial('x')?.url,
+                    target: '_blank',
+                },
+                {
+                    id: 'maps',
+                    label: 'Maps',
+                    icon: '<i class="fa-solid fa-location-dot icon-style"></i>',
+                    href: card.gpsPosition?.coordinates
+                        ? `https://maps.google.com/?q=${card.gpsPosition.coordinates[1]},${card.gpsPosition.coordinates[0]}`
+                        : (company.liveData.address ? `https://maps.google.com/?q=${encodeURIComponent(company.liveData.address + ' ' + (company.liveData.ville || ''))}` : null),
+                    target: '_blank',
+                },
+            ];
+
+            // Render only services with valid href
+            const servicesEl = document.getElementById('lu-services');
+            servicesEl.innerHTML = services
+                .filter(s => s.href)
+                .map(s => `
+                    <a class="service-card aspect-square bg-white flex flex-col items-center justify-center text-center group p-2" 
+                       href="${escape(s.href)}"${s.target ? ` target="${s.target}" rel="noopener"` : ''}>
+                        <div class="flex items-center justify-center mb-2 w-8 h-8">
+                            ${s.icon.replace('icon-style', 'text-on-surface-variant group-hover:text-primary transition-colors icon-style')}
+                        </div>
+                        <span class="font-bold text-on-surface text-[11px]">${escape(s.label)}</span>
+                    </a>
+                `).join('');
+        })();
+    </script>
+
+</body>
+
+</html>

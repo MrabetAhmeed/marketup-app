@@ -1,0 +1,1162 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Admin · Annuaire des entreprises · MARKET-UP</title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap"
+        rel="stylesheet" />
+    <link rel="stylesheet"
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" />
+
+    <script src="marketup_seed_data.js"></script>
+    <script src="admin_data_bridge.js"></script>
+    <script src="admin_notifications_dropdown.js"></script>
+
+    <style>
+        :root {
+            --admin-primary: #5C2D91;
+            --admin-primary-hover: #4A2375;
+            --admin-primary-light: #F3EFFA;
+            --admin-primary-tint: #EBE2F5;
+            --text-primary: #242424;
+            --text-secondary: #616161;
+            --text-tertiary: #8A8886;
+            --border-default: #E0E0E0;
+            --bg-canvas: #F5F5F5;
+            --bg-surface: #FFFFFF;
+        }
+
+        html,
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Inter', sans-serif;
+            color: var(--text-primary);
+            background: var(--bg-canvas);
+        }
+
+        .font-heading {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+        }
+
+        .icon-fill {
+            font-variation-settings: 'FILL' 1;
+        }
+
+        .card {
+            background: var(--bg-surface);
+            border: 1px solid var(--border-default);
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
+        }
+
+        /* Nav sidebar */
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 8px 12px;
+            border-radius: 6px;
+            color: var(--text-secondary);
+            font-size: 13px;
+            font-weight: 500;
+            transition: background 0.15s ease, color 0.15s ease;
+            cursor: pointer;
+            text-decoration: none;
+        }
+
+        .nav-item:hover {
+            background: #FAFAFA;
+            color: var(--text-primary);
+        }
+
+        .nav-item.active {
+            background: var(--admin-primary-light);
+            color: var(--admin-primary);
+            font-weight: 600;
+        }
+
+        .nav-item.active .material-symbols-outlined {
+            color: var(--admin-primary);
+        }
+
+        .nav-item .material-symbols-outlined {
+            font-size: 18px;
+            color: var(--text-tertiary);
+        }
+
+        .nav-group-label {
+            font-size: 10px;
+            font-weight: 700;
+            color: var(--text-tertiary);
+            letter-spacing: 0.06em;
+            padding: 12px 12px 6px;
+            text-transform: uppercase;
+        }
+
+        .nav-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 3px;
+            font-size: 10px;
+            font-weight: 700;
+            padding: 2px 6px;
+            border-radius: 10px;
+            line-height: 1;
+        }
+
+        .nav-pill--count-amber {
+            background: #D97706;
+            color: white;
+        }
+
+        .nav-pill--count-red {
+            background: #DC2626;
+            color: white;
+        }
+
+        /* Buttons */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            padding: 7px 14px;
+            border-radius: 4px;
+            font-size: 12.5px;
+            font-weight: 600;
+            cursor: pointer;
+            border: 1px solid transparent;
+            transition: all 0.15s ease;
+            text-decoration: none;
+            white-space: nowrap;
+        }
+
+        .btn .material-symbols-outlined {
+            font-size: 16px;
+        }
+
+        .btn-primary {
+            background: var(--admin-primary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--admin-primary-hover);
+        }
+
+        .btn-ghost {
+            background: transparent;
+            color: var(--text-primary);
+        }
+
+        .btn-ghost:hover {
+            background: #F5F5F5;
+        }
+
+        /* Status pills */
+        .status-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 11px;
+            font-weight: 600;
+            padding: 3px 9px;
+            border-radius: 4px;
+            border: 1px solid;
+        }
+
+        .status-pill .dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+        }
+
+        .status-pill--active {
+            color: #107C10;
+            background: #F0FDF4;
+            border-color: #B7EBC0;
+        }
+
+        .status-pill--active .dot {
+            background: #107C10;
+        }
+
+        .status-pill--pending {
+            color: #92400E;
+            background: #FFFBEB;
+            border-color: #FDE68A;
+        }
+
+        .status-pill--pending .dot {
+            background: #D97706;
+        }
+
+        .status-pill--suspended {
+            color: #B91C1C;
+            background: #FEF2F2;
+            border-color: #FCA5A5;
+        }
+
+        .status-pill--suspended .dot {
+            background: #DC2626;
+        }
+
+        .status-pill--update {
+            color: #5C2D91;
+            background: #F3EFFA;
+            border-color: #D6C1EC;
+        }
+
+        .status-pill--update .dot {
+            background: #5C2D91;
+        }
+
+        /* Type pill */
+        .type-pill {
+            display: inline-flex;
+            align-items: center;
+            font-size: 10.5px;
+            font-weight: 700;
+            padding: 2px 7px;
+            border-radius: 4px;
+            letter-spacing: 0.02em;
+        }
+
+        .type-pill--b2b {
+            background: #EBE2F5;
+            color: #5C2D91;
+        }
+
+        .type-pill--b2c {
+            background: #FEF3C7;
+            color: #92400E;
+        }
+
+        /* KPI inline */
+        .kpi-inline {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 14px;
+            background: white;
+            border: 1px solid var(--border-default);
+            border-radius: 8px;
+            min-width: 0;
+            flex: 1;
+        }
+
+        .kpi-inline__value {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--text-primary);
+            line-height: 1;
+        }
+
+        .kpi-inline__label {
+            font-size: 11px;
+            color: var(--text-secondary);
+            line-height: 1.2;
+        }
+
+        /* Search + filters */
+        .search-bar {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 8px 12px;
+            background: white;
+            border: 1px solid var(--border-default);
+            border-radius: 6px;
+            transition: border-color 0.15s ease, box-shadow 0.15s ease;
+        }
+
+        .search-bar:focus-within {
+            border-color: var(--admin-primary);
+            box-shadow: 0 0 0 2px var(--admin-primary-light);
+        }
+
+        .search-bar input {
+            flex: 1;
+            border: none;
+            outline: none;
+            font-size: 13px;
+            font-family: inherit;
+            background: transparent;
+            min-width: 0;
+        }
+
+        .filter-select {
+            padding: 8px 12px;
+            border: 1px solid var(--border-default);
+            border-radius: 6px;
+            font-size: 12.5px;
+            background: white;
+            color: var(--text-primary);
+            cursor: pointer;
+            min-width: 140px;
+        }
+
+        .filter-select:focus {
+            outline: none;
+            border-color: var(--admin-primary);
+            box-shadow: 0 0 0 2px var(--admin-primary-light);
+        }
+
+        /* Table */
+        .queue-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .queue-table thead th {
+            background: #FAFAFA;
+            border-bottom: 1px solid var(--border-default);
+            padding: 10px 16px;
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--text-secondary);
+            text-align: left;
+            letter-spacing: 0.04em;
+            text-transform: uppercase;
+            white-space: nowrap;
+        }
+
+        .queue-table tbody tr {
+            border-bottom: 1px solid #F0F0F0;
+            transition: background 0.1s ease;
+            cursor: pointer;
+        }
+
+        .queue-table tbody tr:hover {
+            background: #FAFAFA;
+        }
+
+        .queue-table tbody tr:last-child {
+            border-bottom: none;
+        }
+
+        .queue-table tbody td {
+            padding: 14px 16px;
+            font-size: 13px;
+            color: var(--text-primary);
+            vertical-align: middle;
+        }
+
+        /* Avatar */
+        .avatar {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            font-weight: 700;
+            color: white;
+            flex-shrink: 0;
+        }
+
+        .avatar--sm {
+            width: 32px;
+            height: 32px;
+            font-size: 11px;
+        }
+
+        .avatar--md {
+            width: 40px;
+            height: 40px;
+            font-size: 13px;
+        }
+
+        /* Profils dots (BrandUP/TraceUP/LinkUP état) */
+        .profile-dots {
+            display: inline-flex;
+            align-items: center;
+            gap: 3px;
+        }
+
+        .profile-dot {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 24px;
+            height: 24px;
+            border-radius: 6px;
+            font-size: 10px;
+            font-weight: 800;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            color: white;
+            position: relative;
+        }
+
+        .profile-dot--brandup {
+            background: #0078D4;
+        }
+
+        .profile-dot--traceup {
+            background: #8764B8;
+        }
+
+        .profile-dot--linkup {
+            background: #242424;
+        }
+
+        .profile-dot--inactive {
+            opacity: 0.25;
+        }
+
+        .profile-dot .status-indicator {
+            position: absolute;
+            bottom: -2px;
+            right: -2px;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            border: 2px solid white;
+        }
+
+        .profile-dot .status-indicator--active {
+            background: #107C10;
+        }
+
+        .profile-dot .status-indicator--pending {
+            background: #D97706;
+        }
+
+        .profile-dot .status-indicator--draft {
+            background: #64748B;
+        }
+
+        .profile-dot .status-indicator--rejected {
+            background: #DC2626;
+        }
+
+        .profile-dot .status-indicator--disabled {
+            background: #8A8886;
+        }
+
+        /* Badges (boost / sponsoring / rse) */
+        .badge-mini {
+            display: inline-flex;
+            align-items: center;
+            padding: 2px 6px;
+            font-size: 10px;
+            font-weight: 700;
+            border-radius: 4px;
+            letter-spacing: 0.02em;
+        }
+
+        .badge-mini--boost {
+            background: #EFF6FC;
+            color: #0078D4;
+        }
+
+        .badge-mini--rse {
+            background: #FEFCE8;
+            color: #8A6A1F;
+        }
+
+        .badge-mini--update {
+            background: #F3EFFA;
+            color: #5C2D91;
+        }
+
+        /* Empty state */
+        .empty-state {
+            padding: 48px 24px;
+            text-align: center;
+        }
+
+        .empty-state .material-symbols-outlined {
+            font-size: 48px;
+            color: var(--text-tertiary);
+        }
+
+        /* Pagination */
+        .pagination {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 16px;
+            border-top: 1px solid var(--border-default);
+            background: #FAFAFA;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .pagination__info {
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+
+        .pagination__controls {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .pagination__btn {
+            width: 32px;
+            height: 32px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid var(--border-default);
+            background: white;
+            border-radius: 4px;
+            color: var(--text-primary);
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: 600;
+            transition: background 0.1s ease, border-color 0.1s ease;
+        }
+
+        .pagination__btn:hover:not(:disabled):not(.active) {
+            background: #F5F5F5;
+            border-color: #CBD5E1;
+        }
+
+        .pagination__btn.active {
+            background: var(--admin-primary);
+            color: white;
+            border-color: var(--admin-primary);
+        }
+
+        .pagination__btn:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+        }
+
+        .pagination__size {
+            padding: 6px 10px;
+            border: 1px solid var(--border-default);
+            border-radius: 4px;
+            font-size: 12px;
+            background: white;
+            cursor: pointer;
+        }
+
+        *:focus-visible {
+            outline: 2px solid var(--admin-primary);
+            outline-offset: 2px;
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #D1D1D1;
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #A19F9D;
+        }
+
+        @media (max-width: 768px) {
+            #sidebar {
+                transform: translateX(-100%);
+                transition: transform 0.3s ease;
+            }
+
+            #sidebar.open {
+                transform: translateX(0);
+            }
+
+            #backdrop {
+                display: none;
+            }
+
+            #backdrop.show {
+                display: block;
+            }
+
+            .queue-table thead {
+                display: none;
+            }
+
+            .queue-table,
+            .queue-table tbody,
+            .queue-table tr,
+            .queue-table td {
+                display: block;
+                width: 100%;
+            }
+
+            .queue-table tbody tr {
+                border: 1px solid var(--border-default);
+                border-radius: 8px;
+                margin-bottom: 12px;
+                padding: 8px;
+            }
+
+            .queue-table td {
+                padding: 6px 8px;
+                border: none !important;
+            }
+
+            .queue-table td[data-label]::before {
+                content: attr(data-label);
+                display: block;
+                font-size: 10px;
+                font-weight: 700;
+                color: var(--text-tertiary);
+                text-transform: uppercase;
+                letter-spacing: 0.04em;
+                margin-bottom: 2px;
+            }
+        }
+    </style>
+</head>
+
+<body class="min-h-screen">
+
+    <div id="backdrop" class="fixed inset-0 bg-black/30 z-40 hidden md:hidden" aria-hidden="true"></div>
+
+    <div class="flex">
+
+        <!-- SIDEBAR -->
+        <aside id="sidebar"
+            class="fixed top-0 left-0 w-60 h-screen bg-white border-r border-[#E0E0E0] z-50 flex flex-col">
+            <a href="admin_dashboard.html"
+                class="flex items-center gap-2.5 px-5 py-4 border-b border-[#E0E0E0] shrink-0 h-14 hover:bg-[#FAFAFA] transition-colors">
+                <span class="material-symbols-outlined icon-fill text-[#5C2D91]"
+                    style="font-size:22px">shield_person</span>
+                <div class="leading-tight min-w-0">
+                    <div class="text-[#242424] font-heading font-bold text-[15px] tracking-tight">MARKET-UP</div>
+                    <div class="text-[10px] text-[#5C2D91] tracking-wide font-semibold uppercase">Admin</div>
+                </div>
+            </a>
+            <nav class="flex-1 overflow-y-auto px-3 py-2">
+                <div class="nav-group-label">Tableau de bord</div>
+                <a href="admin_dashboard.html" class="nav-item"><span class="material-symbols-outlined">dashboard</span><span
+                        class="flex-1 min-w-0 truncate">Vue d'ensemble</span></a>
+                <div class="nav-group-label">Validations</div>
+                <a href="admin_validation-comptes.html" class="nav-item"><span
+                        class="material-symbols-outlined">person_check</span><span
+                        class="flex-1 min-w-0 truncate">Comptes</span><span class="nav-pill nav-pill--count-amber"
+                        data-pill="comptes">11</span></a>
+                <a href="admin_validation-profils.html" class="nav-item"><span
+                        class="material-symbols-outlined">fact_check</span><span
+                        class="flex-1 min-w-0 truncate">Profils</span><span class="nav-pill nav-pill--count-amber"
+                        data-pill="profils">10</span></a>
+                <a href="admin_validation-rse.html" class="nav-item"><span
+                        class="material-symbols-outlined">volunteer_activism</span><span
+                        class="flex-1 min-w-0 truncate">Reçus RSE</span><span class="nav-pill nav-pill--count-amber"
+                        data-pill="rse">3</span></a>
+                <div class="nav-group-label">Gestion</div>
+                <a href="admin_entreprises.html" class="nav-item active"><span
+                        class="material-symbols-outlined">business</span><span
+                        class="flex-1 min-w-0 truncate">Entreprises</span></a>
+                
+                
+                <div class="nav-group-label">Finances</div>
+                <a href="admin_transactions.html" class="nav-item"><span
+                        class="material-symbols-outlined">receipt_long</span><span
+                        class="flex-1 min-w-0 truncate">Transactions</span></a>
+                
+            </nav>
+            <div class="border-t border-[#E0E0E0] p-3">
+                <div class="flex items-center gap-2.5 px-2 py-2 rounded-lg hover:bg-[#FAFAFA] transition-colors">
+                    <div class="avatar avatar--sm" style="background:#5C2D91;">BA</div>
+                    <div class="leading-tight min-w-0 flex-1">
+                        <div class="text-[12.5px] font-semibold text-[#242424] truncate">Bassem Admin</div>
+                        <div class="text-[10px] text-[#8A8886] truncate">Super administrateur</div>
+                    </div>
+                    <button
+                        class="p-1.5 rounded hover:bg-[#F5F5F5] text-[#8A8886] hover:text-[#B91C1C] transition-colors"
+                        aria-label="Se déconnecter" onclick="window.location.href='auth_connexion.html';">
+                        <span class="material-symbols-outlined" style="font-size:16px">logout</span>
+                    </button>
+                </div>
+            </div>
+        </aside>
+
+        <div class="flex-1 md:ml-60 min-h-screen flex flex-col">
+            <header
+                class="sticky top-0 z-30 bg-white border-b border-[#E0E0E0] h-14 flex items-center px-4 md:px-6 shrink-0">
+                <button id="menuBtn" class="md:hidden mr-3 p-2 rounded hover:bg-[#F5F5F5] transition-colors"
+                    aria-label="Ouvrir le menu">
+                    <span class="material-symbols-outlined text-[#242424]">menu</span>
+                </button>
+                <div class="min-w-0 leading-tight flex-1">
+                    <nav class="hidden md:flex items-center gap-1.5 text-[11px] text-[#8A8886] mb-0.5"
+                        aria-label="Fil d'Ariane">
+                        <a href="admin_dashboard.html" class="hover:text-[#5C2D91] hover:underline transition-colors">Dashboard</a>
+                        <span class="material-symbols-outlined" style="font-size:12px">chevron_right</span>
+                        <span class="text-[#8A8886]">Gestion</span>
+                        <span class="material-symbols-outlined" style="font-size:12px">chevron_right</span>
+                        <span class="text-[#616161] font-medium">Entreprises</span>
+                    </nav>
+                    <h1 class="font-heading text-[16px] font-bold text-[#242424] truncate">Annuaire des entreprises</h1>
+                </div>
+                <div class="flex items-center gap-2 ml-3">
+                    <button id="bellBtn" class="relative p-2 rounded-lg hover:bg-[#F5F5F5] transition-colors"
+                        aria-label="Notifications admin">
+                        <span class="material-symbols-outlined text-[#242424]">notifications</span>
+                        <span
+                            class="absolute top-1 right-1 w-4 h-4 bg-[#DC2626] text-white text-[9px] font-bold rounded-full flex items-center justify-center">5</span>
+                    </button>
+                    <button id="avatarBtn"
+                        class="flex items-center gap-2 px-1 py-1 rounded-lg hover:bg-[#F5F5F5] transition-colors"
+                        aria-label="Menu admin">
+                        <div class="avatar avatar--sm" style="background:#5C2D91;">BA</div>
+                        <span class="material-symbols-outlined text-[#8A8886] hidden md:inline"
+                            style="font-size:16px">expand_more</span>
+                    </button>
+                </div>
+            </header>
+
+            <main class="flex-1 p-4 md:p-8">
+                <div class="max-w-[1280px] mx-auto">
+
+                    <div class="mb-6">
+                        <h2 class="font-heading text-[22px] md:text-[26px] font-bold text-[#242424] mb-1">
+                            Toutes les entreprises
+                        </h2>
+                        <p class="text-[13px] text-[#616161]">
+                            Annuaire consolidé des entreprises inscrites sur la plateforme MARKET-UP
+                        </p>
+                    </div>
+
+                    <!-- KPI BAR (4 cellules) -->
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
+                        <div class="kpi-inline">
+                            <span class="material-symbols-outlined text-[#5C2D91]"
+                                style="font-size:24px">business</span>
+                            <div class="min-w-0">
+                                <div class="kpi-inline__value" id="kpi-total">20</div>
+                                <div class="kpi-inline__label">total</div>
+                            </div>
+                        </div>
+                        <div class="kpi-inline">
+                            <span class="material-symbols-outlined text-[#107C10]"
+                                style="font-size:24px">check_circle</span>
+                            <div class="min-w-0">
+                                <div class="kpi-inline__value" id="kpi-active">11</div>
+                                <div class="kpi-inline__label">actives</div>
+                            </div>
+                        </div>
+                        <div class="kpi-inline">
+                            <span class="material-symbols-outlined text-[#D97706]"
+                                style="font-size:24px">schedule</span>
+                            <div class="min-w-0">
+                                <div class="kpi-inline__value" id="kpi-pending">8</div>
+                                <div class="kpi-inline__label">en attente</div>
+                            </div>
+                        </div>
+                        <div class="kpi-inline">
+                            <span class="material-symbols-outlined text-[#DC2626]" style="font-size:24px">block</span>
+                            <div class="min-w-0">
+                                <div class="kpi-inline__value" id="kpi-suspended">1</div>
+                                <div class="kpi-inline__label">suspendue</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Filtres -->
+                    <div class="card p-4 mb-4">
+                        <div class="flex flex-col md:flex-row gap-3">
+                            <div class="search-bar flex-1">
+                                <span class="material-symbols-outlined text-[#8A8886]"
+                                    style="font-size:18px">search</span>
+                                <input type="search" id="search-input"
+                                    placeholder="Rechercher par nom, RNE, propriétaire…" autocomplete="off" />
+                                <button id="search-clear" class="text-[#8A8886] hover:text-[#242424] hidden"
+                                    aria-label="Effacer la recherche">
+                                    <span class="material-symbols-outlined" style="font-size:18px">close</span>
+                                </button>
+                            </div>
+                            <select class="filter-select" id="filter-status">
+                                <option value="all">Tous les statuts</option>
+                                <option value="active">Actives</option>
+                                <option value="pending">En attente</option>
+                                <option value="suspended">Suspendues</option>
+                                <option value="pending_updates">Avec modifs en attente</option>
+                            </select>
+                            <select class="filter-select" id="filter-type">
+                                <option value="all">Tous types</option>
+                                <option value="B2B">B2B uniquement</option>
+                                <option value="B2C">B2C uniquement</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Table -->
+                    <div class="card overflow-hidden">
+                        <div class="overflow-x-auto">
+                            <table class="queue-table">
+                                <thead>
+                                    <tr>
+                                        <th>Entreprise</th>
+                                        <th>Propriétaire</th>
+                                        <th>Localisation</th>
+                                        <th>Statut</th>
+                                        <th>Profils</th>
+                                        <th>Engagements</th>
+                                        <th style="text-align:right">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="queue-body"></tbody>
+                            </table>
+                        </div>
+
+                        <!-- Empty state (JS toggle) -->
+                        <div id="empty-state" class="empty-state" style="display:none">
+                            <span class="material-symbols-outlined">search_off</span>
+                            <div class="font-heading text-[16px] font-bold text-[#242424] mt-2">Aucune entreprise
+                                trouvée</div>
+                            <p class="text-[13px] text-[#616161] mt-1">Ajustez les filtres ou la recherche pour voir
+                                plus de résultats.</p>
+                        </div>
+
+                        <!-- Pagination -->
+                        <div class="pagination" id="pagination">
+                            <div class="pagination__info">
+                                <span id="page-info-text">Affichage 1-10 sur 20 entreprises</span>
+                            </div>
+                            <div class="pagination__controls" id="pagination-controls"></div>
+                            <select class="pagination__size" id="page-size">
+                                <option value="10">10 par page</option>
+                                <option value="20" selected>20 par page</option>
+                                <option value="50">50 par page</option>
+                            </select>
+                        </div>
+                    </div>
+
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <script>
+        (function () {
+            const data = window.MARKETUP_DATA;
+            if (!data) { console.error('admin_data.js non chargé'); return; }
+
+            const OWNER_COLORS = [
+                '#374151', '#1E40AF', '#7C2D12', '#166534',
+                '#92400E', '#831843', '#0F766E', '#5B21B6'
+            ];
+            const getOwnerColor = (id) => {
+                const hash = id.split('').reduce((a, c) => a + c.charCodeAt(0), 0);
+                return OWNER_COLORS[hash % OWNER_COLORS.length];
+            };
+
+            function escapeHtml(s) {
+                if (s == null) return '';
+                return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+                    .replace(/"/g, '&quot;').replace(/'/g, '&#039;');
+            }
+
+            const STATUS_META = {
+                active: { label: 'Actif', cls: 'status-pill--active' },
+                pending: { label: 'En attente', cls: 'status-pill--pending' },
+                suspended: { label: 'Suspendu', cls: 'status-pill--suspended' }
+            };
+
+            const PROFILE_STATUS_INDICATOR = {
+                active: 'active',
+                pending: 'pending',
+                draft: 'draft',
+                rejected: 'rejected',
+                disabled: 'disabled'
+            };
+
+            const PROFILE_LABELS = {
+                brandup: 'B',
+                traceup: 'T',
+                linkup: 'L'
+            };
+
+            // ═════════════════════════════════════
+            // SIDEBAR COUNTERS
+            // ═════════════════════════════════════
+            (function updateCounters() {
+                const comptesNew = data.companies.filter(c => c.status === 'pending').length;
+                const updatesP = data.companies.filter(c => c.pending_updates).length;
+                let profilsCount = 0;
+                data.companies.forEach(c => Object.values(c.profiles || {}).forEach(p => { if (p.status === 'pending' && p.submitted_at) profilsCount++; }));
+                const rseCount = data.rse_receipts.filter(r => r.status === 'pending').length;
+                const litigesCount = data.disputes.filter(d => d.status === 'open').length;
+
+                document.querySelectorAll('[data-pill="comptes"]').forEach(el => el.textContent = comptesNew + updatesP);
+                document.querySelectorAll('[data-pill="profils"]').forEach(el => el.textContent = profilsCount);
+                document.querySelectorAll('[data-pill="rse"]').forEach(el => el.textContent = rseCount);
+                document.querySelectorAll('[data-pill="litiges"]').forEach(el => el.textContent = litigesCount);
+            })();
+
+            // ═════════════════════════════════════
+            // KPI BAR
+            // ═════════════════════════════════════
+            const kpis = data.kpis_global;
+            document.getElementById('kpi-total').textContent = kpis.companies_total;
+            document.getElementById('kpi-active').textContent = kpis.companies_active;
+            document.getElementById('kpi-pending').textContent = kpis.companies_pending;
+            document.getElementById('kpi-suspended').textContent = kpis.companies_suspended;
+
+            // ═════════════════════════════════════
+            // STATE (filtres + pagination)
+            // ═════════════════════════════════════
+            let state = {
+                search: '',
+                status: 'all',
+                type: 'all',
+                page: 1,
+                pageSize: 20
+            };
+
+            function applyFilters() {
+                const q = state.search.trim().toLowerCase();
+                return data.companies.filter(c => {
+                    // Recherche
+                    if (q) {
+                        const hay = [
+                            c.name, c.slug, c.rne, c.sector, c.city, c.governorate,
+                            c.owner.firstName, c.owner.lastName, c.owner.email
+                        ].join(' ').toLowerCase();
+                        if (!hay.includes(q)) return false;
+                    }
+                    // Statut
+                    if (state.status !== 'all') {
+                        if (state.status === 'pending_updates') {
+                            if (!c.pending_updates) return false;
+                        } else if (c.status !== state.status) {
+                            return false;
+                        }
+                    }
+                    // Type
+                    if (state.type !== 'all' && c.type !== state.type) return false;
+
+                    return true;
+                });
+            }
+
+            // ═════════════════════════════════════
+            // RENDER TABLE
+            // ═════════════════════════════════════
+            function renderTable() {
+                const filtered = applyFilters();
+                const totalPages = Math.max(1, Math.ceil(filtered.length / state.pageSize));
+                if (state.page > totalPages) state.page = totalPages;
+
+                const start = (state.page - 1) * state.pageSize;
+                const end = start + state.pageSize;
+                const pageItems = filtered.slice(start, end);
+
+                const tbody = document.getElementById('queue-body');
+                const emptyEl = document.getElementById('empty-state');
+                const paginationEl = document.getElementById('pagination');
+
+                if (filtered.length === 0) {
+                    tbody.innerHTML = '';
+                    emptyEl.style.display = '';
+                    paginationEl.style.display = 'none';
+                    return;
+                }
+
+                emptyEl.style.display = 'none';
+                paginationEl.style.display = '';
+                tbody.innerHTML = '';
+
+                pageItems.forEach(c => {
+                    const statusMeta = STATUS_META[c.status] || { label: c.status, cls: '' };
+                    const ownerColor = getOwnerColor(c.id);
+                    const detailUrl = `admin_entreprise-detail.html?id=${encodeURIComponent(c.id)}`;
+
+                    // Profils dots
+                    const profilesHTML = ['brandup', 'traceup', 'linkup'].map(k => {
+                        const p = c.profiles[k] || { status: 'draft' };
+                        const indicator = PROFILE_STATUS_INDICATOR[p.status] || 'draft';
+                        const isInactive = (p.status === 'disabled');
+                        return `
+                            <span class="profile-dot profile-dot--${k}${isInactive ? ' profile-dot--inactive' : ''}" title="${k.toUpperCase()} : ${escapeHtml(p.status)}">
+                                ${PROFILE_LABELS[k]}
+                                <span class="status-indicator status-indicator--${indicator}"></span>
+                            </span>
+                        `;
+                    }).join('');
+
+                    // Badges engagements (boost / sponsoring / RSE / modifs en attente)
+                    const badges = [];
+                    if (c.boost_active) badges.push('<span class="badge-mini badge-mini--boost">BOOST</span>');
+                    if (c.sponsoring_active) badges.push('<span class="badge-mini badge-mini--boost">SPONSO</span>');
+                    if (c.rse_badge === 'validated') badges.push('<span class="badge-mini badge-mini--rse">RSE ✓</span>');
+                    if (c.pending_updates) badges.push('<span class="badge-mini badge-mini--update">MODIF</span>');
+                    const badgesHTML = badges.length > 0
+                        ? `<div class="flex items-center gap-1 flex-wrap">${badges.join('')}</div>`
+                        : '<span class="text-[11px] text-[#8A8886]">—</span>';
+
+                    const typePill = c.type === 'B2B'
+                        ? `<span class="type-pill type-pill--b2b">B2B</span>`
+                        : `<span class="type-pill type-pill--b2c">B2C</span>`;
+
+                    const tr = document.createElement('tr');
+                    tr.dataset.url = detailUrl;
+                    tr.innerHTML = `
+                        <td data-label="Entreprise">
+                            <div class="flex items-center gap-3 min-w-0">
+                                <div class="avatar avatar--sm" style="background:#5C2D91;">
+                                    ${escapeHtml(c.name.substring(0, 2).toUpperCase())}
+                                </div>
+                                <div class="min-w-0">
+                                    <div class="font-semibold text-[#242424] truncate">${escapeHtml(c.name)}</div>
+                                    <div class="flex items-center gap-1.5 mt-0.5">
+                                        ${typePill}
+                                        <span class="text-[11px] text-[#8A8886] truncate">${escapeHtml(c.sector)}</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </td>
+                        <td data-label="Propriétaire">
+                            <div class="flex items-center gap-2 min-w-0">
+                                <div class="avatar avatar--sm" style="background:${ownerColor};">
+                                    ${escapeHtml(c.owner.avatar_initials)}
+                                </div>
+                                <div class="min-w-0">
+                                    <div class="text-[12.5px] font-medium text-[#242424] truncate">
+                                        ${escapeHtml(c.owner.firstName)} ${escapeHtml(c.owner.lastName)}
+                                    </div>
+                                    <div class="text-[11px] text-[#8A8886] truncate">${escapeHtml(c.owner.email)}</div>
+                                </div>
+                            </div>
+                        </td>
+                        <td data-label="Localisation">
+                            <div class="text-[13px] text-[#242424]">${escapeHtml(c.city)}</div>
+                            <div class="text-[11px] text-[#8A8886]">${escapeHtml(c.governorate)}</div>
+                        </td>
+                        <td data-label="Statut">
+                            <span class="status-pill ${statusMeta.cls}">
+                                <span class="dot"></span>${escapeHtml(statusMeta.label)}
+                            </span>
+                        </td>
+                        <td data-label="Profils">
+                            <div class="profile-dots">${profilesHTML}</div>
+                        </td>
+                        <td data-label="Engagements">${badgesHTML}</td>
+                        <td data-label="Actions" style="text-align:right">
+                            <a href="${detailUrl}" class="btn btn-ghost" data-action="view-profile">
+                                <span class="material-symbols-outlined">open_in_new</span>
+                                Voir
+                            </a>
+                        </td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+
+                // Clic ligne → redirection
+                tbody.querySelectorAll('tr').forEach(tr => {
+                    tr.addEventListener('click', (e) => {
+                        if (e.target.closest('a')) return;
+                        window.location.href = tr.dataset.url;
+                    });
+                });
+
+                renderPagination(filtered.length, totalPages);
+            }
+
+            function renderPagination(totalItems, totalPages) {
+                const start = (state.page - 1) * state.pageSize + 1;
+                const end = Math.min(state.page * state.pageSize, totalItems);
+                document.getElementById('page-info-text').textContent =
+                    `Affichage ${start}-${end} sur ${totalItems} entreprise(s)`;
+
+                const controls = document.getElementById('pagination-controls');
+                const buttons = [];
+
+                // Prev
+                buttons.push(`<button class="pagination__btn" data-page="${state.page - 1}" ${state.page === 1 ? 'disabled' : ''} aria-label="Page précédente"><span class="material-symbols-outlined" style="font-size:16px">chevron_left</span></button>`);
+
+                // Pages (max 5 visibles)
+                const maxVisible = 5;
+                let pageStart = Math.max(1, state.page - Math.floor(maxVisible / 2));
+                let pageEnd = Math.min(totalPages, pageStart + maxVisible - 1);
+                if (pageEnd - pageStart < maxVisible - 1) {
+                    pageStart = Math.max(1, pageEnd - maxVisible + 1);
+                }
+                for (let p = pageStart; p <= pageEnd; p++) {
+                    buttons.push(`<button class="pagination__btn${p === state.page ? ' active' : ''}" data-page="${p}">${p}</button>`);
+                }
+
+                // Next
+                buttons.push(`<button class="pagination__btn" data-page="${state.page + 1}" ${state.page === totalPages ? 'disabled' : ''} aria-label="Page suivante"><span class="material-symbols-outlined" style="font-size:16px">chevron_right</span></button>`);
+
+                controls.innerHTML = buttons.join('');
+                controls.querySelectorAll('.pagination__btn').forEach(btn => {
+                    btn.addEventListener('click', () => {
+                        const p = parseInt(btn.dataset.page, 10);
+                        if (!isNaN(p) && p >= 1 && p <= totalPages) {
+                            state.page = p;
+                            renderTable();
+                        }
+                    });
+                });
+            }
+
+            // ═════════════════════════════════════
+            // FILTRES
+            // ═════════════════════════════════════
+            const searchInput = document.getElementById('search-input');
+            const searchClear = document.getElementById('search-clear');
+            searchInput.addEventListener('input', (e) => {
+                state.search = e.target.value;
+                state.page = 1;
+                searchClear.style.display = state.search ? '' : 'none';
+                renderTable();
+            });
+            searchClear.addEventListener('click', () => {
+                searchInput.value = '';
+                state.search = '';
+                state.page = 1;
+                searchClear.style.display = 'none';
+                renderTable();
+            });
+
+            document.getElementById('filter-status').addEventListener('change', (e) => {
+                state.status = e.target.value;
+                state.page = 1;
+                renderTable();
+            });
+            document.getElementById('filter-type').addEventListener('change', (e) => {
+                state.type = e.target.value;
+                state.page = 1;
+                renderTable();
+            });
+            document.getElementById('page-size').addEventListener('change', (e) => {
+                state.pageSize = parseInt(e.target.value, 10);
+                state.page = 1;
+                renderTable();
+            });
+
+            // ═════════════════════════════════════
+            // Sidebar mobile
+            // ═════════════════════════════════════
+            const sidebar = document.getElementById('sidebar');
+            const backdrop = document.getElementById('backdrop');
+            document.getElementById('menuBtn')?.addEventListener('click', () => {
+                sidebar.classList.add('open'); backdrop.classList.add('show');
+            });
+            backdrop?.addEventListener('click', () => {
+                sidebar.classList.remove('open'); backdrop.classList.remove('show');
+            });
+
+            // INIT
+            renderTable();
+        })();
+    </script>
+</body>
+
+</html>

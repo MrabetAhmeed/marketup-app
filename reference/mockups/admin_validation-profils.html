@@ -1,0 +1,807 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Admin · Validation des profils · MARKET-UP</title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap"
+        rel="stylesheet" />
+    <link rel="stylesheet"
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" />
+
+    <script src="marketup_seed_data.js"></script>
+    <script src="admin_data_bridge.js"></script>
+    <script src="admin_notifications_dropdown.js"></script>
+
+    <style>
+        :root {
+            --admin-primary: #5C2D91;
+            --admin-primary-hover: #4A2375;
+            --admin-primary-light: #F3EFFA;
+            --admin-primary-tint: #EBE2F5;
+            --text-primary: #242424;
+            --text-secondary: #616161;
+            --text-tertiary: #8A8886;
+            --border-default: #E0E0E0;
+            --bg-canvas: #F5F5F5;
+            --bg-surface: #FFFFFF;
+        }
+
+        html,
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Inter', sans-serif;
+            color: var(--text-primary);
+            background: var(--bg-canvas);
+        }
+
+        .font-heading {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+        }
+
+        .icon-fill {
+            font-variation-settings: 'FILL' 1;
+        }
+
+        .card {
+            background: var(--bg-surface);
+            border: 1px solid var(--border-default);
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
+        }
+
+        /* Nav sidebar */
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 8px 12px;
+            border-radius: 6px;
+            color: var(--text-secondary);
+            font-size: 13px;
+            font-weight: 500;
+            transition: background 0.15s ease, color 0.15s ease;
+            cursor: pointer;
+            text-decoration: none;
+        }
+
+        .nav-item:hover {
+            background: #FAFAFA;
+            color: var(--text-primary);
+        }
+
+        .nav-item.active {
+            background: var(--admin-primary-light);
+            color: var(--admin-primary);
+            font-weight: 600;
+        }
+
+        .nav-item.active .material-symbols-outlined {
+            color: var(--admin-primary);
+        }
+
+        .nav-item .material-symbols-outlined {
+            font-size: 18px;
+            color: var(--text-tertiary);
+        }
+
+        .nav-group-label {
+            font-size: 10px;
+            font-weight: 700;
+            color: var(--text-tertiary);
+            letter-spacing: 0.06em;
+            padding: 12px 12px 6px;
+            text-transform: uppercase;
+        }
+
+        .nav-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 3px;
+            font-size: 10px;
+            font-weight: 700;
+            padding: 2px 6px;
+            border-radius: 10px;
+            line-height: 1;
+        }
+
+        .nav-pill--count-amber {
+            background: #D97706;
+            color: white;
+        }
+
+        .nav-pill--count-red {
+            background: #DC2626;
+            color: white;
+        }
+
+        /* Buttons */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            padding: 7px 14px;
+            border-radius: 4px;
+            font-size: 12.5px;
+            font-weight: 600;
+            cursor: pointer;
+            border: 1px solid transparent;
+            transition: all 0.15s ease;
+            text-decoration: none;
+            white-space: nowrap;
+        }
+
+        .btn .material-symbols-outlined {
+            font-size: 16px;
+        }
+
+        .btn-ghost {
+            background: transparent;
+            color: var(--text-primary);
+        }
+
+        .btn-ghost:hover {
+            background: #F5F5F5;
+        }
+
+        /* Status pills */
+        .status-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 11px;
+            font-weight: 600;
+            padding: 3px 9px;
+            border-radius: 4px;
+            border: 1px solid;
+        }
+
+        .status-pill .dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+        }
+
+        .status-pill--sla-ok {
+            color: #107C10;
+            background: #F0FDF4;
+            border-color: #B7EBC0;
+        }
+
+        .status-pill--sla-ok .dot {
+            background: #107C10;
+        }
+
+        .status-pill--sla-exceeded {
+            color: #B91C1C;
+            background: #FEF2F2;
+            border-color: #FCA5A5;
+        }
+
+        .status-pill--sla-exceeded .dot {
+            background: #DC2626;
+        }
+
+        /* Type pill (profil type : BrandUP / TraceUP / LinkUP) */
+        .profile-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 11px;
+            font-weight: 700;
+            padding: 3px 8px;
+            border-radius: 4px;
+            letter-spacing: 0.02em;
+        }
+
+        .profile-pill .material-symbols-outlined {
+            font-size: 13px;
+        }
+
+        .profile-pill--brandup {
+            background: #EFF6FC;
+            color: #0078D4;
+        }
+
+        .profile-pill--traceup {
+            background: #F3EFFA;
+            color: #5C2D91;
+        }
+
+        .profile-pill--linkup {
+            background: #F5F5F5;
+            color: #242424;
+        }
+
+        /* Type pill (B2B/B2C) */
+        .type-pill {
+            display: inline-flex;
+            align-items: center;
+            font-size: 10.5px;
+            font-weight: 700;
+            padding: 2px 7px;
+            border-radius: 4px;
+            letter-spacing: 0.02em;
+        }
+
+        .type-pill--b2b {
+            background: #EBE2F5;
+            color: #5C2D91;
+        }
+
+        .type-pill--b2c {
+            background: #FEF3C7;
+            color: #92400E;
+        }
+
+        /* KPI inline */
+        .kpi-inline {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 14px;
+            background: white;
+            border: 1px solid var(--border-default);
+            border-radius: 8px;
+            min-width: 0;
+            flex: 1;
+        }
+
+        .kpi-inline__value {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--text-primary);
+            line-height: 1;
+        }
+
+        .kpi-inline__label {
+            font-size: 11px;
+            color: var(--text-secondary);
+            line-height: 1.2;
+        }
+
+        /* Table */
+        .queue-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .queue-table thead th {
+            background: #FAFAFA;
+            border-bottom: 1px solid var(--border-default);
+            padding: 10px 16px;
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--text-secondary);
+            text-align: left;
+            letter-spacing: 0.04em;
+            text-transform: uppercase;
+            white-space: nowrap;
+        }
+
+        .queue-table tbody tr {
+            border-bottom: 1px solid #F0F0F0;
+            transition: background 0.1s ease;
+            cursor: pointer;
+        }
+
+        .queue-table tbody tr:hover {
+            background: #FAFAFA;
+        }
+
+        .queue-table tbody tr:last-child {
+            border-bottom: none;
+        }
+
+        .queue-table tbody td {
+            padding: 14px 16px;
+            font-size: 13px;
+            color: var(--text-primary);
+            vertical-align: middle;
+        }
+
+        /* Avatars */
+        .avatar {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            font-weight: 700;
+            color: white;
+            flex-shrink: 0;
+        }
+
+        .avatar--sm {
+            width: 32px;
+            height: 32px;
+            font-size: 11px;
+        }
+
+        .avatar--md {
+            width: 40px;
+            height: 40px;
+            font-size: 13px;
+        }
+
+        /* Profile logo thumb (colored square for content preview) */
+        .profile-thumb {
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-weight: 800;
+            font-size: 13px;
+            letter-spacing: -0.02em;
+            flex-shrink: 0;
+        }
+
+        *:focus-visible {
+            outline: 2px solid var(--admin-primary);
+            outline-offset: 2px;
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #D1D1D1;
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #A19F9D;
+        }
+
+        @media (max-width: 768px) {
+            #sidebar {
+                transform: translateX(-100%);
+                transition: transform 0.3s ease;
+            }
+
+            #sidebar.open {
+                transform: translateX(0);
+            }
+
+            #backdrop {
+                display: none;
+            }
+
+            #backdrop.show {
+                display: block;
+            }
+
+            .queue-table thead {
+                display: none;
+            }
+
+            .queue-table,
+            .queue-table tbody,
+            .queue-table tr,
+            .queue-table td {
+                display: block;
+                width: 100%;
+            }
+
+            .queue-table tbody tr {
+                border: 1px solid var(--border-default);
+                border-radius: 8px;
+                margin-bottom: 12px;
+                padding: 8px;
+            }
+
+            .queue-table td {
+                padding: 6px 8px;
+                border: none !important;
+            }
+
+            .queue-table td[data-label]::before {
+                content: attr(data-label);
+                display: block;
+                font-size: 10px;
+                font-weight: 700;
+                color: var(--text-tertiary);
+                text-transform: uppercase;
+                letter-spacing: 0.04em;
+                margin-bottom: 2px;
+            }
+        }
+
+        /* Badge "Modif" (pour distinguer les modifs des nouvelles soumissions dans la même table) */
+        .type-pill--modif {
+            background: #FFFBEB;
+            color: #92400E;
+            border: 1px solid #FDE68A;
+        }
+        .type-pill--new {
+            background: #F3EFFA;
+            color: #5C2D91;
+            border: 1px solid #D6C7EA;
+        }
+    </style>
+</head>
+
+<body class="min-h-screen">
+
+    <div id="backdrop" class="fixed inset-0 bg-black/30 z-40 hidden md:hidden" aria-hidden="true"></div>
+
+    <div class="flex">
+
+        <!-- SIDEBAR -->
+        <aside id="sidebar"
+            class="fixed top-0 left-0 w-60 h-screen bg-white border-r border-[#E0E0E0] z-50 flex flex-col">
+
+            <a href="admin_dashboard.html"
+                class="flex items-center gap-2.5 px-5 py-4 border-b border-[#E0E0E0] shrink-0 h-14 hover:bg-[#FAFAFA] transition-colors"
+                title="Retour au tableau de bord admin">
+                <span class="material-symbols-outlined icon-fill text-[#5C2D91]"
+                    style="font-size:22px">shield_person</span>
+                <div class="leading-tight min-w-0">
+                    <div class="text-[#242424] font-heading font-bold text-[15px] tracking-tight">MARKET-UP</div>
+                    <div class="text-[10px] text-[#5C2D91] tracking-wide font-semibold uppercase">Admin</div>
+                </div>
+            </a>
+
+            <nav class="flex-1 overflow-y-auto px-3 py-2">
+                <div class="nav-group-label">Tableau de bord</div>
+                <a href="admin_dashboard.html" class="nav-item">
+                    <span class="material-symbols-outlined">dashboard</span>
+                    <span class="flex-1 min-w-0 truncate">Vue d'ensemble</span>
+                </a>
+
+                <div class="nav-group-label">Validations</div>
+                <a href="admin_validation-comptes.html" class="nav-item">
+                    <span class="material-symbols-outlined">person_check</span>
+                    <span class="flex-1 min-w-0 truncate">Comptes</span>
+                    <span class="nav-pill nav-pill--count-amber" data-pill="comptes">11</span>
+                </a>
+                <a href="admin_validation-profils.html" class="nav-item active">
+                    <span class="material-symbols-outlined">fact_check</span>
+                    <span class="flex-1 min-w-0 truncate">Profils</span>
+                    <span class="nav-pill nav-pill--count-amber" data-pill="profils">10</span>
+                </a>
+                <a href="admin_validation-rse.html" class="nav-item">
+                    <span class="material-symbols-outlined">volunteer_activism</span>
+                    <span class="flex-1 min-w-0 truncate">Reçus RSE</span>
+                    <span class="nav-pill nav-pill--count-amber" data-pill="rse">3</span>
+                </a>
+
+                <div class="nav-group-label">Gestion</div>
+                <a href="admin_entreprises.html" class="nav-item">
+                    <span class="material-symbols-outlined">business</span>
+                    <span class="flex-1 min-w-0 truncate">Entreprises</span>
+                </a>
+            
+
+                
+
+                <div class="nav-group-label">Finances</div>
+                <a href="admin_transactions.html" class="nav-item">
+                    <span class="material-symbols-outlined">receipt_long</span>
+                    <span class="flex-1 min-w-0 truncate">Transactions</span>
+                </a>
+                
+            </nav>
+
+            <div class="border-t border-[#E0E0E0] p-3">
+                <div class="flex items-center gap-2.5 px-2 py-2 rounded-lg hover:bg-[#FAFAFA] transition-colors">
+                    <div class="avatar avatar--sm" style="background:#5C2D91;">BA</div>
+                    <div class="leading-tight min-w-0 flex-1">
+                        <div class="text-[12.5px] font-semibold text-[#242424] truncate">Bassem Admin</div>
+                        <div class="text-[10px] text-[#8A8886] truncate">Super administrateur</div>
+                    </div>
+                    <button
+                        class="p-1.5 rounded hover:bg-[#F5F5F5] text-[#8A8886] hover:text-[#B91C1C] transition-colors"
+                        title="Se déconnecter" aria-label="Se déconnecter" onclick="window.location.href='auth_connexion.html';">
+                        <span class="material-symbols-outlined" style="font-size:16px">logout</span>
+                    </button>
+                </div>
+            </div>
+        </aside>
+
+        <!-- MAIN CONTENT -->
+        <div class="flex-1 md:ml-60 min-h-screen flex flex-col">
+
+            <header
+                class="sticky top-0 z-30 bg-white border-b border-[#E0E0E0] h-14 flex items-center px-4 md:px-6 shrink-0">
+                <button id="menuBtn" class="md:hidden mr-3 p-2 rounded hover:bg-[#F5F5F5] transition-colors"
+                    aria-label="Ouvrir le menu">
+                    <span class="material-symbols-outlined text-[#242424]">menu</span>
+                </button>
+                <div class="min-w-0 leading-tight flex-1">
+                    <nav class="hidden md:flex items-center gap-1.5 text-[11px] text-[#8A8886] mb-0.5"
+                        aria-label="Fil d'Ariane">
+                        <a href="admin_dashboard.html" class="hover:text-[#5C2D91] hover:underline transition-colors">Dashboard</a>
+                        <span class="material-symbols-outlined" style="font-size:12px">chevron_right</span>
+                        <span class="text-[#8A8886]">Validations</span>
+                        <span class="material-symbols-outlined" style="font-size:12px">chevron_right</span>
+                        <span class="text-[#616161] font-medium">Profils</span>
+                    </nav>
+                    <h1 class="font-heading text-[16px] font-bold text-[#242424] truncate">Validation des profils</h1>
+                </div>
+                <div class="flex items-center gap-2 ml-3">
+                    <button id="bellBtn" class="relative p-2 rounded-lg hover:bg-[#F5F5F5] transition-colors"
+                        aria-label="Notifications admin">
+                        <span class="material-symbols-outlined text-[#242424]">notifications</span>
+                        <span
+                            class="absolute top-1 right-1 w-4 h-4 bg-[#DC2626] text-white text-[9px] font-bold rounded-full flex items-center justify-center">5</span>
+                    </button>
+                    <button id="avatarBtn"
+                        class="flex items-center gap-2 px-1 py-1 rounded-lg hover:bg-[#F5F5F5] transition-colors"
+                        aria-label="Menu admin">
+                        <div class="avatar avatar--sm" style="background:#5C2D91;">BA</div>
+                        <span class="material-symbols-outlined text-[#8A8886] hidden md:inline"
+                            style="font-size:16px">expand_more</span>
+                    </button>
+                </div>
+            </header>
+
+            <main class="flex-1 p-4 md:p-8">
+                <div class="max-w-[1280px] mx-auto">
+
+                    <div class="mb-6">
+                        <h2 class="font-heading text-[22px] md:text-[26px] font-bold text-[#242424] mb-1">
+                            Profils en attente de validation
+                        </h2>
+                        <p class="text-[13px] text-[#616161]">
+                            File d'attente FIFO — BrandUP, TraceUP et LinkUP · SLA 48h
+                        </p>
+                    </div>
+
+                    <!-- KPI BAR (2 cellules seulement) -->
+                    <div class="flex flex-col sm:flex-row gap-3 mb-6">
+                        <div class="kpi-inline">
+                            <span class="material-symbols-outlined text-[#D97706]"
+                                style="font-size:24px">schedule</span>
+                            <div class="min-w-0">
+                                <div class="kpi-inline__value" id="kpi-total">10</div>
+                                <div class="kpi-inline__label">en attente</div>
+                            </div>
+                        </div>
+                        <div class="kpi-inline">
+                            <span class="material-symbols-outlined text-[#DC2626]" style="font-size:24px">error</span>
+                            <div class="min-w-0">
+                                <div class="kpi-inline__value" id="kpi-sla"><span class="text-[#B91C1C]">3</span></div>
+                                <div class="kpi-inline__label">SLA dépassé</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- TABLE -->
+                    <div class="card overflow-hidden">
+                        <div class="overflow-x-auto">
+                            <table class="queue-table">
+                                <thead>
+                                    <tr>
+                                        <th>Profil</th>
+                                        <th>Entreprise</th>
+                                        <th>Type</th>
+                                        <th>Soumis</th>
+                                        <th style="text-align:right">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="queue-body"></tbody>
+                            </table>
+                        </div>
+                        <div class="flex items-center justify-between px-4 py-3 border-t border-[#E0E0E0] bg-[#FAFAFA]">
+                            <span class="text-[12px] text-[#616161]">
+                                <span id="queue-count" class="font-semibold text-[#242424]">10</span> profil(s) en
+                                attente
+                            </span>
+                            <span class="text-[11px] text-[#8A8886] flex items-center gap-1">
+                                <span class="material-symbols-outlined" style="font-size:14px">sort</span>
+                                Tri FIFO (plus ancien en haut)
+                            </span>
+                        </div>
+                    </div>
+
+                </div>
+            </main>
+
+        </div>
+
+    </div>
+
+    <script>
+        (function () {
+            const data = window.MARKETUP_DATA;
+            if (!data) { console.error('admin_data.js non chargé'); return; }
+
+            const NOW = new Date('2026-04-20T14:00:00Z');
+            const SLA_HOURS = data.platform_settings?.sla?.profile_validation_hours || 48;
+
+            const PROFILE_META = {
+                brandup: { label: 'BrandUP', icon: 'storefront', detail: 'admin_brandup-detail.html' },
+                traceup: { label: 'TraceUP', icon: 'play_circle', detail: 'admin_traceup-detail.html' },
+                linkup: { label: 'LinkUP', icon: 'qr_code_2', detail: 'admin_linkup-detail.html' }
+            };
+
+            function getHoursElapsed(iso) {
+                return Math.floor((NOW - new Date(iso)) / (1000 * 60 * 60));
+            }
+            function isSlaExceeded(iso) { return getHoursElapsed(iso) > SLA_HOURS; }
+            function formatRelativeTime(iso) {
+                const h = getHoursElapsed(iso);
+                if (h < 1) return 'il y a quelques minutes';
+                if (h < 24) return `il y a ${h} h`;
+                const d = Math.floor(h / 24);
+                return d === 1 ? 'il y a 1 jour' : `il y a ${d} jours`;
+            }
+            function escapeHtml(s) {
+                if (s == null) return '';
+                return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+                    .replace(/"/g, '&quot;').replace(/'/g, '&#039;');
+            }
+
+            // Récupérer tous les profils pending OU avec modifs en attente (unified queue)
+            //  - kind 'new'   : nouvelle soumission (status === 'pending')
+            //  - kind 'modif' : modifs sur profil active (status === 'active' && pending_data)
+            const pendingProfiles = [];
+            data.companies.forEach(c => {
+                ['brandup', 'traceup', 'linkup'].forEach(k => {
+                    const p = c.profiles[k];
+                    if (!p) return;
+                    if (p.status === 'pending') {
+                        pendingProfiles.push({
+                            company: c,
+                            type: k,
+                            profile: p,
+                            kind: 'new',
+                            submitted_at: p.submitted_at || c.registered_at,
+                            pending_data: null,
+                        });
+                    } else if (p.status === 'active' && p.pending_data) {
+                        pendingProfiles.push({
+                            company: c,
+                            type: k,
+                            profile: p,
+                            kind: 'modif',
+                            submitted_at: p.pending_data.submittedAt || c.registered_at,
+                            pending_data: p.pending_data,
+                        });
+                    }
+                });
+            });
+            // FIFO : plus ancien en haut
+            pendingProfiles.sort((a, b) => new Date(a.submitted_at) - new Date(b.submitted_at));
+
+            // Counters sidebar (cohérent avec les autres pages admin)
+            (function updateCounters() {
+                const comptesNew = data.companies.filter(c => c.status === 'pending').length;
+                const updatesP = data.companies.filter(c => c.pending_updates).length;
+                const rseCount = data.rse_receipts.filter(r => r.status === 'pending').length;
+                const litigesCount = data.disputes.filter(d => d.status === 'open').length;
+
+                document.querySelectorAll('[data-pill="comptes"]').forEach(el => el.textContent = comptesNew + updatesP);
+                document.querySelectorAll('[data-pill="profils"]').forEach(el => el.textContent = pendingProfiles.length);
+                document.querySelectorAll('[data-pill="rse"]').forEach(el => el.textContent = rseCount);
+                document.querySelectorAll('[data-pill="litiges"]').forEach(el => el.textContent = litigesCount);
+            })();
+
+            // KPI (2 cellules)
+            const slaExceeded = pendingProfiles.filter(p => isSlaExceeded(p.submitted_at)).length;
+            document.getElementById('kpi-total').textContent = pendingProfiles.length;
+            document.getElementById('kpi-sla').innerHTML =
+                slaExceeded > 0 ? `<span class="text-[#B91C1C]">${slaExceeded}</span>` : '0';
+            document.getElementById('queue-count').textContent = pendingProfiles.length;
+
+            // Render table
+            const tbody = document.getElementById('queue-body');
+            pendingProfiles.forEach(item => {
+                const c = item.company;
+                const type = item.type;
+                const p = item.profile;
+                const meta = PROFILE_META[type];
+                const hours = getHoursElapsed(item.submitted_at);
+                const slaExc = isSlaExceeded(item.submitted_at);
+
+                // Logo / thumbnail
+                const content = p.content || {};
+                const logoBg = content.logo_bg || '#5C2D91';
+                const logoInitials = content.logo_initials || c.name.substring(0, 2).toUpperCase();
+
+                // Profile display name
+                const profileTitle = (type === 'linkup' && content.card_name) ? content.card_name
+                    : (type === 'traceup' && content.channel_name) ? content.channel_name
+                        : c.name;
+                const profileSubtitle = content.role || (content.pitch ? content.pitch.substring(0, 60) + '…' : '');
+
+                const slaPill = slaExc
+                    ? `<span class="status-pill status-pill--sla-exceeded"><span class="dot"></span>SLA dépassé · ${hours}h</span>`
+                    : `<span class="status-pill status-pill--sla-ok"><span class="dot"></span>${hours}h / 48h</span>`;
+
+                const typePill = c.type === 'B2B'
+                    ? `<span class="type-pill type-pill--b2b">B2B</span>`
+                    : `<span class="type-pill type-pill--b2c">B2C</span>`;
+
+                const detailUrl = `${meta.detail}?id=${encodeURIComponent(c.id)}`;
+
+                const tr = document.createElement('tr');
+                tr.dataset.url = detailUrl;
+                tr.innerHTML = `
+                    <td data-label="Profil">
+                        <div class="flex items-center gap-3 min-w-0">
+                            <div class="profile-thumb" style="background:${logoBg}">
+                                ${escapeHtml(logoInitials)}
+                            </div>
+                            <div class="min-w-0">
+                                <div class="font-semibold text-[#242424] truncate">${escapeHtml(profileTitle)}</div>
+                                <div class="text-[11px] text-[#8A8886] truncate">${escapeHtml(profileSubtitle)}</div>
+                            </div>
+                        </div>
+                    </td>
+                    <td data-label="Entreprise">
+                        <div class="text-[13px] font-medium text-[#242424] truncate">${escapeHtml(c.name)}</div>
+                        <div class="flex items-center gap-1.5 mt-0.5">
+                            ${typePill}
+                            <span class="text-[11px] text-[#8A8886] truncate">${escapeHtml(c.city)}</span>
+                        </div>
+                    </td>
+                    <td data-label="Type">
+                        <span class="profile-pill profile-pill--${type}">
+                            <span class="material-symbols-outlined icon-fill">${meta.icon}</span>
+                            ${meta.label}
+                        </span>
+                        <div class="mt-1">
+                            ${item.kind === 'modif'
+                                ? `<span class="type-pill type-pill--modif">Modif</span>`
+                                : `<span class="type-pill type-pill--new">Nouveau</span>`}
+                        </div>
+                    </td>
+                    <td data-label="Soumis">
+                        <div class="text-[12.5px] text-[#242424]">${formatRelativeTime(item.submitted_at)}</div>
+                        <div class="mt-1">${slaPill}</div>
+                    </td>
+                    <td data-label="Actions" style="text-align:right">
+                        <a href="${detailUrl}" class="btn btn-ghost" data-action="view-profile">
+                            <span class="material-symbols-outlined">open_in_new</span>
+                            Voir le profil
+                        </a>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+
+            // Clic ligne → redirection
+            tbody.querySelectorAll('tr').forEach(tr => {
+                tr.addEventListener('click', (e) => {
+                    if (e.target.closest('a')) return;
+                    window.location.href = tr.dataset.url;
+                });
+            });
+
+            // Sidebar mobile
+            const sidebar = document.getElementById('sidebar');
+            const backdrop = document.getElementById('backdrop');
+            document.getElementById('menuBtn')?.addEventListener('click', () => {
+                sidebar.classList.add('open');
+                backdrop.classList.add('show');
+            });
+            backdrop?.addEventListener('click', () => {
+                sidebar.classList.remove('open');
+                backdrop.classList.remove('show');
+            });
+        })();
+    </script>
+</body>
+
+</html>
