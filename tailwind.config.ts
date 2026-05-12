@@ -9,8 +9,88 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        background: "var(--background)",
-        foreground: "var(--foreground)",
+        // Brand primary (BrandUP blue, the default app accent)
+        primary: {
+          DEFAULT: "#0078D4",
+          hover: "#106EBE",
+          dark: "#005A9E",
+          light: "#EFF6FC",
+        },
+
+        // Brand accents per product
+        traceup: {
+          DEFAULT: "#8764B8",
+        },
+        linkup: {
+          black: "#000000",
+          gold: "#C5A059",
+        },
+
+        // Admin workspace accent
+        admin: {
+          DEFAULT: "#5C2D91",
+          hover: "#4A2375",
+          dark: "#3D1F60",
+          light: "#F3EFFA",
+          tint: "#EBE2F5",
+        },
+
+        // Neutral palette (Fluent flat)
+        ink: {
+          primary: "#242424",
+          secondary: "#616161",
+          tertiary: "#8A8886",
+        },
+        surface: {
+          DEFAULT: "#FFFFFF",
+          subtle: "#FAFAFA",
+          muted: "#F5F5F5",
+          strong: "#EFEDED",
+          border: "#E0E0E0",
+        },
+
+        // Semantic status palette (status pills)
+        status: {
+          "draft-fg": "#475569",
+          "draft-bg": "#F1F5F9",
+          "draft-border": "#CBD5E1",
+          "draft-dot": "#64748B",
+          "pending-fg": "#92400E",
+          "pending-bg": "#FFFBEB",
+          "pending-border": "#FDE68A",
+          "pending-dot": "#D97706",
+          "active-fg": "#107C10",
+          "active-bg": "#F0FDF4",
+          "active-border": "#B7EBC0",
+          "active-dot": "#107C10",
+          "rejected-fg": "#B91C1C",
+          "rejected-bg": "#FEF2F2",
+          "rejected-border": "#FCA5A5",
+          "rejected-dot": "#DC2626",
+          "disabled-fg": "#616161",
+          "disabled-bg": "#F5F5F5",
+          "disabled-border": "#E0E0E0",
+          "disabled-dot": "#8A8886",
+          "gold-fg": "#8A6A1F",
+          "gold-bg": "#FEFCE8",
+          "gold-border": "#E8C96A",
+          "gold-dot": "#C5A059",
+        },
+      },
+      fontFamily: {
+        heading: ["'Plus Jakarta Sans'", "sans-serif"],
+        body: ["Inter", "sans-serif"],
+      },
+      borderRadius: {
+        DEFAULT: "4px",
+        lg: "8px",
+        xl: "12px",
+        // DO NOT add 2xl / 3xl — Fluent flat scale only
+      },
+      boxShadow: {
+        card: "0 2px 4px rgba(0,0,0,0.08)",
+        "card-hover": "0 4px 16px rgba(0,0,0,0.12)",
+        modal: "0 8px 32px rgba(0,0,0,0.16)",
       },
     },
   },
