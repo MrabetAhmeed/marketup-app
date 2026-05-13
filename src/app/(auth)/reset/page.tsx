@@ -6,8 +6,12 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import Link from "next/link";
 import { z } from "zod";
+import AuthErrorBanner from "@/components/shared/AuthErrorBanner";
 import AuthLeftPanel from "@/components/shared/AuthLeftPanel";
 import PasswordInput from "@/components/shared/PasswordInput";
+import { useToast } from "@/components/shared/Toast";
+import { getAuthErrorMessage } from "@/lib/auth-error-messages";
+import type { ErrorMapEntry } from "@/lib/auth-error-messages";
 
 // Extended schema with passwordConfirm + refine for this page
 
@@ -41,7 +45,8 @@ export default function ResetPasswordPage(): JSX.Element {
   const searchParams = useSearchParams();
   const token = searchParams.get("token");
   const [state, setState] = useState<"form" | "success">("form");
-  const [serverError, setServerError] = useState("");
+  const { showToast } = useToast();
+  const [errorEntry, setErrorEntry] = useState<ErrorMapEntry | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const [confirmVisible, setConfirmVisible] = useState(false);
 
@@ -61,7 +66,7 @@ export default function ResetPasswordPage(): JSX.Element {
   const onSubmit = useCallback(
     async (data: ResetFormInput) => {
       if (!token) return;
-      setServerError("");
+      setErrorEntry(null);
       setSubmitting(true);
 
       if (process.env.NODE_ENV === "development") {
@@ -76,17 +81,23 @@ export default function ResetPasswordPage(): JSX.Element {
         });
         const json = await res.json();
         if (!res.ok) {
-          setServerError(json.error?.message || "Une erreur est survenue.");
+          const code = json.error?.code || "SERVER_ERROR";
+          const entry = getAuthErrorMessage(code);
+          if (entry.presentation === "toast") {
+            showToast(entry.message);
+          } else {
+            setErrorEntry(entry);
+          }
           return;
         }
         setState("success");
       } catch {
-        setServerError("Erreur réseau. Vérifiez votre connexion.");
+        showToast(getAuthErrorMessage("NETWORK_ERROR").message);
       } finally {
         setSubmitting(false);
       }
     },
-    [token],
+    [token, showToast],
   );
 
   // Missing token state
@@ -147,12 +158,7 @@ export default function ResetPasswordPage(): JSX.Element {
                   </p>
                 </header>
 
-                {serverError && (
-                  <div className="mb-6 flex items-start gap-2.5 p-4 bg-[#FDE7E9] border border-[#D13438] rounded text-[13px] text-[#A4262C]" role="alert">
-                    <span className="material-symbols-outlined text-xl">error</span>
-                    <p>{serverError}</p>
-                  </div>
-                )}
+                {errorEntry && <AuthErrorBanner entry={errorEntry} />}
 
                 {/* eslint-disable-next-line @typescript-eslint/no-misused-promises */}
                 <form onSubmit={handleSubmit(

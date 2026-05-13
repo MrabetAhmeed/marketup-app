@@ -5,14 +5,19 @@ import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import Link from "next/link";
+import AuthErrorBanner from "@/components/shared/AuthErrorBanner";
 import AuthLeftPanel from "@/components/shared/AuthLeftPanel";
 import PasswordInput from "@/components/shared/PasswordInput";
+import { useToast } from "@/components/shared/Toast";
+import { getAuthErrorMessage } from "@/lib/auth-error-messages";
+import type { ErrorMapEntry } from "@/lib/auth-error-messages";
 import { SignupUserSchema } from "@/schemas/auth.schema";
 import type { SignupUserInput } from "@/schemas/auth.schema";
 
 export default function SignupUserPage(): JSX.Element {
   const router = useRouter();
-  const [serverError, setServerError] = useState("");
+  const { showToast } = useToast();
+  const [errorEntry, setErrorEntry] = useState<ErrorMapEntry | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const [accountEmail, setAccountEmail] = useState("");
   const [userId, setUserId] = useState("");
@@ -50,7 +55,7 @@ export default function SignupUserPage(): JSX.Element {
   const passwordConfirm = watch("passwordConfirm") || "";
 
   const onSubmit = async (data: SignupUserInput) => {
-    setServerError("");
+    setErrorEntry(null);
     setSubmitting(true);
     try {
       const res = await fetch("/api/v1/auth/signup/user", {
@@ -63,12 +68,18 @@ export default function SignupUserPage(): JSX.Element {
       });
       const json = await res.json();
       if (!res.ok) {
-        setServerError(json.error?.message || "Une erreur est survenue.");
+        const code = json.error?.code || "SERVER_ERROR";
+        const entry = getAuthErrorMessage(code);
+        if (entry.presentation === "toast") {
+          showToast(entry.message);
+        } else {
+          setErrorEntry(entry);
+        }
         return;
       }
       router.push("/signup/verify");
     } catch {
-      setServerError("Erreur réseau. Vérifiez votre connexion.");
+      showToast(getAuthErrorMessage("NETWORK_ERROR").message);
     } finally {
       setSubmitting(false);
     }
@@ -103,12 +114,7 @@ export default function SignupUserPage(): JSX.Element {
               <p className="text-[#616161] text-base">Configurez votre accès personnel à la plateforme.</p>
             </header>
 
-            {serverError && (
-              <div className="mb-6 flex items-start gap-2.5 p-4 bg-[#FDE7E9] border border-[#D13438] rounded text-[13px] text-[#A4262C]" role="alert">
-                <span className="material-symbols-outlined text-xl">error</span>
-                <p>{serverError}</p>
-              </div>
-            )}
+            {errorEntry && <AuthErrorBanner entry={errorEntry} />}
 
             {/* eslint-disable-next-line @typescript-eslint/no-misused-promises */}
             <form onSubmit={handleSubmit(

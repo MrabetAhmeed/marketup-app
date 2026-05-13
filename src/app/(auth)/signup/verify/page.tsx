@@ -5,6 +5,8 @@ import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import AuthLeftPanel from "@/components/shared/AuthLeftPanel";
 import OtpInput from "@/components/shared/OtpInput";
+import { useToast } from "@/components/shared/Toast";
+import { getAuthErrorMessage } from "@/lib/auth-error-messages";
 
 export default function SignupVerifyPage(): JSX.Element {
   const router = useRouter();
@@ -12,6 +14,7 @@ export default function SignupVerifyPage(): JSX.Element {
   const [userId, setUserId] = useState("");
   const [accountEmail, setAccountEmail] = useState("");
   const [otpCode, setOtpCode] = useState("");
+  const { showToast } = useToast();
   const [error, setError] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [countdown, setCountdown] = useState(60);
@@ -66,7 +69,9 @@ export default function SignupVerifyPage(): JSX.Element {
         });
         const json = await res.json();
         if (!res.ok) {
-          setError(json.error?.message || "Une erreur est survenue.");
+          const code = json.error?.code || "SERVER_ERROR";
+          const entry = getAuthErrorMessage(code);
+          setError(entry.message);
           return;
         }
         // Clear signup state
@@ -74,12 +79,12 @@ export default function SignupVerifyPage(): JSX.Element {
         sessionStorage.removeItem("signupEmail");
         router.push("/signup/success");
       } catch {
-        setError("Erreur réseau. Vérifiez votre connexion.");
+        showToast(getAuthErrorMessage("NETWORK_ERROR").message);
       } finally {
         setSubmitting(false);
       }
     },
-    [otpCode, userId, router],
+    [otpCode, userId, router, showToast],
   );
 
   const handleResend = useCallback(async () => {

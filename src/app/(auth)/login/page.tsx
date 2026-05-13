@@ -4,9 +4,13 @@ import { useState, useCallback } from "react";
 import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import AuthErrorBanner from "@/components/shared/AuthErrorBanner";
 import AuthLeftPanel from "@/components/shared/AuthLeftPanel";
+import { useToast } from "@/components/shared/Toast";
+import { getAuthErrorMessage } from "@/lib/auth-error-messages";
+import type { ErrorMapEntry } from "@/lib/auth-error-messages";
 
-interface LoginError {
+interface ParsedError {
   code: string;
   message: string;
   status: number;
@@ -15,17 +19,20 @@ interface LoginError {
 
 export default function LoginPage(): JSX.Element {
   const router = useRouter();
+  const { showToast } = useToast();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [passwordVisible, setPasswordVisible] = useState(false);
   const [rememberMe, setRememberMe] = useState(false);
-  const [error, setError] = useState<LoginError | null>(null);
+  const [errorEntry, setErrorEntry] = useState<ErrorMapEntry | null>(null);
+  const [hasError, setHasError] = useState(false);
   const [submitting, setSubmitting] = useState(false);
 
   const handleSubmit = useCallback(
     async (e: React.FormEvent) => {
       e.preventDefault();
-      setError(null);
+      setErrorEntry(null);
+      setHasError(false);
       setSubmitting(true);
 
       if (process.env.NODE_ENV === "development") {
@@ -40,12 +47,11 @@ export default function LoginPage(): JSX.Element {
         });
 
         if (result?.error) {
-          // NextAuth wraps authorize() errors in result.error
           try {
-            const parsed: LoginError = JSON.parse(result.error);
+            const parsed: ParsedError = JSON.parse(result.error);
 
+            // EMAIL_NOT_VERIFIED: auto-resend + redirect
             if (parsed.code === "EMAIL_NOT_VERIFIED" && parsed.details?.userId) {
-              // Auto-resend OTP + redirect to verify
               try {
                 await fetch("/api/v1/auth/email/resend-validation", {
                   method: "POST",
@@ -53,82 +59,43 @@ export default function LoginPage(): JSX.Element {
                   body: JSON.stringify({ email }),
                 });
               } catch {
-                // Best-effort — silent
+                // Best-effort
               }
+              const entry = getAuthErrorMessage("EMAIL_NOT_VERIFIED");
+              showToast(entry.message);
               router.push(`/signup/verify?userId=${parsed.details.userId}`);
               return;
             }
 
-            setError(parsed);
+            // COMPANY_NOT_ACTIVE with sub-status
+            const entry =
+              parsed.code === "COMPANY_NOT_ACTIVE" && parsed.details?.status
+                ? getAuthErrorMessage(parsed.code, parsed.details.status)
+                : getAuthErrorMessage(parsed.code);
+
+            if (entry.presentation === "toast") {
+              showToast(entry.message);
+            } else {
+              setErrorEntry(entry);
+              setHasError(true);
+            }
           } catch {
-            // Unparseable error — generic credentials error
-            setError({
-              code: "INVALID_CREDENTIALS",
-              message: "Email ou mot de passe incorrect.",
-              status: 401,
-            });
+            const entry = getAuthErrorMessage("INVALID_CREDENTIALS");
+            setErrorEntry(entry);
+            setHasError(true);
           }
         } else if (result?.ok) {
           router.push("/dashboard");
         }
       } catch {
-        setError({
-          code: "NETWORK_ERROR",
-          message: "Erreur réseau. Vérifiez votre connexion.",
-          status: 0,
-        });
+        const entry = getAuthErrorMessage("NETWORK_ERROR");
+        showToast(entry.message);
       } finally {
         setSubmitting(false);
       }
     },
-    [email, password, router],
+    [email, password, router, showToast],
   );
-
-  // Error banner content
-  const errorBanner = (() => {
-    if (!error) return null;
-    switch (error.code) {
-      case "INVALID_CREDENTIALS":
-        return {
-          title: "Email ou mot de passe incorrect",
-          subtitle: "Vérifiez vos informations et réessayez.",
-        };
-      case "SIGNUP_INCOMPLETE":
-        return {
-          title: "Inscription incomplète",
-          subtitle: "Finalisez votre inscription pour accéder à votre compte.",
-          action: { label: "Continuer l'inscription", href: "/signup/company" },
-        };
-      case "COMPANY_NOT_ACTIVE":
-        if (error.details?.status === "pending") {
-          return {
-            title: "Compte en attente de validation",
-            subtitle: "Votre compte est en attente de validation par notre équipe.",
-          };
-        }
-        if (error.details?.status === "rejected") {
-          return {
-            title: "Compte refusé",
-            subtitle: "Votre compte a été refusé. Contactez le support pour plus d'informations.",
-          };
-        }
-        if (error.details?.status === "suspended") {
-          return {
-            title: "Compte suspendu",
-            subtitle: "Votre compte est suspendu. Contactez le support.",
-          };
-        }
-        return {
-          title: "Compte inactif",
-          subtitle: error.message,
-        };
-      default:
-        return {
-          title: "Erreur",
-          subtitle: error.message,
-        };
-    }
-  })();
 
   return (
     <>
@@ -153,19 +120,8 @@ export default function LoginPage(): JSX.Element {
             </header>
 
             {/* Error banner */}
-            {errorBanner && (
-              <div className="mb-6 flex items-start gap-2.5 p-3 bg-[#FDE7E9] border border-[#D13438] rounded text-[13px] text-[#A4262C]" role="alert">
-                <span className="material-symbols-outlined text-xl">error</span>
-                <div>
-                  <p className="font-semibold">{errorBanner.title}</p>
-                  <p className="text-xs mt-1 opacity-80">{errorBanner.subtitle}</p>
-                  {errorBanner.action && (
-                    <Link href={errorBanner.action.href} className="inline-block mt-2 text-xs font-semibold text-[#0078D4] hover:underline">
-                      {errorBanner.action.label}
-                    </Link>
-                  )}
-                </div>
-              </div>
+            {errorEntry && errorEntry.presentation === "banner" && (
+              <AuthErrorBanner entry={errorEntry} />
             )}
 
             <form onSubmit={handleSubmit} className="space-y-5">
@@ -179,7 +135,7 @@ export default function LoginPage(): JSX.Element {
                   autoFocus
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className={`w-full px-3.5 py-2.5 bg-white border rounded text-sm text-[#242424] placeholder:text-[#8A8886] focus:border-[#0078D4] focus:outline-none focus:ring-2 focus:ring-[#EFF6FC] ${error ? "border-[#D13438]" : "border-[#D1D1D1]"}`}
+                  className={`w-full px-3.5 py-2.5 bg-white border rounded text-sm text-[#242424] placeholder:text-[#8A8886] focus:border-[#0078D4] focus:outline-none focus:ring-2 focus:ring-[#EFF6FC] ${hasError ? "border-[#D13438]" : "border-[#D1D1D1]"}`}
                   placeholder="contact@votre-entreprise.tn"
                 />
               </div>
@@ -194,7 +150,7 @@ export default function LoginPage(): JSX.Element {
                     required
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    className={`w-full px-3.5 py-2.5 bg-white border rounded text-sm text-[#242424] placeholder:text-[#8A8886] focus:border-[#0078D4] focus:outline-none focus:ring-2 focus:ring-[#EFF6FC] pr-12 ${error ? "border-[#D13438]" : "border-[#D1D1D1]"}`}
+                    className={`w-full px-3.5 py-2.5 bg-white border rounded text-sm text-[#242424] placeholder:text-[#8A8886] focus:border-[#0078D4] focus:outline-none focus:ring-2 focus:ring-[#EFF6FC] pr-12 ${hasError ? "border-[#D13438]" : "border-[#D1D1D1]"}`}
                     placeholder="Votre mot de passe"
                   />
                   <button
