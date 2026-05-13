@@ -47,7 +47,7 @@ export default function SignupUserPage(): JSX.Element {
   }, [userId, setValue]);
 
   const password = watch("password") || "";
-  const passwordConfirm = watch("passwordConfirm" as keyof SignupUserInput) as string | undefined;
+  const passwordConfirm = watch("passwordConfirm") || "";
 
   const onSubmit = async (data: SignupUserInput) => {
     setServerError("");
@@ -76,12 +76,6 @@ export default function SignupUserPage(): JSX.Element {
 
   const [confirmVisible, setConfirmVisible] = useState(false);
   const toggleConfirmVisibility = useCallback(() => setConfirmVisible((v) => !v), []);
-
-  const passwordMatch = passwordConfirm
-    ? password === passwordConfirm
-      ? "match"
-      : "mismatch"
-    : null;
 
   if (!userId) return <div />;
 
@@ -215,7 +209,7 @@ export default function SignupUserPage(): JSX.Element {
                     type={confirmVisible ? "text" : "password"}
                     className="w-full px-3.5 py-2.5 bg-white border border-[#D1D1D1] rounded text-sm text-[#242424] placeholder:text-[#8A8886] focus:border-[#0078D4] focus:outline-none focus:ring-2 focus:ring-[#EFF6FC] pr-12"
                     placeholder="Ressaisissez le mot de passe"
-                    {...register("passwordConfirm" as keyof SignupUserInput)}
+                    {...register("passwordConfirm")}
                   />
                   <button
                     type="button"
@@ -228,11 +222,11 @@ export default function SignupUserPage(): JSX.Element {
                     </span>
                   </button>
                 </div>
-                {passwordMatch === "match" && (
+                {passwordConfirm && !errors.passwordConfirm && password === passwordConfirm && (
                   <p className="text-xs mt-1.5" style={{ color: "#107C10" }}>✓ Les mots de passe correspondent</p>
                 )}
-                {passwordMatch === "mismatch" && (
-                  <p className="text-xs mt-1.5" style={{ color: "#D13438" }}>Les mots de passe ne correspondent pas</p>
+                {errors.passwordConfirm && (
+                  <p className="text-xs text-[#D13438] mt-1.5">{errors.passwordConfirm.message}</p>
                 )}
               </div>
 

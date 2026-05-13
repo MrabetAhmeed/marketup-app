@@ -23,18 +23,24 @@ export const SignupCompanySchema = z.object({
 export type SignupCompanyInput = z.infer<typeof SignupCompanySchema>;
 
 // --- Step 2: Signup User ---
+// Form-level schema: includes passwordConfirm for client-side validation.
 // acceptedTermsAt is added programmatically in the submit handler (not a form field).
 // The CGU checkbox is a required HTML checkbox that gates submission.
-// The API-level schema (used in the route handler) validates it as required.
-export const SignupUserSchema = z.object({
-  userId: z.string().min(1, "userId requis."),
-  firstName: z.string().min(1, "Le prénom est obligatoire.").max(60),
-  lastName: z.string().min(1, "Le nom est obligatoire.").max(60),
-  phone: z.string().max(30).optional().nullable(),
-  languages: z.array(z.enum(["fr", "ar", "en"])).min(1),
-  password: passwordSchema,
-  acceptedTermsAt: z.string().datetime({ message: "Date d'acceptation CGU invalide." }).optional(),
-});
+export const SignupUserSchema = z
+  .object({
+    userId: z.string().min(1, "userId requis."),
+    firstName: z.string().min(1, "Le prénom est obligatoire.").max(60),
+    lastName: z.string().min(1, "Le nom est obligatoire.").max(60),
+    phone: z.string().max(30).optional().nullable(),
+    languages: z.array(z.enum(["fr", "ar", "en"])).min(1),
+    password: passwordSchema,
+    passwordConfirm: z.string().min(1, "Veuillez confirmer le mot de passe."),
+    acceptedTermsAt: z.string().datetime({ message: "Date d'acceptation CGU invalide." }).optional(),
+  })
+  .refine((data) => data.password === data.passwordConfirm, {
+    message: "Les mots de passe ne correspondent pas.",
+    path: ["passwordConfirm"],
+  });
 export type SignupUserInput = z.infer<typeof SignupUserSchema>;
 
 // --- Step 3: Verify OTP ---
