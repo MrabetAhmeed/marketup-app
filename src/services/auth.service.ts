@@ -263,6 +263,11 @@ export async function verifyOtp(input: VerifyOtpInput): Promise<VerifyOtpResult>
     throw new AppError("NO_OTP", "Aucun code en attente. Complétez l'étape 2 d'abord.", 400);
   }
 
+  // Defense-in-depth: step 2 must have populated these before OTP verify
+  if (!user.firstName || !user.lastName || !user.passwordHash) {
+    throw new AppError("SIGNUP_INCOMPLETE", "Complétez l'étape 2 d'abord.", 400);
+  }
+
   // Check expiry
   if (!user.otpExpiresAt || new Date() > new Date(user.otpExpiresAt)) {
     throw new AppError("OTP_EXPIRED", "Code expiré. Demandez un nouveau code.", 410);
