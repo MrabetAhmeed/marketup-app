@@ -1,0 +1,229 @@
+"use client";
+
+import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import Link from "next/link";
+import AuthLeftPanel from "@/components/shared/AuthLeftPanel";
+import PasswordInput from "@/components/shared/PasswordInput";
+import { SignupUserSchema } from "@/schemas/auth.schema";
+import type { SignupUserInput } from "@/schemas/auth.schema";
+
+export default function SignupUserPage(): JSX.Element {
+  const router = useRouter();
+  const [serverError, setServerError] = useState("");
+  const [submitting, setSubmitting] = useState(false);
+  const [accountEmail, setAccountEmail] = useState("");
+  const [userId, setUserId] = useState("");
+
+  useEffect(() => {
+    const uid = sessionStorage.getItem("signupUserId");
+    const email = sessionStorage.getItem("signupEmail");
+    if (!uid) {
+      router.replace("/signup/company");
+      return;
+    }
+    setUserId(uid);
+    setAccountEmail(email || "");
+  }, [router]);
+
+  const {
+    register,
+    handleSubmit,
+    watch,
+    setValue,
+    formState: { errors },
+  } = useForm<SignupUserInput>({
+    resolver: zodResolver(SignupUserSchema),
+    defaultValues: {
+      languages: ["fr"],
+    },
+  });
+
+  // Keep userId in sync
+  useEffect(() => {
+    if (userId) setValue("userId", userId);
+  }, [userId, setValue]);
+
+  const password = watch("password") || "";
+  const passwordConfirm = watch("passwordConfirm" as keyof SignupUserInput) as string | undefined;
+
+  const onSubmit = async (data: SignupUserInput) => {
+    setServerError("");
+    setSubmitting(true);
+    try {
+      const res = await fetch("/api/v1/auth/signup/user", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          ...data,
+          acceptedTermsAt: new Date().toISOString(),
+        }),
+      });
+      const json = await res.json();
+      if (!res.ok) {
+        setServerError(json.error?.message || "Une erreur est survenue.");
+        return;
+      }
+      router.push("/signup/verify");
+    } catch {
+      setServerError("Erreur réseau. Vérifiez votre connexion.");
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  const passwordMatch = passwordConfirm
+    ? password === passwordConfirm
+      ? "match"
+      : "mismatch"
+    : null;
+
+  if (!userId) return <div />;
+
+  return (
+    <>
+      <AuthLeftPanel step={2} completedSteps={[1]} />
+
+      <section className="flex-1 flex flex-col">
+        {/* Mobile header */}
+        <div className="lg:hidden flex items-center justify-between px-6 py-4 border-b border-[#E0E0E0]">
+          <Link href="/onboarding" className="text-xl font-bold tracking-tighter text-[#0078D4] font-headline">MARKET-UP</Link>
+          <span className="text-xs text-[#616161]">Étape <span className="font-bold text-[#242424]">2</span> / 3</span>
+        </div>
+        <div className="lg:hidden px-6 pt-4">
+          <div className="h-[3px] bg-[#E0E0E0] rounded-sm overflow-hidden">
+            <div className="h-full bg-[#0078D4] transition-[width] duration-300" style={{ width: "66.66%" }} />
+          </div>
+        </div>
+
+        <div className="flex-1 flex items-start justify-center px-6 md:px-12 py-8 md:py-12 lg:py-16">
+          <div className="w-full max-w-2xl">
+            <header className="mb-10">
+              <span className="inline-block px-2.5 py-1 bg-[#EFF6FC] text-[#0078D4] text-[10px] font-bold uppercase tracking-widest rounded mb-4">Étape 2 sur 3</span>
+              <h1 className="text-3xl md:text-[32px] font-semibold text-[#242424] mb-3 tracking-tight">Vos informations</h1>
+              <p className="text-[#616161] text-base">Configurez votre accès personnel à la plateforme.</p>
+            </header>
+
+            {serverError && (
+              <div className="mb-6 flex items-start gap-2.5 p-4 bg-[#FDE7E9] border border-[#D13438] rounded text-[13px] text-[#A4262C]" role="alert">
+                <span className="material-symbols-outlined text-xl">error</span>
+                <p>{serverError}</p>
+              </div>
+            )}
+
+            <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+              {/* Hidden userId */}
+              <input type="hidden" {...register("userId")} />
+
+              {/* Email banner */}
+              <div className="flex items-start gap-3 p-4 bg-[#EFF6FC] border border-[#0078D4]/20 rounded-lg">
+                <span className="material-symbols-outlined text-[#0078D4] shrink-0 mt-0.5">mail</span>
+                <div className="min-w-0">
+                  <p className="text-xs font-bold uppercase tracking-wider text-[#616161] mb-0.5">Email du compte</p>
+                  <p className="text-sm font-semibold text-[#242424] truncate">{accountEmail}</p>
+                </div>
+              </div>
+
+              {/* First + Last name */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                <div>
+                  <label htmlFor="firstName" className="block text-[11px] font-bold uppercase tracking-[0.06em] text-[#616161] mb-1.5 after:content-['*'] after:text-[#D13438] after:ml-1">Prénom</label>
+                  <input id="firstName" {...register("firstName")} className="w-full px-3.5 py-2.5 bg-white border border-[#D1D1D1] rounded text-sm text-[#242424] placeholder:text-[#8A8886] focus:border-[#0078D4] focus:outline-none focus:ring-2 focus:ring-[#EFF6FC]" placeholder="Ex : Ahmed" />
+                  {errors.firstName && <p className="text-xs text-[#D13438] mt-1">{errors.firstName.message}</p>}
+                </div>
+                <div>
+                  <label htmlFor="lastName" className="block text-[11px] font-bold uppercase tracking-[0.06em] text-[#616161] mb-1.5 after:content-['*'] after:text-[#D13438] after:ml-1">Nom</label>
+                  <input id="lastName" {...register("lastName")} className="w-full px-3.5 py-2.5 bg-white border border-[#D1D1D1] rounded text-sm text-[#242424] placeholder:text-[#8A8886] focus:border-[#0078D4] focus:outline-none focus:ring-2 focus:ring-[#EFF6FC]" placeholder="Ex : Mrabet" />
+                  {errors.lastName && <p className="text-xs text-[#D13438] mt-1">{errors.lastName.message}</p>}
+                </div>
+              </div>
+
+              {/* Phone */}
+              <div>
+                <label htmlFor="phone" className="block text-[11px] font-bold uppercase tracking-[0.06em] text-[#616161] mb-1.5">Téléphone</label>
+                <input id="phone" type="tel" {...register("phone")} className="w-full px-3.5 py-2.5 bg-white border border-[#D1D1D1] rounded text-sm text-[#242424] placeholder:text-[#8A8886] focus:border-[#0078D4] focus:outline-none focus:ring-2 focus:ring-[#EFF6FC]" placeholder="+216 12 345 678" />
+                <p className="text-xs text-[#8A8886] mt-1">Optionnel — utilisé pour les notifications importantes</p>
+              </div>
+
+              {/* Languages */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                <div>
+                  <label htmlFor="primaryLang" className="block text-[11px] font-bold uppercase tracking-[0.06em] text-[#616161] mb-1.5 after:content-['*'] after:text-[#D13438] after:ml-1">Langue principale</label>
+                  <select id="primaryLang" disabled className="w-full px-3.5 py-2.5 bg-[#F5F5F5] border border-[#D1D1D1] rounded text-sm text-[#616161] cursor-not-allowed">
+                    <option value="fr">Français</option>
+                  </select>
+                </div>
+                <div>
+                  <label htmlFor="secondaryLang" className="block text-[11px] font-bold uppercase tracking-[0.06em] text-[#616161] mb-1.5">Langue secondaire</label>
+                  <select id="secondaryLang" disabled className="w-full px-3.5 py-2.5 bg-[#F5F5F5] border border-[#D1D1D1] rounded text-sm text-[#616161] cursor-not-allowed">
+                    <option value="">— Aucune —</option>
+                  </select>
+                </div>
+              </div>
+
+              {/* Password */}
+              <PasswordInput
+                id="password"
+                name="password"
+                label="Mot de passe"
+                required
+                value={password}
+                onChange={(e) => setValue("password", e.target.value, { shouldValidate: true })}
+                error={errors.password?.message}
+                showStrength
+              />
+
+              {/* Confirm password */}
+              <div>
+                <label htmlFor="passwordConfirm" className="block text-[11px] font-bold uppercase tracking-[0.06em] text-[#616161] mb-1.5 after:content-['*'] after:text-[#D13438] after:ml-1">Confirmer le mot de passe</label>
+                <div className="relative">
+                  <input
+                    id="passwordConfirm"
+                    type="password"
+                    className="w-full px-3.5 py-2.5 bg-white border border-[#D1D1D1] rounded text-sm text-[#242424] placeholder:text-[#8A8886] focus:border-[#0078D4] focus:outline-none focus:ring-2 focus:ring-[#EFF6FC]"
+                    placeholder="Ressaisissez le mot de passe"
+                    {...register("passwordConfirm" as keyof SignupUserInput)}
+                  />
+                </div>
+                {passwordMatch === "match" && (
+                  <p className="text-xs mt-1.5" style={{ color: "#107C10" }}>✓ Les mots de passe correspondent</p>
+                )}
+                {passwordMatch === "mismatch" && (
+                  <p className="text-xs mt-1.5" style={{ color: "#D13438" }}>Les mots de passe ne correspondent pas</p>
+                )}
+              </div>
+
+              {/* CGU */}
+              <div className="p-4 bg-[#F5F5F5] border border-[#E0E0E0] rounded-lg">
+                <label className="flex items-start gap-3 cursor-pointer">
+                  <input type="checkbox" required className="mt-0.5 w-[18px] h-[18px] border-[1.5px] border-[#8A8886] rounded-[3px] bg-white appearance-none cursor-pointer shrink-0 checked:bg-[#0078D4] checked:border-[#0078D4] focus:ring-2 focus:ring-[#EFF6FC] focus:outline-none" />
+                  <span className="text-sm text-[#242424] leading-snug">
+                    J&apos;accepte les{" "}
+                    <a href="#" className="text-[#0078D4] font-semibold hover:underline">Conditions Générales d&apos;Utilisation</a>{" "}
+                    et la{" "}
+                    <a href="#" className="text-[#0078D4] font-semibold hover:underline">Politique de confidentialité</a>{" "}
+                    de MARKET-UP.
+                  </span>
+                </label>
+              </div>
+
+              {/* Actions */}
+              <div className="pt-6 flex flex-col-reverse sm:flex-row items-center justify-between gap-3 border-t border-[#E0E0E0]">
+                <Link href="/signup/company" className="w-full sm:w-auto inline-flex items-center justify-center gap-1.5 px-5 py-3 text-sm font-semibold text-[#0078D4] hover:bg-[#EFF6FC] rounded transition-colors">
+                  <span className="material-symbols-outlined text-base">arrow_back</span>
+                  Retour
+                </Link>
+                <button type="submit" disabled={submitting} className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-3 bg-[#0078D4] hover:bg-[#106EBE] active:bg-[#005A9E] text-white text-sm font-semibold rounded transition-colors disabled:bg-[#D1D1D1] disabled:cursor-not-allowed">
+                  {submitting ? "Envoi..." : "Continuer"}
+                  <span className="material-symbols-outlined text-base">arrow_forward</span>
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </section>
+    </>
+  );
+}
