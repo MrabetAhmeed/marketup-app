@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef, useCallback } from "react";
+import { useRouter } from "next/navigation";
 import Link from "next/link";
 
 const PRODUCTS = {
@@ -30,6 +31,7 @@ const PRODUCTS = {
 type ProductKey = keyof typeof PRODUCTS;
 
 export default function OnboardingPage(): JSX.Element {
+  const router = useRouter();
   const [productKey, setProductKey] = useState<ProductKey>("brandup");
   const [countryOpen, setCountryOpen] = useState(false);
   const [launcherOpen, setLauncherOpen] = useState(false);
@@ -197,9 +199,12 @@ export default function OnboardingPage(): JSX.Element {
       </div>
 
       {/* Main — Split B2B / B2C */}
-      <main className="flex flex-col md:flex-row flex-grow w-full overflow-hidden">
+      <main className="split-container group/split flex flex-col md:flex-row flex-grow w-full overflow-hidden">
         {/* B2B Panel */}
-        <section className="group relative w-full md:w-1/2 h-1/2 md:h-full cursor-pointer overflow-hidden transition-all duration-700 md:hover:w-[55%]">
+        <section
+          className="split-panel group relative w-full md:w-1/2 h-1/2 md:h-full cursor-pointer overflow-hidden"
+          onClick={() => router.push(`${product.searchUrl}?type=B2B`)}
+        >
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img alt="B2B" className="absolute inset-0 w-full h-full object-cover transition-transform duration-[1500ms] group-hover:scale-105" src="/shared/onboarding-images/onboarding-images-b2b_img.jpg" />
           <div className="absolute inset-0 bg-gradient-to-t from-black/95 via-black/50 to-black/30 z-[6]" />
@@ -215,6 +220,7 @@ export default function OnboardingPage(): JSX.Element {
               </p>
               <Link
                 href={`${product.searchUrl}?type=B2B`}
+                onClick={(e) => e.stopPropagation()}
                 className="w-full sm:w-auto inline-flex py-4 px-8 bg-[#0078D4] hover:bg-[#106EBE] text-white rounded-lg font-bold items-center justify-center gap-3 transition-colors"
               >
                 Choisir B2B
@@ -225,7 +231,10 @@ export default function OnboardingPage(): JSX.Element {
         </section>
 
         {/* B2C Panel */}
-        <section className="group relative w-full md:w-1/2 h-1/2 md:h-full cursor-pointer overflow-hidden border-t md:border-t-0 md:border-l border-white/10 transition-all duration-700 md:hover:w-[55%]">
+        <section
+          className="split-panel group relative w-full md:w-1/2 h-1/2 md:h-full cursor-pointer overflow-hidden border-t md:border-t-0 md:border-l border-white/10"
+          onClick={() => router.push(`${product.searchUrl}?type=B2C`)}
+        >
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img alt="B2C" className="absolute inset-0 w-full h-full object-cover transition-transform duration-[1500ms] group-hover:scale-105" src="/shared/onboarding-images/onboarding-images-b2c_img.jpg" />
           <div className="absolute inset-0 bg-gradient-to-t from-black/95 via-black/50 to-black/30 z-[6]" />
@@ -241,6 +250,7 @@ export default function OnboardingPage(): JSX.Element {
               </p>
               <Link
                 href={`${product.searchUrl}?type=B2C`}
+                onClick={(e) => e.stopPropagation()}
                 className="w-full sm:w-auto inline-flex py-4 px-8 border border-white text-white rounded-lg font-bold items-center justify-center gap-3 transition-colors hover:bg-white hover:text-[#242424]"
               >
                 Choisir B2C
@@ -251,11 +261,27 @@ export default function OnboardingPage(): JSX.Element {
         </section>
       </main>
 
-      {/* Float animation keyframes */}
+      {/* Float animation + split-panel hover behavior */}
       <style jsx>{`
         @keyframes float {
           0%, 100% { transform: translate(-50%, -50%) translateY(0); }
           50% { transform: translate(-50%, -50%) translateY(-8px); }
+        }
+        .split-panel {
+          transition: all 0.7s cubic-bezier(0.23, 1, 0.32, 1);
+          position: relative;
+          z-index: 1;
+        }
+        @media (min-width: 768px) {
+          .split-container:hover .split-panel {
+            width: 45%;
+            filter: grayscale(0.2) brightness(0.7);
+          }
+          .split-container .split-panel:hover {
+            width: 55%;
+            filter: grayscale(0) brightness(1.1);
+            z-index: 10;
+          }
         }
       `}</style>
     </div>

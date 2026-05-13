@@ -193,11 +193,25 @@ export default function SignupCompanyPage(): JSX.Element {
               </div>
 
               {/* Country + Gouvernorat */}
+              {/* V1: country hardcoded to "TN" server-side (canon).
+                  To extend to other countries in V2:
+                    1. Add `country` to SignupCompanySchema
+                    2. Create GET /api/v1/resources/countries endpoint
+                    3. Remove the hardcoded "TN" in signupCompany() service
+                    4. Enable the dropdown in the UI */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                 <div>
                   <label htmlFor="country" className="block text-[11px] font-bold uppercase tracking-[0.06em] text-[#616161] mb-1.5 after:content-['*'] after:text-[#D13438] after:ml-1">Pays</label>
-                  <select id="country" disabled className="w-full px-3.5 py-2.5 bg-[#F5F5F5] border border-[#D1D1D1] rounded text-sm text-[#616161] cursor-not-allowed">
+                  <select
+                    id="country"
+                    defaultValue="TN"
+                    className="w-full px-3.5 py-2.5 bg-white border border-[#D1D1D1] rounded text-sm text-[#242424] appearance-none focus:border-[#0078D4] focus:outline-none focus:ring-2 focus:ring-[#EFF6FC]"
+                    style={{ backgroundImage: `url("data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23616161' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E")`, paddingRight: "40px", backgroundPosition: "right 12px center", backgroundRepeat: "no-repeat", backgroundSize: "16px" }}
+                  >
                     <option value="TN">🇹🇳 Tunisie</option>
+                    <option value="FR" disabled>🇫🇷 France — Bientôt disponible</option>
+                    <option value="MA" disabled>🇲🇦 Maroc — Bientôt disponible</option>
+                    <option value="DZ" disabled>🇩🇿 Algérie — Bientôt disponible</option>
                   </select>
                 </div>
                 <div>

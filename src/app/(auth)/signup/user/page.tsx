@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -73,6 +73,9 @@ export default function SignupUserPage(): JSX.Element {
       setSubmitting(false);
     }
   };
+
+  const [confirmVisible, setConfirmVisible] = useState(false);
+  const toggleConfirmVisibility = useCallback(() => setConfirmVisible((v) => !v), []);
 
   const passwordMatch = passwordConfirm
     ? password === passwordConfirm
@@ -151,14 +154,29 @@ export default function SignupUserPage(): JSX.Element {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                 <div>
                   <label htmlFor="primaryLang" className="block text-[11px] font-bold uppercase tracking-[0.06em] text-[#616161] mb-1.5 after:content-['*'] after:text-[#D13438] after:ml-1">Langue principale</label>
-                  <select id="primaryLang" disabled className="w-full px-3.5 py-2.5 bg-[#F5F5F5] border border-[#D1D1D1] rounded text-sm text-[#616161] cursor-not-allowed">
+                  <select
+                    id="primaryLang"
+                    defaultValue="fr"
+                    className="w-full px-3.5 py-2.5 bg-white border border-[#D1D1D1] rounded text-sm text-[#242424] appearance-none focus:border-[#0078D4] focus:outline-none focus:ring-2 focus:ring-[#EFF6FC]"
+                    style={{ backgroundImage: `url("data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23616161' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E")`, paddingRight: "40px", backgroundPosition: "right 12px center", backgroundRepeat: "no-repeat", backgroundSize: "16px" }}
+                  >
                     <option value="fr">Français</option>
+                    <option value="en" disabled>English — Bientôt disponible</option>
+                    <option value="ar" disabled>العربية — Bientôt disponible</option>
                   </select>
                 </div>
                 <div>
                   <label htmlFor="secondaryLang" className="block text-[11px] font-bold uppercase tracking-[0.06em] text-[#616161] mb-1.5">Langue secondaire</label>
-                  <select id="secondaryLang" disabled className="w-full px-3.5 py-2.5 bg-[#F5F5F5] border border-[#D1D1D1] rounded text-sm text-[#616161] cursor-not-allowed">
+                  <select
+                    id="secondaryLang"
+                    defaultValue=""
+                    className="w-full px-3.5 py-2.5 bg-white border border-[#D1D1D1] rounded text-sm text-[#242424] appearance-none focus:border-[#0078D4] focus:outline-none focus:ring-2 focus:ring-[#EFF6FC]"
+                    style={{ backgroundImage: `url("data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23616161' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E")`, paddingRight: "40px", backgroundPosition: "right 12px center", backgroundRepeat: "no-repeat", backgroundSize: "16px" }}
+                  >
                     <option value="">— Aucune —</option>
+                    <option value="fr">Français</option>
+                    <option value="en" disabled>English — Bientôt disponible</option>
+                    <option value="ar" disabled>العربية — Bientôt disponible</option>
                   </select>
                 </div>
               </div>
@@ -181,11 +199,21 @@ export default function SignupUserPage(): JSX.Element {
                 <div className="relative">
                   <input
                     id="passwordConfirm"
-                    type="password"
-                    className="w-full px-3.5 py-2.5 bg-white border border-[#D1D1D1] rounded text-sm text-[#242424] placeholder:text-[#8A8886] focus:border-[#0078D4] focus:outline-none focus:ring-2 focus:ring-[#EFF6FC]"
+                    type={confirmVisible ? "text" : "password"}
+                    className="w-full px-3.5 py-2.5 bg-white border border-[#D1D1D1] rounded text-sm text-[#242424] placeholder:text-[#8A8886] focus:border-[#0078D4] focus:outline-none focus:ring-2 focus:ring-[#EFF6FC] pr-12"
                     placeholder="Ressaisissez le mot de passe"
                     {...register("passwordConfirm" as keyof SignupUserInput)}
                   />
+                  <button
+                    type="button"
+                    onClick={toggleConfirmVisibility}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 w-8 h-8 flex items-center justify-center text-[#616161] hover:text-[#0078D4] rounded transition-colors"
+                    aria-label={confirmVisible ? "Masquer le mot de passe" : "Afficher le mot de passe"}
+                  >
+                    <span className="material-symbols-outlined text-xl">
+                      {confirmVisible ? "visibility_off" : "visibility"}
+                    </span>
+                  </button>
                 </div>
                 {passwordMatch === "match" && (
                   <p className="text-xs mt-1.5" style={{ color: "#107C10" }}>✓ Les mots de passe correspondent</p>
