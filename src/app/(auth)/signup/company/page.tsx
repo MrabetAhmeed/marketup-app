@@ -105,7 +105,19 @@ export default function SignupCompanyPage(): JSX.Element {
             )}
 
             {/* eslint-disable-next-line @typescript-eslint/no-misused-promises */}
-            <form onSubmit={handleSubmit(onSubmit as Parameters<typeof handleSubmit>[0])} className="space-y-6">
+            <form onSubmit={handleSubmit(
+              (data) => {
+                if (process.env.NODE_ENV === "development") {
+                  console.log("[signup/company] submitting:", data);
+                }
+                return onSubmit(data as SignupCompanyInput);
+              },
+              (validationErrors) => {
+                if (process.env.NODE_ENV === "development") {
+                  console.warn("[signup/company] validation errors:", validationErrors);
+                }
+              },
+            )} className="space-y-6">
               {/* Market type */}
               <div>
                 <label className="block text-[11px] font-bold uppercase tracking-[0.06em] text-[#616161] mb-1.5 after:content-['*'] after:text-[#D13438] after:ml-1">Type de marché</label>

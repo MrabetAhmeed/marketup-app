@@ -116,7 +116,20 @@ export default function SignupUserPage(): JSX.Element {
               </div>
             )}
 
-            <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+            {/* eslint-disable-next-line @typescript-eslint/no-misused-promises */}
+            <form onSubmit={handleSubmit(
+              (data) => {
+                if (process.env.NODE_ENV === "development") {
+                  console.log("[signup/user] submitting:", { ...data, password: "[REDACTED]" });
+                }
+                return onSubmit(data);
+              },
+              (validationErrors) => {
+                if (process.env.NODE_ENV === "development") {
+                  console.warn("[signup/user] validation errors:", validationErrors);
+                }
+              },
+            )} className="space-y-6">
               {/* Hidden userId */}
               <input type="hidden" {...register("userId")} />
 

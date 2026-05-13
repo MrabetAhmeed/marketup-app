@@ -131,7 +131,7 @@ export async function signupCompany(input: SignupCompanyInput): Promise<SignupCo
             sectorId: input.sectorId,
             gouvernorat: input.gouvernorat,
             ville: input.ville,
-            address: input.address || "",
+            address: input.address || null,
             contactEmail: email,
             phone: null,
             whatsapp: null,
@@ -186,7 +186,7 @@ interface SignupUserInput {
   phone?: string | null;
   languages: string[];
   password: string;
-  acceptedTermsAt: string;
+  acceptedTermsAt?: string;
 }
 
 interface SignupUserResult {
@@ -221,7 +221,7 @@ export async function signupUser(input: SignupUserInput): Promise<SignupUserResu
   user.phone = input.phone || null;
   user.languages = input.languages;
   user.passwordHash = passwordHash;
-  user.acceptedTermsAt = new Date(input.acceptedTermsAt);
+  user.acceptedTermsAt = input.acceptedTermsAt ? new Date(input.acceptedTermsAt) : new Date();
   user.otpHash = otpHash;
   user.otpExpiresAt = otpExpiresAt;
   user.otpAttempts = 0;

@@ -80,7 +80,7 @@ const CompanySchema = new Schema(
       sectorId: { type: String, required: true },
       gouvernorat: { type: String, required: true },
       ville: { type: String, required: true },
-      address: { type: String, required: true },
+      address: { type: String, default: null },
       contactEmail: { type: String, lowercase: true, trim: true },
       phone: { type: String, default: null },
       whatsapp: { type: String, default: null },

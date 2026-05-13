@@ -23,6 +23,9 @@ export const SignupCompanySchema = z.object({
 export type SignupCompanyInput = z.infer<typeof SignupCompanySchema>;
 
 // --- Step 2: Signup User ---
+// acceptedTermsAt is added programmatically in the submit handler (not a form field).
+// The CGU checkbox is a required HTML checkbox that gates submission.
+// The API-level schema (used in the route handler) validates it as required.
 export const SignupUserSchema = z.object({
   userId: z.string().min(1, "userId requis."),
   firstName: z.string().min(1, "Le prénom est obligatoire.").max(60),
@@ -30,7 +33,7 @@ export const SignupUserSchema = z.object({
   phone: z.string().max(30).optional().nullable(),
   languages: z.array(z.enum(["fr", "ar", "en"])).min(1),
   password: passwordSchema,
-  acceptedTermsAt: z.string().datetime({ message: "Date d'acceptation CGU invalide." }),
+  acceptedTermsAt: z.string().datetime({ message: "Date d'acceptation CGU invalide." }).optional(),
 });
 export type SignupUserInput = z.infer<typeof SignupUserSchema>;
 
