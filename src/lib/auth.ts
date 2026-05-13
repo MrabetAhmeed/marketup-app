@@ -1,4 +1,6 @@
 import CredentialsProvider from "next-auth/providers/credentials";
+import { login } from "@/services/auth.service";
+import { AuthError } from "@/lib/api-error";
 import type { NextAuthOptions } from "next-auth";
 
 export const authOptions: NextAuthOptions = {
@@ -14,16 +16,28 @@ export const authOptions: NextAuthOptions = {
           return null;
         }
 
-        // TODO: Wire to User model in Phase 1/2
-        // 1. await connectDb()
-        // 2. const user = await User.findOne({ email: credentials.email })
-        // 3. if (!user) return null
-        // 4. const valid = await bcrypt.compare(credentials.password, user.passwordHash)
-        // 5. if (!valid) return null
-        // 6. Check company.status === "active"
-        // 7. Return { id, email, companyId, role }
-
-        return null;
+        try {
+          const result = await login(credentials.email, credentials.password);
+          return {
+            id: result.id,
+            email: result.email,
+            companyId: result.companyId,
+            role: result.role,
+          };
+        } catch (err) {
+          if (err instanceof AuthError) {
+            // Propagate structured error via message for the client to parse
+            throw new Error(
+              JSON.stringify({
+                code: err.code,
+                message: err.message,
+                status: err.status,
+                details: err.details,
+              }),
+            );
+          }
+          return null;
+        }
       },
     }),
   ],
@@ -39,7 +53,7 @@ export const authOptions: NextAuthOptions = {
     async jwt({ token, user }) {
       if (user) {
         token.id = user.id;
-        token.email = user.email;
+        token.email = user.email ?? "";
         token.companyId = user.companyId;
         token.role = user.role;
       }

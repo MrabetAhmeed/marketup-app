@@ -23,8 +23,8 @@ export class NotFoundError extends AppError {
 }
 
 export class AuthError extends AppError {
-  constructor(code: string, message: string, status: number = 401) {
-    super(code, message, status);
+  constructor(code: string, message: string, status: number = 401, details?: Record<string, unknown>) {
+    super(code, message, status, details);
   }
 }
 
