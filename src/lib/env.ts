@@ -10,6 +10,7 @@ const envSchema = z.object({
 
   // Resend
   RESEND_API_KEY: z.string().default(""),
+  EMAIL_FROM: z.string().min(1).default("onboarding@resend.dev"),
 
   // Pusher
   PUSHER_APP_ID: z.string().default(""),

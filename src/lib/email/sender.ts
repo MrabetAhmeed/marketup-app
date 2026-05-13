@@ -3,7 +3,7 @@ import { env } from "@/lib/env";
 import { otpEmailTemplate } from "./templates/otp";
 import { passwordResetEmailTemplate } from "./templates/password-reset";
 
-const FROM_ADDRESS = "MARKET-UP <noreply@vivasky.media>";
+const FROM_ADDRESS = `MARKET-UP <${env.EMAIL_FROM}>`;
 
 let resendClient: Resend | null = null;
 
