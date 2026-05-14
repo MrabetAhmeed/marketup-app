@@ -37,72 +37,106 @@ Not a bug, just a phase dependency to track.
 
 ---
 
-## CGU hardening — Zod-level validation
+## CGU hardening — z.literal(true) instead of HTML-only required
 
-The CGU checkbox is currently enforced only by HTML `required` attribute.
-Add `z.literal(true)` field for CGU acceptance in `SignupUserSchema` for
-server-side validation. Low risk (browser enforces it), but defense-in-depth.
+Currently CGU acceptance is enforced via HTML `required` attribute on
+the checkbox. Can be bypassed by:
+- Disabling JS in browser dev tools
+- Submitting directly to the API
+
+For V1.1, harden with Zod:
+  cguAccepted: z.literal(true, {
+    errorMap: () => ({ message: "Vous devez accepter les CGU." })
+  })
+
+And update signupUser service to generate acceptedTermsAt = new Date()
+only when cguAccepted === true.
 
 Estimated effort: 15 minutes.
 
 ---
 
-## Login route 429 — use jsonError instead of jsonOk
+## jsonError refactor for login route 429 response
 
-`src/app/api/v1/auth/login/route.ts` returns rate-limit error via
-`jsonOk({ error: ... }, 429)`. Should use `jsonError()` for consistency
-with the API error contract.
+login/route.ts currently uses:
+  return jsonOk({ error: { code: "RATE_LIMITED", ... } }, 429);
+
+Functionally correct (returns 429 with error body) but stylistically
+inconsistent. Refactor to:
+  return jsonError("RATE_LIMITED", "Trop de tentatives...", 429);
 
 Estimated effort: 5 minutes.
 
 ---
 
-## Forgot route outer catch — swallow Zod validation errors
+## Forgot route — swallow Zod errors in outer catch
 
-`src/app/api/v1/auth/password/forgot/route.ts` outer catch uses
-`handleApiError` which leaks Zod validation errors as 400. Not an
+forgot/route.ts outer catch uses handleApiError which leaks Zod
+validation errors as 400 ("email is required", etc). Not an
 email-enumeration leak (result doesn't depend on account existence)
-but exposes the API contract. Consider swallowing all errors and
-returning 200 for zero-info-leak.
+but exposes the API contract.
+
+For V1.1 zero-info-leak compliance:
+  } catch (err) {
+    console.error("[forgot] outer error swallowed:", err);
+    return jsonOk({ message: STANDARD_MESSAGE });
+  }
 
 Estimated effort: 10 minutes.
 
 ---
 
-## Mobile bottom sheets for onboarding dropdowns
+## Mobile bottom sheets — 3 items deferred from C4
 
-The onboarding page's country and app launcher dropdowns use standard
-click-toggled dropdowns. The mockup shows mobile bottom sheets with:
-- Slide-up animation from bottom
-- Drag handle bar at top
-- Backdrop overlay
-- Mobile-specific header with "Choisir un pays" / close button
+Onboarding page mobile dropdowns currently use standard dropdown
+behavior instead of slide-up bottom sheet pattern shown in mockup.
 
-3 items to implement. Desktop behavior is correct.
+Items:
+- Country dropdown mobile header ("Choisir un pays" + close button)
+- App launcher mobile header ("Produits MARKET-UP" + close button)
+- Mobile backdrop overlay (#mobileBackdrop) for both dropdowns
 
-Estimated effort: 2 hours.
+Estimated effort: 2-3 hours (CSS animations + state management).
+
+Discovered during C4 audit. Page remains functional on mobile but
+without the canonical UX polish.
 
 ---
 
-## Cleanup orphan signups — dev script
+## Cleanup orphan signups — dev tooling script
 
-Users with `emailVerifiedAt=null AND createdAt < now-7d` should be
-cascade-deleted along with their Company. Currently documented as a
-TODO in `user.model.ts` (Phase 10 cron). For dev, a manual script
-would be useful.
+During development, testing signup creates "stuck" Users
+(emailVerifiedAt=null, < 7 days old). Currently only fixable via manual
+MongoDB Compass deletion.
+
+For dev experience, add:
+  scripts/cleanup-orphan-signups.ts
+
+A script that:
+- Connects to MongoDB
+- Finds all Users where emailVerifiedAt=null
+- Lists them with createdAt + accountEmail
+- Asks for confirmation
+- Cascade-deletes the User + their Company
+
+Usage: npm run cleanup:orphans
 
 Estimated effort: 30 minutes.
 
+Note: production cleanup (cron for >7d orphans) tracked separately
+for Phase 10.
+
 ---
 
-## Unused dependencies cleanup
+## Remove unused shadcn deps
 
-Phase 0 installed shadcn/ui which pulled in deps not used by our code:
-- `lucide-react` — not imported (we use Material Symbols)
-- `next-themes` — not imported
-- `@base-ui/react` — not imported
+shadcn/ui installed deps not used in our app:
+- lucide-react (we use Material Symbols)
+- next-themes (no dark mode toggle yet)
+- @base-ui/react (replaced by our custom components)
+- sonner (replaced by our custom Toast)
 
-Remove to reduce bundle size. Verify no shadcn component imports them
-before removing.
+Run: npm uninstall lucide-react next-themes @base-ui/react sonner
+Verify: npm run lint + typecheck stay clean
 
-Estimated effort: 15 minutes.
+Estimated effort: 5 minutes (but verify carefully).

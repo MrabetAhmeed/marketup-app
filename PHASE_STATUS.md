@@ -1,44 +1,48 @@
 # MARKET-UP — Phase Status
 
-**Updated:** 2026-05-14
-**Current phase:** Phase 2 complete (tag: phase-2-complete)
+Last updated: 2026-05-14
 
-## What's done
+## Current state
 
-- **Phase 0 — Foundation:** Next.js 14, strict TS, ESLint+Prettier, Tailwind (Fluent flat tokens), shadcn/ui, NextAuth v4 scaffold, middleware, env validation, core libs (db, i18n, api-error, api-response, auth-guards, visibility)
-- **Phase 1 — Models + Seed:** 16 Mongoose models, barrel export, full seed script (10 companies, 30 profiles, 19 transactions, 6 boosts, 2 sponsorings, 8 RSE receipts, 16 notifications), reset script, 20 Vitest tests
-- **Phase 2 — Auth Flow:** 3-step signup (company → user → OTP verify), login with NextAuth Credentials, password reset (forgot + reset), email validation resend. 8 API routes + 3 resource endpoints. 9 UI pages ported 1:1 from mockups. Unified error code mapping. 14 integration tests (34 total).
+- Phase 2 COMPLETE (tag: phase-2-complete pending push)
+- 27 commits total (Phase 0 → Phase 2)
+- 34 tests green
+- 9 auth pages + 11 API routes operational
+- Flow signup end-to-end validated in browser
 
-## Key artifacts (Phase 2)
+## Atlas database state
 
-- **Services:** `src/services/auth.service.ts` — signupCompany, signupUser, verifyOtp, login, forgotPassword, resetPassword, resendValidationEmail
-- **Routes:** 8 auth (`/api/v1/auth/*`) + 3 resources (`/api/v1/resources/*`)
-- **Pages:** onboarding, signup/company, signup/user, signup/verify, signup/success, login, validation-email, forgot, reset
-- **Shared components:** AuthLeftPanel, PasswordInput, OtpInput, Toast/ToastProvider, AuthErrorBanner
-- **Error mapping:** `src/lib/auth-error-messages.ts` — 20+ error codes with French messages
+- 10 seeded companies (TechnoFab canon as c-001)
+- 30 seeded profiles, 6 boosts, 2 sponsorings, 19 transactions, 8 RSE receipts
 
-## Atlas state
+## Required .env.local vars
 
-Seeded with TechnoFab canon (unchanged from Phase 1):
-- brandup.status = **rejected** (verbatim rejection reason)
-- traceup.status = **pending** (first submission, awaiting admin)
-- linkup.status = **active** + 1 active boost + 1 active sponsoring
-- rseBadgeStatus = **validated**
+- MONGODB_URI (Atlas connection string)
+- NEXTAUTH_URL (http://localhost:3000)
+- NEXTAUTH_SECRET (32-byte base64)
+- RESEND_API_KEY (re_...)
+- EMAIL_FROM (onboarding@resend.dev for sandbox dev)
+- R2_* (empty, Phase 4)
+- PUSHER_* (empty, Phase 9)
 
-## Env vars (.env.local)
+## Phase 2 deliverables
 
-- MONGODB_URI — provided
-- NEXTAUTH_SECRET — provided
-- RESEND_API_KEY — provided
-- EMAIL_FROM — set to onboarding@resend.dev (Resend sandbox)
+- 8 service functions (signupCompany, signupUser, verifyOtp, login, resendOtp, forgotPassword, resetPassword, resendValidationEmail)
+- 11 API routes (8 auth + 3 resources)
+- 9 UI pages (onboarding, signup x4, login, validation-email, forgot, reset)
+- 5 shared components (AuthLeftPanel, PasswordInput, OtpInput, Toast, AuthErrorBanner)
+- Unified error mapping (20+ codes)
+- 14 integration tests
 
-## Next phase: Phase 3 — Owner dashboard skeleton
+## Next phase
 
-`/(dashboard)/*` layout + sidebar + topbar + `/me` endpoint. 16 pages from `dashboard_*.html` mockups.
+Phase 3 — Dashboard skeleton (16 pages from reference/mockups/dashboard_*.html)
 
-## Resume reading order
+## Key files to read on resume
 
-1. `CLAUDE.md`
-2. `.claude/skills/marketup-api-routes/SKILL.md`
-3. `reference/API_REFERENCE_MARKETUP.md` — section 2 (Account & Company)
-4. `reference/mockups/dashboard_*.html`
+1. CLAUDE.md (project canon)
+2. PHASE_STATUS.md (this file)
+3. PHASE_2_AUDIT_REPORT.md (audit findings)
+4. V1_1_POLISH_BACKLOG.md (deferred items)
+5. .claude/skills/marketup-ui-canon/SKILL.md (UI tokens)
+6. reference/mockups/dashboard_*.html (Phase 3 source of truth)
