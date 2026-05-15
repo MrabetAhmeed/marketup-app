@@ -347,6 +347,7 @@ interface CompanySeedData {
   suspendedAt?: Date | null;
   suspendedReason?: string | null;
   rseBadgeStatus: string;
+  rseBadgeValidatedAt?: Date | null;
   profiles: {
     brandup: ProfileSeedData;
     traceup: ProfileSeedData;
@@ -446,7 +447,7 @@ function buildCompanies(): CompanySeedData[] {
       pendingUpdates: null,
       registeredAt: daysAgo(97),
       validatedAt: daysAgo(96),
-      rseBadgeStatus: "validated",
+      rseBadgeStatus: "validated", rseBadgeValidatedAt: daysAgo(45),
       profiles: {
         brandup: {
           kind: "brandup",
@@ -762,6 +763,7 @@ async function seedCompanies(
       lastName: c.user.lastName,
       email: c.accountEmail,
       passwordHash,
+      phone: c.user.phone ?? null,
       languages: c.user.languages,
       role: "OWNER",
       emailVerifiedAt: c.registeredAt,
@@ -794,6 +796,7 @@ async function seedCompanies(
       suspendedAt: c.suspendedAt ?? null,
       suspendedReason: c.suspendedReason ?? null,
       rseBadgeStatus: c.rseBadgeStatus,
+      rseBadgeValidatedAt: c.rseBadgeValidatedAt ?? null,
       ownerUserId: userId,
     });
     const companyId = company._id as Types.ObjectId;
