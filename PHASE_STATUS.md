@@ -1,19 +1,44 @@
 # MARKET-UP — Phase Status
 
-Last updated: 2026-05-14
+Last updated: 2026-05-15
 
 ## Current state
 
-- Phase 2 COMPLETE (tag: phase-2-complete pending push)
-- 27 commits total (Phase 0 → Phase 2)
+- Phase 2 COMPLETE (tag: phase-2-complete)
+- Phase 3 IN PROGRESS — C1 committed, C2 next
+- 29 commits total (Phase 0 → Phase 3 C1)
 - 34 tests green
-- 9 auth pages + 11 API routes operational
-- Flow signup end-to-end validated in browser
+- 12 API routes (11 auth/resources + GET /me)
+- 11 dashboard pages (stubs) + sidebar + topbar operational
+
+## Phase 3 progress
+
+| Commit | Scope | Status |
+|---|---|---|
+| C1 | Layout shell + /me service + sidebar + topbar | DONE |
+| C2 | Overview page (dashboard_index.html) | NEXT |
+| C3 | Account + Settings pages | Pending |
+| C4 | 3 Profile editor skeletons | Pending |
+| C5 | Boost + Sponsoring + RSE pages | Pending |
+| C6 | Billing + Notifications + tests | Pending |
+
+## C1 deliverables
+
+- GET /api/v1/me (owner session, full MeResponse)
+- me.service.ts: getMe() + getNotificationPreviews()
+- DashboardSidebar (5 sections, status dots, badges, mobile Sheet, signOut)
+- DashboardTopbar (bell dropdown with real DB data, avatar dropdown)
+- StatusPill (6 variants), StatusDot, MoneyAmount
+- stub-messages.ts + useFeatureSoonToast() hook
+- pricing.ts: formatMoney() + computeTTC()
+- 11 page stubs + error boundary
+- 6 shadcn primitives (sheet, separator, avatar, badge, switch, skeleton)
 
 ## Atlas database state
 
 - 10 seeded companies (TechnoFab canon as c-001)
 - 30 seeded profiles, 6 boosts, 2 sponsorings, 19 transactions, 8 RSE receipts
+- 16 notifications (3 unread for TechnoFab)
 
 ## Required .env.local vars
 
@@ -25,24 +50,19 @@ Last updated: 2026-05-14
 - R2_* (empty, Phase 4)
 - PUSHER_* (empty, Phase 9)
 
-## Phase 2 deliverables
-
-- 8 service functions (signupCompany, signupUser, verifyOtp, login, resendOtp, forgotPassword, resetPassword, resendValidationEmail)
-- 11 API routes (8 auth + 3 resources)
-- 9 UI pages (onboarding, signup x4, login, validation-email, forgot, reset)
-- 5 shared components (AuthLeftPanel, PasswordInput, OtpInput, Toast, AuthErrorBanner)
-- Unified error mapping (20+ codes)
-- 14 integration tests
-
-## Next phase
-
-Phase 3 — Dashboard skeleton (16 pages from reference/mockups/dashboard_*.html)
-
 ## Key files to read on resume
 
 1. CLAUDE.md (project canon)
 2. PHASE_STATUS.md (this file)
-3. PHASE_2_AUDIT_REPORT.md (audit findings)
-4. V1_1_POLISH_BACKLOG.md (deferred items)
-5. .claude/skills/marketup-ui-canon/SKILL.md (UI tokens)
-6. reference/mockups/dashboard_*.html (Phase 3 source of truth)
+3. Plan file: .claude/plans/silly-snacking-galaxy.md (Phase 3 full plan)
+4. .claude/skills/marketup-ui-canon/SKILL.md (UI tokens)
+5. reference/mockups/dashboard_index.html (C2 source of truth)
+
+## C2 scope (next session)
+
+- SectionHeader, EmptyState shared components
+- OverviewStats (4 stat cards grid)
+- OverviewProfiles (3 profile summary cards with status pills + CTAs)
+- OverviewRse (RSE badge card, gold accent)
+- OverviewQuickActions (4 quick action cards)
+- loading.tsx skeleton for overview
