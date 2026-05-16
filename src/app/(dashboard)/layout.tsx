@@ -22,6 +22,11 @@ export default async function DashboardLayout({
     getNotificationPreviews(session.user.id),
   ]);
 
+  // Stale session: JWT is valid but user/company was deleted from DB
+  if (!me) {
+    redirect("/session-expired");
+  }
+
   return (
     <ToastProvider>
       <div className="flex min-h-screen bg-surface-muted">

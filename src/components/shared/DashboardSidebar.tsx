@@ -37,7 +37,7 @@ function buildNavSections(me: MeResponse): NavSection[] {
   const boostBadge =
     stats.activeBoosts > 0 ? `${stats.activeBoosts} ACTIF${stats.activeBoosts > 1 ? "S" : ""}` : null;
 
-  const rseBadge = me.company.rseBadgeStatus === "validated" ? "VALIDÉ" : null;
+  const rseBadge = me.rse.badgeStatus === "validated" ? "VALIDÉ" : null;
 
   return [
     {

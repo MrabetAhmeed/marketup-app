@@ -128,6 +128,12 @@ export const AUTH_ERROR_MESSAGES: Record<string, ErrorMapEntry> = {
     presentation: "toast",
   },
 
+  // === Session errors ===
+  SESSION_INVALID: {
+    message: "Votre session a expiré. Veuillez vous reconnecter.",
+    presentation: "banner" as const,
+  },
+
   // === Network / generic ===
   NETWORK_ERROR: {
     message: "Erreur de connexion. Vérifiez votre internet et réessayez.",

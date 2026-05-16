@@ -4,6 +4,23 @@
 @tailwind components;
 @tailwind utilities;
 
+@layer components {
+  /* Card primitives — ported from mockup inline CSS */
+  .card {
+    @apply bg-white border border-surface-border rounded-lg;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.04);
+    transition: box-shadow 0.2s ease, border-color 0.2s ease;
+  }
+  .card--hover:hover {
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+    @apply border-[#C8C6C4];
+  }
+  /* Material Symbols filled variant */
+  .icon-fill {
+    font-variation-settings: 'FILL' 1;
+  }
+}
+
 @layer base {
   :root {
     --background: 0 0% 96%;

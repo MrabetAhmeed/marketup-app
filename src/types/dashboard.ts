@@ -4,6 +4,17 @@ import type { CompanyStatus, ProfileStatus, ProfileKind, CompanyType } from "@/t
 // /api/v1/me response shape
 // ---------------------------------------------------------------------------
 
+export interface RseSummary {
+  badgeStatus: "none" | "validated";
+  badgeValidatedAt: string | null;
+  lastDonation: {
+    associationName: string;
+    date: string;
+    amount: number;
+  } | null;
+  totalDonationsYear: number;
+}
+
 export interface ProfileSummary {
   id: string;
   kind: ProfileKind;
@@ -57,8 +68,6 @@ export interface MeResponse {
     registeredAt: string;
     validatedAt: string | null;
     pendingUpdates: unknown | null;
-    rseBadgeStatus: "none" | "validated";
-    rseBadgeValidatedAt: string | null;
     avatarInitials: string;
   };
   profiles: {
@@ -66,6 +75,7 @@ export interface MeResponse {
     traceup: ProfileSummary | null;
     linkup: ProfileSummary | null;
   };
+  rse: RseSummary;
   stats: {
     viewsTotal: number;
     views30d: number;

@@ -1,4 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+import { Types } from "mongoose";
 import { connectDb } from "@/lib/db";
 import { pickLocale } from "@/lib/i18n";
 import { isProfileVisible } from "@/lib/visibility";
@@ -11,7 +12,9 @@ import { Notification } from "@/models/notification.model";
 import { Sector } from "@/models/sector.model";
 import { Gouvernorat } from "@/models/gouvernorat.model";
 import type { SupportedLang } from "@/lib/i18n";
-import type { MeResponse, ProfileSummary, NotificationPreview } from "@/types/dashboard";
+import { RseReceipt } from "@/models/rse-receipt.model";
+import { Association } from "@/models/association.model";
+import type { MeResponse, ProfileSummary, RseSummary, NotificationPreview } from "@/types/dashboard";
 import type { ProfileKind } from "@/types";
 
 // Mongoose 9 strict types require casts for dynamic queries
@@ -21,6 +24,8 @@ const ProfileModel = Profile as any;
 const BoostModel = Boost as any;
 const SponsoringModel = Sponsoring as any;
 const NotificationModel = Notification as any;
+const RseReceiptModel = RseReceipt as any;
+const AssociationModel = Association as any;
 const SectorModel = Sector as any;
 const GouvernoratModel = Gouvernorat as any;
 
@@ -49,27 +54,50 @@ export async function getMe(
   userId: string,
   companyId: string,
   lang: SupportedLang = "fr",
-): Promise<MeResponse> {
+): Promise<MeResponse | null> {
   await connectDb();
 
   const now = new Date();
 
-  const [company, user, profiles, activeBoosts, activeSponsorings, unreadNotifications] =
-    await Promise.all([
-      CompanyModel.findById(companyId).lean(),
-      UserModel.findById(userId).lean(),
-      ProfileModel.find({ companyId }).lean(),
-      BoostModel.find({ companyId, status: "active", to: { $gte: now } }).lean(),
-      SponsoringModel.find({ companyId, status: "active", to: { $gte: now } }).lean(),
-      NotificationModel.countDocuments({
-        recipientType: "owner",
-        recipientId: userId,
-        read: false,
-      }),
-    ]);
+  // RSE year boundaries (current civil year)
+  const yearStart = new Date(now.getFullYear(), 0, 1);
+  const yearEnd = new Date(now.getFullYear(), 11, 31, 23, 59, 59, 999);
+
+  const [
+    company, user, profiles, activeBoosts, activeSponsorings,
+    unreadNotifications, lastValidatedReceipt, yearlyDonationAgg,
+  ] = await Promise.all([
+    CompanyModel.findById(companyId).lean(),
+    UserModel.findById(userId).lean(),
+    ProfileModel.find({ companyId }).lean(),
+    BoostModel.find({ companyId, status: "active", to: { $gte: now } }).lean(),
+    SponsoringModel.find({ companyId, status: "active", to: { $gte: now } }).lean(),
+    NotificationModel.countDocuments({
+      recipientType: "owner",
+      recipientId: userId,
+      read: false,
+    }),
+    // Last validated RSE receipt (all-time, most recent by donationDate)
+    RseReceiptModel.findOne({ companyId, status: "validated" })
+      .sort({ donationDate: -1 })
+      .lean(),
+    // Sum of validated receipts for current year
+    RseReceiptModel.aggregate([
+      {
+        $match: {
+          companyId: new Types.ObjectId(companyId),
+          status: "validated",
+          donationDate: { $gte: yearStart, $lte: yearEnd },
+          deletedAt: null,
+        },
+      },
+      { $group: { _id: null, total: { $sum: "$amount" } } },
+    ]),
+  ]);
 
   if (!company || !user) {
-    throw new Error("Company or User not found");
+    console.warn("[getMe] User or Company not found", { userId, companyId });
+    return null;
   }
 
   // Resolve sector + gouvernorat names
@@ -140,6 +168,28 @@ export async function getMe(
     (profileSummaries.traceup?.stats.views30d ?? 0) +
     (profileSummaries.linkup?.stats.views30d ?? 0);
 
+  // Build RSE summary
+  const totalDonationsYear = (yearlyDonationAgg as any[])[0]?.total ?? 0;
+  let lastDonation: RseSummary["lastDonation"] = null;
+  if (lastValidatedReceipt) {
+    const receipt = lastValidatedReceipt as any;
+    const association = await AssociationModel.findById(receipt.associationId).lean();
+    lastDonation = {
+      associationName: association
+        ? pickLocale((association as any).name, lang)
+        : "Association inconnue",
+      date: new Date(receipt.donationDate).toISOString(),
+      amount: receipt.amount,
+    };
+  }
+
+  const rseSummary: RseSummary = {
+    badgeStatus: company.rseBadgeStatus ?? "none",
+    badgeValidatedAt: toISOOrNull(company.rseBadgeValidatedAt),
+    lastDonation,
+    totalDonationsYear,
+  };
+
   const displayName = pickLocale(company.data?.displayName, lang);
   const ownerFullName = [user.firstName, user.lastName].filter(Boolean).join(" ");
 
@@ -184,11 +234,10 @@ export async function getMe(
       registeredAt: new Date(company.registeredAt).toISOString(),
       validatedAt: toISOOrNull(company.validatedAt),
       pendingUpdates: company.pendingUpdates ?? null,
-      rseBadgeStatus: company.rseBadgeStatus ?? "none",
-      rseBadgeValidatedAt: toISOOrNull(company.rseBadgeValidatedAt),
       avatarInitials: getInitials(displayName),
     },
     profiles: profileSummaries,
+    rse: rseSummary,
     stats: {
       viewsTotal,
       views30d,
