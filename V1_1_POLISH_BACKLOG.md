@@ -128,6 +128,58 @@ for Phase 10.
 
 ---
 
+## Storage — Path traversal defense in depth
+
+Origin: Audit b2975ff finding B8.
+
+Current state: LocalStorageAdapter uses options.companyId directly in
+key construction. If a malicious companyId like "../../etc" reaches
+the adapter, the resolved path would escape the uploads directory.
+
+Risk: LOW. Real protection happens at the API route layer — companyId
+is always read from session.user.companyId (verified ObjectId from
+JWT), never from request body.
+
+V1.1 hardening (~10 min):
+- Add a guard in LocalStorageAdapter.upload() (and other methods
+  consuming key):
+    if (!/^[a-f0-9]{24}$/.test(options.companyId)) {
+      throw new StorageError("Invalid companyId format");
+    }
+- This is belt-and-suspenders. The API route layer is the primary
+  defense, but this prevents any future caller mistake from leaking
+  paths.
+
+Commit when implemented:
+  fix(storage): defense-in-depth ObjectId validation in LocalAdapter
+
+---
+
+## Storage — Random suffix for collision-resistant keys
+
+Origin: Audit b2975ff finding B3a.
+
+Current state: Keys use YYYY-MM-DD date format. Two uploads of the
+same filename on the same day would generate identical keys,
+overwriting the first.
+
+Risk: LOW for logo/banner (1 per company), MODERATE for gallery
+uploads where users may upload multiple images per session.
+
+V1.1 fix (~5 min):
+- Switch from YYYY-MM-DD to a more granular timestamp:
+    const ts = Date.now().toString(36); // base36 for shorter string
+    const key = `companies/${id}/${cat}/${ts}-${slug}.${ext}`;
+- Or use nanoid(8) for 8-char random suffix.
+
+Phase 4 dependency: Implement BEFORE building gallery upload (gallery
+needs collision resistance more than single-image fields).
+
+Commit when implemented:
+  fix(storage): time-precision + random suffix for collision resistance
+
+---
+
 ## Remove unused shadcn deps
 
 shadcn/ui installed deps not used in our app:
