@@ -1,26 +1,41 @@
 # MARKET-UP — Phase Status
 
-Last updated: 2026-05-15
+Last updated: 2026-05-16
 
 ## Current state
 
 - Phase 2 COMPLETE (tag: phase-2-complete)
-- Phase 3 IN PROGRESS — C1 committed, C2 next
-- 29 commits total (Phase 0 → Phase 3 C1)
+- Phase 3 IN PROGRESS — C2 committed, C3 next
+- 30 commits total (Phase 0 → Phase 3 C2)
 - 34 tests green
 - 12 API routes (11 auth/resources + GET /me)
-- 11 dashboard pages (stubs) + sidebar + topbar operational
+- 11 dashboard pages (stubs) + overview page live + sidebar + topbar operational
 
 ## Phase 3 progress
 
 | Commit | Scope | Status |
 |---|---|---|
 | C1 | Layout shell + /me service + sidebar + topbar | DONE |
-| C2 | Overview page (dashboard_index.html) | NEXT |
-| C3 | Account + Settings pages | Pending |
+| C2 | Overview page (dashboard_index.html) + stale-session fix | DONE |
+| C3 | Account + Settings pages | NEXT |
 | C4 | 3 Profile editor skeletons | Pending |
 | C5 | Boost + Sponsoring + RSE pages | Pending |
 | C6 | Billing + Notifications + tests | Pending |
+
+## C2 deliverables
+
+- SectionHeader, EmptyState shared components
+- OverviewStats: 4 stat cards (total + per-profile, status-driven)
+- OverviewProfiles: 3 cards with StatusPill, switch, status-driven CTAs
+- OverviewRse: gold-accented badge card (last donation + total year)
+- OverviewQuickActions: 4 quick action cards with hover effects
+- MeResponse extended: root-level `rse` block (badgeStatus, lastDonation, totalDonationsYear)
+- rseBadgeStatus/rseBadgeValidatedAt moved from company to rse block
+- .card / .card--hover / .icon-fill CSS utilities in globals.css
+- loading.tsx skeleton for overview page
+- MOCKUP_FIX (P3-R12): TraceUP stat link corrected
+- Graceful stale-session: getMe() returns null → /session-expired → signOut → /login
+- SESSION_INVALID error code added to auth-error-messages
 
 ## C1 deliverables
 
@@ -54,15 +69,13 @@ Last updated: 2026-05-15
 
 1. CLAUDE.md (project canon)
 2. PHASE_STATUS.md (this file)
-3. Plan file: .claude/plans/silly-snacking-galaxy.md (Phase 3 full plan)
-4. .claude/skills/marketup-ui-canon/SKILL.md (UI tokens)
-5. reference/mockups/dashboard_index.html (C2 source of truth)
+3. .claude/skills/marketup-ui-canon/SKILL.md (UI tokens)
+4. reference/mockups/dashboard_account.html (C3 source of truth)
+5. reference/mockups/dashboard_settings.html (C3 source of truth)
 
-## C2 scope (next session)
+## C3 scope (next session)
 
-- SectionHeader, EmptyState shared components
-- OverviewStats (4 stat cards grid)
-- OverviewProfiles (3 profile summary cards with status pills + CTAs)
-- OverviewRse (RSE badge card, gold accent)
-- OverviewQuickActions (4 quick action cards)
-- loading.tsx skeleton for overview
+- Account page: company info display + 3-tier field editing (live/validation/locked)
+- Settings page: password change, language, notifications preferences
+- FieldBadge component (locked/validation/live/verified)
+- Form patterns with React Hook Form + Zod
