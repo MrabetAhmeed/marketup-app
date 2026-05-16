@@ -1,8 +1,14 @@
-export default function AccountPage(): JSX.Element {
-  return (
-    <div className="space-y-8">
-      <h1 className="font-heading text-[20px] font-bold text-ink-primary">Compte Entreprise</h1>
-      <p className="text-[14px] text-ink-secondary">Contenu en cours de développement.</p>
-    </div>
-  );
+import { redirect } from "next/navigation";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth";
+import { getMe } from "@/services/me.service";
+import { AccountForm } from "@/components/features/account/AccountForm";
+
+export default async function AccountPage(): Promise<JSX.Element> {
+  const session = await getServerSession(authOptions);
+  if (!session?.user?.companyId) redirect("/login");
+  const me = await getMe(session.user.id, session.user.companyId);
+  if (!me) redirect("/session-expired");
+
+  return <AccountForm me={me} />;
 }

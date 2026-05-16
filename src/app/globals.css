@@ -15,6 +15,28 @@
     box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
     @apply border-[#C8C6C4];
   }
+  /* Form field primitives — ported from mockup inline CSS */
+  .field-label {
+    @apply block text-[11px] font-semibold text-ink-secondary uppercase tracking-[0.06em] mb-1.5;
+  }
+  .field-input {
+    @apply w-full px-3 py-[9px] text-[13.5px] text-ink-primary bg-white border border-[#D1D1D1] rounded outline-none transition-colors;
+  }
+  .field-input:hover:not(:disabled):not([readonly]) {
+    @apply border-ink-tertiary;
+  }
+  .field-input:focus {
+    @apply border-primary ring-2 ring-primary-light;
+  }
+  .field-input[readonly] {
+    @apply bg-surface-muted text-[#424242] cursor-default;
+  }
+  .field-input::placeholder {
+    @apply text-ink-tertiary;
+  }
+  .field-help {
+    @apply flex items-center gap-1 text-[11px] text-ink-tertiary mt-1;
+  }
   /* Material Symbols filled variant */
   .icon-fill {
     font-variation-settings: 'FILL' 1;

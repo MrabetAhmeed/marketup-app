@@ -11,6 +11,10 @@ export const STUB_MESSAGES = {
     message: "Le paiement sera disponible bientôt.",
     presentation: "toast" as const,
   },
+  FEATURE_COMING_SOON_DELETE: {
+    message: "La suppression du compte sera disponible prochainement.",
+    presentation: "toast" as const,
+  },
 } as const;
 
 export type StubKey = keyof typeof STUB_MESSAGES;
