@@ -461,7 +461,13 @@ function buildCompanies(): CompanySeedData[] {
               { label: i18n("LinkedIn"), url: "https://linkedin.com/company/technofab", icon: "linkedin" },
               { label: i18n("Catalogue"), url: "https://technofab.tn/catalogue.pdf", icon: "download" },
             ],
-            gallery: [],
+            gallery: [
+              { id: "img-001", url: "https://images.unsplash.com/photo-1565793298595-6a879b1d9492?w=800", caption: i18n("Usine CNC Sahline"), order: 0 },
+              { id: "img-002", url: "https://images.unsplash.com/photo-1581092334651-ddf26d9a09d0?w=800", caption: i18n("Atelier d'usinage"), order: 1 },
+              { id: "img-003", url: "https://images.unsplash.com/photo-1581092335397-9583eb92d232?w=800", caption: i18n("Pièces aéronautiques"), order: 2 },
+              { id: "img-004", url: "https://images.unsplash.com/photo-1571171637578-41bc2dd41cd2?w=800", caption: i18n("Contrôle qualité ISO"), order: 3 },
+              { id: "img-005", url: "https://images.unsplash.com/photo-1542222024-c39e2281f121?w=800", caption: i18n("Équipe technique"), order: 4 },
+            ],
             projects: [
               { id: "proj-c-001-1", name: i18n("Pièces aéronautiques A320"), image: "https://picsum.photos/seed/c-001-proj-1/600/400", description: i18n("Production de pièces structurelles aluminium pour Airbus A320 — partenariat Stelia Aerospace."), order: 1 },
               { id: "proj-c-001-2", name: i18n("Outillage spécialisé"), image: "https://picsum.photos/seed/c-001-proj-2/600/400", description: i18n("Conception et fabrication d'outillage de précision sur cahier des charges client."), order: 2 },
