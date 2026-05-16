@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useFeatureSoonToast } from "@/hooks/useFeatureSoonToast";
 import type { StubKey } from "@/lib/stub-messages";
 
-type FeatureKind = "boost" | "sponsoring";
+type FeatureKind = "boost" | "sponsoring" | "billing";
 
 const KIND_CONFIG: Record<FeatureKind, { icon: string; title: string; description: string; stubKey: StubKey }> = {
   boost: {
@@ -18,6 +18,12 @@ const KIND_CONFIG: Record<FeatureKind, { icon: string; title: string; descriptio
     title: "Sponsoring — Bientôt disponible",
     description: "Lancez des campagnes ciblées sur les profils MARKET-UP. Bannières sponsorisées dans les résultats de recherche pour toucher votre audience B2B. Module en développement final.",
     stubKey: "FEATURE_COMING_SOON_SPONSORING",
+  },
+  billing: {
+    icon: "receipt_long",
+    title: "Facturation — Bientôt disponible",
+    description: "Consultez votre historique de paiements, téléchargez vos factures et suivez vos dépenses sur MARKET-UP. Module en développement final.",
+    stubKey: "FEATURE_COMING_SOON_BILLING",
   },
 };
 

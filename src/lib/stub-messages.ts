@@ -55,6 +55,22 @@ export const STUB_MESSAGES = {
     message: "Le téléchargement de reçu sera disponible prochainement.",
     presentation: "toast" as const,
   },
+  FEATURE_COMING_SOON_MARK_READ: {
+    message: "Le marquage de notification sera disponible prochainement.",
+    presentation: "toast" as const,
+  },
+  FEATURE_COMING_SOON_MARK_ALL_READ: {
+    message: "Le marquage en masse sera disponible prochainement.",
+    presentation: "toast" as const,
+  },
+  FEATURE_COMING_SOON_DELETE_NOTIFICATION: {
+    message: "La suppression de notification sera disponible prochainement.",
+    presentation: "toast" as const,
+  },
+  FEATURE_COMING_SOON_BILLING: {
+    message: "Le module Facturation sera disponible dans une prochaine version.",
+    presentation: "toast" as const,
+  },
 } as const;
 
 export type StubKey = keyof typeof STUB_MESSAGES;
