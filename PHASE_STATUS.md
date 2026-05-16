@@ -4,38 +4,41 @@ Last updated: 2026-05-16
 
 ## Current state
 
-- Phase 2 COMPLETE (tag: phase-2-complete)
-- Phase 3 IN PROGRESS — C5 committed, C6 next
-- 37 commits total (Phase 0 → Phase 3 C5)
+- Phase 3 COMPLETE (tag: phase-3-complete)
+- 39 commits total (Phase 0 → Phase 3 C6)
 - 34 tests green
 - 12 API routes (11 auth/resources + GET /me)
-- 9 dashboard pages live (overview + account + settings + 3 editors + rse + boost + sponsoring) + 2 stubs remaining (billing + notifications)
+- 11 dashboard pages live (0 stubs remaining)
 - Storage adapter foundation committed (local filesystem, R2 stub for V1.1)
+- All mockups ported 1-to-1 with browser-tested fidelity
 
-## Phase 3 progress
+## Phase 3 summary — COMPLETE
 
 | Commit | Scope | Status |
 |---|---|---|
 | C1 | Layout shell + /me service + sidebar + topbar | DONE |
-| C2 | Overview page (dashboard_index.html) + stale-session fix | DONE |
+| C2 | Overview page + stale-session graceful handling | DONE |
 | C3 | Account + Settings pages | DONE |
 | C4 | 3 Profile editor pages (BrandUP/TraceUP/LinkUP) | DONE |
 | C5 | RSE page + Boost/Sponsoring placeholders | DONE |
-| C6 | Billing + Notifications + tests | NEXT |
+| C6 | Notifications page + Billing placeholder | DONE |
+
+## C6 deliverables
+
+- getNotificationsForUser() service (filter + pagination + unread count)
+- NotificationsPageClient: 7 filter pills + client-side pagination (10/page)
+- NotificationItemCard: read/unread visual states + hover actions
+- "Mark all as read" CTA (stubbed)
+- formatRelativeTime() helper (French: "Il y a 2 heures", "Hier", etc.)
+- FeatureComingSoonPage extended with "billing" kind
+- Seed extended: TechnoFab now has 15 notifications (3 unread + 12 read)
+- 4 new stub messages (MARK_READ, MARK_ALL_READ, DELETE_NOTIFICATION, BILLING)
 
 ## C5 deliverables
 
-- getRseDataForUser() service (fetches receipts + associations + stats)
-- RsePageData + RseReceiptForUser types
-- RseBadgeHero: gold accent card (validated/none states)
-- RseStats: 3 stat cards (total validated, receipt count, last donation)
-- RseReceiptsList: filterable list (all/validated/pending) + footer recap
-- RseDonationModal: 5 fields (association/amount/date/file/notes)
-- PDF download button on validated cards (stubbed toast)
-- FeatureComingSoonPage shared component (boost/sponsoring kinds)
-- Boost + Sponsoring placeholder pages with kind-specific copy
-- 4 new stub messages (RSE_DONATION, BOOST, SPONSORING, RECEIPT_DOWNLOAD)
-- Loading skeletons for all 3 routes
+- getRseDataForUser() service + RseBadgeHero + RseStats + RseReceiptsList
+- RseDonationModal (5 fields) + PDF download button (stubbed)
+- FeatureComingSoonPage (boost/sponsoring placeholders)
 
 ## C4 deliverables
 
@@ -44,7 +47,6 @@ Last updated: 2026-05-16
 - BrandUpEditor: 9-slot gallery (HERO + reorder + delete + add modal)
 - TraceUpEditor: 4-tab videos + AddVideoModal (regex validation)
 - LinkUpEditor: 5 platforms + auto links + QR placeholder
-- 6 stub messages (CREATE, VIDEO_ADD, REACTIVATE, GALLERY_*)
 
 ## C3 deliverables
 
@@ -67,7 +69,7 @@ Last updated: 2026-05-16
 - 10 seeded companies (TechnoFab canon as c-001)
 - 30 seeded profiles (TechnoFab BrandUP has 5 gallery images)
 - 6 boosts, 2 sponsorings, 19 transactions, 8 RSE receipts
-- 16 notifications (3 unread for TechnoFab)
+- 25 notifications (15 for TechnoFab: 3 unread + 12 read)
 - 5 associations (Al Ahed, Tunisie Verte, Croissant Rouge, SOS Villages, Aveugles)
 
 ## Required .env.local vars
@@ -87,12 +89,16 @@ Last updated: 2026-05-16
 1. CLAUDE.md (project canon)
 2. PHASE_STATUS.md (this file)
 3. .claude/skills/marketup-ui-canon/SKILL.md (UI tokens)
-4. reference/mockups/dashboard_notifications.html (C6 source of truth)
-5. reference/mockups/dashboard_billing.html (C6 source of truth)
+4. reference/API_REFERENCE_MARKETUP.md (Phase 4 REST contract)
+5. reference/SEED_ARCHITECTURE.md (3-tier validation pattern)
 
-## C6 scope (next session)
+## What's next — Phase 4
 
-- Notifications page: full notification list with read/unread, pagination
-- Billing page: placeholder (FeatureComingSoonPage pattern) or transaction list
-- Phase 3 end-of-phase tests (if time permits)
-- PHASE_STATUS update + phase-3-complete tag
+Phase 4 = Profile editing (real mutations):
+- PUT endpoints for profile data (3-tier pattern: live/validation/locked)
+- File upload wiring (storage adapter → /api/v1/uploads)
+- Form submissions that persist to DB
+- Admin notification on profile submission
+- pendingData flow for validation-gated fields
+
+Estimated: 5 days (per CLAUDE.md §9)
