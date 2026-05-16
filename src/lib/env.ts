@@ -18,6 +18,12 @@ const envSchema = z.object({
   PUSHER_SECRET: z.string().default(""),
   PUSHER_CLUSTER: z.string().default("eu"),
 
+  // Storage
+  STORAGE_ADAPTER: z.enum(["local", "r2"]).default("local"),
+  UPLOAD_MAX_SIZE_MB: z.coerce.number().int().positive().default(5),
+  UPLOAD_ALLOWED_IMAGE_TYPES: z.string().default("image/jpeg,image/png,image/webp"),
+  UPLOAD_ALLOWED_DOC_TYPES: z.string().default("application/pdf"),
+
   // Cloudflare R2 (optional in dev — app must not crash if empty)
   R2_ACCOUNT_ID: z.string().default(""),
   R2_ACCESS_KEY_ID: z.string().default(""),

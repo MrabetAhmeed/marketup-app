@@ -25,6 +25,10 @@ npm-debug.log*
 # generated assets (recreated by npm run sync-shared)
 public/shared/
 
+# Uploaded files (runtime data, preserved via .gitkeep)
+public/uploads/companies/*/
+!public/uploads/companies/.gitkeep
+
 # OS
 .DS_Store
 Thumbs.db
