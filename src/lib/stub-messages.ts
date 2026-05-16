@@ -39,6 +39,22 @@ export const STUB_MESSAGES = {
     message: "Le réordonnancement sera disponible prochainement.",
     presentation: "toast" as const,
   },
+  FEATURE_COMING_SOON_RSE_DONATION: {
+    message: "La soumission de reçu RSE sera disponible prochainement.",
+    presentation: "toast" as const,
+  },
+  FEATURE_COMING_SOON_BOOST: {
+    message: "Le module Boost sera disponible dans une prochaine version.",
+    presentation: "toast" as const,
+  },
+  FEATURE_COMING_SOON_SPONSORING: {
+    message: "Le module Sponsoring sera disponible dans une prochaine version.",
+    presentation: "toast" as const,
+  },
+  FEATURE_COMING_SOON_RECEIPT_DOWNLOAD: {
+    message: "Le téléchargement de reçu sera disponible prochainement.",
+    presentation: "toast" as const,
+  },
 } as const;
 
 export type StubKey = keyof typeof STUB_MESSAGES;
