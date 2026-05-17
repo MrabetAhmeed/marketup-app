@@ -1,11 +1,14 @@
 "use client";
 
+import { useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { StatusPill } from "@/components/shared/StatusPill";
 import { FieldBadge } from "@/components/shared/FieldBadge";
 import { CopyGroup } from "@/components/shared/CopyGroup";
 import { LangChip } from "@/components/shared/LangChip";
+import { useToast } from "@/components/shared/Toast";
 import type { MeResponse } from "@/types/dashboard";
 import { LogoUploadZone } from "./LogoUploadZone";
 import { BannerUploadZone } from "./BannerUploadZone";
@@ -20,6 +23,9 @@ interface AccountFormValues {
   address: string;
 }
 
+/** The 5 LIVE fields that the PATCH endpoint accepts */
+const LIVE_KEYS = ["contactEmail", "phone", "whatsapp", "ville", "address"] as const;
+
 interface AccountFormProps {
   me: MeResponse;
 }
@@ -27,8 +33,11 @@ interface AccountFormProps {
 export function AccountForm({ me }: AccountFormProps): JSX.Element {
   const { company } = me;
   const baseUrl = "https://vivasky.media";
+  const router = useRouter();
+  const { showToast } = useToast();
+  const [saving, setSaving] = useState(false);
 
-  const { register, formState: { isDirty, dirtyFields }, reset } = useForm<AccountFormValues>({
+  const { register, handleSubmit, formState: { isDirty, dirtyFields, errors }, reset, setError } = useForm<AccountFormValues>({
     defaultValues: {
       displayName: company.displayName,
       contactEmail: company.contactEmail,
@@ -40,6 +49,62 @@ export function AccountForm({ me }: AccountFormProps): JSX.Element {
   });
 
   const dirtyCount = Object.keys(dirtyFields).length;
+
+  async function onSubmit(values: AccountFormValues): Promise<void> {
+    // Build patch with only dirty LIVE fields
+    const patch: Record<string, string> = {};
+    for (const key of LIVE_KEYS) {
+      if (dirtyFields[key]) {
+        patch[key] = values[key];
+      }
+    }
+
+    if (Object.keys(patch).length === 0) return;
+
+    setSaving(true);
+    try {
+      const res = await fetch("/api/v1/me/account", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(patch),
+      });
+
+      const json = await res.json();
+
+      if (!res.ok) {
+        // Zod field-level errors → inline under each field
+        if (json.error?.code === "VALIDATION_FAILED" && json.error.fields) {
+          const fields = json.error.fields as Record<string, string[]>;
+          for (const [field, messages] of Object.entries(fields)) {
+            if (LIVE_KEYS.includes(field as typeof LIVE_KEYS[number])) {
+              setError(field as keyof AccountFormValues, { message: messages[0] });
+            }
+          }
+          return;
+        }
+        // Generic server error → toast
+        showToast("Erreur, veuillez réessayer");
+        return;
+      }
+
+      // Success — reset form with updated values from response
+      const meData = json as MeResponse;
+      reset({
+        displayName: meData.company.displayName,
+        contactEmail: meData.company.contactEmail,
+        phone: meData.company.phone ?? "",
+        whatsapp: meData.company.whatsapp ?? "",
+        ville: meData.company.ville,
+        address: meData.company.address ?? "",
+      });
+      showToast("Modifications enregistrées");
+      router.refresh();
+    } catch {
+      showToast("Erreur, veuillez réessayer");
+    } finally {
+      setSaving(false);
+    }
+  }
 
   return (
     <div className="max-w-[1120px] mx-auto space-y-6">
@@ -294,12 +359,16 @@ export function AccountForm({ me }: AccountFormProps): JSX.Element {
               <span className="absolute left-3 top-1/2 -translate-y-1/2 material-symbols-outlined text-ink-tertiary pointer-events-none" style={{ fontSize: 16 }}>
                 alternate_email
               </span>
-              <input id="acc-email-contact" type="email" className="field-input pl-9" {...register("contactEmail")} />
+              <input id="acc-email-contact" type="email" className={`field-input pl-9 ${errors.contactEmail ? "border-[#B91C1C]" : ""}`} {...register("contactEmail")} />
             </div>
-            <div className="field-help">
-              <span className="material-symbols-outlined" style={{ fontSize: 13 }}>info</span>
-              Affiché sur vos profils publics — peut différer de l&apos;email de compte
-            </div>
+            {errors.contactEmail ? (
+              <p className="text-[12px] text-[#B91C1C] mt-1">{errors.contactEmail.message}</p>
+            ) : (
+              <div className="field-help">
+                <span className="material-symbols-outlined" style={{ fontSize: 13 }}>info</span>
+                Affiché sur vos profils publics — peut différer de l&apos;email de compte
+              </div>
+            )}
           </div>
 
           {/* Phone (live) */}
@@ -311,12 +380,16 @@ export function AccountForm({ me }: AccountFormProps): JSX.Element {
               <span className="absolute left-3 top-1/2 -translate-y-1/2 material-symbols-outlined text-ink-tertiary pointer-events-none" style={{ fontSize: 16 }}>
                 call
               </span>
-              <input id="acc-phone" type="tel" className="field-input pl-9" {...register("phone")} />
+              <input id="acc-phone" type="tel" className={`field-input pl-9 ${errors.phone ? "border-[#B91C1C]" : ""}`} {...register("phone")} />
             </div>
-            <div className="field-help">
-              <span className="material-symbols-outlined" style={{ fontSize: 13 }}>info</span>
-              Ligne fixe ou standard · Affiché sur vos 3 profils publics
-            </div>
+            {errors.phone ? (
+              <p className="text-[12px] text-[#B91C1C] mt-1">{errors.phone.message}</p>
+            ) : (
+              <div className="field-help">
+                <span className="material-symbols-outlined" style={{ fontSize: 13 }}>info</span>
+                Ligne fixe ou standard · Affiché sur vos 3 profils publics
+              </div>
+            )}
           </div>
 
           {/* WhatsApp (live) */}
@@ -328,12 +401,16 @@ export function AccountForm({ me }: AccountFormProps): JSX.Element {
               <span className="absolute left-3 top-1/2 -translate-y-1/2 material-symbols-outlined icon-fill text-status-active-fg pointer-events-none" style={{ fontSize: 16 }}>
                 chat
               </span>
-              <input id="acc-whatsapp" type="tel" className="field-input pl-9" {...register("whatsapp")} />
+              <input id="acc-whatsapp" type="tel" className={`field-input pl-9 ${errors.whatsapp ? "border-[#B91C1C]" : ""}`} {...register("whatsapp")} />
             </div>
-            <div className="field-help">
-              <span className="material-symbols-outlined" style={{ fontSize: 13 }}>info</span>
-              Numéro WhatsApp business · peut être identique au téléphone
-            </div>
+            {errors.whatsapp ? (
+              <p className="text-[12px] text-[#B91C1C] mt-1">{errors.whatsapp.message}</p>
+            ) : (
+              <div className="field-help">
+                <span className="material-symbols-outlined" style={{ fontSize: 13 }}>info</span>
+                Numéro WhatsApp business · peut être identique au téléphone
+              </div>
+            )}
           </div>
 
           {/* Country (locked) */}
@@ -364,7 +441,10 @@ export function AccountForm({ me }: AccountFormProps): JSX.Element {
             <label htmlFor="acc-city" className="field-label">
               Ville <span className="text-[#B91C1C] font-bold ml-0.5">*</span>
             </label>
-            <input id="acc-city" type="text" className="field-input" {...register("ville")} />
+            <input id="acc-city" type="text" className={`field-input ${errors.ville ? "border-[#B91C1C]" : ""}`} {...register("ville")} />
+            {errors.ville && (
+              <p className="text-[12px] text-[#B91C1C] mt-1">{errors.ville.message}</p>
+            )}
           </div>
 
           {/* Address (live, optional) */}
@@ -376,8 +456,11 @@ export function AccountForm({ me }: AccountFormProps): JSX.Element {
               <span className="absolute left-3 top-1/2 -translate-y-1/2 material-symbols-outlined text-ink-tertiary pointer-events-none" style={{ fontSize: 16 }}>
                 location_on
               </span>
-              <input id="acc-address" type="text" className="field-input pl-9" {...register("address")} />
+              <input id="acc-address" type="text" className={`field-input pl-9 ${errors.address ? "border-[#B91C1C]" : ""}`} {...register("address")} />
             </div>
+            {errors.address && (
+              <p className="text-[12px] text-[#B91C1C] mt-1">{errors.address.message}</p>
+            )}
           </div>
         </div>
       </section>
@@ -487,7 +570,7 @@ export function AccountForm({ me }: AccountFormProps): JSX.Element {
       </section>
 
       {/* ═══ ACTION BAR ═══ */}
-      <AccountActionBar isDirty={isDirty} dirtyCount={dirtyCount} onReset={() => reset()} />
+      <AccountActionBar isDirty={isDirty} dirtyCount={dirtyCount} saving={saving} onReset={() => reset()} onSave={handleSubmit(onSubmit)} />
 
       {/* ═══ DANGER ZONE ═══ */}
       <section className="border border-[#FCA5A5] bg-[#FEF2F2] rounded-lg p-5 md:p-6 mt-8">

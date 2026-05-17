@@ -1,15 +1,15 @@
 "use client";
 
-import { useFeatureSoonToast } from "@/hooks/useFeatureSoonToast";
-
 interface AccountActionBarProps {
   isDirty: boolean;
   dirtyCount: number;
+  saving: boolean;
   onReset: () => void;
+  onSave: () => void;
 }
 
-export function AccountActionBar({ isDirty, dirtyCount, onReset }: AccountActionBarProps): JSX.Element {
-  const toast = useFeatureSoonToast();
+export function AccountActionBar({ isDirty, dirtyCount, saving, onReset, onSave }: AccountActionBarProps): JSX.Element {
+  const disabled = !isDirty || saving;
 
   return (
     <section className="flex flex-col md:flex-row md:items-center md:justify-between gap-3 md:gap-4 pt-2 md:pt-0">
@@ -47,10 +47,10 @@ export function AccountActionBar({ isDirty, dirtyCount, onReset }: AccountAction
       <div className="flex items-center gap-2 shrink-0 flex-wrap justify-end">
         <button
           type="button"
-          disabled={!isDirty}
+          disabled={disabled}
           onClick={onReset}
           className={`px-4 py-[9px] text-[13px] font-semibold rounded transition-colors ${
-            isDirty
+            !disabled
               ? "text-primary hover:bg-primary-light cursor-pointer"
               : "text-[#C8C6C4] cursor-not-allowed"
           }`}
@@ -59,16 +59,20 @@ export function AccountActionBar({ isDirty, dirtyCount, onReset }: AccountAction
         </button>
         <button
           type="button"
-          disabled={!isDirty}
-          onClick={() => toast()}
+          disabled={disabled}
+          onClick={onSave}
           className={`inline-flex items-center gap-1.5 px-4 py-[9px] text-[13px] font-semibold rounded transition-colors ${
-            isDirty
+            !disabled
               ? "text-white bg-primary hover:bg-primary-hover cursor-pointer"
               : "text-[#A8A8A8] bg-[#E0E0E0] border border-[#E0E0E0] cursor-not-allowed"
           }`}
         >
-          <span className="material-symbols-outlined" style={{ fontSize: 16 }}>save</span>
-          Enregistrer
+          {saving ? (
+            <span className="material-symbols-outlined animate-spin" style={{ fontSize: 16 }}>progress_activity</span>
+          ) : (
+            <span className="material-symbols-outlined" style={{ fontSize: 16 }}>save</span>
+          )}
+          {saving ? "Enregistrement…" : "Enregistrer"}
         </button>
       </div>
     </section>
