@@ -16,24 +16,20 @@ export const AccountLiveUpdateSchema = z.object({
   phone: z
     .string()
     .trim()
-    .transform((v) => v.replace(/[^\d+]/g, ""))
+    .refine((v) => /^[+\s\-()0-9]*$/.test(v), "Numéro de téléphone invalide (format attendu : +216XXXXXXXX).")
+    .transform((v) => v.replace(/[\s\-()]/g, ""))
     .pipe(
-      z
-        .string()
-        .min(8, "Numéro de téléphone trop court (8 chiffres min).")
-        .max(20, "Numéro de téléphone trop long."),
+      z.string().regex(/^\+[0-9]{8,15}$/, "Numéro de téléphone invalide (format attendu : +216XXXXXXXX)."),
     )
     .optional(),
 
   whatsapp: z
     .string()
     .trim()
-    .transform((v) => v.replace(/[^\d+]/g, ""))
+    .refine((v) => /^[+\s\-()0-9]*$/.test(v), "Numéro WhatsApp invalide (format attendu : +216XXXXXXXX).")
+    .transform((v) => v.replace(/[\s\-()]/g, ""))
     .pipe(
-      z
-        .string()
-        .min(8, "Numéro WhatsApp trop court (8 chiffres min).")
-        .max(20, "Numéro WhatsApp trop long."),
+      z.string().regex(/^\+[0-9]{8,15}$/, "Numéro WhatsApp invalide (format attendu : +216XXXXXXXX)."),
     )
     .optional(),
 

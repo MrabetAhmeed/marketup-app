@@ -380,7 +380,7 @@ export function AccountForm({ me }: AccountFormProps): JSX.Element {
               <span className="absolute left-3 top-1/2 -translate-y-1/2 material-symbols-outlined text-ink-tertiary pointer-events-none" style={{ fontSize: 16 }}>
                 call
               </span>
-              <input id="acc-phone" type="tel" className={`field-input pl-9 ${errors.phone ? "border-[#B91C1C]" : ""}`} {...register("phone")} />
+              <input id="acc-phone" type="text" inputMode="tel" className={`field-input pl-9 ${errors.phone ? "border-[#B91C1C]" : ""}`} {...register("phone")} />
             </div>
             {errors.phone ? (
               <p className="text-[12px] text-[#B91C1C] mt-1">{errors.phone.message}</p>
@@ -401,7 +401,7 @@ export function AccountForm({ me }: AccountFormProps): JSX.Element {
               <span className="absolute left-3 top-1/2 -translate-y-1/2 material-symbols-outlined icon-fill text-status-active-fg pointer-events-none" style={{ fontSize: 16 }}>
                 chat
               </span>
-              <input id="acc-whatsapp" type="tel" className={`field-input pl-9 ${errors.whatsapp ? "border-[#B91C1C]" : ""}`} {...register("whatsapp")} />
+              <input id="acc-whatsapp" type="text" inputMode="tel" className={`field-input pl-9 ${errors.whatsapp ? "border-[#B91C1C]" : ""}`} {...register("whatsapp")} />
             </div>
             {errors.whatsapp ? (
               <p className="text-[12px] text-[#B91C1C] mt-1">{errors.whatsapp.message}</p>
