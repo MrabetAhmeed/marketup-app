@@ -29,6 +29,10 @@ public/shared/
 public/uploads/companies/*/
 !public/uploads/companies/.gitkeep
 
+# Browser test working docs (regenerated per sprint)
+tmp/
+BROWSER_TEST_SCENARIOS_*.md
+
 # OS
 .DS_Store
 Thumbs.db

@@ -2,9 +2,11 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { StatusPill } from "@/components/shared/StatusPill";
 import { ProfileStatusBlock } from "@/components/shared/ProfileStatusBlock";
+import { useToast } from "@/components/shared/Toast";
 import { ProfileActionBar } from "./ProfileActionBar";
 import { AddVideoModal } from "./AddVideoModal";
 import { useFeatureSoonToast } from "@/hooks/useFeatureSoonToast";
@@ -31,7 +33,8 @@ interface FormValues {
 }
 
 export function TraceUpEditor({ profile, company }: TraceUpEditorProps): JSX.Element {
-  const toast = useFeatureSoonToast();
+  const router = useRouter();
+  const { showToast } = useToast();
   // Per CLAUDE.md §6.10: videos are direct CRUD, only metadata is pending-gated
   const isMetadataReadOnly = profile.status === "pending" || profile.status === "disabled";
 
@@ -44,6 +47,47 @@ export function TraceUpEditor({ profile, company }: TraceUpEditorProps): JSX.Ele
       channelDescription: profile.data.channelDescription,
     },
   });
+
+  // --- Soft state: isPublic ---
+  const [isPublic, setIsPublic] = useState(profile.isPublic);
+  const isPublicDirty = isPublic !== profile.isPublic;
+  const softDirtyCount = isPublicDirty ? 1 : 0;
+  const [saving, setSaving] = useState(false);
+
+  async function handleSoftSave(): Promise<void> {
+    if (!isPublicDirty) return;
+    setSaving(true);
+    try {
+      const res = await fetch(`/api/v1/profiles/${profile.id}/soft`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ isPublic }),
+      });
+      const json = await res.json();
+
+      if (!res.ok) {
+        if (json.error?.code === "VALIDATION_FAILED") {
+          showToast(json.error.message || "Erreur de validation");
+        } else {
+          showToast("Erreur, veuillez réessayer");
+        }
+        return;
+      }
+      const data = json as TraceUpEditorData;
+      setIsPublic(data.isPublic);
+      showToast("Modifications enregistrées");
+      router.refresh();
+    } catch {
+      showToast("Erreur, veuillez réessayer");
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  function handleReset(): void {
+    reset();
+    setIsPublic(profile.isPublic);
+  }
 
   // Group videos by category
   const videosByCategory: Record<VideoCategory, VideoItem[]> = {
@@ -115,7 +159,7 @@ export function TraceUpEditor({ profile, company }: TraceUpEditorProps): JSX.Ele
           <div className="text-[12px] text-ink-secondary mt-0.5">Quand activé, votre profil apparaît dans le moteur TraceUP.</div>
         </div>
         <label className="relative inline-block w-9 h-5 shrink-0">
-          <input type="checkbox" className="sr-only peer" checked={profile.isPublic} disabled={profile.status !== "active"} onChange={() => toast()} />
+          <input type="checkbox" className="sr-only peer" checked={isPublic} disabled={profile.status !== "active"} onChange={() => setIsPublic(!isPublic)} />
           <span className="absolute inset-0 cursor-pointer rounded-[10px] bg-[#C8C6C4] transition-colors peer-checked:bg-primary peer-disabled:opacity-60 peer-disabled:cursor-not-allowed" />
           <span className="absolute left-[3px] top-[3px] h-3.5 w-3.5 rounded-full bg-white shadow-sm transition-transform peer-checked:translate-x-4" />
         </label>
@@ -246,7 +290,14 @@ export function TraceUpEditor({ profile, company }: TraceUpEditorProps): JSX.Ele
       </section>
 
       {/* ═══ ACTION BAR ═══ */}
-      <ProfileActionBar status={profile.status} isDirty={isDirty} onReset={() => reset()} />
+      <ProfileActionBar
+        status={profile.status}
+        isDirty={isDirty}
+        onReset={handleReset}
+        softDirtyCount={softDirtyCount}
+        saving={saving}
+        onSoftSave={handleSoftSave}
+      />
 
       {/* ═══ ADD VIDEO MODAL ═══ */}
       <AddVideoModal

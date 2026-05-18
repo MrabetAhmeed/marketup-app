@@ -7,17 +7,21 @@ interface ProfileActionBarProps {
   status: ProfileStatus;
   isDirty: boolean;
   onReset: () => void;
+  /** Soft mutation props (Phase 4 Sprint 2) */
+  softDirtyCount?: number;
+  saving?: boolean;
+  onSoftSave?: () => void;
 }
 
 /**
  * Status-driven action bar for profile editors.
- * All submit actions are stubbed via useFeatureSoonToast() for Phase 3.
  *
- * Mutation tracking is conceptual only (comments) — real soft/hard
- * distinction activates in Phase 4 when mutations are live.
+ * - SOFT mutations (isPublic, galleryOrder, socials): wired via onSoftSave (Phase 4 Sprint 2)
+ * - HARD mutations (pitch, about, submit): stubbed via useFeatureSoonToast (Phase 4 Sprint 3)
  */
-export function ProfileActionBar({ status, isDirty, onReset }: ProfileActionBarProps): JSX.Element {
+export function ProfileActionBar({ status, isDirty, onReset, softDirtyCount = 0, saving = false, onSoftSave }: ProfileActionBarProps): JSX.Element {
   const toast = useFeatureSoonToast();
+  const hasSoftChanges = softDirtyCount > 0;
 
   // ─── pending: disabled with info ───────────────────────────────────────
   if (status === "pending") {
@@ -60,17 +64,52 @@ export function ProfileActionBar({ status, isDirty, onReset }: ProfileActionBarP
 
   // ─── incomplete: save draft + submit ───────────────────────────────────
   if (status === "incomplete") {
+    const anyDirtyInc = isDirty || hasSoftChanges;
+    const softDisabledInc = !hasSoftChanges || saving;
     return (
       <ActionBarShell>
         <div className="flex items-start md:items-center gap-2 text-[12px] text-ink-secondary leading-snug">
-          <span className="material-symbols-outlined icon-fill shrink-0 mt-[1px] md:mt-0 text-[#475569]" style={{ fontSize: 15 }}>
-            draft
-          </span>
-          <span>
-            <strong className="text-[#475569]">Brouillon</strong> · complétez les champs puis soumettez
-          </span>
+          {hasSoftChanges ? (
+            <>
+              <span className="material-symbols-outlined icon-fill shrink-0 mt-[1px] md:mt-0 text-[#D97706]" style={{ fontSize: 15 }}>edit</span>
+              <span>
+                <strong className="text-[#92400E]">{softDirtyCount} modification{softDirtyCount > 1 ? "s" : ""} en attente</strong>{" "}
+                · cliquez Enregistrer pour appliquer
+              </span>
+            </>
+          ) : (
+            <>
+              <span className="material-symbols-outlined icon-fill shrink-0 mt-[1px] md:mt-0 text-[#475569]" style={{ fontSize: 15 }}>draft</span>
+              <span><strong className="text-[#475569]">Brouillon</strong> · complétez les champs puis soumettez</span>
+            </>
+          )}
         </div>
         <div className="flex items-center gap-2 shrink-0 flex-wrap justify-end">
+          {anyDirtyInc && (
+            <button
+              type="button"
+              disabled={saving}
+              onClick={onReset}
+              className={`px-4 py-[9px] text-[13px] font-semibold rounded transition-colors ${!saving ? "text-primary hover:bg-primary-light" : "text-[#C8C6C4] cursor-not-allowed"}`}
+            >
+              Annuler
+            </button>
+          )}
+          {onSoftSave && (
+            <button
+              type="button"
+              disabled={softDisabledInc}
+              onClick={onSoftSave}
+              className={`inline-flex items-center gap-1.5 px-4 py-[9px] text-[13px] font-semibold rounded transition-colors ${!softDisabledInc ? "text-white bg-primary hover:bg-primary-hover" : "text-[#A8A8A8] bg-[#E0E0E0] cursor-not-allowed"}`}
+            >
+              {saving ? (
+                <span className="material-symbols-outlined animate-spin" style={{ fontSize: 16 }}>progress_activity</span>
+              ) : (
+                <span className="material-symbols-outlined" style={{ fontSize: 16 }}>save</span>
+              )}
+              {saving ? "Enregistrement…" : "Enregistrer"}
+            </button>
+          )}
           <button type="button" onClick={() => toast()} className="px-4 py-[9px] text-[13px] font-semibold text-primary hover:bg-primary-light rounded transition-colors">
             Enregistrer brouillon
           </button>
@@ -85,35 +124,64 @@ export function ProfileActionBar({ status, isDirty, onReset }: ProfileActionBarP
 
   // ─── rejected: resoumettre ─────────────────────────────────────────────
   if (status === "rejected") {
+    const anyDirtyRej = isDirty || hasSoftChanges;
+    const softDisabledRej = !hasSoftChanges || saving;
     return (
       <ActionBarShell>
-        <div className="flex items-start md:items-center gap-2 text-[12px] text-ink-secondary leading-snug">
-          {isDirty ? (
-            <>
-              <span className="material-symbols-outlined icon-fill shrink-0 mt-[1px] md:mt-0 text-[#475569]" style={{ fontSize: 15 }}>draft</span>
-              <span><strong className="text-[#475569]">Modifications non soumises</strong> · soumettez pour publication</span>
-            </>
-          ) : (
-            <>
-              <span className="material-symbols-outlined icon-fill shrink-0 mt-[1px] md:mt-0 text-[#B91C1C]" style={{ fontSize: 15 }}>error</span>
+        <div className="flex flex-col gap-1.5 text-[12px] text-ink-secondary leading-snug">
+          {hasSoftChanges && (
+            <div className="flex items-center gap-2">
+              <span className="material-symbols-outlined icon-fill shrink-0 text-[#D97706]" style={{ fontSize: 15 }}>edit</span>
+              <span>
+                <strong className="text-[#92400E]">{softDirtyCount} modification{softDirtyCount > 1 ? "s" : ""} directe{softDirtyCount > 1 ? "s" : ""}</strong>{" "}
+                · cliquez Enregistrer pour appliquer
+              </span>
+            </div>
+          )}
+          {isDirty && (
+            <div className="flex items-center gap-2">
+              <span className="material-symbols-outlined icon-fill shrink-0 text-[#475569]" style={{ fontSize: 15 }}>draft</span>
+              <span><strong className="text-[#475569]">Modifications à resoumettre</strong> · revalidation admin requise</span>
+            </div>
+          )}
+          {!hasSoftChanges && !isDirty && (
+            <div className="flex items-center gap-2">
+              <span className="material-symbols-outlined icon-fill shrink-0 text-[#B91C1C]" style={{ fontSize: 15 }}>error</span>
               <span><strong className="text-[#B91C1C]">Profil refusé</strong> · corrigez puis resoumettez</span>
-            </>
+            </div>
           )}
         </div>
         <div className="flex items-center gap-2 shrink-0 flex-wrap justify-end">
           <button
             type="button"
-            disabled={!isDirty}
+            disabled={!anyDirtyRej || saving}
             onClick={onReset}
-            className={`px-4 py-[9px] text-[13px] font-semibold rounded transition-colors ${isDirty ? "text-primary hover:bg-primary-light" : "text-[#C8C6C4] cursor-not-allowed"}`}
+            className={`px-4 py-[9px] text-[13px] font-semibold rounded transition-colors ${anyDirtyRej && !saving ? "text-primary hover:bg-primary-light" : "text-[#C8C6C4] cursor-not-allowed"}`}
           >
             Annuler
           </button>
+          {/* Soft save — instant, no admin review */}
+          {onSoftSave && (
+            <button
+              type="button"
+              disabled={softDisabledRej}
+              onClick={onSoftSave}
+              className={`inline-flex items-center gap-1.5 px-4 py-[9px] text-[13px] font-semibold rounded transition-colors ${!softDisabledRej ? "text-white bg-primary hover:bg-primary-hover" : "text-[#A8A8A8] bg-[#E0E0E0] cursor-not-allowed"}`}
+            >
+              {saving ? (
+                <span className="material-symbols-outlined animate-spin" style={{ fontSize: 16 }}>progress_activity</span>
+              ) : (
+                <span className="material-symbols-outlined" style={{ fontSize: 16 }}>save</span>
+              )}
+              {saving ? "Enregistrement…" : "Enregistrer"}
+            </button>
+          )}
+          {/* Hard submit — admin review required (Sprint 3) */}
           <button
             type="button"
-            disabled={!isDirty}
+            disabled={!isDirty || saving}
             onClick={() => toast()}
-            className={`inline-flex items-center gap-1.5 px-4 py-[9px] text-[13px] font-semibold rounded transition-colors ${isDirty ? "text-white bg-primary hover:bg-primary-hover" : "text-[#A8A8A8] bg-[#E0E0E0] cursor-not-allowed"}`}
+            className={`inline-flex items-center gap-1.5 px-4 py-[9px] text-[13px] font-semibold rounded transition-colors ${isDirty && !saving ? "text-white bg-primary hover:bg-primary-hover" : "text-[#A8A8A8] bg-[#E0E0E0] cursor-not-allowed"}`}
           >
             <span className="material-symbols-outlined" style={{ fontSize: 16 }}>send</span>
             Enregistrer et resoumettre
@@ -124,35 +192,67 @@ export function ProfileActionBar({ status, isDirty, onReset }: ProfileActionBarP
   }
 
   // ─── active: standard edit flow ────────────────────────────────────────
+  const anyDirty = isDirty || hasSoftChanges;
+  const softSaveDisabled = !hasSoftChanges || saving;
+
   return (
     <ActionBarShell>
-      <div className="flex items-start md:items-center gap-2 text-[12px] text-ink-secondary leading-snug">
-        {isDirty ? (
-          <>
-            <span className="material-symbols-outlined icon-fill shrink-0 mt-[1px] md:mt-0 text-[#475569]" style={{ fontSize: 15 }}>draft</span>
-            <span><strong className="text-[#475569]">Modifications non soumises</strong> · les changements nécessitent une revalidation admin</span>
-          </>
-        ) : (
-          <>
-            <span className="material-symbols-outlined icon-fill shrink-0 mt-[1px] md:mt-0 text-status-active-fg" style={{ fontSize: 15 }}>check_circle</span>
-            <span><strong className="text-status-active-fg">Profil publié</strong> · les modifications nécessitent une revalidation admin</span>
-          </>
+      <div className="flex flex-col gap-1.5 text-[12px] text-ink-secondary leading-snug">
+        {hasSoftChanges && (
+          <div className="flex items-center gap-2">
+            <span className="material-symbols-outlined icon-fill shrink-0 text-[#D97706]" style={{ fontSize: 15 }}>edit</span>
+            <span>
+              <strong className="text-[#92400E]">
+                {softDirtyCount} modification{softDirtyCount > 1 ? "s" : ""} directe{softDirtyCount > 1 ? "s" : ""}
+              </strong>{" "}
+              · cliquez Enregistrer pour appliquer
+            </span>
+          </div>
+        )}
+        {isDirty && (
+          <div className="flex items-center gap-2">
+            <span className="material-symbols-outlined icon-fill shrink-0 text-[#475569]" style={{ fontSize: 15 }}>draft</span>
+            <span><strong className="text-[#475569]">Modifications à soumettre</strong> · revalidation admin requise</span>
+          </div>
+        )}
+        {!hasSoftChanges && !isDirty && (
+          <div className="flex items-center gap-2">
+            <span className="material-symbols-outlined icon-fill shrink-0 text-status-active-fg" style={{ fontSize: 15 }}>check_circle</span>
+            <span><strong className="text-status-active-fg">Profil publié</strong> · aucune modification en attente</span>
+          </div>
         )}
       </div>
       <div className="flex items-center gap-2 shrink-0 flex-wrap justify-end">
         <button
           type="button"
-          disabled={!isDirty}
+          disabled={!anyDirty || saving}
           onClick={onReset}
-          className={`px-4 py-[9px] text-[13px] font-semibold rounded transition-colors ${isDirty ? "text-primary hover:bg-primary-light" : "text-[#C8C6C4] cursor-not-allowed"}`}
+          className={`px-4 py-[9px] text-[13px] font-semibold rounded transition-colors ${anyDirty && !saving ? "text-primary hover:bg-primary-light" : "text-[#C8C6C4] cursor-not-allowed"}`}
         >
           Annuler
         </button>
+        {/* Soft save — instant, no admin review */}
+        {onSoftSave && (
+          <button
+            type="button"
+            disabled={softSaveDisabled}
+            onClick={onSoftSave}
+            className={`inline-flex items-center gap-1.5 px-4 py-[9px] text-[13px] font-semibold rounded transition-colors ${!softSaveDisabled ? "text-white bg-primary hover:bg-primary-hover" : "text-[#A8A8A8] bg-[#E0E0E0] cursor-not-allowed"}`}
+          >
+            {saving ? (
+              <span className="material-symbols-outlined animate-spin" style={{ fontSize: 16 }}>progress_activity</span>
+            ) : (
+              <span className="material-symbols-outlined" style={{ fontSize: 16 }}>save</span>
+            )}
+            {saving ? "Enregistrement…" : "Enregistrer"}
+          </button>
+        )}
+        {/* Hard submit — admin review required (Sprint 3) */}
         <button
           type="button"
-          disabled={!isDirty}
+          disabled={!isDirty || saving}
           onClick={() => toast()}
-          className={`inline-flex items-center gap-1.5 px-4 py-[9px] text-[13px] font-semibold rounded transition-colors ${isDirty ? "text-white bg-primary hover:bg-primary-hover" : "text-[#A8A8A8] bg-[#E0E0E0] cursor-not-allowed"}`}
+          className={`inline-flex items-center gap-1.5 px-4 py-[9px] text-[13px] font-semibold rounded transition-colors ${isDirty && !saving ? "text-white bg-primary hover:bg-primary-hover" : "text-[#A8A8A8] bg-[#E0E0E0] cursor-not-allowed"}`}
         >
           <span className="material-symbols-outlined" style={{ fontSize: 16 }}>send</span>
           Soumettre les modifications

@@ -44,6 +44,7 @@ export async function getProfileForEditor(
   ]);
 
   const base = {
+    id: profile._id.toString(),
     status: profile.status,
     isPublic: profile.isPublic ?? true,
     rejectionReason: profile.rejectionReason ?? null,

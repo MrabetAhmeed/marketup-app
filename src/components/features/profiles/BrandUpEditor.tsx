@@ -1,15 +1,16 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { StatusPill } from "@/components/shared/StatusPill";
 import { ProfileStatusBlock } from "@/components/shared/ProfileStatusBlock";
+import { useToast } from "@/components/shared/Toast";
 import { ProfileActionBar } from "./ProfileActionBar";
 import { AddGalleryImageModal } from "./AddGalleryImageModal";
 import { GalleryDeleteConfirm } from "./GalleryDeleteConfirm";
-import { useFeatureSoonToast } from "@/hooks/useFeatureSoonToast";
-import type { BrandUpEditorData } from "@/types/profile-editor";
+import type { BrandUpEditorData, GalleryItem } from "@/types/profile-editor";
 import type { MeResponse } from "@/types/dashboard";
 
 // SCOPE_DECISION: 9 gallery slots max (mockup shows 10 — reduced per owner directive)
@@ -26,7 +27,8 @@ interface FormValues {
 }
 
 export function BrandUpEditor({ profile, company }: BrandUpEditorProps): JSX.Element {
-  const toast = useFeatureSoonToast();
+  const router = useRouter();
+  const { showToast } = useToast();
   const isReadOnly = profile.status === "pending" || profile.status === "disabled";
 
   const { register, formState: { isDirty }, reset } = useForm<FormValues>({
@@ -36,7 +38,73 @@ export function BrandUpEditor({ profile, company }: BrandUpEditorProps): JSX.Ele
     },
   });
 
-  const gallery = profile.data.gallery;
+  // --- Soft state: isPublic ---
+  const [isPublic, setIsPublic] = useState(profile.isPublic);
+  const isPublicDirty = isPublic !== profile.isPublic;
+
+  // --- Soft state: gallery order ---
+  const [galleryOrder, setGalleryOrder] = useState<GalleryItem[]>(profile.data.gallery);
+  const initialOrderIds = profile.data.gallery.map((g) => g.id).join(",");
+  const currentOrderIds = galleryOrder.map((g) => g.id).join(",");
+  const galleryOrderDirty = currentOrderIds !== initialOrderIds;
+
+  // --- Soft dirty tracking ---
+  const softDirtyCount = (isPublicDirty ? 1 : 0) + (galleryOrderDirty ? 1 : 0);
+  const [saving, setSaving] = useState(false);
+
+  const moveGalleryItem = useCallback((fromIdx: number, toIdx: number) => {
+    setGalleryOrder((prev) => {
+      const next = [...prev];
+      const [item] = next.splice(fromIdx, 1);
+      next.splice(toIdx, 0, item!);
+      return next;
+    });
+  }, []);
+
+  async function handleSoftSave(): Promise<void> {
+    const patch: Record<string, unknown> = {};
+    if (isPublicDirty) patch.isPublic = isPublic;
+    if (galleryOrderDirty) patch.galleryOrder = galleryOrder.map((g) => g.id);
+    if (Object.keys(patch).length === 0) return;
+
+    setSaving(true);
+    try {
+      const res = await fetch(`/api/v1/profiles/${profile.id}/soft`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(patch),
+      });
+
+      const json = await res.json();
+
+      if (!res.ok) {
+        if (json.error?.code === "VALIDATION_FAILED") {
+          showToast(json.error.message || "Erreur de validation");
+        } else {
+          showToast("Erreur, veuillez réessayer");
+        }
+        return;
+      }
+      const data = json as BrandUpEditorData;
+      // Reset soft state to server values
+      setIsPublic(data.isPublic);
+      setGalleryOrder(data.data.gallery);
+      showToast("Modifications enregistrées");
+      router.refresh();
+    } catch {
+      showToast("Erreur, veuillez réessayer");
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  function handleReset(): void {
+    reset();
+    setIsPublic(profile.isPublic);
+    setGalleryOrder(profile.data.gallery);
+  }
+
+  const gallery = galleryOrder;
   const filledSlots = gallery.length;
   const emptySlots = MAX_GALLERY - filledSlots;
 
@@ -124,9 +192,9 @@ export function BrandUpEditor({ profile, company }: BrandUpEditorProps): JSX.Ele
           <input
             type="checkbox"
             className="sr-only peer"
-            checked={profile.isPublic}
+            checked={isPublic}
             disabled={isReadOnly || profile.status !== "active"}
-            onChange={() => toast()}
+            onChange={() => setIsPublic(!isPublic)}
           />
           <span className="absolute inset-0 cursor-pointer rounded-[10px] bg-[#C8C6C4] transition-colors peer-checked:bg-primary peer-disabled:opacity-60 peer-disabled:cursor-not-allowed" />
           <span className="absolute left-[3px] top-[3px] h-3.5 w-3.5 rounded-full bg-white shadow-sm transition-transform peer-checked:translate-x-4" />
@@ -205,6 +273,8 @@ export function BrandUpEditor({ profile, company }: BrandUpEditorProps): JSX.Ele
           gallery={gallery}
           emptySlots={emptySlots}
           isReadOnly={isReadOnly}
+          onMoveUp={(i) => moveGalleryItem(i, i - 1)}
+          onMoveDown={(i) => moveGalleryItem(i, i + 1)}
         />
 
         <div className="mt-4 flex items-start gap-2 text-[11px] text-ink-tertiary leading-snug">
@@ -230,7 +300,14 @@ export function BrandUpEditor({ profile, company }: BrandUpEditorProps): JSX.Ele
       )}
 
       {/* ═══ ACTION BAR ═══ */}
-      <ProfileActionBar status={profile.status} isDirty={isDirty} onReset={() => reset()} />
+      <ProfileActionBar
+        status={profile.status}
+        isDirty={isDirty}
+        onReset={handleReset}
+        softDirtyCount={softDirtyCount}
+        saving={saving}
+        onSoftSave={handleSoftSave}
+      />
     </div>
   );
 }
@@ -247,12 +324,15 @@ function GalleryGrid({
   gallery,
   emptySlots,
   isReadOnly,
+  onMoveUp,
+  onMoveDown,
 }: {
   gallery: BrandUpEditorData["data"]["gallery"];
   emptySlots: number;
   isReadOnly: boolean;
+  onMoveUp: (index: number) => void;
+  onMoveDown: (index: number) => void;
 }): JSX.Element {
-  const toast = useFeatureSoonToast();
   const [addModalOpen, setAddModalOpen] = useState(false);
   const [deleteTarget, setDeleteTarget] = useState<{ caption: string } | null>(null);
 
@@ -302,7 +382,7 @@ function GalleryGrid({
                   <button
                     type="button"
                     disabled={i === 0}
-                    onClick={() => toast("FEATURE_COMING_SOON_GALLERY_REORDER")}
+                    onClick={() => onMoveUp(i)}
                     className="w-6 h-6 rounded flex items-center justify-center text-ink-secondary hover:text-primary hover:bg-primary-light transition-colors disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:text-ink-secondary disabled:hover:bg-transparent"
                     aria-label="Monter"
                   >
@@ -311,7 +391,7 @@ function GalleryGrid({
                   <button
                     type="button"
                     disabled={i === gallery.length - 1}
-                    onClick={() => toast("FEATURE_COMING_SOON_GALLERY_REORDER")}
+                    onClick={() => onMoveDown(i)}
                     className="w-6 h-6 rounded flex items-center justify-center text-ink-secondary hover:text-primary hover:bg-primary-light transition-colors disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:text-ink-secondary disabled:hover:bg-transparent"
                     aria-label="Descendre"
                   >

@@ -22,8 +22,8 @@ export async function middleware(req: NextRequest): Promise<NextResponse> {
     return NextResponse.redirect(loginUrl);
   }
 
-  // Dashboard routes require OWNER role
-  if (pathname.startsWith("/dashboard") || pathname.startsWith("/api/v1/me")) {
+  // Owner routes require OWNER role
+  if (pathname.startsWith("/dashboard") || pathname.startsWith("/api/v1/me") || pathname.startsWith("/api/v1/profiles")) {
     if (token.role !== "OWNER") {
       if (isApiRoute) {
         return NextResponse.json(
@@ -52,5 +52,5 @@ export async function middleware(req: NextRequest): Promise<NextResponse> {
 }
 
 export const config = {
-  matcher: ["/dashboard/:path*", "/admin/:path*", "/api/v1/me/:path*", "/api/v1/admin/:path*"],
+  matcher: ["/dashboard/:path*", "/admin/:path*", "/api/v1/me/:path*", "/api/v1/profiles/:path*", "/api/v1/admin/:path*"],
 };

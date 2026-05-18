@@ -192,3 +192,16 @@ Run: npm uninstall lucide-react next-themes @base-ui/react sonner
 Verify: npm run lint + typecheck stay clean
 
 Estimated effort: 5 minutes (but verify carefully).
+
+
+### Compteur HARD message
+- Actuellement : "Modifications à resoumettre · revalidation admin requise"
+- Cible : "X modifications à resoumettre · revalidation admin requise"
+- Cohérence avec compteur SOFT qui affiche déjà le nombre
+- Fichier : ProfileActionBar.tsx (branches active + rejected + incomplete)
+
+### Tests Vitest manquants Sprint 2
+- profile-soft.service: dispatch by kind
+- profile-soft.service: cross-tenant guard
+- profile-soft.service: gallery reorder with markModified
+- profile-soft.schema: strict mode + nested socials validation

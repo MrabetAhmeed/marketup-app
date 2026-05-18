@@ -1,12 +1,14 @@
 "use client";
 
+import { useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { StatusPill } from "@/components/shared/StatusPill";
 import { ProfileStatusBlock } from "@/components/shared/ProfileStatusBlock";
 import { CopyGroup } from "@/components/shared/CopyGroup";
+import { useToast } from "@/components/shared/Toast";
 import { ProfileActionBar } from "./ProfileActionBar";
-import { useFeatureSoonToast } from "@/hooks/useFeatureSoonToast";
 import type { LinkUpEditorData } from "@/types/profile-editor";
 import type { MeResponse } from "@/types/dashboard";
 
@@ -26,7 +28,8 @@ interface LinkUpEditorProps {
 type FormValues = Record<string, string>;
 
 export function LinkUpEditor({ profile, company }: LinkUpEditorProps): JSX.Element {
-  const toast = useFeatureSoonToast();
+  const router = useRouter();
+  const { showToast } = useToast();
   const isReadOnly = profile.status === "pending" || profile.status === "disabled";
   const baseUrl = "https://vivasky.media";
 
@@ -37,9 +40,109 @@ export function LinkUpEditor({ profile, company }: LinkUpEditorProps): JSX.Eleme
     defaultSocials[platform.id] = social?.url ?? "";
   }
 
-  const { register, formState: { isDirty }, reset } = useForm<FormValues>({
+  const { register, formState: { dirtyFields, errors }, reset, getValues, setError, clearErrors } = useForm<FormValues>({
     defaultValues: defaultSocials,
   });
+
+  // --- Soft state: isPublic ---
+  const [isPublic, setIsPublic] = useState(profile.isPublic);
+  const isPublicDirty = isPublic !== profile.isPublic;
+
+  // socials isDirty is tracked by the form (all 5 platform inputs are form fields)
+  const socialsDirtyCount = Object.keys(dirtyFields).length;
+  const softDirtyCount = (isPublicDirty ? 1 : 0) + (socialsDirtyCount > 0 ? 1 : 0);
+  const [saving, setSaving] = useState(false);
+
+  async function handleSoftSave(): Promise<void> {
+    const patch: Record<string, unknown> = {};
+    if (isPublicDirty) patch.isPublic = isPublic;
+
+    // Build socials array from dirty form fields
+    if (socialsDirtyCount > 0) {
+      const values = getValues();
+      const socials = LINK_PLATFORMS.map((p) => ({
+        platform: p.id,
+        url: values[p.id] ?? "",
+      }));
+      patch.socials = socials;
+    }
+
+    if (Object.keys(patch).length === 0) return;
+
+    clearErrors();
+    setSaving(true);
+    try {
+      const res = await fetch(`/api/v1/profiles/${profile.id}/soft`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(patch),
+      });
+
+      const json = await res.json();
+
+      if (!res.ok) {
+        if (json.error?.code === "VALIDATION_FAILED" && json.error.fields) {
+          const fields = json.error.fields as Record<string, string[]>;
+          let hasInlineError = false;
+
+          for (const [fieldPath, messages] of Object.entries(fields)) {
+            // Zod flatten() collapses nested array errors to "socials"
+            // Mark all dirty social inputs that have invalid URLs
+            if (fieldPath === "socials") {
+              const values = getValues();
+              for (const p of LINK_PLATFORMS) {
+                if (dirtyFields[p.id] && values[p.id] && !isValidUrl(values[p.id]!)) {
+                  setError(p.id, { message: messages[0] ?? "URL invalide." });
+                  hasInlineError = true;
+                }
+              }
+              if (!hasInlineError) {
+                // Fallback: show on first dirty social
+                const firstDirty = LINK_PLATFORMS.find((p) => dirtyFields[p.id]);
+                if (firstDirty) {
+                  setError(firstDirty.id, { message: messages[0] ?? "URL invalide." });
+                  hasInlineError = true;
+                }
+              }
+            }
+            // Direct field match (isPublic, etc.)
+            const directPlatform = LINK_PLATFORMS.find((p) => p.id === fieldPath);
+            if (directPlatform) {
+              setError(directPlatform.id, { message: messages[0] });
+              hasInlineError = true;
+            }
+          }
+          if (!hasInlineError) {
+            showToast("Erreur de validation, vérifiez vos liens");
+          }
+          return;
+        }
+        showToast("Erreur, veuillez réessayer");
+        return;
+      }
+
+      const data = json as LinkUpEditorData;
+      setIsPublic(data.isPublic);
+      // Reset form with new socials values
+      const newDefaults: FormValues = {};
+      for (const platform of LINK_PLATFORMS) {
+        const social = data.data.socials.find((s) => s.platform === platform.id);
+        newDefaults[platform.id] = social?.url ?? "";
+      }
+      reset(newDefaults);
+      showToast("Modifications enregistrées");
+      router.refresh();
+    } catch {
+      showToast("Erreur, veuillez réessayer");
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  function handleReset(): void {
+    reset();
+    setIsPublic(profile.isPublic);
+  }
 
   const filledCount = LINK_PLATFORMS.filter(
     (p) => (defaultSocials[p.id] ?? "").length > 0
@@ -108,7 +211,7 @@ export function LinkUpEditor({ profile, company }: LinkUpEditorProps): JSX.Eleme
           </div>
         </div>
         <label className="relative inline-block w-9 h-5 shrink-0">
-          <input type="checkbox" className="sr-only peer" checked={profile.isPublic} disabled={isReadOnly || profile.status !== "active"} onChange={() => toast()} />
+          <input type="checkbox" className="sr-only peer" checked={isPublic} disabled={isReadOnly || profile.status !== "active"} onChange={() => setIsPublic(!isPublic)} />
           <span className="absolute inset-0 cursor-pointer rounded-[10px] bg-[#C8C6C4] transition-colors peer-checked:bg-primary peer-disabled:opacity-60 peer-disabled:cursor-not-allowed" />
           <span className="absolute left-[3px] top-[3px] h-3.5 w-3.5 rounded-full bg-white shadow-sm transition-transform peer-checked:translate-x-4" />
         </label>
@@ -218,10 +321,13 @@ export function LinkUpEditor({ profile, company }: LinkUpEditorProps): JSX.Eleme
                   type="url"
                   readOnly={isReadOnly}
                   placeholder={platform.placeholder}
-                  className="field-input pl-9"
+                  className={`field-input pl-9 ${errors[platform.id] ? "border-[#B91C1C]" : ""}`}
                   {...register(platform.id)}
                 />
               </div>
+              {errors[platform.id] && (
+                <p className="text-[12px] text-[#B91C1C] mt-1">{errors[platform.id]?.message}</p>
+              )}
             </div>
           ))}
         </div>
@@ -257,11 +363,27 @@ export function LinkUpEditor({ profile, company }: LinkUpEditorProps): JSX.Eleme
       </section>
 
       {/* ═══ ACTION BAR ═══ */}
-      <ProfileActionBar status={profile.status} isDirty={isDirty} onReset={() => reset()} />
+      <ProfileActionBar
+        status={profile.status}
+        isDirty={false}
+        onReset={handleReset}
+        softDirtyCount={softDirtyCount}
+        saving={saving}
+        onSoftSave={handleSoftSave}
+      />
     </div>
   );
 }
 
 function formatDate(iso: string): string {
   return new Date(iso).toLocaleDateString("fr-FR", { day: "numeric", month: "long", year: "numeric" });
+}
+
+function isValidUrl(value: string): boolean {
+  try {
+    new URL(value);
+    return true;
+  } catch {
+    return false;
+  }
 }

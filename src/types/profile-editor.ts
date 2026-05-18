@@ -13,6 +13,7 @@ export interface GalleryItem {
 }
 
 export interface BrandUpEditorData {
+  id: string;
   kind: "brandup";
   status: ProfileStatus;
   isPublic: boolean;
@@ -46,6 +47,7 @@ export interface VideoItem {
 }
 
 export interface TraceUpEditorData {
+  id: string;
   kind: "traceup";
   status: ProfileStatus;
   isPublic: boolean;
@@ -69,6 +71,7 @@ export interface SocialLink {
 }
 
 export interface LinkUpEditorData {
+  id: string;
   kind: "linkup";
   status: ProfileStatus;
   isPublic: boolean;

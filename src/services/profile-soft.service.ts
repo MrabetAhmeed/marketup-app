@@ -1,0 +1,171 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import { connectDb } from "@/lib/db";
+import { AppError, NotFoundError } from "@/lib/api-error";
+import { Profile } from "@/models/profile.model";
+import { BrandUp } from "@/models/profile-brandup.model";
+import { TraceUp } from "@/models/profile-traceup.model";
+import { LinkUp } from "@/models/profile-linkup.model";
+import { User } from "@/models/user.model";
+import { getProfileForEditor } from "@/services/profile-editor.service";
+import {
+  BrandupSoftSchema,
+  TraceupSoftSchema,
+  LinkupSoftSchema,
+} from "@/schemas/profile-soft.schema";
+import type { BrandupSoftInput, LinkupSoftInput } from "@/schemas/profile-soft.schema";
+import type { SupportedLang } from "@/lib/i18n";
+import type { ProfileEditorData } from "@/types/profile-editor";
+import type { ProfileKind } from "@/types";
+
+// Mongoose 9 strict types — use discriminator models for data.* updates
+const ProfileModel = Profile as any;
+const BrandUpModel = BrandUp as any;
+const TraceUpModel = TraceUp as any;
+const LinkUpModel = LinkUp as any;
+const UserModel = User as any;
+
+// ---------------------------------------------------------------------------
+// updateProfileSoft — apply SOFT field patch to a Profile
+// ---------------------------------------------------------------------------
+
+export async function updateProfileSoft(
+  profileId: string,
+  userId: string,
+  rawPatch: unknown,
+  lang: SupportedLang = "fr",
+): Promise<ProfileEditorData> {
+  await connectDb();
+
+  // Load profile
+  const profile = await ProfileModel.findById(profileId).lean();
+  if (!profile) throw new NotFoundError("Profile");
+
+  // Cross-tenant guard
+  const user = await UserModel.findById(userId).lean();
+  if (!user) throw new NotFoundError("User");
+  if (profile.companyId.toString() !== user.companyId?.toString()) {
+    throw new AppError("FORBIDDEN", "Vous ne pouvez pas modifier ce profil.", 403);
+  }
+
+  const kind: ProfileKind = profile.kind;
+
+  // Dispatch validation + apply by kind
+  switch (kind) {
+    case "brandup":
+      await applyBrandupSoft(profileId, profile, rawPatch);
+      break;
+    case "traceup":
+      await applyTraceupSoft(profileId, rawPatch);
+      break;
+    case "linkup":
+      await applyLinkupSoft(profileId, rawPatch);
+      break;
+  }
+
+  // Return fresh editor data
+  const updated = await getProfileForEditor(profile.companyId.toString(), kind, lang);
+  if (!updated) throw new NotFoundError("Profile");
+  return updated;
+}
+
+// ---------------------------------------------------------------------------
+// BrandUP soft: isPublic + galleryOrder
+// ---------------------------------------------------------------------------
+
+async function applyBrandupSoft(
+  profileId: string,
+  profile: any,
+  rawPatch: unknown,
+): Promise<void> {
+  const patch: BrandupSoftInput = BrandupSoftSchema.parse(rawPatch);
+
+  const setMap: Record<string, unknown> = {};
+
+  if (patch.isPublic !== undefined) {
+    setMap.isPublic = patch.isPublic;
+  }
+
+  if (patch.galleryOrder !== undefined) {
+    // Validate gallery order: must be exact same set of IDs as current gallery
+    const currentGallery: any[] = profile.data?.gallery ?? [];
+    const currentIds = new Set(currentGallery.map((g: any) => g.id));
+
+    if (patch.galleryOrder.length !== currentIds.size) {
+      throw new AppError(
+        "VALIDATION_FAILED",
+        "L'ordre de la galerie doit contenir exactement les mêmes images.",
+        400,
+        { fields: { galleryOrder: ["Mismatch avec les images existantes."] } },
+      );
+    }
+    for (const id of patch.galleryOrder) {
+      if (!currentIds.has(id)) {
+        throw new AppError(
+          "VALIDATION_FAILED",
+          "L'ordre de la galerie contient un ID inconnu.",
+          400,
+          { fields: { galleryOrder: [`Image "${id}" introuvable.`] } },
+        );
+      }
+    }
+
+    // Rebuild gallery in the requested order with updated order fields
+    const galleryById = new Map(currentGallery.map((g: any) => [g.id, g]));
+    const reorderedGallery = patch.galleryOrder.map((id, idx) => ({
+      ...galleryById.get(id),
+      order: idx,
+    }));
+
+    setMap["data.gallery"] = reorderedGallery;
+  }
+
+  if (Object.keys(setMap).length > 0) {
+    // Must use BrandUp discriminator model — base Profile strips data.* fields
+    await BrandUpModel.findByIdAndUpdate(profileId, { $set: setMap });
+  }
+}
+
+// ---------------------------------------------------------------------------
+// TraceUP soft: isPublic only
+// ---------------------------------------------------------------------------
+
+async function applyTraceupSoft(
+  profileId: string,
+  rawPatch: unknown,
+): Promise<void> {
+  const patch = TraceupSoftSchema.parse(rawPatch);
+
+  if (patch.isPublic !== undefined) {
+    // isPublic is on the base schema, but use discriminator for consistency
+    await TraceUpModel.findByIdAndUpdate(profileId, { $set: { isPublic: patch.isPublic } });
+  }
+}
+
+// ---------------------------------------------------------------------------
+// LinkUP soft: isPublic + socials
+// ---------------------------------------------------------------------------
+
+async function applyLinkupSoft(
+  profileId: string,
+  rawPatch: unknown,
+): Promise<void> {
+  const patch: LinkupSoftInput = LinkupSoftSchema.parse(rawPatch);
+
+  const setMap: Record<string, unknown> = {};
+
+  if (patch.isPublic !== undefined) {
+    setMap.isPublic = patch.isPublic;
+  }
+
+  if (patch.socials !== undefined) {
+    setMap["data.socials"] = patch.socials.map((s) => ({
+      platform: s.platform,
+      url: s.url || null,
+    }));
+  }
+
+  if (Object.keys(setMap).length > 0) {
+    // Must use LinkUp discriminator model — base Profile strips data.* fields
+    await LinkUpModel.findByIdAndUpdate(profileId, { $set: setMap });
+  }
+}
