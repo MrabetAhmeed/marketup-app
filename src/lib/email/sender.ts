@@ -2,6 +2,7 @@ import { Resend } from "resend";
 import { env } from "@/lib/env";
 import { otpEmailTemplate } from "./templates/otp";
 import { passwordResetEmailTemplate } from "./templates/password-reset";
+import { profileSubmittedEmailTemplate } from "./templates/profile-submitted";
 
 const FROM_ADDRESS = `MARKET-UP <${env.EMAIL_FROM}>`;
 
@@ -47,6 +48,31 @@ export async function sendOtpEmail(to: string, otp: string): Promise<void> {
 export async function sendPasswordResetEmail(to: string, resetUrl: string): Promise<void> {
   const { subject, html } = passwordResetEmailTemplate(resetUrl);
   await sendEmail(to, subject, html);
+}
+
+/** Notify admin that a profile has been submitted for validation. */
+export async function sendProfileSubmittedEmail(params: {
+  adminEmail: string;
+  companyName: string;
+  profileKind: string;
+  previousStatus: string;
+  submittedAt: Date;
+  adminUrl: string;
+}): Promise<void> {
+  const { subject, html } = profileSubmittedEmailTemplate({
+    companyName: params.companyName,
+    profileKind: params.profileKind,
+    previousStatus: params.previousStatus,
+    submittedAt: params.submittedAt.toLocaleDateString("fr-FR", {
+      day: "numeric",
+      month: "long",
+      year: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+    }),
+    adminUrl: params.adminUrl,
+  });
+  await sendEmail(params.adminEmail, subject, html);
 }
 
 /** Send account approved notification. Stub — template built in Phase 6. */

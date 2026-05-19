@@ -41,7 +41,7 @@ export function TraceUpEditor({ profile, company }: TraceUpEditorProps): JSX.Ele
   const [activeTab, setActiveTab] = useState<VideoCategory>("actualite");
   const [addVideoOpen, setAddVideoOpen] = useState(false);
 
-  const { register, formState: { isDirty }, reset } = useForm<FormValues>({
+  const { register, handleSubmit, formState: { isDirty, errors }, reset, setError, getValues } = useForm<FormValues>({
     defaultValues: {
       channelName: profile.data.channelName,
       channelDescription: profile.data.channelDescription,
@@ -81,6 +81,42 @@ export function TraceUpEditor({ profile, company }: TraceUpEditorProps): JSX.Ele
       showToast("Erreur, veuillez réessayer");
     } finally {
       setSaving(false);
+    }
+  }
+
+  // --- Hard submit ---
+  const [submitting, setSubmitting] = useState(false);
+
+  async function handleHardSubmit(): Promise<void> {
+    const values = getValues();
+    setSubmitting(true);
+    try {
+      const res = await fetch(`/api/v1/profiles/${profile.id}/submit`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ channelName: values.channelName, channelDescription: values.channelDescription }),
+      });
+      const json = await res.json();
+      if (!res.ok) {
+        if (json.error?.code === "VALIDATION_FAILED" && json.error.fields) {
+          const fields = json.error.fields as Record<string, string[]>;
+          for (const [field, messages] of Object.entries(fields)) {
+            if (field === "channelName" || field === "channelDescription") {
+              setError(field, { message: messages[0] });
+            }
+          }
+          return;
+        }
+        showToast(json.error?.message || "Erreur, veuillez réessayer");
+        return;
+      }
+      showToast("Profil soumis pour validation");
+      reset({ channelName: values.channelName, channelDescription: values.channelDescription });
+      router.refresh();
+    } catch {
+      showToast("Erreur, veuillez réessayer");
+    } finally {
+      setSubmitting(false);
     }
   }
 
@@ -269,9 +305,12 @@ export function TraceUpEditor({ profile, company }: TraceUpEditorProps): JSX.Ele
               type="text"
               maxLength={80}
               readOnly={isMetadataReadOnly}
-              className="field-input"
+              className={`field-input ${errors.channelName ? "border-[#B91C1C]" : ""}`}
               {...register("channelName")}
             />
+            {errors.channelName && (
+              <p className="text-[12px] text-[#B91C1C] mt-1">{errors.channelName.message}</p>
+            )}
           </div>
           <div>
             <label htmlFor="tu-channel-desc" className="field-label">
@@ -282,9 +321,12 @@ export function TraceUpEditor({ profile, company }: TraceUpEditorProps): JSX.Ele
               rows={4}
               maxLength={500}
               readOnly={isMetadataReadOnly}
-              className="field-input resize-y min-h-[96px]"
+              className={`field-input resize-y min-h-[96px] ${errors.channelDescription ? "border-[#B91C1C]" : ""}`}
               {...register("channelDescription")}
             />
+            {errors.channelDescription && (
+              <p className="text-[12px] text-[#B91C1C] mt-1">{errors.channelDescription.message}</p>
+            )}
           </div>
         </div>
       </section>
@@ -297,6 +339,8 @@ export function TraceUpEditor({ profile, company }: TraceUpEditorProps): JSX.Ele
         softDirtyCount={softDirtyCount}
         saving={saving}
         onSoftSave={handleSoftSave}
+        submitting={submitting}
+        onHardSubmit={handleSubmit(handleHardSubmit)}
       />
 
       {/* ═══ ADD VIDEO MODAL ═══ */}

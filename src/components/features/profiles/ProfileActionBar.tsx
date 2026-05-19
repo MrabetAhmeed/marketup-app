@@ -11,17 +11,21 @@ interface ProfileActionBarProps {
   softDirtyCount?: number;
   saving?: boolean;
   onSoftSave?: () => void;
+  /** Hard submit props (Phase 4 Sprint 3) */
+  submitting?: boolean;
+  onHardSubmit?: () => void;
 }
 
 /**
  * Status-driven action bar for profile editors.
  *
- * - SOFT mutations (isPublic, galleryOrder, socials): wired via onSoftSave (Phase 4 Sprint 2)
- * - HARD mutations (pitch, about, submit): stubbed via useFeatureSoonToast (Phase 4 Sprint 3)
+ * - SOFT mutations (isPublic, galleryOrder, socials): wired via onSoftSave
+ * - HARD mutations (pitch, about, submit): wired via onHardSubmit
  */
-export function ProfileActionBar({ status, isDirty, onReset, softDirtyCount = 0, saving = false, onSoftSave }: ProfileActionBarProps): JSX.Element {
+export function ProfileActionBar({ status, isDirty, onReset, softDirtyCount = 0, saving = false, onSoftSave, submitting = false, onHardSubmit }: ProfileActionBarProps): JSX.Element {
   const toast = useFeatureSoonToast();
   const hasSoftChanges = softDirtyCount > 0;
+  const busy = saving || submitting;
 
   // ─── pending: disabled with info ───────────────────────────────────────
   if (status === "pending") {
@@ -110,12 +114,18 @@ export function ProfileActionBar({ status, isDirty, onReset, softDirtyCount = 0,
               {saving ? "Enregistrement…" : "Enregistrer"}
             </button>
           )}
-          <button type="button" onClick={() => toast()} className="px-4 py-[9px] text-[13px] font-semibold text-primary hover:bg-primary-light rounded transition-colors">
-            Enregistrer brouillon
-          </button>
-          <button type="button" onClick={() => toast()} className="inline-flex items-center gap-1.5 px-4 py-[9px] text-[13px] font-semibold text-white bg-primary hover:bg-primary-hover rounded transition-colors">
-            <span className="material-symbols-outlined" style={{ fontSize: 16 }}>send</span>
-            Soumettre
+          <button
+            type="button"
+            disabled={!isDirty || busy}
+            onClick={onHardSubmit ?? (() => toast())}
+            className={`inline-flex items-center gap-1.5 px-4 py-[9px] text-[13px] font-semibold rounded transition-colors ${isDirty && !busy ? "text-white bg-primary hover:bg-primary-hover" : "text-[#A8A8A8] bg-[#E0E0E0] cursor-not-allowed"}`}
+          >
+            {submitting ? (
+              <span className="material-symbols-outlined animate-spin" style={{ fontSize: 16 }}>progress_activity</span>
+            ) : (
+              <span className="material-symbols-outlined" style={{ fontSize: 16 }}>send</span>
+            )}
+            {submitting ? "Soumission…" : "Soumettre à validation"}
           </button>
         </div>
       </ActionBarShell>
@@ -154,9 +164,9 @@ export function ProfileActionBar({ status, isDirty, onReset, softDirtyCount = 0,
         <div className="flex items-center gap-2 shrink-0 flex-wrap justify-end">
           <button
             type="button"
-            disabled={!anyDirtyRej || saving}
+            disabled={!anyDirtyRej || busy}
             onClick={onReset}
-            className={`px-4 py-[9px] text-[13px] font-semibold rounded transition-colors ${anyDirtyRej && !saving ? "text-primary hover:bg-primary-light" : "text-[#C8C6C4] cursor-not-allowed"}`}
+            className={`px-4 py-[9px] text-[13px] font-semibold rounded transition-colors ${anyDirtyRej && !busy ? "text-primary hover:bg-primary-light" : "text-[#C8C6C4] cursor-not-allowed"}`}
           >
             Annuler
           </button>
@@ -176,15 +186,19 @@ export function ProfileActionBar({ status, isDirty, onReset, softDirtyCount = 0,
               {saving ? "Enregistrement…" : "Enregistrer"}
             </button>
           )}
-          {/* Hard submit — admin review required (Sprint 3) */}
+          {/* Hard submit — admin review required */}
           <button
             type="button"
-            disabled={!isDirty || saving}
-            onClick={() => toast()}
-            className={`inline-flex items-center gap-1.5 px-4 py-[9px] text-[13px] font-semibold rounded transition-colors ${isDirty && !saving ? "text-white bg-primary hover:bg-primary-hover" : "text-[#A8A8A8] bg-[#E0E0E0] cursor-not-allowed"}`}
+            disabled={!isDirty || busy}
+            onClick={onHardSubmit ?? (() => toast())}
+            className={`inline-flex items-center gap-1.5 px-4 py-[9px] text-[13px] font-semibold rounded transition-colors ${isDirty && !busy ? "text-white bg-primary hover:bg-primary-hover" : "text-[#A8A8A8] bg-[#E0E0E0] cursor-not-allowed"}`}
           >
-            <span className="material-symbols-outlined" style={{ fontSize: 16 }}>send</span>
-            Enregistrer et resoumettre
+            {submitting ? (
+              <span className="material-symbols-outlined animate-spin" style={{ fontSize: 16 }}>progress_activity</span>
+            ) : (
+              <span className="material-symbols-outlined" style={{ fontSize: 16 }}>send</span>
+            )}
+            {submitting ? "Soumission…" : "Enregistrer et resoumettre"}
           </button>
         </div>
       </ActionBarShell>
@@ -225,9 +239,9 @@ export function ProfileActionBar({ status, isDirty, onReset, softDirtyCount = 0,
       <div className="flex items-center gap-2 shrink-0 flex-wrap justify-end">
         <button
           type="button"
-          disabled={!anyDirty || saving}
+          disabled={!anyDirty || busy}
           onClick={onReset}
-          className={`px-4 py-[9px] text-[13px] font-semibold rounded transition-colors ${anyDirty && !saving ? "text-primary hover:bg-primary-light" : "text-[#C8C6C4] cursor-not-allowed"}`}
+          className={`px-4 py-[9px] text-[13px] font-semibold rounded transition-colors ${anyDirty && !busy ? "text-primary hover:bg-primary-light" : "text-[#C8C6C4] cursor-not-allowed"}`}
         >
           Annuler
         </button>
@@ -247,15 +261,19 @@ export function ProfileActionBar({ status, isDirty, onReset, softDirtyCount = 0,
             {saving ? "Enregistrement…" : "Enregistrer"}
           </button>
         )}
-        {/* Hard submit — admin review required (Sprint 3) */}
+        {/* Hard submit — admin review required */}
         <button
           type="button"
-          disabled={!isDirty || saving}
-          onClick={() => toast()}
-          className={`inline-flex items-center gap-1.5 px-4 py-[9px] text-[13px] font-semibold rounded transition-colors ${isDirty && !saving ? "text-white bg-primary hover:bg-primary-hover" : "text-[#A8A8A8] bg-[#E0E0E0] cursor-not-allowed"}`}
+          disabled={!isDirty || busy}
+          onClick={onHardSubmit ?? (() => toast())}
+          className={`inline-flex items-center gap-1.5 px-4 py-[9px] text-[13px] font-semibold rounded transition-colors ${isDirty && !busy ? "text-white bg-primary hover:bg-primary-hover" : "text-[#A8A8A8] bg-[#E0E0E0] cursor-not-allowed"}`}
         >
-          <span className="material-symbols-outlined" style={{ fontSize: 16 }}>send</span>
-          Soumettre les modifications
+          {submitting ? (
+            <span className="material-symbols-outlined animate-spin" style={{ fontSize: 16 }}>progress_activity</span>
+          ) : (
+            <span className="material-symbols-outlined" style={{ fontSize: 16 }}>send</span>
+          )}
+          {submitting ? "Soumission…" : "Soumettre les modifications"}
         </button>
       </div>
     </ActionBarShell>

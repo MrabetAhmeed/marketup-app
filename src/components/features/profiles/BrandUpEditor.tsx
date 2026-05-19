@@ -31,7 +31,7 @@ export function BrandUpEditor({ profile, company }: BrandUpEditorProps): JSX.Ele
   const { showToast } = useToast();
   const isReadOnly = profile.status === "pending" || profile.status === "disabled";
 
-  const { register, formState: { isDirty }, reset } = useForm<FormValues>({
+  const { register, handleSubmit, formState: { isDirty, errors }, reset, setError, getValues } = useForm<FormValues>({
     defaultValues: {
       pitch: profile.data.pitch,
       about: profile.data.about,
@@ -95,6 +95,42 @@ export function BrandUpEditor({ profile, company }: BrandUpEditorProps): JSX.Ele
       showToast("Erreur, veuillez réessayer");
     } finally {
       setSaving(false);
+    }
+  }
+
+  // --- Hard submit ---
+  const [submitting, setSubmitting] = useState(false);
+
+  async function handleHardSubmit(): Promise<void> {
+    const values = getValues();
+    setSubmitting(true);
+    try {
+      const res = await fetch(`/api/v1/profiles/${profile.id}/submit`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ pitch: values.pitch, about: values.about }),
+      });
+      const json = await res.json();
+      if (!res.ok) {
+        if (json.error?.code === "VALIDATION_FAILED" && json.error.fields) {
+          const fields = json.error.fields as Record<string, string[]>;
+          for (const [field, messages] of Object.entries(fields)) {
+            if (field === "pitch" || field === "about") {
+              setError(field, { message: messages[0] });
+            }
+          }
+          return;
+        }
+        showToast(json.error?.message || "Erreur, veuillez réessayer");
+        return;
+      }
+      showToast("Profil soumis pour validation");
+      reset({ pitch: values.pitch, about: values.about });
+      router.refresh();
+    } catch {
+      showToast("Erreur, veuillez réessayer");
+    } finally {
+      setSubmitting(false);
     }
   }
 
@@ -221,13 +257,17 @@ export function BrandUpEditor({ profile, company }: BrandUpEditorProps): JSX.Ele
               type="text"
               maxLength={280}
               readOnly={isReadOnly}
-              className="field-input"
+              className={`field-input ${errors.pitch ? "border-[#B91C1C]" : ""}`}
               {...register("pitch")}
             />
-            <div className="field-help">
-              <span className="material-symbols-outlined" style={{ fontSize: 13 }}>info</span>
-              Phrase affichée en header de votre profil · 280 caractères max
-            </div>
+            {errors.pitch ? (
+              <p className="text-[12px] text-[#B91C1C] mt-1">{errors.pitch.message}</p>
+            ) : (
+              <div className="field-help">
+                <span className="material-symbols-outlined" style={{ fontSize: 13 }}>info</span>
+                Phrase affichée en header de votre profil · 280 caractères max
+              </div>
+            )}
           </div>
 
           {/* About — HARD_MUTATION */}
@@ -240,13 +280,17 @@ export function BrandUpEditor({ profile, company }: BrandUpEditorProps): JSX.Ele
               rows={6}
               maxLength={1000}
               readOnly={isReadOnly}
-              className="field-input resize-y min-h-[120px]"
+              className={`field-input resize-y min-h-[120px] ${errors.about ? "border-[#B91C1C]" : ""}`}
               {...register("about")}
             />
-            <div className="field-help">
-              <span className="material-symbols-outlined" style={{ fontSize: 13 }}>info</span>
-              Texte complet affiché sur votre profil · 1000 caractères max
-            </div>
+            {errors.about ? (
+              <p className="text-[12px] text-[#B91C1C] mt-1">{errors.about.message}</p>
+            ) : (
+              <div className="field-help">
+                <span className="material-symbols-outlined" style={{ fontSize: 13 }}>info</span>
+                Texte complet affiché sur votre profil · 1000 caractères max
+              </div>
+            )}
           </div>
         </div>
       </section>
@@ -307,6 +351,8 @@ export function BrandUpEditor({ profile, company }: BrandUpEditorProps): JSX.Ele
         softDirtyCount={softDirtyCount}
         saving={saving}
         onSoftSave={handleSoftSave}
+        submitting={submitting}
+        onHardSubmit={handleSubmit(handleHardSubmit)}
       />
     </div>
   );

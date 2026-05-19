@@ -67,6 +67,23 @@ export async function getProfileForEditor(
 }
 
 // ---------------------------------------------------------------------------
+// Helpers
+// ---------------------------------------------------------------------------
+
+/**
+ * When profile is pending, extract pendingData.fields into a key→newValue map.
+ * Returns empty map if no pendingData.
+ */
+function getPendingFieldMap(profile: any): Record<string, unknown> {
+  if (profile.status !== "pending" || !profile.pendingData?.fields) return {};
+  const map: Record<string, unknown> = {};
+  for (const field of profile.pendingData.fields as any[]) {
+    map[field.key] = field.newValue;
+  }
+  return map;
+}
+
+// ---------------------------------------------------------------------------
 // Builders per kind
 // ---------------------------------------------------------------------------
 
@@ -86,12 +103,17 @@ function buildBrandUp(
   // Sort gallery by order
   gallery.sort((a, b) => a.order - b.order);
 
+  // When pending, overlay HARD fields with pendingData values
+  const pending = getPendingFieldMap(profile);
+  const pitch = pending.pitch ? pickLocale(pending.pitch as any, lang) : pickLocale(data.pitch, lang);
+  const about = pending.about ? pickLocale(pending.about as any, lang) : pickLocale(data.about, lang);
+
   return {
     kind: "brandup",
     ...base,
     data: {
-      pitch: pickLocale(data.pitch, lang),
-      about: pickLocale(data.about, lang),
+      pitch,
+      about,
       color: data.color ?? "#0078D4",
       gallery,
     },
@@ -121,12 +143,21 @@ function buildTraceUp(
   // Sort videos by order within each category
   videos.sort((a, b) => a.order - b.order);
 
+  // When pending, overlay HARD fields with pendingData values
+  const pending = getPendingFieldMap(profile);
+  const channelName = pending.channelName
+    ? pickLocale(pending.channelName as any, lang)
+    : pickLocale(data.channelName, lang);
+  const channelDescription = pending.channelDescription
+    ? pickLocale(pending.channelDescription as any, lang)
+    : pickLocale(data.channelDescription, lang);
+
   return {
     kind: "traceup",
     ...base,
     data: {
-      channelName: pickLocale(data.channelName, lang),
-      channelDescription: pickLocale(data.channelDescription, lang),
+      channelName,
+      channelDescription,
       videos,
     },
   };

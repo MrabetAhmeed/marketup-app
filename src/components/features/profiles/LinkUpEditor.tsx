@@ -139,6 +139,31 @@ export function LinkUpEditor({ profile, company }: LinkUpEditorProps): JSX.Eleme
     }
   }
 
+  // --- Hard submit (LinkUP: empty body, just status transition) ---
+  const [submitting, setSubmitting] = useState(false);
+
+  async function handleHardSubmit(): Promise<void> {
+    setSubmitting(true);
+    try {
+      const res = await fetch(`/api/v1/profiles/${profile.id}/submit`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({}),
+      });
+      const json = await res.json();
+      if (!res.ok) {
+        showToast(json.error?.message || "Erreur, veuillez réessayer");
+        return;
+      }
+      showToast("Profil soumis pour validation");
+      router.refresh();
+    } catch {
+      showToast("Erreur, veuillez réessayer");
+    } finally {
+      setSubmitting(false);
+    }
+  }
+
   function handleReset(): void {
     reset();
     setIsPublic(profile.isPublic);
@@ -365,11 +390,13 @@ export function LinkUpEditor({ profile, company }: LinkUpEditorProps): JSX.Eleme
       {/* ═══ ACTION BAR ═══ */}
       <ProfileActionBar
         status={profile.status}
-        isDirty={false}
+        isDirty={profile.status === "incomplete" || profile.status === "rejected"}
         onReset={handleReset}
         softDirtyCount={softDirtyCount}
         saving={saving}
         onSoftSave={handleSoftSave}
+        submitting={submitting}
+        onHardSubmit={handleHardSubmit}
       />
     </div>
   );
