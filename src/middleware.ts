@@ -23,7 +23,7 @@ export async function middleware(req: NextRequest): Promise<NextResponse> {
   }
 
   // Owner routes require OWNER role
-  if (pathname.startsWith("/dashboard") || pathname.startsWith("/api/v1/me") || pathname.startsWith("/api/v1/profiles")) {
+  if (pathname.startsWith("/dashboard") || pathname.startsWith("/api/v1/me") || pathname.startsWith("/api/v1/profiles") || pathname.startsWith("/api/v1/uploads")) {
     if (token.role !== "OWNER") {
       if (isApiRoute) {
         return NextResponse.json(
@@ -52,5 +52,5 @@ export async function middleware(req: NextRequest): Promise<NextResponse> {
 }
 
 export const config = {
-  matcher: ["/dashboard/:path*", "/admin/:path*", "/api/v1/me/:path*", "/api/v1/profiles/:path*", "/api/v1/admin/:path*"],
+  matcher: ["/dashboard/:path*", "/admin/:path*", "/api/v1/me/:path*", "/api/v1/profiles/:path*", "/api/v1/uploads/:path*", "/api/v1/admin/:path*"],
 };

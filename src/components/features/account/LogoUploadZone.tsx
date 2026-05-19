@@ -1,6 +1,8 @@
 "use client";
 
-import { useFeatureSoonToast } from "@/hooks/useFeatureSoonToast";
+import { useRef, useState } from "react";
+import { useRouter } from "next/navigation";
+import { useToast } from "@/components/shared/Toast";
 
 interface LogoUploadZoneProps {
   initials: string;
@@ -8,15 +10,49 @@ interface LogoUploadZoneProps {
 }
 
 export function LogoUploadZone({ initials, logoUrl }: LogoUploadZoneProps): JSX.Element {
-  const toast = useFeatureSoonToast();
+  const router = useRouter();
+  const { showToast } = useToast();
+  const fileRef = useRef<HTMLInputElement>(null);
+  const [uploading, setUploading] = useState(false);
+  const [previewUrl, setPreviewUrl] = useState(logoUrl);
+
+  async function handleFileChange(file: File | undefined): Promise<void> {
+    if (!file) return;
+    setUploading(true);
+    try {
+      const fd = new FormData();
+      fd.append("file", file);
+      const res = await fetch("/api/v1/me/account/logo", { method: "POST", body: fd });
+      const json = await res.json();
+      if (!res.ok) {
+        showToast(json.error?.message || "Erreur lors de l'upload");
+        return;
+      }
+      setPreviewUrl(json.url);
+      showToast("Logo mis à jour");
+      router.refresh();
+    } catch {
+      showToast("Erreur, veuillez réessayer");
+    } finally {
+      setUploading(false);
+      if (fileRef.current) fileRef.current.value = "";
+    }
+  }
 
   return (
     <div className="flex items-center gap-[18px] p-4 bg-surface-muted border border-dashed border-[#D1D1D1] rounded-lg hover:border-primary hover:bg-primary-light transition-colors">
+      <input
+        ref={fileRef}
+        type="file"
+        accept="image/jpeg,image/png,image/webp"
+        className="sr-only"
+        onChange={(e) => handleFileChange(e.target.files?.[0])}
+      />
       {/* Logo preview */}
       <div className="w-[88px] h-[88px] rounded-lg bg-white border border-surface-border flex items-center justify-center shrink-0 overflow-hidden">
-        {logoUrl ? (
+        {previewUrl ? (
           /* eslint-disable-next-line @next/next/no-img-element */
-          <img src={logoUrl} alt="Logo" className="w-full h-full object-cover" />
+          <img src={previewUrl} alt="Logo" className="w-full h-full object-cover" />
         ) : (
           <span className="font-heading font-bold text-[28px] text-primary">
             {initials}
@@ -34,19 +70,16 @@ export function LogoUploadZone({ initials, logoUrl }: LogoUploadZoneProps): JSX.
         <div className="flex items-center gap-2 flex-wrap">
           <button
             type="button"
-            onClick={() => toast()}
-            className="inline-flex items-center gap-1.5 px-4 py-[9px] text-[13px] font-semibold text-ink-primary bg-white border border-[#D1D1D1] rounded hover:bg-surface-muted hover:border-ink-tertiary transition-colors"
+            disabled={uploading}
+            onClick={() => fileRef.current?.click()}
+            className="inline-flex items-center gap-1.5 px-4 py-[9px] text-[13px] font-semibold text-ink-primary bg-white border border-[#D1D1D1] rounded hover:bg-surface-muted hover:border-ink-tertiary transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
           >
-            <span className="material-symbols-outlined" style={{ fontSize: 16 }}>upload</span>
-            Parcourir
-          </button>
-          <button
-            type="button"
-            onClick={() => toast()}
-            className="inline-flex items-center gap-1.5 px-4 py-[9px] text-[13px] font-semibold text-[#B91C1C] bg-transparent hover:bg-[#FEF2F2] rounded transition-colors"
-          >
-            <span className="material-symbols-outlined" style={{ fontSize: 16 }}>delete</span>
-            Retirer
+            {uploading ? (
+              <span className="material-symbols-outlined animate-spin" style={{ fontSize: 16 }}>progress_activity</span>
+            ) : (
+              <span className="material-symbols-outlined" style={{ fontSize: 16 }}>upload</span>
+            )}
+            {uploading ? "Upload…" : "Parcourir"}
           </button>
         </div>
       </div>

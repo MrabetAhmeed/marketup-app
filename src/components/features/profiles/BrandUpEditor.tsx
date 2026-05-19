@@ -42,53 +42,131 @@ export function BrandUpEditor({ profile, company }: BrandUpEditorProps): JSX.Ele
   const [isPublic, setIsPublic] = useState(profile.isPublic);
   const isPublicDirty = isPublic !== profile.isPublic;
 
-  // --- Soft state: gallery order ---
+  // --- Soft state: gallery (order + pending adds/deletes) ---
   const [galleryOrder, setGalleryOrder] = useState<GalleryItem[]>(profile.data.gallery);
-  const initialOrderIds = profile.data.gallery.map((g) => g.id).join(",");
-  const currentOrderIds = galleryOrder.map((g) => g.id).join(",");
-  const galleryOrderDirty = currentOrderIds !== initialOrderIds;
+  const [pendingAdds, setPendingAdds] = useState<GalleryItem[]>([]);
+  const [pendingDeletes, setPendingDeletes] = useState<string[]>([]);
 
-  // --- Soft dirty tracking ---
-  const softDirtyCount = (isPublicDirty ? 1 : 0) + (galleryOrderDirty ? 1 : 0);
+  // Combined gallery: initial (minus deletes) + pending adds, in order
+  const combinedGallery = [
+    ...galleryOrder.filter((g) => !pendingDeletes.includes(g.id)),
+    ...pendingAdds,
+  ];
+
+  // Dirty tracking
+  const initialOrderIds = profile.data.gallery.map((g) => g.id).join(",");
+  const currentOrderIds = galleryOrder.filter((g) => !pendingDeletes.includes(g.id)).map((g) => g.id).join(",");
+  const galleryOrderDirty = currentOrderIds !== initialOrderIds;
+  const hasGalleryChanges = pendingAdds.length > 0 || pendingDeletes.length > 0 || galleryOrderDirty;
+
+  const softDirtyCount = (isPublicDirty ? 1 : 0) + pendingAdds.length + pendingDeletes.length + (galleryOrderDirty ? 1 : 0);
   const [saving, setSaving] = useState(false);
 
   const moveGalleryItem = useCallback((fromIdx: number, toIdx: number) => {
-    setGalleryOrder((prev) => {
-      const next = [...prev];
-      const [item] = next.splice(fromIdx, 1);
-      next.splice(toIdx, 0, item!);
-      return next;
-    });
-  }, []);
+    // Reorder operates on combined gallery — update both galleryOrder and pendingAdds
+    const combined = [
+      ...galleryOrder.filter((g) => !pendingDeletes.includes(g.id)),
+      ...pendingAdds,
+    ];
+    const moved = [...combined];
+    const [item] = moved.splice(fromIdx, 1);
+    moved.splice(toIdx, 0, item!);
+
+    // Split back: existing items go to galleryOrder, pending stay in pendingAdds
+    const existingIds = new Set(profile.data.gallery.map((g) => g.id));
+    const newOrder: GalleryItem[] = [];
+    const newPending: GalleryItem[] = [];
+    for (const g of moved) {
+      if (existingIds.has(g.id)) {
+        newOrder.push(g);
+      } else {
+        newPending.push(g);
+      }
+    }
+    setGalleryOrder(newOrder);
+    setPendingAdds(newPending);
+  }, [galleryOrder, pendingAdds, pendingDeletes, profile.data.gallery]);
+
+  function handleGalleryAdd(item: GalleryItem): void {
+    setPendingAdds((prev) => [...prev, item]);
+  }
+
+  function handleGalleryDelete(imageId: string): void {
+    // If it's a pending add, just remove it from pendingAdds
+    if (pendingAdds.some((g) => g.id === imageId)) {
+      setPendingAdds((prev) => prev.filter((g) => g.id !== imageId));
+      return;
+    }
+    // Otherwise mark for deletion
+    setPendingDeletes((prev) => [...prev, imageId]);
+  }
 
   async function handleSoftSave(): Promise<void> {
-    const patch: Record<string, unknown> = {};
-    if (isPublicDirty) patch.isPublic = isPublic;
-    if (galleryOrderDirty) patch.galleryOrder = galleryOrder.map((g) => g.id);
-    if (Object.keys(patch).length === 0) return;
-
+    if (softDirtyCount === 0) return;
     setSaving(true);
+
     try {
-      const res = await fetch(`/api/v1/profiles/${profile.id}/soft`, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(patch),
-      });
+      const tempToReal = new Map<string, string>();
 
-      const json = await res.json();
-
-      if (!res.ok) {
-        if (json.error?.code === "VALIDATION_FAILED") {
-          showToast(json.error.message || "Erreur de validation");
-        } else {
-          showToast("Erreur, veuillez réessayer");
+      // Phase 1: POST new gallery images sequentially
+      for (const add of pendingAdds) {
+        const res = await fetch(`/api/v1/profiles/${profile.id}/gallery`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ url: add.url, title: add.caption }),
+        });
+        if (!res.ok) {
+          showToast("Erreur lors de l'ajout d'une image");
+          return;
         }
-        return;
+        const json = await res.json();
+        tempToReal.set(add.id, json.id as string);
       }
-      const data = json as BrandUpEditorData;
-      // Reset soft state to server values
-      setIsPublic(data.isPublic);
-      setGalleryOrder(data.data.gallery);
+
+      // Phase 2: DELETE removed images sequentially
+      for (const deleteId of pendingDeletes) {
+        const res = await fetch(`/api/v1/profiles/${profile.id}/gallery/${deleteId}`, {
+          method: "DELETE",
+        });
+        if (!res.ok) {
+          showToast("Erreur lors de la suppression d'une image");
+          return;
+        }
+      }
+
+      // Phase 3: PATCH /soft with final order + isPublic
+      const patch: Record<string, unknown> = {};
+      if (isPublicDirty) patch.isPublic = isPublic;
+
+      if (hasGalleryChanges) {
+        // Build final order with real IDs
+        const finalOrder = combinedGallery.map((g) => tempToReal.get(g.id) ?? g.id);
+        patch.galleryOrder = finalOrder;
+      }
+
+      if (Object.keys(patch).length > 0) {
+        const res = await fetch(`/api/v1/profiles/${profile.id}/soft`, {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(patch),
+        });
+        const softJson = await res.json();
+        if (!res.ok) {
+          showToast(softJson.error?.message || "Erreur lors de la sauvegarde");
+          return;
+        }
+        // Use fresh data from response to reset gallery state
+        if (softJson.data?.gallery) {
+          setGalleryOrder(softJson.data.gallery);
+        }
+        if (softJson.isPublic !== undefined) {
+          setIsPublic(softJson.isPublic);
+        }
+      }
+
+      // Success — reset all pending state
+      setPendingAdds([]);
+      setPendingDeletes([]);
       showToast("Modifications enregistrées");
       router.refresh();
     } catch {
@@ -138,9 +216,11 @@ export function BrandUpEditor({ profile, company }: BrandUpEditorProps): JSX.Ele
     reset();
     setIsPublic(profile.isPublic);
     setGalleryOrder(profile.data.gallery);
+    setPendingAdds([]);
+    setPendingDeletes([]);
   }
 
-  const gallery = galleryOrder;
+  const gallery = combinedGallery;
   const filledSlots = gallery.length;
   const emptySlots = MAX_GALLERY - filledSlots;
 
@@ -315,10 +395,13 @@ export function BrandUpEditor({ profile, company }: BrandUpEditorProps): JSX.Ele
         {/* Gallery grid */}
         <GalleryGrid
           gallery={gallery}
+          pendingAddIds={new Set(pendingAdds.map((g) => g.id))}
           emptySlots={emptySlots}
           isReadOnly={isReadOnly}
           onMoveUp={(i) => moveGalleryItem(i, i - 1)}
           onMoveDown={(i) => moveGalleryItem(i, i + 1)}
+          onAdd={handleGalleryAdd}
+          onDelete={handleGalleryDelete}
         />
 
         <div className="mt-4 flex items-start gap-2 text-[11px] text-ink-tertiary leading-snug">
@@ -368,19 +451,25 @@ export function BrandUpEditor({ profile, company }: BrandUpEditorProps): JSX.Ele
 
 function GalleryGrid({
   gallery,
+  pendingAddIds,
   emptySlots,
   isReadOnly,
   onMoveUp,
   onMoveDown,
+  onAdd,
+  onDelete,
 }: {
   gallery: BrandUpEditorData["data"]["gallery"];
+  pendingAddIds: Set<string>;
   emptySlots: number;
   isReadOnly: boolean;
   onMoveUp: (index: number) => void;
   onMoveDown: (index: number) => void;
+  onAdd: (item: GalleryItem) => void;
+  onDelete: (imageId: string) => void;
 }): JSX.Element {
   const [addModalOpen, setAddModalOpen] = useState(false);
-  const [deleteTarget, setDeleteTarget] = useState<{ caption: string } | null>(null);
+  const [deleteTarget, setDeleteTarget] = useState<{ id: string; caption: string } | null>(null);
 
   return (
     <>
@@ -401,11 +490,17 @@ function GalleryGrid({
               }`}>
                 {i === 0 ? "★ HERO" : `#${i + 1}`}
               </span>
+              {/* New badge for pending adds */}
+              {pendingAddIds.has(item.id) && (
+                <span className="absolute bottom-1.5 left-1.5 text-[8px] font-bold px-1.5 py-0.5 rounded bg-[#D97706] text-white">
+                  Nouveau
+                </span>
+              )}
               {/* Delete button (hover on desktop, always on mobile) */}
               {!isReadOnly && (
                 <button
                   type="button"
-                  onClick={() => setDeleteTarget({ caption: item.caption })}
+                  onClick={() => setDeleteTarget({ id: item.id, caption: item.caption })}
                   className="absolute top-1.5 right-1.5 w-7 h-7 rounded bg-[#DC2626] text-white flex items-center justify-center opacity-100 md:opacity-0 group-hover/slot:opacity-100 transition-opacity"
                   aria-label="Supprimer"
                 >
@@ -468,11 +563,12 @@ function GalleryGrid({
       </div>
 
       {/* Modals */}
-      <AddGalleryImageModal open={addModalOpen} onClose={() => setAddModalOpen(false)} />
+      <AddGalleryImageModal open={addModalOpen} onClose={() => setAddModalOpen(false)} onAdd={onAdd} />
       <GalleryDeleteConfirm
         open={deleteTarget !== null}
         onClose={() => setDeleteTarget(null)}
         caption={deleteTarget?.caption ?? ""}
+        onConfirm={() => { if (deleteTarget) { onDelete(deleteTarget.id); setDeleteTarget(null); } }}
       />
     </>
   );

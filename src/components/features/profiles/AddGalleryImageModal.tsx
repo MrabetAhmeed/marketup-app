@@ -1,40 +1,63 @@
 "use client";
 
-import { useState, useCallback } from "react";
-import { useFeatureSoonToast } from "@/hooks/useFeatureSoonToast";
+import { useRef, useState, useCallback } from "react";
+import { useToast } from "@/components/shared/Toast";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
+import type { GalleryItem } from "@/types/profile-editor";
 
 interface AddGalleryImageModalProps {
   open: boolean;
   onClose: () => void;
+  onAdd: (item: GalleryItem) => void;
 }
 
-export function AddGalleryImageModal({ open, onClose }: AddGalleryImageModalProps): JSX.Element {
-  const toast = useFeatureSoonToast();
+export function AddGalleryImageModal({ open, onClose, onAdd }: AddGalleryImageModalProps): JSX.Element {
+  const { showToast } = useToast();
+  const fileRef = useRef<HTMLInputElement>(null);
   const [title, setTitle] = useState("");
-  const [fileSelected, setFileSelected] = useState(false);
-  const [fileName, setFileName] = useState("");
+  const [file, setFile] = useState<File | null>(null);
+  const [uploading, setUploading] = useState(false);
 
-  const canSubmit = fileSelected && title.trim().length > 0;
+  const canSubmit = file !== null && title.trim().length > 0 && !uploading;
 
   const handleClose = useCallback(() => {
     setTitle("");
-    setFileSelected(false);
-    setFileName("");
+    setFile(null);
+    if (fileRef.current) fileRef.current.value = "";
     onClose();
   }, [onClose]);
 
-  const handleSubmit = useCallback(() => {
-    toast("FEATURE_COMING_SOON_GALLERY_UPLOAD");
-    handleClose();
-  }, [toast, handleClose]);
+  async function handleSubmit(): Promise<void> {
+    if (!file) return;
+    setUploading(true);
+    try {
+      // Upload to Cloudinary via generic upload endpoint
+      const fd = new FormData();
+      fd.append("file", file);
+      const res = await fetch("/api/v1/uploads/image", { method: "POST", body: fd });
+      const json = await res.json();
+      if (!res.ok) {
+        showToast(json.error?.message || "Erreur lors de l'upload");
+        return;
+      }
 
-  const handleFilePick = useCallback(() => {
-    // Stub: simulate file selection
-    toast("FEATURE_COMING_SOON_GALLERY_UPLOAD");
-    setFileSelected(true);
-    setFileName("image-selectionnee.jpg");
-  }, [toast]);
+      // Create local gallery item with temp ID
+      const newItem: GalleryItem = {
+        id: crypto.randomUUID(),
+        url: json.url as string,
+        caption: title.trim(),
+        order: 0, // will be set by parent
+      };
+
+      onAdd(newItem);
+      showToast("Image ajoutée — n'oubliez pas d'enregistrer");
+      handleClose();
+    } catch {
+      showToast("Erreur, veuillez réessayer");
+    } finally {
+      setUploading(false);
+    }
+  }
 
   return (
     <Dialog open={open} onOpenChange={(v) => !v && handleClose()}>
@@ -62,16 +85,23 @@ export function AddGalleryImageModal({ open, onClose }: AddGalleryImageModalProp
           {/* File picker zone */}
           <div>
             <label className="field-label">Image <span className="text-[#B91C1C] font-bold ml-0.5">*</span></label>
+            <input
+              ref={fileRef}
+              type="file"
+              accept="image/jpeg,image/png,image/webp"
+              className="sr-only"
+              onChange={(e) => setFile(e.target.files?.[0] ?? null)}
+            />
             <button
               type="button"
-              onClick={handleFilePick}
+              onClick={() => fileRef.current?.click()}
               className="w-full py-6 border-2 border-dashed border-[#C8C6C4] hover:border-primary hover:bg-primary-light/30 rounded-lg transition-colors flex flex-col items-center gap-2 text-ink-secondary hover:text-primary"
             >
               <span className="material-symbols-outlined" style={{ fontSize: 32 }}>
-                {fileSelected ? "check_circle" : "cloud_upload"}
+                {file ? "check_circle" : "cloud_upload"}
               </span>
-              {fileSelected ? (
-                <span className="text-[13px] font-semibold text-status-active-fg">{fileName}</span>
+              {file ? (
+                <span className="text-[13px] font-semibold text-status-active-fg">{file.name}</span>
               ) : (
                 <>
                   <span className="text-[13px] font-semibold">Choisir une image</span>
@@ -113,8 +143,12 @@ export function AddGalleryImageModal({ open, onClose }: AddGalleryImageModalProp
             onClick={handleSubmit}
             className="inline-flex items-center gap-1.5 px-4 py-[9px] text-[13px] font-semibold text-white bg-primary hover:bg-primary-hover rounded transition-colors disabled:bg-[#E0E0E0] disabled:text-[#A8A8A8] disabled:cursor-not-allowed"
           >
-            <span className="material-symbols-outlined" style={{ fontSize: 16 }}>add_photo_alternate</span>
-            Ajouter l&apos;image
+            {uploading ? (
+              <span className="material-symbols-outlined animate-spin" style={{ fontSize: 16 }}>progress_activity</span>
+            ) : (
+              <span className="material-symbols-outlined" style={{ fontSize: 16 }}>add_photo_alternate</span>
+            )}
+            {uploading ? "Upload…" : "Ajouter l\u0027image"}
           </button>
         </div>
       </DialogContent>

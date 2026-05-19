@@ -205,3 +205,13 @@ Estimated effort: 5 minutes (but verify carefully).
 - profile-soft.service: cross-tenant guard
 - profile-soft.service: gallery reorder with markModified
 - profile-soft.schema: strict mode + nested socials validation
+
+
+### Logo/Banner/Gallery validation-gated cascade
+- Currently V1 démo: upload direct (Sprint 4 Option C decision)
+- Target V1.1: switch to HARD validation-gated
+- Logo/Banner: store in company.pendingUpdates, admin approval required
+- Gallery: store new items + deletes in profile.pendingData, admin approval
+- Requires Phase 6 admin validation UI (already in scope)
+- Files impacted: account/logo route, account/banner route, profiles/gallery routes
+- Canon §6.1 to be updated accordingly
