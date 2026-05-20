@@ -19,6 +19,7 @@ export const SignupCompanySchema = z.object({
   gouvernorat: z.string().min(1, "Le gouvernorat est obligatoire."),
   ville: z.string().min(1, "La ville est obligatoire.").max(100),
   address: z.string().max(300).optional().nullable(),
+  identityDocumentUrl: z.string().url().optional().nullable(),
 });
 export type SignupCompanyInput = z.infer<typeof SignupCompanySchema>;
 

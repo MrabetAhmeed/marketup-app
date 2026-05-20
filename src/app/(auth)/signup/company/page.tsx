@@ -23,6 +23,9 @@ export default function SignupCompanyPage(): JSX.Element {
   const { showToast } = useToast();
   const [errorEntry, setErrorEntry] = useState<ErrorMapEntry | null>(null);
   const [submitting, setSubmitting] = useState(false);
+  const [docFile, setDocFile] = useState<File | null>(null);
+  const [docUploading, setDocUploading] = useState(false);
+  const [docUrl, setDocUrl] = useState<string | null>(null);
 
   const {
     register,
@@ -51,6 +54,29 @@ export default function SignupCompanyPage(): JSX.Element {
     setValue("sectorId", "");
   }, [marketType, setValue]);
 
+  async function handleDocUpload(file: File): Promise<void> {
+    setDocFile(file);
+    setDocUploading(true);
+    try {
+      const fd = new FormData();
+      fd.append("file", file);
+      const res = await fetch("/api/v1/public/signup-document", { method: "POST", body: fd });
+      const json = await res.json();
+      if (!res.ok) {
+        showToast(json.error?.message || "Erreur lors de l'upload du document");
+        setDocFile(null);
+        return;
+      }
+      setDocUrl(json.url as string);
+      setValue("identityDocumentUrl", json.url as string);
+    } catch {
+      showToast("Erreur, veuillez réessayer");
+      setDocFile(null);
+    } finally {
+      setDocUploading(false);
+    }
+  }
+
   const onSubmit = async (data: SignupCompanyInput) => {
     setErrorEntry(null);
     setSubmitting(true);
@@ -58,7 +84,7 @@ export default function SignupCompanyPage(): JSX.Element {
       const res = await fetch("/api/v1/auth/signup/company", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data),
+        body: JSON.stringify({ ...data, identityDocumentUrl: docUrl }),
       });
       const json = await res.json();
       if (!res.ok) {
@@ -160,24 +186,45 @@ export default function SignupCompanyPage(): JSX.Element {
                 {errors.legalId && <p className="text-xs text-[#D13438] mt-1">{errors.legalId.message}</p>}
               </div>
 
-              {/* Legal document upload — DISABLED for V1 */}
+              {/* Legal document upload */}
               <div>
                 <label className="block text-[11px] font-bold uppercase tracking-[0.06em] text-[#616161] mb-1.5">Document légal officiel</label>
-                <div className="flex items-center gap-3.5 px-4 py-3.5 bg-[#F5F5F5] border border-dashed border-[#D1D1D1] rounded-lg opacity-60 cursor-not-allowed">
+                <div className={`flex items-center gap-3.5 px-4 py-3.5 border border-dashed rounded-lg transition-colors ${docUrl ? "bg-[#F0FDF4] border-[#86EFAC]" : "bg-[#F5F5F5] border-[#D1D1D1] hover:border-[#0078D4]"}`}>
                   <div className="w-11 h-11 rounded-lg bg-white border border-[#E0E0E0] flex items-center justify-center shrink-0 text-[#0078D4]">
-                    <span className="material-symbols-outlined" style={{ fontSize: "22px" }}>description</span>
+                    <span className="material-symbols-outlined" style={{ fontSize: "22px" }}>
+                      {docUrl ? "check_circle" : "description"}
+                    </span>
                   </div>
                   <div className="flex-1 min-w-0">
-                    <div className="font-semibold text-[13px] text-[#242424] mb-0.5">Téléverser le document</div>
-                    <div className="text-[11.5px] text-[#616161]">PDF, JPG ou PNG · 5 Mo max</div>
+                    {docUrl ? (
+                      <>
+                        <div className="font-semibold text-[13px] text-[#166534] mb-0.5">{docFile?.name ?? "Document uploadé"}</div>
+                        <div className="text-[11.5px] text-[#166534]">Document prêt</div>
+                      </>
+                    ) : (
+                      <>
+                        <div className="font-semibold text-[13px] text-[#242424] mb-0.5">Téléverser le document</div>
+                        <div className="text-[11.5px] text-[#616161]">PDF, JPG ou PNG · 5 Mo max</div>
+                      </>
+                    )}
                   </div>
-                  <label className="inline-flex items-center gap-1.5 px-3 py-1.5 border border-[#D1D1D1] rounded bg-white text-[#242424] text-xs font-semibold cursor-not-allowed">
-                    <span className="material-symbols-outlined" style={{ fontSize: "14px" }}>upload</span>
-                    Choisir un fichier
-                    <input type="file" disabled aria-disabled="true" className="sr-only" />
+                  <label className={`inline-flex items-center gap-1.5 px-3 py-1.5 border border-[#D1D1D1] rounded bg-white text-[#242424] text-xs font-semibold ${docUploading ? "cursor-wait opacity-60" : "cursor-pointer hover:bg-[#F5F5F5]"}`}>
+                    {docUploading ? (
+                      <span className="material-symbols-outlined animate-spin" style={{ fontSize: "14px" }}>progress_activity</span>
+                    ) : (
+                      <span className="material-symbols-outlined" style={{ fontSize: "14px" }}>upload</span>
+                    )}
+                    {docUploading ? "Upload…" : docUrl ? "Remplacer" : "Choisir un fichier"}
+                    <input
+                      type="file"
+                      accept="application/pdf,image/jpeg,image/png,image/webp"
+                      className="sr-only"
+                      disabled={docUploading}
+                      onChange={(e) => { const f = e.target.files?.[0]; if (f) handleDocUpload(f); }}
+                    />
                   </label>
                 </div>
-                <p className="text-xs text-[#8A8886] mt-1">Téléversement bientôt disponible — l&apos;administrateur pourra vous demander ce document pendant la validation.</p>
+                <p className="text-xs text-[#8A8886] mt-1">Document officiel (RNE, patente...) — optionnel mais accélère la validation.</p>
               </div>
 
               {/* Email */}

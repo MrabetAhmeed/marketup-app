@@ -1,7 +1,8 @@
 "use client";
 
-import { useState, useCallback } from "react";
-import { useFeatureSoonToast } from "@/hooks/useFeatureSoonToast";
+import { useRef, useState, useCallback } from "react";
+import { useRouter } from "next/navigation";
+import { useToast } from "@/components/shared/Toast";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 
 interface AssociationOption {
@@ -16,31 +17,55 @@ interface RseDonationModalProps {
 }
 
 export function RseDonationModal({ open, onClose, associations }: RseDonationModalProps): JSX.Element {
-  const toast = useFeatureSoonToast();
+  const router = useRouter();
+  const { showToast } = useToast();
+  const fileRef = useRef<HTMLInputElement>(null);
 
   const [associationId, setAssociationId] = useState("");
   const [amount, setAmount] = useState("");
   const [donationDate, setDonationDate] = useState("");
-  const [fileSelected, setFileSelected] = useState(false);
-  const [fileName, setFileName] = useState("");
+  const [file, setFile] = useState<File | null>(null);
   const [notes, setNotes] = useState("");
+  const [submitting, setSubmitting] = useState(false);
 
-  const canSubmit = associationId.length > 0 && Number(amount) >= 50 && donationDate.length > 0 && fileSelected;
+  const canSubmit = associationId.length > 0 && Number(amount) >= 50 && donationDate.length > 0 && file !== null && !submitting;
 
   const handleClose = useCallback(() => {
     setAssociationId("");
     setAmount("");
     setDonationDate("");
-    setFileSelected(false);
-    setFileName("");
+    setFile(null);
     setNotes("");
+    if (fileRef.current) fileRef.current.value = "";
     onClose();
   }, [onClose]);
 
-  const handleSubmit = useCallback(() => {
-    toast("FEATURE_COMING_SOON_RSE_DONATION");
-    handleClose();
-  }, [toast, handleClose]);
+  async function handleSubmit(): Promise<void> {
+    if (!file) return;
+    setSubmitting(true);
+    try {
+      const fd = new FormData();
+      fd.append("associationId", associationId);
+      fd.append("amount", amount);
+      fd.append("donationDate", donationDate);
+      fd.append("notes", notes);
+      fd.append("receipt", file);
+
+      const res = await fetch("/api/v1/me/rse/donations", { method: "POST", body: fd });
+      const json = await res.json();
+      if (!res.ok) {
+        showToast(json.error?.message || "Erreur lors de la soumission");
+        return;
+      }
+      showToast("Reçu de don soumis pour validation");
+      handleClose();
+      router.refresh();
+    } catch {
+      showToast("Erreur, veuillez réessayer");
+    } finally {
+      setSubmitting(false);
+    }
+  }
 
   // Max date = today
   const today = new Date().toISOString().slice(0, 10);
@@ -134,13 +159,20 @@ export function RseDonationModal({ open, onClose, associations }: RseDonationMod
             <label className="field-label">
               Reçu de don <span className="text-[#B91C1C] font-bold ml-0.5">*</span>
             </label>
-            {fileSelected ? (
+            <input
+              ref={fileRef}
+              type="file"
+              accept="application/pdf,image/jpeg,image/png,image/webp"
+              className="sr-only"
+              onChange={(e) => setFile(e.target.files?.[0] ?? null)}
+            />
+            {file ? (
               <div className="flex items-center gap-3 px-3 py-2.5 bg-surface-muted border border-surface-border rounded">
                 <span className="material-symbols-outlined text-primary" style={{ fontSize: 18 }}>description</span>
-                <span className="flex-1 text-[13px] text-ink-primary truncate">{fileName}</span>
+                <span className="flex-1 text-[13px] text-ink-primary truncate">{file.name}</span>
                 <button
                   type="button"
-                  onClick={() => { setFileSelected(false); setFileName(""); }}
+                  onClick={() => { setFile(null); if (fileRef.current) fileRef.current.value = ""; }}
                   className="w-6 h-6 flex items-center justify-center rounded text-ink-tertiary hover:text-[#B91C1C] hover:bg-[#FEF2F2] transition-colors"
                   aria-label="Retirer le fichier"
                 >
@@ -150,7 +182,7 @@ export function RseDonationModal({ open, onClose, associations }: RseDonationMod
             ) : (
               <button
                 type="button"
-                onClick={() => { setFileSelected(true); setFileName("recu-don-2026.pdf"); }}
+                onClick={() => fileRef.current?.click()}
                 className="w-full py-4 border-2 border-dashed border-[#C8C6C4] hover:border-primary hover:bg-primary-light/30 rounded-lg transition-colors flex flex-col items-center gap-1.5 text-ink-secondary hover:text-primary"
               >
                 <span className="material-symbols-outlined" style={{ fontSize: 24 }}>cloud_upload</span>
@@ -195,8 +227,12 @@ export function RseDonationModal({ open, onClose, associations }: RseDonationMod
             onClick={handleSubmit}
             className="inline-flex items-center gap-1.5 px-4 py-[9px] text-[13px] font-semibold text-white bg-[#C5A059] hover:bg-[#8A6A1F] rounded transition-colors disabled:bg-[#E0E0E0] disabled:text-[#A8A8A8] disabled:cursor-not-allowed"
           >
-            <span className="material-symbols-outlined" style={{ fontSize: 16 }}>send</span>
-            Soumettre le reçu
+            {submitting ? (
+              <span className="material-symbols-outlined animate-spin" style={{ fontSize: 16 }}>progress_activity</span>
+            ) : (
+              <span className="material-symbols-outlined" style={{ fontSize: 16 }}>send</span>
+            )}
+            {submitting ? "Soumission…" : "Soumettre le reçu"}
           </button>
         </div>
       </DialogContent>

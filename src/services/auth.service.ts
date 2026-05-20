@@ -57,6 +57,7 @@ interface SignupCompanyInput {
   gouvernorat: string;
   ville: string;
   address?: string | null;
+  identityDocumentUrl?: string | null;
 }
 
 interface SignupCompanyResult {
@@ -118,7 +119,7 @@ export async function signupCompany(input: SignupCompanyInput): Promise<SignupCo
           type: input.type,
           legalId: input.legalId,
           vatNumber: input.vatNumber || null,
-          identityDocumentUrl: null,
+          identityDocumentUrl: input.identityDocumentUrl ?? null,
           country: "TN",
           accountEmail: email,
           data: {
