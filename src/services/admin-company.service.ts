@@ -100,7 +100,7 @@ export interface CompanyForAdminReview {
 export async function getCompanyForAdminReview(
   companyId: string,
   lang: SupportedLang = "fr",
-): Promise<CompanyForAdminReview> {
+): Promise<CompanyForAdminReview & { status: string }> {
   if (!isValidObjectId(companyId)) {
     throw new BusinessRuleError("INVALID_ID", "Identifiant invalide.");
   }
@@ -108,9 +108,6 @@ export async function getCompanyForAdminReview(
 
   const company = await CompanyModel.findById(companyId).lean();
   if (!company) throw new NotFoundError("Company");
-  if (company.status !== "pending") {
-    throw new BusinessRuleError("NOT_PENDING", "Ce compte n'est pas en attente de validation.");
-  }
 
   const user = await UserModel.findOne({ companyId: company._id }).lean();
   const sector = await SectorModel.findOne({ slug: company.liveData?.sectorId }).lean();
@@ -118,6 +115,7 @@ export async function getCompanyForAdminReview(
 
   return {
     id: company._id.toString(),
+    status: company.status,
     displayName: pickLocale(company.data?.displayName, lang),
     slug: company.slug,
     type: company.type,
@@ -222,4 +220,91 @@ export async function rejectCompanyByAdmin(
   } catch (err) {
     console.warn("[rejectCompany] Email failed (non-blocking):", err);
   }
+}
+
+// ---------------------------------------------------------------------------
+// Suspend company (admin action)
+// ---------------------------------------------------------------------------
+
+export async function suspendCompanyByAdmin(
+  companyId: string,
+): Promise<void> {
+  if (!isValidObjectId(companyId)) {
+    throw new BusinessRuleError("INVALID_ID", "Identifiant invalide.");
+  }
+  await connectDb();
+
+  const company = await CompanyModel.findById(companyId).lean();
+  if (!company) throw new NotFoundError("Company");
+  if (company.status === "suspended") {
+    throw new BusinessRuleError("ALREADY_SUSPENDED", "Ce compte est déjà désactivé.");
+  }
+
+  await CompanyModel.findByIdAndUpdate(companyId, {
+    $set: { status: "suspended", suspendedAt: new Date() },
+  });
+}
+
+// ---------------------------------------------------------------------------
+// Reactivate company (admin action)
+// ---------------------------------------------------------------------------
+
+export async function reactivateCompanyByAdmin(
+  companyId: string,
+): Promise<void> {
+  if (!isValidObjectId(companyId)) {
+    throw new BusinessRuleError("INVALID_ID", "Identifiant invalide.");
+  }
+  await connectDb();
+
+  const company = await CompanyModel.findById(companyId).lean();
+  if (!company) throw new NotFoundError("Company");
+  if (company.status !== "suspended") {
+    throw new BusinessRuleError("NOT_SUSPENDED", "Ce compte n'est pas désactivé.");
+  }
+
+  await CompanyModel.findByIdAndUpdate(companyId, {
+    $set: { status: "active", suspendedAt: null, suspendedReason: null },
+  });
+}
+
+// ---------------------------------------------------------------------------
+// List all companies (active + suspended) for admin entreprises page
+// ---------------------------------------------------------------------------
+
+export interface CompanyListItem {
+  id: string;
+  displayName: string;
+  slug: string;
+  type: string;
+  status: string;
+  sector: string;
+  ville: string;
+  registeredAt: string;
+}
+
+export async function listAllCompanies(
+  lang: SupportedLang = "fr",
+): Promise<CompanyListItem[]> {
+  await connectDb();
+
+  const companies = await CompanyModel.find({
+    status: { $in: ["active", "suspended"] },
+    deletedAt: null,
+  }).sort({ registeredAt: -1 }).lean();
+
+  const sectorSlugs = Array.from(new Set((companies as any[]).map((c) => c.liveData?.sectorId).filter(Boolean)));
+  const sectors = await SectorModel.find({ slug: { $in: sectorSlugs } }).lean();
+  const sectorMap = new Map((sectors as any[]).map((s) => [s.slug, pickLocale(s.name, lang)]));
+
+  return (companies as any[]).map((c) => ({
+    id: c._id.toString(),
+    displayName: pickLocale(c.data?.displayName, lang),
+    slug: c.slug,
+    type: c.type,
+    status: c.status,
+    sector: sectorMap.get(c.liveData?.sectorId) ?? c.liveData?.sectorId ?? "",
+    ville: c.liveData?.ville ?? "",
+    registeredAt: new Date(c.registeredAt).toISOString(),
+  }));
 }

@@ -1,4 +1,5 @@
 import { redirect } from "next/navigation";
+import { headers } from "next/headers";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { getMe, getNotificationPreviews } from "@/services/me.service";
@@ -25,6 +26,15 @@ export default async function DashboardLayout({
   // Stale session: JWT is valid but user/company was deleted from DB
   if (!me) {
     redirect("/session-expired");
+  }
+
+  // Strict gating: rejected users can ONLY access /dashboard/account/edit
+  if (me.company.status === "rejected") {
+    const headersList = await headers();
+    const currentPath = headersList.get("x-current-path") ?? "";
+    if (!currentPath.startsWith("/dashboard/account/edit")) {
+      redirect("/dashboard/account/edit?reason=rejected");
+    }
   }
 
   return (

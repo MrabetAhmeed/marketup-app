@@ -353,16 +353,19 @@ export async function login(email: string, password: string): Promise<LoginResul
       throw new AuthError("NO_COMPANY", "Aucune entreprise associée.", 403);
     }
 
-    if (company.status !== "active") {
-      const messages: Record<string, string> = {
-        pending: "Votre compte est en attente de validation par notre équipe.",
-        rejected: "Votre compte a été refusé.",
-        suspended: "Votre compte est suspendu.",
-        deleted: "Ce compte n'existe plus.",
-      };
-      throw new AuthError("COMPANY_NOT_ACTIVE", messages[company.status] || "Compte inactif.", 403, {
-        status: company.status,
-      });
+    // Rejected: allow login (user can correct + resubmit)
+    // Active: allow login (normal flow)
+    // All others: block
+    if (company.status !== "active" && company.status !== "rejected") {
+      if (company.status === "pending") {
+        throw new AuthError("COMPANY_PENDING", "Votre compte est en attente de validation.", 403, {
+          submittedAt: company.registeredAt ? new Date(company.registeredAt).toISOString() : null,
+        });
+      }
+      if (company.status === "suspended") {
+        throw new AuthError("COMPANY_SUSPENDED", "Votre compte a été désactivé.", 403);
+      }
+      throw new AuthError("COMPANY_NOT_ACTIVE", "Compte inactif.", 403, { status: company.status });
     }
 
     user.lastLoginAt = new Date();

@@ -67,11 +67,8 @@ export default function LoginPage(): JSX.Element {
               return;
             }
 
-            // COMPANY_NOT_ACTIVE with sub-status
-            const entry =
-              parsed.code === "COMPANY_NOT_ACTIVE" && parsed.details?.status
-                ? getAuthErrorMessage(parsed.code, parsed.details.status)
-                : getAuthErrorMessage(parsed.code);
+            // Dedicated company status errors
+            const entry = getAuthErrorMessage(parsed.code);
 
             if (entry.presentation === "toast") {
               showToast(entry.message);

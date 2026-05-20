@@ -96,7 +96,17 @@ export const AUTH_ERROR_MESSAGES: Record<string, ErrorMapEntry> = {
     presentation: "banner",
   },
 
-  // === Company status errors (sub-codes for COMPANY_NOT_ACTIVE) ===
+  // === Company status errors (dedicated codes) ===
+  COMPANY_PENDING: {
+    message: "Votre compte est en attente de validation par notre équipe. Vous recevrez un email sous 24-48h.",
+    presentation: "banner",
+  },
+  COMPANY_SUSPENDED: {
+    message: "Votre compte a été désactivé. Pour toute question, contactez support@vivasky.media.",
+    presentation: "banner",
+  },
+
+  // Legacy sub-codes (kept for backward compat)
   "COMPANY_NOT_ACTIVE.pending": {
     message: "Votre compte est en attente de validation par notre équipe (24-48h).",
     presentation: "banner",
@@ -106,7 +116,7 @@ export const AUTH_ERROR_MESSAGES: Record<string, ErrorMapEntry> = {
     presentation: "banner",
   },
   "COMPANY_NOT_ACTIVE.suspended": {
-    message: "Votre compte est suspendu. Contactez le support.",
+    message: "Votre compte a été désactivé. Contactez support@vivasky.media.",
     presentation: "banner",
   },
   "COMPANY_NOT_ACTIVE.deleted": {

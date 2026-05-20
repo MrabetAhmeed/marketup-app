@@ -325,3 +325,10 @@ Estimated effort: 30 minutes.
 - One-time effort
 
 Estimated effort: 4-6 hours (adapter + migration script + cutover).
+
+
+### V1.1 — Resend domain verification
+- Vérifier un domaine (vivasky.media ou autre) sur resend.com/domains
+- Mettre à jour FROM_EMAIL dans .env (passe de onboarding@resend.dev à no-reply@vivasky.media)
+- Les emails passent à tous les destinataires
+- Effort : 10 min config + 10-30 min propagation DNS

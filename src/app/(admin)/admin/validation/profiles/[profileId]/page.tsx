@@ -33,15 +33,21 @@ export default async function ProfileReviewPage({ params }: PageProps): Promise<
               {profile.companyName} — {kindLabel}
             </h1>
             <div className="flex items-center gap-2 mt-1 text-[12px] text-ink-secondary">
-              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-[#FEF3C7] text-[#92400E] text-[10px] font-bold">
-                <span className="material-symbols-outlined" style={{ fontSize: 12 }}>schedule</span>
-                En attente
+              <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-bold ${
+                profile.status === "pending" ? "bg-[#FEF3C7] text-[#92400E]"
+                  : profile.status === "active" ? "bg-[#F0FDF4] text-[#16A34A]"
+                    : profile.status === "rejected" ? "bg-[#FEF2F2] text-[#B91C1C]"
+                      : "bg-surface-muted text-ink-secondary"
+              }`}>
+                {profile.status === "pending" ? "En attente" : profile.status === "active" ? "Validé" : profile.status === "rejected" ? "Refusé" : profile.status}
               </span>
-              <span>Soumis le {new Date(profile.submittedAt).toLocaleDateString("fr-FR", { day: "numeric", month: "long", year: "numeric" })}</span>
+              {profile.submittedAt && (
+                <span>Soumis le {new Date(profile.submittedAt).toLocaleDateString("fr-FR", { day: "numeric", month: "long", year: "numeric" })}</span>
+              )}
             </div>
           </div>
         </div>
-        <ProfileReviewActions profileId={profileId} />
+        {profile.status === "pending" && <ProfileReviewActions profileId={profileId} />}
       </div>
 
       {/* Pending modifications */}

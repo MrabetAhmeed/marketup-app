@@ -96,9 +96,6 @@ export async function getProfileForAdminReview(
 
   const profile = await ProfileModel.findById(profileId).lean();
   if (!profile) throw new NotFoundError("Profile");
-  if (profile.status !== "pending") {
-    throw new BusinessRuleError("NOT_PENDING", "Ce profil n'est pas en attente de validation.");
-  }
 
   const company = await CompanyModel.findById(profile.companyId).lean();
   if (!company) throw new NotFoundError("Company");

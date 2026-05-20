@@ -8,7 +8,7 @@ const NAV_ITEMS = [
   { href: "/admin/validation/profiles", label: "Validation profils", icon: "verified" },
   { href: "/admin/validation/comptes", label: "Validation comptes", icon: "how_to_reg" },
   { href: "/admin/validation/rse", label: "Validation RSE", icon: "volunteer_activism" },
-  { href: "#", label: "Entreprises", icon: "business", disabled: true },
+  { href: "/admin/entreprises", label: "Entreprises", icon: "business" },
   { href: "#", label: "Transactions", icon: "receipt_long", disabled: true },
 ];
 

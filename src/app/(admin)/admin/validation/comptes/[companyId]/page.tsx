@@ -41,15 +41,19 @@ export default async function CompanyReviewPage({ params }: PageProps): Promise<
           <div>
             <h1 className="font-heading font-bold text-[20px] text-ink-primary leading-tight">{company.displayName}</h1>
             <div className="flex items-center gap-2 mt-1 text-[12px] text-ink-secondary">
-              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-[#FEF3C7] text-[#92400E] text-[10px] font-bold">
-                <span className="material-symbols-outlined" style={{ fontSize: 12 }}>schedule</span>
-                En attente
+              <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-bold ${
+                company.status === "pending" ? "bg-[#FEF3C7] text-[#92400E]"
+                  : company.status === "active" ? "bg-[#F0FDF4] text-[#16A34A]"
+                    : company.status === "rejected" ? "bg-[#FEF2F2] text-[#B91C1C]"
+                      : "bg-surface-muted text-ink-secondary"
+              }`}>
+                {company.status === "pending" ? "En attente" : company.status === "active" ? "Actif" : company.status === "rejected" ? "Refusé" : company.status}
               </span>
               <span>Inscrit le {new Date(company.registeredAt).toLocaleDateString("fr-FR", { day: "numeric", month: "long", year: "numeric" })}</span>
             </div>
           </div>
         </div>
-        <CompanyReviewActions companyId={companyId} />
+        {company.status === "pending" && <CompanyReviewActions companyId={companyId} />}
       </div>
 
       {/* Company info */}

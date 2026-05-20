@@ -9,6 +9,7 @@ import { companyValidatedEmailTemplate } from "./templates/company-validated";
 import { companyRejectedEmailTemplate } from "./templates/company-rejected";
 import { rseReceiptValidatedEmailTemplate } from "./templates/rse-receipt-validated";
 import { rseReceiptRejectedEmailTemplate } from "./templates/rse-receipt-rejected";
+import { companyResubmittedEmailTemplate } from "./templates/company-resubmitted";
 
 const FROM_ADDRESS = `MARKET-UP <${env.EMAIL_FROM}>`;
 
@@ -172,4 +173,17 @@ export async function sendRseReceiptRejectedEmail(params: {
     rsePageUrl: `${env.NEXTAUTH_URL}/dashboard/rse`,
   });
   await sendEmail(params.userEmail, subject, html);
+}
+
+/** Notify admin that a company has resubmitted after rejection. */
+export async function sendCompanyResubmittedEmail(params: {
+  adminEmail: string;
+  companyName: string;
+  adminUrl: string;
+}): Promise<void> {
+  const { subject, html } = companyResubmittedEmailTemplate({
+    companyName: params.companyName,
+    adminUrl: params.adminUrl,
+  });
+  await sendEmail(params.adminEmail, subject, html);
 }

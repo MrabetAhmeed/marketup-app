@@ -48,7 +48,10 @@ export async function middleware(req: NextRequest): Promise<NextResponse> {
     }
   }
 
-  return NextResponse.next();
+  // Inject current pathname as header for server components to read
+  const requestHeaders = new Headers(req.headers);
+  requestHeaders.set("x-current-path", pathname);
+  return NextResponse.next({ request: { headers: requestHeaders } });
 }
 
 export const config = {
