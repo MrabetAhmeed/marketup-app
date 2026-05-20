@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useCallback } from "react";
-import { signIn } from "next-auth/react";
+import { signIn, getSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import AuthErrorBanner from "@/components/shared/AuthErrorBanner";
@@ -85,7 +85,13 @@ export default function LoginPage(): JSX.Element {
             setHasError(true);
           }
         } else if (result?.ok) {
-          router.push("/dashboard");
+          // Role-based redirect
+          const session = await getSession();
+          if (session?.user?.role === "SUPER_ADMIN") {
+            router.push("/admin");
+          } else {
+            router.push("/dashboard");
+          }
         }
       } catch {
         const entry = getAuthErrorMessage("NETWORK_ERROR");

@@ -3,6 +3,8 @@ import { env } from "@/lib/env";
 import { otpEmailTemplate } from "./templates/otp";
 import { passwordResetEmailTemplate } from "./templates/password-reset";
 import { profileSubmittedEmailTemplate } from "./templates/profile-submitted";
+import { profileValidatedEmailTemplate } from "./templates/profile-validated";
+import { profileRejectedEmailTemplate } from "./templates/profile-rejected";
 
 const FROM_ADDRESS = `MARKET-UP <${env.EMAIL_FROM}>`;
 
@@ -73,6 +75,38 @@ export async function sendProfileSubmittedEmail(params: {
     adminUrl: params.adminUrl,
   });
   await sendEmail(params.adminEmail, subject, html);
+}
+
+/** Notify user that their profile has been validated by admin. */
+export async function sendProfileValidatedEmail(params: {
+  userEmail: string;
+  companyName: string;
+  profileKind: string;
+  profileUrl: string;
+}): Promise<void> {
+  const { subject, html } = profileValidatedEmailTemplate({
+    companyName: params.companyName,
+    profileKind: params.profileKind,
+    profileUrl: params.profileUrl,
+  });
+  await sendEmail(params.userEmail, subject, html);
+}
+
+/** Notify user that their profile has been rejected by admin. */
+export async function sendProfileRejectedEmail(params: {
+  userEmail: string;
+  companyName: string;
+  profileKind: string;
+  rejectionReason: string;
+  dashboardUrl: string;
+}): Promise<void> {
+  const { subject, html } = profileRejectedEmailTemplate({
+    companyName: params.companyName,
+    profileKind: params.profileKind,
+    rejectionReason: params.rejectionReason,
+    dashboardUrl: params.dashboardUrl,
+  });
+  await sendEmail(params.userEmail, subject, html);
 }
 
 /** Send account approved notification. Stub — template built in Phase 6. */

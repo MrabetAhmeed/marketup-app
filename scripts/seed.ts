@@ -298,7 +298,7 @@ async function seedAdminUser(passwordHash: string): Promise<Types.ObjectId> {
   const admin = await insert(AdminUser, {
     firstName: "Bassem",
     lastName: "Admin",
-    email: "mrabet.ahmeed@mail.com",
+    email: "bassem@vivasky.media",
     passwordHash,
     role: "SUPER_ADMIN",
     avatar: { initials: "BA", backgroundColor: "#5C2D91" },
