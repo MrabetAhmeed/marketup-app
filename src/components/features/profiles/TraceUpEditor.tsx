@@ -9,7 +9,7 @@ import { ProfileStatusBlock } from "@/components/shared/ProfileStatusBlock";
 import { useToast } from "@/components/shared/Toast";
 import { ProfileActionBar } from "./ProfileActionBar";
 import { AddVideoModal } from "./AddVideoModal";
-import { useFeatureSoonToast } from "@/hooks/useFeatureSoonToast";
+import { VideoDeleteConfirm } from "./VideoDeleteConfirm";
 import type { TraceUpEditorData, VideoItem } from "@/types/profile-editor";
 import type { MeResponse } from "@/types/dashboard";
 
@@ -40,6 +40,7 @@ export function TraceUpEditor({ profile, company }: TraceUpEditorProps): JSX.Ele
 
   const [activeTab, setActiveTab] = useState<VideoCategory>("actualite");
   const [addVideoOpen, setAddVideoOpen] = useState(false);
+  const [deleteTarget, setDeleteTarget] = useState<{ id: string; title: string } | null>(null);
 
   const { register, handleSubmit, formState: { isDirty, errors }, reset, setError, getValues } = useForm<FormValues>({
     defaultValues: {
@@ -271,7 +272,7 @@ export function TraceUpEditor({ profile, company }: TraceUpEditorProps): JSX.Ele
           ) : (
             <div className="space-y-3">
               {currentVideos.map((video) => (
-                <VideoCard key={video.id} video={video} />
+                <VideoCard key={video.id} video={video} onDelete={() => setDeleteTarget({ id: video.id, title: video.title })} />
               ))}
             </div>
           )}
@@ -347,7 +348,15 @@ export function TraceUpEditor({ profile, company }: TraceUpEditorProps): JSX.Ele
       <AddVideoModal
         open={addVideoOpen}
         onClose={() => setAddVideoOpen(false)}
+        profileId={profile.id}
         defaultCategory={activeTab}
+      />
+      <VideoDeleteConfirm
+        open={deleteTarget !== null}
+        onClose={() => setDeleteTarget(null)}
+        profileId={profile.id}
+        videoId={deleteTarget?.id ?? ""}
+        title={deleteTarget?.title ?? ""}
       />
     </div>
   );
@@ -357,9 +366,7 @@ export function TraceUpEditor({ profile, company }: TraceUpEditorProps): JSX.Ele
 // Video card sub-component
 // ---------------------------------------------------------------------------
 
-function VideoCard({ video }: { video: VideoItem }): JSX.Element {
-  const toast = useFeatureSoonToast();
-
+function VideoCard({ video, onDelete }: { video: VideoItem; onDelete: () => void }): JSX.Element {
   return (
     <div className="bg-white border border-surface-border rounded-lg p-3 flex flex-col md:flex-row items-start md:items-center gap-3 md:gap-4">
       {/* Thumbnail */}
@@ -404,7 +411,7 @@ function VideoCard({ video }: { video: VideoItem }): JSX.Element {
       {/* Delete button */}
       <button
         type="button"
-        onClick={() => toast()}
+        onClick={onDelete}
         className="inline-flex items-center gap-1.5 px-3 py-[7px] text-[13px] font-semibold text-[#B91C1C] hover:bg-[#FEF2F2] rounded transition-colors self-start md:self-center shrink-0"
         aria-label="Supprimer la vidéo"
       >

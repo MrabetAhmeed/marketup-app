@@ -1,7 +1,8 @@
 "use client";
 
 import { useState, useCallback } from "react";
-import { useFeatureSoonToast } from "@/hooks/useFeatureSoonToast";
+import { useRouter } from "next/navigation";
+import { useToast } from "@/components/shared/Toast";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 
 type Platform = "youtube" | "dailymotion" | "vimeo";
@@ -50,20 +51,24 @@ const URL_ERROR_EXAMPLES: Record<Platform, string> = {
 interface AddVideoModalProps {
   open: boolean;
   onClose: () => void;
+  profileId: string;
   defaultCategory?: VideoCategory;
 }
 
-export function AddVideoModal({ open, onClose, defaultCategory = "actualite" }: AddVideoModalProps): JSX.Element {
-  const toast = useFeatureSoonToast();
+export function AddVideoModal({ open, onClose, profileId, defaultCategory = "actualite" }: AddVideoModalProps): JSX.Element {
+  const router = useRouter();
+  const { showToast } = useToast();
 
   const [platform, setPlatform] = useState<Platform | null>(null);
   const [url, setUrl] = useState("");
   const [category, setCategory] = useState<VideoCategory>(defaultCategory);
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
+  const [submitting, setSubmitting] = useState(false);
+  const [urlError, setUrlError] = useState<string | null>(null);
 
   const urlValid = platform ? URL_PATTERNS[platform].some((re) => re.test(url)) : false;
-  const canSubmit = platform && urlValid && title.trim().length > 0;
+  const canSubmit = platform && urlValid && title.trim().length > 0 && !submitting;
 
   const handleClose = useCallback(() => {
     setPlatform(null);
@@ -71,13 +76,43 @@ export function AddVideoModal({ open, onClose, defaultCategory = "actualite" }: 
     setCategory(defaultCategory);
     setTitle("");
     setDescription("");
+    setUrlError(null);
     onClose();
   }, [onClose, defaultCategory]);
 
-  const handleSubmit = useCallback(() => {
-    toast("FEATURE_COMING_SOON_VIDEO_ADD");
-    handleClose();
-  }, [toast, handleClose]);
+  async function handleSubmit(): Promise<void> {
+    if (!platform || !urlValid) return;
+    setSubmitting(true);
+    setUrlError(null);
+    try {
+      const res = await fetch(`/api/v1/profiles/${profileId}/videos`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ platform, url, title: title.trim(), description: description.trim(), category }),
+      });
+      const json = await res.json();
+      if (!res.ok) {
+        if (json.error?.code === "VALIDATION_FAILED") {
+          const fields = json.error.fields as Record<string, string[]> | undefined;
+          if (fields?.url) {
+            setUrlError(fields.url[0] ?? "URL invalide.");
+            return;
+          }
+          showToast(json.error.message || "Erreur de validation");
+          return;
+        }
+        showToast(json.error?.message || "Erreur, veuillez réessayer");
+        return;
+      }
+      showToast("Vidéo ajoutée");
+      handleClose();
+      router.refresh();
+    } catch {
+      showToast("Erreur, veuillez réessayer");
+    } finally {
+      setSubmitting(false);
+    }
+  }
 
   return (
     <Dialog open={open} onOpenChange={(v) => !v && handleClose()}>
@@ -158,6 +193,9 @@ export function AddVideoModal({ open, onClose, defaultCategory = "actualite" }: 
                 URL non reconnue. Exemple : {URL_ERROR_EXAMPLES[platform]}
               </div>
             )}
+            {urlError && (
+              <p className="text-[12px] text-[#B91C1C] mt-1">{urlError}</p>
+            )}
           </div>
 
           {/* Category */}
@@ -225,8 +263,12 @@ export function AddVideoModal({ open, onClose, defaultCategory = "actualite" }: 
             onClick={handleSubmit}
             className="inline-flex items-center gap-1.5 px-4 py-[9px] text-[13px] font-semibold text-white bg-primary hover:bg-primary-hover rounded transition-colors disabled:bg-[#E0E0E0] disabled:text-[#A8A8A8] disabled:cursor-not-allowed"
           >
-            <span className="material-symbols-outlined" style={{ fontSize: 16 }}>add</span>
-            Ajouter la vidéo
+            {submitting ? (
+              <span className="material-symbols-outlined animate-spin" style={{ fontSize: 16 }}>progress_activity</span>
+            ) : (
+              <span className="material-symbols-outlined" style={{ fontSize: 16 }}>add</span>
+            )}
+            {submitting ? "Ajout en cours…" : "Ajouter la vidéo"}
           </button>
         </div>
       </DialogContent>

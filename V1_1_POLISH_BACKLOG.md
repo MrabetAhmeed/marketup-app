@@ -215,3 +215,113 @@ Estimated effort: 5 minutes (but verify carefully).
 - Requires Phase 6 admin validation UI (already in scope)
 - Files impacted: account/logo route, account/banner route, profiles/gallery routes
 - Canon §6.1 to be updated accordingly
+
+
+---
+
+## Sprint 2 — Profile SOFT mutations
+
+### Tests Vitest manquants
+- profile-soft.service: dispatch by kind
+- profile-soft.service: cross-tenant guard
+- profile-soft.service: gallery reorder with markModified
+- profile-soft.schema: strict mode + nested socials validation
+
+Estimated effort: 1-2 hours.
+
+(Note: already mentioned but moving here under proper sprint heading)
+
+### Socials field counter granularity
+- Currently: any modification to socials array counts as 1 in dirty counter
+  (Option α from C.3 test)
+- Discussed alternative β: count each modified URL individually
+- Decision V1: Option α (validated by Ahmed)
+- V1.1 reconsider if user feedback requests it
+
+---
+
+## Sprint 3 — Profile HARD submit
+
+### Compteur HARD message
+- Actuellement : "Modifications à resoumettre · revalidation admin requise"
+- Cible : "X modifications à resoumettre · revalidation admin requise"
+- Cohérence avec compteur SOFT qui affiche déjà le nombre
+- Fichier : ProfileActionBar.tsx (branches active + rejected + incomplete)
+
+Estimated effort: 15 minutes.
+
+### Tests Vitest manquants
+- profile-hard.service: submit dispatch + cross-tenant guard
+- profile-hard.service: 422 ALREADY_PENDING / PROFILE_DISABLED
+- profile-hard.service: pendingData.fields[] structure
+- profile-hard.service: rejection cleared on re-submit
+- email.service: sendProfileSubmittedEmail (mock Resend)
+
+Estimated effort: 2 hours.
+
+### Email user notifications post-validation
+- Currently: only admin gets email when profile submitted
+- Phase 6 will add: admin validates/rejects → email user
+- "Votre profil X a été validé et est maintenant public"
+- "Votre profil X a été refusé. Raison : ..."
+
+Estimated effort: 1 hour (template + send wiring in admin validation flow).
+
+---
+
+## Sprint 4 — Media uploads
+
+### Logo/Banner/Gallery validation-gated cascade
+- Currently V1 démo: upload direct (Sprint 4 Option C decision)
+- Target V1.1: switch to HARD validation-gated
+- Logo/Banner: store in company.pendingUpdates, admin approval required
+- Gallery: store new items + deletes in profile.pendingData, admin approval
+- Requires Phase 6 admin validation UI (already in scope)
+- Files impacted: account/logo route, account/banner route, profiles/gallery routes
+- Canon §6.1 to be updated accordingly
+
+Estimated effort: 3-4 hours (across endpoints + admin UI extension).
+
+### Cloudinary orphan cleanup cron
+- Currently: when user adds gallery image then cancels, image stays on Cloudinary
+- Same risk on logo/banner if user uploads then changes mind
+- Solution: daily cron that lists Cloudinary public_ids in marketup/ folder
+  and compares with referenced URLs in DB (companies + profiles)
+- Delete unreferenced public_ids
+- Estimated saving: ~5-10% storage post-démo if users experiment with uploads
+
+Estimated effort: 2 hours (script + cron setup).
+
+### Signup company PDF document upload
+- Currently stubbed in signup-entreprise page with {/* DISABLED for V1 */} comment
+- Wire to Cloudinary preset marketup_documents
+- Endpoint: POST /api/v1/auth/upload-document (or integrate in signup flow)
+- Field stored: company.legalDocumentUrl
+- Admin reviews PDF during company validation (Phase 6)
+
+Estimated effort: 30-45 minutes.
+
+### Video moderation a posteriori
+- Currently: video add = CRUD direct (no admin validation, canon §6.10)
+- Risk: user adds inappropriate YouTube/Vimeo/Dailymotion video
+- V1.1 solution: admin can DELETE user videos from admin panel
+- Notification user: "Cette vidéo a été retirée pour non-conformité"
+- Reason field required for admin (audit trail)
+
+Estimated effort: 2 hours (admin UI + delete with reason flow + email).
+
+### oEmbed title auto-fill (optional)
+- Currently: user types title manually, oEmbed only fetches thumbnail
+- V1.1 option: pre-fill title with oEmbed response, user can edit
+- Adds polish but not blocking
+
+Estimated effort: 30 minutes.
+
+### Storage migration to R2 (future)
+- Currently Cloudinary (25 GB free, 25 credits/month)
+- When approaching limits: migrate to Cloudflare R2
+- Both behind StorageAdapter interface (already abstracted)
+- Migration = rewrite adapter + bulk transfer existing files
+- One-time effort
+
+Estimated effort: 4-6 hours (adapter + migration script + cutover).
