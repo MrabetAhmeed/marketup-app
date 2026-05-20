@@ -6,8 +6,8 @@ import { usePathname } from "next/navigation";
 const NAV_ITEMS = [
   { href: "/admin", label: "Vue d'ensemble", icon: "dashboard" },
   { href: "/admin/validation/profiles", label: "Validation profils", icon: "verified" },
-  { href: "#", label: "Validation comptes", icon: "how_to_reg", disabled: true },
-  { href: "#", label: "Validation RSE", icon: "volunteer_activism", disabled: true },
+  { href: "/admin/validation/comptes", label: "Validation comptes", icon: "how_to_reg" },
+  { href: "/admin/validation/rse", label: "Validation RSE", icon: "volunteer_activism" },
   { href: "#", label: "Entreprises", icon: "business", disabled: true },
   { href: "#", label: "Transactions", icon: "receipt_long", disabled: true },
 ];

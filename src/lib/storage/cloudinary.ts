@@ -40,6 +40,7 @@ export class CloudinaryStorageAdapter implements StorageAdapter {
                 resource_type: resourceType,
                 public_id: this.buildPublicId(options),
                 overwrite: true,
+                ...(options.contentType === "application/pdf" && { format: "pdf" }),
               },
               (error, result) => {
                 if (error) return reject(error);

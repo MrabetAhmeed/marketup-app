@@ -130,3 +130,18 @@ export async function uploadDocumentFromFile(
     contentType: file.type,
   });
 }
+
+/**
+ * Ensure a Cloudinary raw PDF URL has .pdf extension for browser inline viewing.
+ * Cloudinary raw uploads without format option produce URLs without extension,
+ * causing browsers to download instead of display inline.
+ */
+export function ensurePdfExtension(url: string | null): string | null {
+  if (!url) return null;
+  if (url.endsWith(".pdf")) return url;
+  if (url.match(/\.(jpg|jpeg|png|webp|gif)$/i)) return url;
+  if (url.includes("res.cloudinary.com") && url.includes("/raw/upload/")) {
+    return `${url}.pdf`;
+  }
+  return url;
+}

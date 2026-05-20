@@ -1,0 +1,27 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import { connectDb } from "@/lib/db";
+import { Profile } from "@/models/profile.model";
+import { Company } from "@/models/company.model";
+import { RseReceipt } from "@/models/rse-receipt.model";
+
+const ProfileModel = Profile as any;
+const CompanyModel = Company as any;
+const RseReceiptModel = RseReceipt as any;
+
+export interface AdminPendingCounts {
+  profiles: number;
+  companies: number;
+  rse: number;
+}
+
+export async function getPendingCountsForAdmin(): Promise<AdminPendingCounts> {
+  await connectDb();
+
+  const [profiles, companies, rse] = await Promise.all([
+    ProfileModel.countDocuments({ status: "pending", deletedAt: null }),
+    CompanyModel.countDocuments({ status: "pending", deletedAt: null }),
+    RseReceiptModel.countDocuments({ status: "pending", deletedAt: null }),
+  ]);
+
+  return { profiles, companies, rse };
+}

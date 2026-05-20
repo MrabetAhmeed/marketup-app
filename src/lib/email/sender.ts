@@ -5,6 +5,10 @@ import { passwordResetEmailTemplate } from "./templates/password-reset";
 import { profileSubmittedEmailTemplate } from "./templates/profile-submitted";
 import { profileValidatedEmailTemplate } from "./templates/profile-validated";
 import { profileRejectedEmailTemplate } from "./templates/profile-rejected";
+import { companyValidatedEmailTemplate } from "./templates/company-validated";
+import { companyRejectedEmailTemplate } from "./templates/company-rejected";
+import { rseReceiptValidatedEmailTemplate } from "./templates/rse-receipt-validated";
+import { rseReceiptRejectedEmailTemplate } from "./templates/rse-receipt-rejected";
 
 const FROM_ADDRESS = `MARKET-UP <${env.EMAIL_FROM}>`;
 
@@ -109,11 +113,63 @@ export async function sendProfileRejectedEmail(params: {
   await sendEmail(params.userEmail, subject, html);
 }
 
-/** Send account approved notification. Stub — template built in Phase 6. */
-export async function sendAccountApprovedEmail(to: string, _companyName: string): Promise<void> {
-  await sendEmail(
-    to,
-    "Votre compte MARKET-UP est activé",
-    `<p>Votre compte est maintenant actif. Connectez-vous sur <a href="${env.NEXTAUTH_URL}">${env.NEXTAUTH_URL}</a>.</p>`,
-  );
+/** Notify user that their company account has been validated. */
+export async function sendCompanyValidatedEmail(params: {
+  userEmail: string;
+  companyName: string;
+  dashboardUrl: string;
+}): Promise<void> {
+  const { subject, html } = companyValidatedEmailTemplate({
+    companyName: params.companyName,
+    dashboardUrl: params.dashboardUrl,
+  });
+  await sendEmail(params.userEmail, subject, html);
+}
+
+/** Notify user that their company account has been rejected. */
+export async function sendCompanyRejectedEmail(params: {
+  userEmail: string;
+  companyName: string;
+  rejectedReason: string;
+}): Promise<void> {
+  const { subject, html } = companyRejectedEmailTemplate({
+    companyName: params.companyName,
+    rejectedReason: params.rejectedReason,
+    supportEmail: "support@vivasky.media",
+  });
+  await sendEmail(params.userEmail, subject, html);
+}
+
+/** Notify user that their RSE receipt has been validated. */
+export async function sendRseReceiptValidatedEmail(params: {
+  userEmail: string;
+  companyName: string;
+  associationName: string;
+  amount: number;
+}): Promise<void> {
+  const { subject, html } = rseReceiptValidatedEmailTemplate({
+    companyName: params.companyName,
+    associationName: params.associationName,
+    amount: params.amount,
+    rsePageUrl: `${env.NEXTAUTH_URL}/dashboard/rse`,
+  });
+  await sendEmail(params.userEmail, subject, html);
+}
+
+/** Notify user that their RSE receipt has been rejected. */
+export async function sendRseReceiptRejectedEmail(params: {
+  userEmail: string;
+  companyName: string;
+  associationName: string;
+  amount: number;
+  rejectedReason: string;
+}): Promise<void> {
+  const { subject, html } = rseReceiptRejectedEmailTemplate({
+    companyName: params.companyName,
+    associationName: params.associationName,
+    amount: params.amount,
+    rejectedReason: params.rejectedReason,
+    rsePageUrl: `${env.NEXTAUTH_URL}/dashboard/rse`,
+  });
+  await sendEmail(params.userEmail, subject, html);
 }
