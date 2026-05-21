@@ -1,9 +1,12 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { connectDb } from "@/lib/db";
 import { pickLocale } from "@/lib/i18n";
+import { Company } from "@/models/company.model";
 import { Profile } from "@/models/profile.model";
 import { Boost } from "@/models/boost.model";
 import { Sponsoring } from "@/models/sponsoring.model";
+
+const CompanyModel = Company as any;
 import type { SupportedLang } from "@/lib/i18n";
 import type { ProfileKind } from "@/types";
 import type {
@@ -61,8 +64,10 @@ export async function getProfileForEditor(
       return buildBrandUp(profile, base, lang);
     case "traceup":
       return buildTraceUp(profile, base, lang);
-    case "linkup":
-      return buildLinkUp(profile, base, lang);
+    case "linkup": {
+      const company = await CompanyModel.findById(companyId).lean();
+      return buildLinkUp(profile, base, lang, company);
+    }
   }
 }
 
@@ -167,9 +172,11 @@ function buildLinkUp(
   profile: any,
   base: Omit<LinkUpEditorData, "kind" | "data">,
   _lang: SupportedLang,
+  company?: any,
 ): LinkUpEditorData {
   const data = profile.data ?? {};
   const contactCard = data.contactCard ?? {};
+  const liveData = company?.liveData ?? {};
   const socials: SocialLink[] = (data.socials ?? []).map((s: any) => ({
     platform: s.platform,
     url: s.url ?? null,
@@ -189,7 +196,8 @@ function buildLinkUp(
     ...base,
     data: {
       contactCard: {
-        whatsapp: contactCard.whatsapp ?? null,
+        // Bug C fix: phone/whatsapp/email/address from company.liveData (canon source)
+        whatsapp: liveData.whatsapp ?? contactCard.whatsapp ?? null,
         gpsUrl,
         website: contactCard.website ?? null,
       },
