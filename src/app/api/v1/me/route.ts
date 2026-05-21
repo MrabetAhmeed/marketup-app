@@ -3,6 +3,7 @@ import { requireOwner } from "@/lib/auth-guards";
 import { jsonOk, jsonError, handleApiError } from "@/lib/api-response";
 import { getMe } from "@/services/me.service";
 import type { SupportedLang } from "@/lib/i18n";
+export const dynamic = "force-dynamic";
 
 export async function GET(req: NextRequest): Promise<Response> {
   try {

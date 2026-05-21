@@ -5,6 +5,7 @@ import { uploadImageFromRequest } from "@/lib/upload";
 import { connectDb } from "@/lib/db";
 import { User } from "@/models/user.model";
 import { NotFoundError } from "@/lib/api-error";
+export const dynamic = "force-dynamic";
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 const UserModel = User as any;

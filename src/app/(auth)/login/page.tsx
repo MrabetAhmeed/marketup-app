@@ -1,8 +1,8 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { Suspense, useState, useCallback, useEffect } from "react";
 import { signIn, getSession } from "next-auth/react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import AuthErrorBanner from "@/components/shared/AuthErrorBanner";
 import AuthLeftPanel from "@/components/shared/AuthLeftPanel";
@@ -18,7 +18,16 @@ interface ParsedError {
 }
 
 export default function LoginPage(): JSX.Element {
+  return (
+    <Suspense>
+      <LoginContent />
+    </Suspense>
+  );
+}
+
+function LoginContent(): JSX.Element {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const { showToast } = useToast();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -27,6 +36,16 @@ export default function LoginPage(): JSX.Element {
   const [errorEntry, setErrorEntry] = useState<ErrorMapEntry | null>(null);
   const [hasError, setHasError] = useState(false);
   const [submitting, setSubmitting] = useState(false);
+
+  // Show error banner from query param (e.g. redirected from suspended/pending guard)
+  useEffect(() => {
+    const errorCode = searchParams.get("error");
+    if (errorCode) {
+      const entry = getAuthErrorMessage(errorCode);
+      setErrorEntry(entry);
+      setHasError(true);
+    }
+  }, [searchParams]);
 
   const handleSubmit = useCallback(
     async (e: React.FormEvent) => {
@@ -82,10 +101,12 @@ export default function LoginPage(): JSX.Element {
             setHasError(true);
           }
         } else if (result?.ok) {
-          // Role-based redirect
+          // Role-based + status-based redirect
           const session = await getSession();
           if (session?.user?.role === "SUPER_ADMIN") {
             router.push("/admin");
+          } else if (session?.user?.companyStatus === "rejected") {
+            router.push("/dashboard/account/edit?reason=rejected");
           } else {
             router.push("/dashboard");
           }

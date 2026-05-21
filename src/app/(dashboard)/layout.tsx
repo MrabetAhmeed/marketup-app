@@ -28,13 +28,18 @@ export default async function DashboardLayout({
     redirect("/session-expired");
   }
 
-  // Strict gating: rejected users can ONLY access /dashboard/account/edit
-  if (me.company.status === "rejected") {
-    const headersList = await headers();
-    const currentPath = headersList.get("x-current-path") ?? "";
-    if (!currentPath.startsWith("/dashboard/account/edit")) {
-      redirect("/dashboard/account/edit?reason=rejected");
-    }
+  // Strict gating: non-active users get redirected
+  const headersList = await headers();
+  const currentPath = headersList.get("x-current-path") ?? "";
+
+  if (me.company.status === "rejected" && !currentPath.startsWith("/dashboard/account/edit")) {
+    redirect("/dashboard/account/edit?reason=rejected");
+  }
+  if (me.company.status === "suspended") {
+    redirect("/login?error=COMPANY_SUSPENDED");
+  }
+  if (me.company.status === "pending") {
+    redirect("/login?error=COMPANY_PENDING");
   }
 
   return (

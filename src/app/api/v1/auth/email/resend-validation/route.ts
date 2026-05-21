@@ -3,6 +3,7 @@ import { getClientIp, resendValidationIpLimit } from "@/lib/rate-limit";
 import { ResendValidationSchema } from "@/schemas/auth.schema";
 import { resendValidationEmail } from "@/services/auth.service";
 import type { NextRequest } from "next/server";
+export const dynamic = "force-dynamic";
 
 export async function POST(req: NextRequest) {
   try {

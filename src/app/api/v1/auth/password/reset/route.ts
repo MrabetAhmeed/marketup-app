@@ -2,6 +2,7 @@ import { jsonOk, handleApiError } from "@/lib/api-response";
 import { ResetPasswordSchema } from "@/schemas/auth.schema";
 import { resetPassword } from "@/services/auth.service";
 import type { NextRequest } from "next/server";
+export const dynamic = "force-dynamic";
 
 export async function POST(req: NextRequest) {
   try {

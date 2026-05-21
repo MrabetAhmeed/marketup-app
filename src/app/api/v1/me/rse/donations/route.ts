@@ -8,6 +8,7 @@ import { Association } from "@/models/association.model";
 import { RseReceipt } from "@/models/rse-receipt.model";
 import { uploadReceiptFromFile } from "@/lib/upload";
 import { CreateRseDonationSchema } from "@/schemas/rse-donation.schema";
+export const dynamic = "force-dynamic";
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 const UserModel = User as any;

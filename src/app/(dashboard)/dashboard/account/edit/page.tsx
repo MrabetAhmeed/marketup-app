@@ -10,5 +10,10 @@ export default async function AccountEditPage(): Promise<JSX.Element> {
 
   const company = await getCompanyForEdit(session.user.id);
 
+  // Rejected: allowed (this is the edit/resubmit page)
+  // Suspended/pending: redirect out — they shouldn't be here
+  if (company.status === "suspended") redirect("/login?error=COMPANY_SUSPENDED");
+  if (company.status === "pending") redirect("/login?error=COMPANY_PENDING");
+
   return <CompanyEditForm company={company} />;
 }

@@ -321,6 +321,7 @@ interface LoginResult {
   email: string;
   companyId: string | null;
   role: "OWNER" | "SUPER_ADMIN";
+  companyStatus: "pending" | "active" | "rejected" | "suspended" | "deleted" | null;
 }
 
 export async function login(email: string, password: string): Promise<LoginResult> {
@@ -376,6 +377,7 @@ export async function login(email: string, password: string): Promise<LoginResul
       email: user.email,
       companyId: (company._id as mongoose.Types.ObjectId).toString(),
       role: "OWNER",
+      companyStatus: company.status as LoginResult["companyStatus"],
     };
   }
 
@@ -395,6 +397,7 @@ export async function login(email: string, password: string): Promise<LoginResul
       email: admin.email,
       companyId: null,
       role: "SUPER_ADMIN",
+      companyStatus: null,
     };
   }
 

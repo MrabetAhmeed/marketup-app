@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { Suspense, useState, useCallback } from "react";
 import { useSearchParams } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -42,6 +42,14 @@ const REQUIREMENTS = [
 ];
 
 export default function ResetPasswordPage(): JSX.Element {
+  return (
+    <Suspense>
+      <ResetPasswordContent />
+    </Suspense>
+  );
+}
+
+function ResetPasswordContent(): JSX.Element {
   const searchParams = useSearchParams();
   const token = searchParams.get("token");
   const [state, setState] = useState<"form" | "success">("form");

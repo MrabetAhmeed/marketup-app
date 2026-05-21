@@ -3,6 +3,7 @@ import { getClientIp, signupIpLimit } from "@/lib/rate-limit";
 import { SignupCompanySchema } from "@/schemas/auth.schema";
 import { signupCompany } from "@/services/auth.service";
 import type { NextRequest } from "next/server";
+export const dynamic = "force-dynamic";
 
 export async function POST(req: NextRequest) {
   try {

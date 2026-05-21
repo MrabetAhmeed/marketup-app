@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { Suspense, useState, useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -17,6 +17,14 @@ import type { SignupCompanyInput } from "@/schemas/auth.schema";
 const fetcher = (url: string) => fetch(url).then((r) => r.json());
 
 export default function SignupCompanyPage(): JSX.Element {
+  return (
+    <Suspense>
+      <SignupCompanyContent />
+    </Suspense>
+  );
+}
+
+function SignupCompanyContent(): JSX.Element {
   const router = useRouter();
   const searchParams = useSearchParams();
   const presetType = searchParams.get("type")?.toUpperCase();

@@ -1,4 +1,6 @@
+import { redirect } from "next/navigation";
 import { getServerSession } from "next-auth";
+import type { CompanyStatus } from "@/types";
 import { authOptions } from "./auth";
 import { AuthError } from "./api-error";
 
@@ -27,4 +29,21 @@ export async function requireAdmin() {
     throw new AuthError("FORBIDDEN", "Admin role required", 403);
   }
   return session;
+}
+
+/**
+ * Page-level guard for dashboard pages.
+ * Redirects rejected → /account/edit, suspended/pending → /login with error.
+ * Call this in every dashboard server component EXCEPT /account/edit.
+ */
+export function guardActiveCompany(companyStatus: CompanyStatus): void {
+  if (companyStatus === "rejected") {
+    redirect("/dashboard/account/edit?reason=rejected");
+  }
+  if (companyStatus === "suspended") {
+    redirect("/login?error=COMPANY_SUSPENDED");
+  }
+  if (companyStatus === "pending") {
+    redirect("/login?error=COMPANY_PENDING");
+  }
 }

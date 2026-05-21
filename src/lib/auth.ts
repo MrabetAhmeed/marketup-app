@@ -23,6 +23,7 @@ export const authOptions: NextAuthOptions = {
             email: result.email,
             companyId: result.companyId,
             role: result.role,
+            companyStatus: result.companyStatus,
           };
         } catch (err) {
           if (err instanceof AuthError) {
@@ -56,6 +57,7 @@ export const authOptions: NextAuthOptions = {
         token.email = user.email ?? "";
         token.companyId = user.companyId;
         token.role = user.role;
+        token.companyStatus = user.companyStatus;
       }
       return token;
     },
@@ -64,6 +66,7 @@ export const authOptions: NextAuthOptions = {
       session.user.email = token.email;
       session.user.companyId = token.companyId;
       session.user.role = token.role;
+      session.user.companyStatus = token.companyStatus;
       return session;
     },
   },

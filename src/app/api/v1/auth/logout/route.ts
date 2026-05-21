@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+export const dynamic = "force-dynamic";
 
 export async function POST() {
   // NextAuth handles session invalidation via its own /api/auth/signout endpoint.

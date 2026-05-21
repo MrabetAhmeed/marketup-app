@@ -34,6 +34,9 @@ export async function resubmitCompany(
 
   const now = new Date();
 
+  // Always write identityDocumentUrl — either the new Cloudinary URL or the existing one
+  const newDocUrl = payload.identityDocumentUrl ?? company.identityDocumentUrl ?? null;
+
   await CompanyModel.findByIdAndUpdate(companyId, {
     $set: {
       "data.displayName": { fr: payload.displayName, ar: "", en: "" },
@@ -44,7 +47,7 @@ export async function resubmitCompany(
       "liveData.gouvernorat": payload.gouvernorat,
       "liveData.ville": payload.ville,
       "liveData.address": payload.address ?? null,
-      ...(payload.identityDocumentUrl && { identityDocumentUrl: payload.identityDocumentUrl }),
+      identityDocumentUrl: newDocUrl,
       status: "pending",
       registeredAt: now,
       rejectedReason: null,

@@ -7,6 +7,7 @@ import { User } from "@/models/user.model";
 import { Company } from "@/models/company.model";
 import { NotFoundError } from "@/lib/api-error";
 import { storage } from "@/lib/storage";
+export const dynamic = "force-dynamic";
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 const UserModel = User as any;

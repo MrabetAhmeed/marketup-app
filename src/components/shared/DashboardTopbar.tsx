@@ -70,6 +70,7 @@ export function DashboardTopbar({ me, notifications, title, subtitle }: Dashboar
   }, []);
 
   const unread = me.stats.unreadNotifications;
+  const isRejected = me.company.status === "rejected";
 
   return (
     <header className="sticky top-0 z-30 h-14 bg-white border-b border-surface-border flex items-center justify-between px-4 md:px-6 gap-4">
@@ -90,7 +91,8 @@ export function DashboardTopbar({ me, notifications, title, subtitle }: Dashboar
 
       {/* Right: bell + avatar */}
       <div className="flex items-center gap-1 shrink-0">
-        {/* Notification bell */}
+        {/* Notification bell — hidden for rejected users */}
+        {!isRejected && (
         <div ref={bellRef} className="relative">
           <button
             onClick={() => {
@@ -176,6 +178,7 @@ export function DashboardTopbar({ me, notifications, title, subtitle }: Dashboar
             </div>
           )}
         </div>
+        )}
 
         {/* Avatar dropdown */}
         <div ref={avatarRef} className="relative">
@@ -221,7 +224,9 @@ export function DashboardTopbar({ me, notifications, title, subtitle }: Dashboar
                 </div>
               </div>
 
-              {/* Profile links */}
+              {/* Profile links — hidden for rejected users */}
+              {!isRejected && (
+              <>
               <div className="px-2 py-1">
                 <div className="px-2 py-1.5 text-[9px] font-bold tracking-[0.15em] uppercase text-ink-tertiary">
                   Mes profils publics
@@ -253,9 +258,12 @@ export function DashboardTopbar({ me, notifications, title, subtitle }: Dashboar
               </div>
 
               <div className="mx-2 border-t border-surface-border my-1" />
+              </>
+              )}
 
               {/* Settings + logout */}
               <div className="px-2 py-1 pb-2">
+                {!isRejected && (
                 <Link
                   href="/dashboard/settings"
                   onClick={() => setAvatarOpen(false)}
@@ -266,6 +274,7 @@ export function DashboardTopbar({ me, notifications, title, subtitle }: Dashboar
                   </span>
                   Paramètres
                 </Link>
+                )}
                 <button
                   onClick={() => {
                     setAvatarOpen(false);

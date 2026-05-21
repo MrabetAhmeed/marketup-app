@@ -5,6 +5,7 @@ import { pickLocale } from "@/lib/i18n";
 import type { SupportedLang } from "@/lib/i18n";
 import { Sector } from "@/models/sector.model";
 import type { NextRequest } from "next/server";
+export const dynamic = "force-dynamic";
 
 export async function GET(req: NextRequest) {
   await connectDb();

@@ -2,6 +2,7 @@ import { jsonOk, handleApiError } from "@/lib/api-response";
 import { SignupUserSchema } from "@/schemas/auth.schema";
 import { signupUser } from "@/services/auth.service";
 import type { NextRequest } from "next/server";
+export const dynamic = "force-dynamic";
 
 export async function POST(req: NextRequest) {
   try {

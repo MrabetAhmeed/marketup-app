@@ -1,6 +1,7 @@
 import { redirect } from "next/navigation";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
+import { guardActiveCompany } from "@/lib/auth-guards";
 import { getMe } from "@/services/me.service";
 import { AccountForm } from "@/components/features/account/AccountForm";
 
@@ -9,6 +10,7 @@ export default async function AccountPage(): Promise<JSX.Element> {
   if (!session?.user?.companyId) redirect("/login");
   const me = await getMe(session.user.id, session.user.companyId);
   if (!me) redirect("/session-expired");
+  guardActiveCompany(me.company.status);
 
   return <AccountForm me={me} />;
 }

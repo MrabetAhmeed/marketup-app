@@ -58,7 +58,6 @@ describe("Company model", () => {
     doc.type = "B2C";
     doc.accountEmail = "changed@test.tn";
     doc.country = "FR";
-    doc.identityDocumentUrl = "/changed.pdf";
     await doc.save();
 
     const reloaded = await (Company as any).findById(doc._id);
@@ -66,7 +65,6 @@ describe("Company model", () => {
     expect(reloaded!.type).toBe("B2B");
     expect(reloaded!.accountEmail).toBe("test@test.tn");
     expect(reloaded!.country).toBe("TN");
-    expect(reloaded!.identityDocumentUrl).toBeNull();
   });
 
   it("soft delete: a deleted company is excluded from default find()", async () => {

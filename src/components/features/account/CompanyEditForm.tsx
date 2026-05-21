@@ -1,7 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useSearchParams } from "next/navigation";
+import { signOut } from "next-auth/react";
 import { useForm } from "react-hook-form";
 import { useToast } from "@/components/shared/Toast";
 
@@ -35,7 +36,6 @@ interface FormValues {
 }
 
 export function CompanyEditForm({ company }: { company: CompanyEditData }): JSX.Element {
-  const router = useRouter();
   const searchParams = useSearchParams();
   const showRejectionBanner = searchParams.get("reason") === "rejected";
   const { showToast } = useToast();
@@ -97,9 +97,9 @@ export function CompanyEditForm({ company }: { company: CompanyEditData }): JSX.
         showToast(json.error?.message || "Erreur lors de la soumission");
         return;
       }
-      showToast("Compte re-soumis pour validation");
-      router.push("/dashboard");
-      router.refresh();
+      showToast("Re-soumission envoyée. Vous recevrez un email après validation.");
+      await new Promise((r) => setTimeout(r, 1500));
+      await signOut({ callbackUrl: "/login" });
     } catch {
       showToast("Erreur, veuillez réessayer");
     } finally {

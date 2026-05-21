@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback, useRef } from "react";
+import { Suspense, useState, useEffect, useCallback, useRef } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import AuthLeftPanel from "@/components/shared/AuthLeftPanel";
@@ -9,6 +9,14 @@ import { useToast } from "@/components/shared/Toast";
 import { getAuthErrorMessage } from "@/lib/auth-error-messages";
 
 export default function SignupVerifyPage(): JSX.Element {
+  return (
+    <Suspense>
+      <SignupVerifyContent />
+    </Suspense>
+  );
+}
+
+function SignupVerifyContent(): JSX.Element {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [userId, setUserId] = useState("");

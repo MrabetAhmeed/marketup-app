@@ -121,6 +121,21 @@ function buildNavSections(me: MeResponse): NavSection[] {
 // Sidebar content (reused in desktop aside + mobile Sheet)
 // ---------------------------------------------------------------------------
 
+function buildRejectedNavSections(): NavSection[] {
+  return [
+    {
+      label: "Entreprise",
+      items: [
+        {
+          label: "Compte",
+          icon: "business",
+          href: "/dashboard/account/edit?reason=rejected",
+        },
+      ],
+    },
+  ];
+}
+
 function SidebarContent({
   me,
   pathname,
@@ -130,7 +145,10 @@ function SidebarContent({
   pathname: string;
   onNavigate?: () => void;
 }): JSX.Element {
-  const sections = buildNavSections(me);
+  const sections =
+    me.company.status === "rejected"
+      ? buildRejectedNavSections()
+      : buildNavSections(me);
 
   function isActive(href: string): boolean {
     if (href === "/dashboard") return pathname === "/dashboard";
@@ -141,7 +159,7 @@ function SidebarContent({
     <div className="flex flex-col h-full">
       {/* Logo header */}
       <Link
-        href="/dashboard"
+        href={me.company.status === "rejected" ? "/dashboard/account/edit?reason=rejected" : "/dashboard"}
         className="flex items-center gap-2.5 h-14 px-5 py-4 border-b border-surface-border hover:bg-surface-subtle shrink-0"
         onClick={onNavigate}
       >

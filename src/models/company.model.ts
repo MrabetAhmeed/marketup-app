@@ -43,7 +43,7 @@ const CompanySchema = new Schema(
     type: { type: String, enum: ["B2B", "B2C"], required: true, immutable: true },
     legalId: { type: String, required: true, immutable: true, index: true },
     vatNumber: { type: String, default: null, immutable: true },
-    identityDocumentUrl: { type: String, default: null, immutable: true },
+    identityDocumentUrl: { type: String, default: null },
     country: { type: String, default: "TN", immutable: true },
     accountEmail: {
       type: String,

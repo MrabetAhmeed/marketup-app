@@ -9,7 +9,7 @@ export const CompanyResubmitSchema = z.object({
   gouvernorat: z.string().min(1, "Le gouvernorat est obligatoire."),
   ville: z.string().trim().min(1, "La ville est obligatoire.").max(100),
   address: z.string().trim().max(300).optional().nullable(),
-  identityDocumentUrl: z.string().url().optional().nullable(),
+  identityDocumentUrl: z.string().min(1).optional().nullable(),
 });
 
 export type CompanyResubmitInput = z.infer<typeof CompanyResubmitSchema>;

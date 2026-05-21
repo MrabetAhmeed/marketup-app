@@ -3,6 +3,7 @@ import { getClientIp, forgotPasswordIpLimit } from "@/lib/rate-limit";
 import { ForgotPasswordSchema } from "@/schemas/auth.schema";
 import { forgotPassword } from "@/services/auth.service";
 import type { NextRequest } from "next/server";
+export const dynamic = "force-dynamic";
 
 export async function POST(req: NextRequest) {
   try {

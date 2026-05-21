@@ -3,6 +3,7 @@ import { jsonOk, handleApiError } from "@/lib/api-response";
 import { AppError } from "@/lib/api-error";
 import { storage } from "@/lib/storage";
 import { signupDocUploadIpLimit, getClientIp } from "@/lib/rate-limit";
+export const dynamic = "force-dynamic";
 
 const ALLOWED_TYPES = new Set(["application/pdf", "image/jpeg", "image/png", "image/webp"]);
 const MAX_SIZE_BYTES = 10 * 1024 * 1024; // 10 MB

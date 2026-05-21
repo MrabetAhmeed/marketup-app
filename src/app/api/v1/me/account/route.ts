@@ -4,6 +4,7 @@ import { jsonOk, handleApiError } from "@/lib/api-response";
 import { AccountLiveUpdateSchema } from "@/schemas/account.schema";
 import { updateMeAccount } from "@/services/account.service";
 import type { SupportedLang } from "@/lib/i18n";
+export const dynamic = "force-dynamic";
 
 export async function PATCH(req: NextRequest): Promise<Response> {
   try {
