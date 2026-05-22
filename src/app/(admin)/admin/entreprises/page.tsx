@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useToast } from "@/components/shared/Toast";
 
@@ -86,27 +87,36 @@ export default function EntreprisesPage(): JSX.Element {
                   <span>{c.ville}</span>
                 </div>
               </div>
-              {c.status === "active" ? (
-                <button
-                  type="button"
-                  disabled={actionId === c.id}
-                  onClick={() => handleSuspend(c.id)}
-                  className="inline-flex items-center gap-1.5 px-4 py-[9px] text-[13px] font-semibold text-[#B91C1C] bg-white border border-[#FCA5A5] rounded hover:bg-[#FEF2F2] transition-colors disabled:opacity-60 shrink-0"
+              <div className="flex items-center gap-2 shrink-0">
+                <Link
+                  href={`/admin/validation/comptes/${c.id}`}
+                  className="inline-flex items-center gap-1.5 px-4 py-[9px] text-[13px] font-semibold text-ink-primary bg-white border border-[#D1D1D1] rounded hover:bg-surface-muted transition-colors"
                 >
-                  <span className="material-symbols-outlined" style={{ fontSize: 16 }}>block</span>
-                  Désactiver
-                </button>
-              ) : (
-                <button
-                  type="button"
-                  disabled={actionId === c.id}
-                  onClick={() => handleReactivate(c.id)}
-                  className="inline-flex items-center gap-1.5 px-4 py-[9px] text-[13px] font-semibold text-[#16A34A] bg-white border border-[#86EFAC] rounded hover:bg-[#F0FDF4] transition-colors disabled:opacity-60 shrink-0"
-                >
-                  <span className="material-symbols-outlined" style={{ fontSize: 16 }}>refresh</span>
-                  Réactiver
-                </button>
-              )}
+                  <span className="material-symbols-outlined" style={{ fontSize: 16 }}>info</span>
+                  Voir détails
+                </Link>
+                {c.status === "active" ? (
+                  <button
+                    type="button"
+                    disabled={actionId === c.id}
+                    onClick={() => handleSuspend(c.id)}
+                    className="inline-flex items-center gap-1.5 px-4 py-[9px] text-[13px] font-semibold text-[#B91C1C] bg-white border border-[#FCA5A5] rounded hover:bg-[#FEF2F2] transition-colors disabled:opacity-60"
+                  >
+                    <span className="material-symbols-outlined" style={{ fontSize: 16 }}>block</span>
+                    Désactiver
+                  </button>
+                ) : (
+                  <button
+                    type="button"
+                    disabled={actionId === c.id}
+                    onClick={() => handleReactivate(c.id)}
+                    className="inline-flex items-center gap-1.5 px-4 py-[9px] text-[13px] font-semibold text-[#16A34A] bg-white border border-[#86EFAC] rounded hover:bg-[#F0FDF4] transition-colors disabled:opacity-60"
+                  >
+                    <span className="material-symbols-outlined" style={{ fontSize: 16 }}>refresh</span>
+                    Réactiver
+                  </button>
+                )}
+              </div>
             </div>
           ))}
         </div>

@@ -5,13 +5,16 @@ import { env } from "@/lib/env";
 import { NotFoundError, BusinessRuleError } from "@/lib/api-error";
 import { pickLocale } from "@/lib/i18n";
 import { Company } from "@/models/company.model";
+import { Profile } from "@/models/profile.model";
 import { User } from "@/models/user.model";
 import { Sector } from "@/models/sector.model";
 import { Gouvernorat } from "@/models/gouvernorat.model";
 import { sendCompanyValidatedEmail, sendCompanyRejectedEmail } from "@/lib/email/sender";
 import type { SupportedLang } from "@/lib/i18n";
+import type { ProfileKind } from "@/types";
 
 const CompanyModel = Company as any;
+const ProfileModel = Profile as any;
 const UserModel = User as any;
 const SectorModel = Sector as any;
 const GouvernoratModel = Gouvernorat as any;
@@ -77,6 +80,12 @@ export async function listPendingCompanies(
 // Get company for admin review
 // ---------------------------------------------------------------------------
 
+export interface LinkedProfile {
+  id: string;
+  kind: ProfileKind;
+  status: string;
+}
+
 export interface CompanyForAdminReview {
   id: string;
   displayName: string;
@@ -95,6 +104,7 @@ export interface CompanyForAdminReview {
   registeredAt: string;
   ownerName: string;
   ownerEmail: string;
+  profiles: LinkedProfile[];
 }
 
 export async function getCompanyForAdminReview(
@@ -109,9 +119,18 @@ export async function getCompanyForAdminReview(
   const company = await CompanyModel.findById(companyId).lean();
   if (!company) throw new NotFoundError("Company");
 
-  const user = await UserModel.findOne({ companyId: company._id }).lean();
-  const sector = await SectorModel.findOne({ slug: company.liveData?.sectorId }).lean();
-  const gouvernorat = await GouvernoratModel.findOne({ slug: company.liveData?.gouvernorat }).lean();
+  const [user, sector, gouvernorat, profiles] = await Promise.all([
+    UserModel.findOne({ companyId: company._id }).lean(),
+    SectorModel.findOne({ slug: company.liveData?.sectorId }).lean(),
+    GouvernoratModel.findOne({ slug: company.liveData?.gouvernorat }).lean(),
+    ProfileModel.find({ companyId: company._id, deletedAt: null }).lean(),
+  ]);
+
+  const linkedProfiles: LinkedProfile[] = (profiles as any[]).map((p) => ({
+    id: p._id.toString(),
+    kind: p.kind as ProfileKind,
+    status: p.status as string,
+  }));
 
   return {
     id: company._id.toString(),
@@ -132,6 +151,7 @@ export async function getCompanyForAdminReview(
     registeredAt: new Date(company.registeredAt).toISOString(),
     ownerName: user ? `${user.firstName ?? ""} ${user.lastName ?? ""}`.trim() : "",
     ownerEmail: user?.email ?? company.accountEmail,
+    profiles: linkedProfiles,
   };
 }
 

@@ -77,15 +77,59 @@ export async function listPendingProfiles(
 // Get profile for admin review
 // ---------------------------------------------------------------------------
 
+export interface PendingField {
+  key: string;
+  label: string;
+  currentValue: string;
+  newValue: string;
+}
+
+export interface GalleryItemAdmin {
+  id: string;
+  url: string;
+  caption: string;
+  order: number;
+}
+
+export interface VideoItemAdmin {
+  id: string;
+  source: string;
+  videoId: string;
+  videoUrl: string | null;
+  thumbnailUrl: string | null;
+  category: string;
+  title: string;
+  description: string;
+  order: number;
+}
+
 export interface ProfileForAdminReview {
   id: string;
   kind: ProfileKind;
   status: string;
+  isPublic: boolean;
   companyName: string;
   companySlug: string;
+  companyLogoUrl: string | null;
+  companyBannerUrl: string | null;
   ownerEmail: string;
   submittedAt: string;
-  pendingFields: Array<{ key: string; label: string; currentValue: string; newValue: string }>;
+  rejectionReason: string | null;
+  pendingFields: PendingField[];
+  // BrandUP data
+  pitch: string;
+  about: string;
+  gallery: GalleryItemAdmin[];
+  // TraceUP data
+  channelName: string;
+  channelDescription: string;
+  videos: VideoItemAdmin[];
+  // LinkUP data
+  socials: Array<{ platform: string; url: string | null }>;
+  contactCard: {
+    whatsapp: string | null;
+    website: string | null;
+  };
 }
 
 export async function getProfileForAdminReview(
@@ -102,22 +146,75 @@ export async function getProfileForAdminReview(
 
   const user = await UserModel.findOne({ companyId: profile.companyId }).lean();
 
-  const pendingFields = (profile.pendingData?.fields ?? []).map((f: any) => ({
+  const pendingFields: PendingField[] = (profile.pendingData?.fields ?? []).map((f: any) => ({
     key: f.key,
     label: f.label,
     currentValue: pickLocale(f.currentValue, lang),
     newValue: pickLocale(f.newValue, lang),
   }));
 
+  const data = profile.data ?? {};
+
+  // BrandUP fields
+  const gallery: GalleryItemAdmin[] = (data.gallery ?? [])
+    .map((item: any) => ({
+      id: item.id,
+      url: item.url,
+      caption: pickLocale(item.caption, lang),
+      order: item.order ?? 0,
+    }))
+    .sort((a: GalleryItemAdmin, b: GalleryItemAdmin) => a.order - b.order);
+
+  // TraceUP fields
+  const videos: VideoItemAdmin[] = (data.videos ?? [])
+    .map((v: any) => ({
+      id: v.id,
+      source: v.source ?? "",
+      videoId: v.videoId ?? "",
+      videoUrl: v.videoUrl ?? null,
+      thumbnailUrl: v.thumbnailUrl ?? null,
+      category: v.category ?? "",
+      title: pickLocale(v.title, lang),
+      description: pickLocale(v.description, lang),
+      order: v.order ?? 0,
+    }))
+    .sort((a: VideoItemAdmin, b: VideoItemAdmin) => a.order - b.order);
+
+  // LinkUP fields
+  const socials = (data.socials ?? []).map((s: any) => ({
+    platform: s.platform ?? "",
+    url: s.url ?? null,
+  }));
+  const contactCard = data.contactCard ?? {};
+  const liveData = company.liveData ?? {};
+
   return {
     id: profile._id.toString(),
     kind: profile.kind,
     status: profile.status,
+    isPublic: profile.isPublic ?? true,
     companyName: pickLocale(company.data?.displayName, lang),
     companySlug: company.slug,
+    companyLogoUrl: company.data?.logoUrl ?? null,
+    companyBannerUrl: company.data?.bannerUrl ?? null,
     ownerEmail: user?.email ?? company.accountEmail,
     submittedAt: profile.submittedAt ? new Date(profile.submittedAt).toISOString() : "",
+    rejectionReason: profile.rejectionReason ?? null,
     pendingFields,
+    // BrandUP
+    pitch: pickLocale(data.pitch, lang),
+    about: pickLocale(data.about, lang),
+    gallery,
+    // TraceUP
+    channelName: pickLocale(data.channelName, lang),
+    channelDescription: pickLocale(data.channelDescription, lang),
+    videos,
+    // LinkUP
+    socials,
+    contactCard: {
+      whatsapp: liveData.whatsapp ?? contactCard.whatsapp ?? null,
+      website: contactCard.website ?? null,
+    },
   };
 }
 

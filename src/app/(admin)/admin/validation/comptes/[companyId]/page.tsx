@@ -2,6 +2,7 @@ import Link from "next/link";
 import { getCompanyForAdminReview } from "@/services/admin-company.service";
 import { ensurePdfExtension } from "@/lib/upload";
 import { CompanyReviewActions } from "@/components/features/admin/CompanyReviewActions";
+import type { LinkedProfile } from "@/services/admin-company.service";
 
 interface PageProps {
   params: Promise<{ companyId: string }>;
@@ -96,6 +97,82 @@ export default async function CompanyReviewPage({ params }: PageProps): Promise<
           <p className="text-[13px] text-ink-secondary">Aucun document fourni lors de l&apos;inscription.</p>
         )}
       </section>
+
+      {/* Linked profiles */}
+      {company.profiles.length > 0 && (
+        <section className="bg-white border border-surface-border rounded-lg overflow-hidden">
+          <div className="px-5 py-4 border-b border-surface-border">
+            <h2 className="font-heading font-bold text-[15px] text-ink-primary">Profils de cette entreprise</h2>
+            <p className="text-[12px] text-ink-secondary mt-0.5">Les 3 profils associés à cette entreprise</p>
+          </div>
+          <div className="p-5">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+              {(["brandup", "traceup", "linkup"] as const).map((kind) => {
+                const p = company.profiles.find((pr: LinkedProfile) => pr.kind === kind);
+                return <ProfileCard key={kind} kind={kind} profile={p ?? null} />;
+              })}
+            </div>
+          </div>
+        </section>
+      )}
+    </div>
+  );
+}
+
+// ---------------------------------------------------------------------------
+// Profile Card
+// ---------------------------------------------------------------------------
+
+const KIND_CONFIG = {
+  brandup: { label: "BrandUP", icon: "storefront", color: "#0078D4" },
+  traceup: { label: "TraceUP", icon: "play_circle", color: "#7C3AED" },
+  linkup: { label: "LinkUP", icon: "qr_code_2", color: "#242424" },
+} as const;
+
+const STATUS_CONFIG: Record<string, { label: string; bg: string; text: string }> = {
+  pending: { label: "En attente", bg: "bg-[#FEF3C7]", text: "text-[#92400E]" },
+  active: { label: "Actif", bg: "bg-[#F0FDF4]", text: "text-[#16A34A]" },
+  rejected: { label: "Refusé", bg: "bg-[#FEF2F2]", text: "text-[#B91C1C]" },
+  incomplete: { label: "Incomplet", bg: "bg-surface-muted", text: "text-ink-secondary" },
+  suspended: { label: "Suspendu", bg: "bg-[#FEF2F2]", text: "text-[#B91C1C]" },
+  disabled: { label: "Désactivé", bg: "bg-surface-muted", text: "text-ink-secondary" },
+};
+
+function ProfileCard({ kind, profile }: { kind: "brandup" | "traceup" | "linkup"; profile: LinkedProfile | null }): JSX.Element {
+  const config = KIND_CONFIG[kind];
+  const statusCfg = profile ? (STATUS_CONFIG[profile.status] ?? STATUS_CONFIG.incomplete) : null;
+
+  return (
+    <div className="border border-surface-border rounded-lg p-4 flex flex-col gap-3">
+      <div className="flex items-center gap-2">
+        <div className="w-8 h-8 rounded flex items-center justify-center shrink-0" style={{ backgroundColor: `${config.color}15` }}>
+          <span className="material-symbols-outlined" style={{ fontSize: 18, color: config.color }}>{config.icon}</span>
+        </div>
+        <span className="font-heading font-bold text-[13px] text-ink-primary">{config.label}</span>
+      </div>
+
+      {profile ? (
+        <>
+          <span className={`inline-flex items-center self-start gap-1 px-2 py-0.5 rounded text-[10px] font-bold ${statusCfg!.bg} ${statusCfg!.text}`}>
+            {statusCfg!.label}
+          </span>
+          {profile.status === "incomplete" ? (
+            <span className="text-[11px] text-ink-tertiary mt-auto">
+              Profil non rempli
+            </span>
+          ) : (
+            <Link
+              href={`/admin/validation/profiles/${profile.id}`}
+              className="inline-flex items-center gap-1 text-[12px] font-semibold text-primary hover:underline mt-auto"
+            >
+              <span className="material-symbols-outlined" style={{ fontSize: 14 }}>open_in_new</span>
+              Voir le profil
+            </Link>
+          )}
+        </>
+      ) : (
+        <span className="text-[11px] text-ink-tertiary">Profil non créé</span>
+      )}
     </div>
   );
 }
