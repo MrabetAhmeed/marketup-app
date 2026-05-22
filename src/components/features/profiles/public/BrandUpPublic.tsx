@@ -54,8 +54,8 @@ export default function BrandUpPublic({ data, embedded }: BrandUpPublicProps): J
             : data.projects
         } />
 
-        {/* Certifications */}
-        {data.certifications.length > 0 && (
+        {/* HIDDEN V1 — Certifications hidden for demo, reactivate V1.1 */}
+        {false && data.certifications.length > 0 && (
           <div className="mb-20">
             <div className="flex items-center gap-4 mb-8">
               <h2 className="text-2xl font-extrabold text-on-surface tracking-tight">Certifications &amp; Standards</h2>

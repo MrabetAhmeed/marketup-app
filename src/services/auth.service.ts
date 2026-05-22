@@ -12,6 +12,10 @@ import { AdminUser } from "@/models/admin-user.model";
 import { Company } from "@/models/company.model";
 import { Gouvernorat } from "@/models/gouvernorat.model";
 import { Sector } from "@/models/sector.model";
+import { Profile } from "@/models/profile.model";
+import { BrandUp } from "@/models/profile-brandup.model";
+import { TraceUp } from "@/models/profile-traceup.model";
+import { LinkUp } from "@/models/profile-linkup.model";
 import { User } from "@/models/user.model";
 
 // Mongoose 9 strict types require casts for dynamic queries
@@ -20,6 +24,12 @@ const CompanyModel = Company as any;
 const AdminUserModel = AdminUser as any;
 const SectorModel = Sector as any;
 const GouvernoratModel = Gouvernorat as any;
+const ProfileModel = Profile as any;
+const BrandUpModel = BrandUp as any;
+const TraceUpModel = TraceUp as any;
+const LinkUpModel = LinkUp as any;
+
+const PROFILE_MODELS = { brandup: BrandUpModel, traceup: TraceUpModel, linkup: LinkUpModel } as const;
 
 const BCRYPT_ROUNDS = 12;
 const BCRYPT_OTP_ROUNDS = 10;
@@ -295,6 +305,22 @@ export async function verifyOtp(input: VerifyOtpInput): Promise<VerifyOtpResult>
   user.otpLastSentAt = null;
   await user.save();
 
+  // Create 3 empty profiles for the company via discriminator models
+  for (const kind of ["brandup", "traceup", "linkup"] as const) {
+    try {
+      await PROFILE_MODELS[kind].create({
+        companyId: user.companyId,
+        status: "incomplete",
+        isPublic: true,
+        data: {},
+        stats: { viewsTotal: 0, views30d: 0, clicksTotal: 0 },
+      });
+    } catch (err: unknown) {
+      // Ignore duplicate key (E11000) — profiles already exist
+      if (err instanceof Error && "code" in err && (err as any).code !== 11000) throw err;
+    }
+  }
+
   const company = await CompanyModel.findById(user.companyId);
 
   return {
@@ -371,6 +397,25 @@ export async function login(email: string, password: string): Promise<LoginResul
 
     user.lastLoginAt = new Date();
     await user.save();
+
+    // Lazy safety net: create missing profiles for existing accounts
+    const profileCount = await ProfileModel.countDocuments({ companyId: company._id });
+    if (profileCount < 3) {
+      for (const kind of ["brandup", "traceup", "linkup"] as const) {
+        try {
+          await PROFILE_MODELS[kind].create({
+            companyId: company._id,
+            status: "incomplete",
+            isPublic: true,
+            data: {},
+            stats: { viewsTotal: 0, views30d: 0, clicksTotal: 0 },
+          });
+        } catch (err: unknown) {
+          // Ignore duplicate key (E11000) — profile already exists
+          if (err instanceof Error && "code" in err && (err as any).code !== 11000) throw err;
+        }
+      }
+    }
 
     return {
       id: (user._id as mongoose.Types.ObjectId).toString(),
