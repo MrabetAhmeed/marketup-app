@@ -69,59 +69,18 @@ export async function updateProfileSoft(
 }
 
 // ---------------------------------------------------------------------------
-// BrandUP soft: isPublic + galleryOrder
+// BrandUP soft: isPublic only (gallery is now HARD — Sprint 7C)
 // ---------------------------------------------------------------------------
 
 async function applyBrandupSoft(
   profileId: string,
-  profile: any,
+  _profile: any,
   rawPatch: unknown,
 ): Promise<void> {
   const patch: BrandupSoftInput = BrandupSoftSchema.parse(rawPatch);
 
-  const setMap: Record<string, unknown> = {};
-
   if (patch.isPublic !== undefined) {
-    setMap.isPublic = patch.isPublic;
-  }
-
-  if (patch.galleryOrder !== undefined) {
-    // Validate gallery order: must be exact same set of IDs as current gallery
-    const currentGallery: any[] = profile.data?.gallery ?? [];
-    const currentIds = new Set(currentGallery.map((g: any) => g.id));
-
-    if (patch.galleryOrder.length !== currentIds.size) {
-      throw new AppError(
-        "VALIDATION_FAILED",
-        "L'ordre de la galerie doit contenir exactement les mêmes images.",
-        400,
-        { fields: { galleryOrder: ["Mismatch avec les images existantes."] } },
-      );
-    }
-    for (const id of patch.galleryOrder) {
-      if (!currentIds.has(id)) {
-        throw new AppError(
-          "VALIDATION_FAILED",
-          "L'ordre de la galerie contient un ID inconnu.",
-          400,
-          { fields: { galleryOrder: [`Image "${id}" introuvable.`] } },
-        );
-      }
-    }
-
-    // Rebuild gallery in the requested order with updated order fields
-    const galleryById = new Map(currentGallery.map((g: any) => [g.id, g]));
-    const reorderedGallery = patch.galleryOrder.map((id, idx) => ({
-      ...galleryById.get(id),
-      order: idx,
-    }));
-
-    setMap["data.gallery"] = reorderedGallery;
-  }
-
-  if (Object.keys(setMap).length > 0) {
-    // Must use BrandUp discriminator model — base Profile strips data.* fields
-    await BrandUpModel.findByIdAndUpdate(profileId, { $set: setMap });
+    await BrandUpModel.findByIdAndUpdate(profileId, { $set: { isPublic: patch.isPublic } });
   }
 }
 

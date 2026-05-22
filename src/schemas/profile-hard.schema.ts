@@ -5,6 +5,13 @@ import { z } from "zod";
 // One schema per kind. All fields required (full submission).
 // ---------------------------------------------------------------------------
 
+const GalleryItemSchema = z.object({
+  id: z.string().min(1),
+  url: z.string().url(),
+  caption: z.string().max(80).default(""),
+  order: z.number().int().min(0),
+});
+
 export const BrandupHardSubmitSchema = z.object({
   pitch: z
     .string()
@@ -16,6 +23,10 @@ export const BrandupHardSubmitSchema = z.object({
     .trim()
     .min(1, "Le texte « À propos » est obligatoire.")
     .max(1000, "1000 caractères maximum."),
+  gallery: z
+    .array(GalleryItemSchema)
+    .max(9, "9 images maximum.")
+    .optional(),
 }).strict();
 
 export const TraceupHardSubmitSchema = z.object({

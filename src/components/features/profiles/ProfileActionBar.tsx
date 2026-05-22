@@ -14,6 +14,11 @@ interface ProfileActionBarProps {
   /** Hard submit props (Phase 4 Sprint 3) */
   submitting?: boolean;
   onHardSubmit?: () => void;
+  /** BrandUP single-submit mode: no separate soft save for gallery */
+  singleSubmit?: boolean;
+  /** Cancel pending submission (only when status=pending + singleSubmit) */
+  onCancelPending?: () => void;
+  cancellingPending?: boolean;
 }
 
 /**
@@ -22,12 +27,12 @@ interface ProfileActionBarProps {
  * - SOFT mutations (isPublic, galleryOrder, socials): wired via onSoftSave
  * - HARD mutations (pitch, about, submit): wired via onHardSubmit
  */
-export function ProfileActionBar({ status, isDirty, onReset, softDirtyCount = 0, saving = false, onSoftSave, submitting = false, onHardSubmit }: ProfileActionBarProps): JSX.Element {
+export function ProfileActionBar({ status, isDirty, onReset, softDirtyCount = 0, saving = false, onSoftSave, submitting = false, onHardSubmit, singleSubmit = false, onCancelPending, cancellingPending = false }: ProfileActionBarProps): JSX.Element {
   const toast = useFeatureSoonToast();
   const hasSoftChanges = softDirtyCount > 0;
-  const busy = saving || submitting;
+  const busy = saving || submitting || cancellingPending;
 
-  // ─── pending: disabled with info ───────────────────────────────────────
+  // ─── pending: disabled with info + optional cancel ─────────────────────
   if (status === "pending") {
     return (
       <ActionBarShell>
@@ -39,7 +44,27 @@ export function ProfileActionBar({ status, isDirty, onReset, softDirtyCount = 0,
             <strong className="text-[#92400E]">En attente de validation</strong> · réponse admin sous 24-48 h
           </span>
         </div>
-        <div className="shrink-0" />
+        <div className="flex items-center gap-2 shrink-0">
+          {singleSubmit && onCancelPending && (
+            <button
+              type="button"
+              disabled={cancellingPending}
+              onClick={onCancelPending}
+              className={`inline-flex items-center gap-1.5 px-4 py-[9px] text-[13px] font-semibold rounded transition-colors ${
+                !cancellingPending
+                  ? "text-[#B91C1C] bg-white border border-[#FCA5A5] hover:bg-[#FEF2F2]"
+                  : "text-[#A8A8A8] bg-[#E0E0E0] cursor-not-allowed"
+              }`}
+            >
+              {cancellingPending ? (
+                <span className="material-symbols-outlined animate-spin" style={{ fontSize: 16 }}>progress_activity</span>
+              ) : (
+                <span className="material-symbols-outlined" style={{ fontSize: 16 }}>undo</span>
+              )}
+              {cancellingPending ? "Annulation…" : "Annuler la soumission"}
+            </button>
+          )}
+        </div>
       </ActionBarShell>
     );
   }
@@ -70,10 +95,13 @@ export function ProfileActionBar({ status, isDirty, onReset, softDirtyCount = 0,
   if (status === "incomplete") {
     const anyDirtyInc = isDirty || hasSoftChanges;
     const softDisabledInc = !hasSoftChanges || saving;
+    const submitLabelInc = singleSubmit
+      ? (submitting ? "Soumission…" : "Enregistrer et soumettre")
+      : (submitting ? "Soumission…" : "Soumettre à validation");
     return (
       <ActionBarShell>
         <div className="flex items-start md:items-center gap-2 text-[12px] text-ink-secondary leading-snug">
-          {hasSoftChanges ? (
+          {!singleSubmit && hasSoftChanges ? (
             <>
               <span className="material-symbols-outlined icon-fill shrink-0 mt-[1px] md:mt-0 text-[#D97706]" style={{ fontSize: 15 }}>edit</span>
               <span>
@@ -99,7 +127,7 @@ export function ProfileActionBar({ status, isDirty, onReset, softDirtyCount = 0,
               Annuler
             </button>
           )}
-          {onSoftSave && (
+          {!singleSubmit && onSoftSave && (
             <button
               type="button"
               disabled={softDisabledInc}
@@ -125,7 +153,7 @@ export function ProfileActionBar({ status, isDirty, onReset, softDirtyCount = 0,
             ) : (
               <span className="material-symbols-outlined" style={{ fontSize: 16 }}>send</span>
             )}
-            {submitting ? "Soumission…" : "Soumettre à validation"}
+            {submitLabelInc}
           </button>
         </div>
       </ActionBarShell>
@@ -136,10 +164,13 @@ export function ProfileActionBar({ status, isDirty, onReset, softDirtyCount = 0,
   if (status === "rejected") {
     const anyDirtyRej = isDirty || hasSoftChanges;
     const softDisabledRej = !hasSoftChanges || saving;
+    const submitLabelRej = singleSubmit
+      ? (submitting ? "Soumission…" : "Enregistrer et resoumettre")
+      : (submitting ? "Soumission…" : "Enregistrer et resoumettre");
     return (
       <ActionBarShell>
         <div className="flex flex-col gap-1.5 text-[12px] text-ink-secondary leading-snug">
-          {hasSoftChanges && (
+          {!singleSubmit && hasSoftChanges && (
             <div className="flex items-center gap-2">
               <span className="material-symbols-outlined icon-fill shrink-0 text-[#D97706]" style={{ fontSize: 15 }}>edit</span>
               <span>
@@ -154,7 +185,7 @@ export function ProfileActionBar({ status, isDirty, onReset, softDirtyCount = 0,
               <span><strong className="text-[#475569]">Modifications à resoumettre</strong> · revalidation admin requise</span>
             </div>
           )}
-          {!hasSoftChanges && !isDirty && (
+          {(singleSubmit ? !isDirty : !hasSoftChanges && !isDirty) && (
             <div className="flex items-center gap-2">
               <span className="material-symbols-outlined icon-fill shrink-0 text-[#B91C1C]" style={{ fontSize: 15 }}>error</span>
               <span><strong className="text-[#B91C1C]">Profil refusé</strong> · corrigez puis resoumettez</span>
@@ -170,8 +201,8 @@ export function ProfileActionBar({ status, isDirty, onReset, softDirtyCount = 0,
           >
             Annuler
           </button>
-          {/* Soft save — instant, no admin review */}
-          {onSoftSave && (
+          {/* Soft save — only for non-singleSubmit */}
+          {!singleSubmit && onSoftSave && (
             <button
               type="button"
               disabled={softDisabledRej}
@@ -198,7 +229,7 @@ export function ProfileActionBar({ status, isDirty, onReset, softDirtyCount = 0,
             ) : (
               <span className="material-symbols-outlined" style={{ fontSize: 16 }}>send</span>
             )}
-            {submitting ? "Soumission…" : "Enregistrer et resoumettre"}
+            {submitLabelRej}
           </button>
         </div>
       </ActionBarShell>
@@ -209,10 +240,15 @@ export function ProfileActionBar({ status, isDirty, onReset, softDirtyCount = 0,
   const anyDirty = isDirty || hasSoftChanges;
   const softSaveDisabled = !hasSoftChanges || saving;
 
+  // singleSubmit: isDirty already includes gallery changes
+  const submitLabel = singleSubmit
+    ? (submitting ? "Soumission…" : "Enregistrer et soumettre")
+    : (submitting ? "Soumission…" : "Soumettre les modifications");
+
   return (
     <ActionBarShell>
       <div className="flex flex-col gap-1.5 text-[12px] text-ink-secondary leading-snug">
-        {hasSoftChanges && (
+        {!singleSubmit && hasSoftChanges && (
           <div className="flex items-center gap-2">
             <span className="material-symbols-outlined icon-fill shrink-0 text-[#D97706]" style={{ fontSize: 15 }}>edit</span>
             <span>
@@ -226,10 +262,10 @@ export function ProfileActionBar({ status, isDirty, onReset, softDirtyCount = 0,
         {isDirty && (
           <div className="flex items-center gap-2">
             <span className="material-symbols-outlined icon-fill shrink-0 text-[#475569]" style={{ fontSize: 15 }}>draft</span>
-            <span><strong className="text-[#475569]">Modifications à soumettre</strong> · revalidation admin requise</span>
+            <span><strong className="text-[#475569]">{singleSubmit ? "Modifications en attente" : "Modifications à soumettre"}</strong> · {singleSubmit ? "cliquez Enregistrer et soumettre" : "revalidation admin requise"}</span>
           </div>
         )}
-        {!hasSoftChanges && !isDirty && (
+        {(singleSubmit ? !isDirty : !hasSoftChanges && !isDirty) && (
           <div className="flex items-center gap-2">
             <span className="material-symbols-outlined icon-fill shrink-0 text-status-active-fg" style={{ fontSize: 15 }}>check_circle</span>
             <span><strong className="text-status-active-fg">Profil publié</strong> · aucune modification en attente</span>
@@ -245,7 +281,7 @@ export function ProfileActionBar({ status, isDirty, onReset, softDirtyCount = 0,
         >
           Annuler
         </button>
-        {/* Soft save — instant, no admin review */}
+        {/* Soft save — instant, no admin review (hidden in singleSubmit unless isPublic changed) */}
         {onSoftSave && (
           <button
             type="button"
@@ -258,7 +294,7 @@ export function ProfileActionBar({ status, isDirty, onReset, softDirtyCount = 0,
             ) : (
               <span className="material-symbols-outlined" style={{ fontSize: 16 }}>save</span>
             )}
-            {saving ? "Enregistrement…" : "Enregistrer"}
+            {saving ? "Enregistrement…" : "Enregistrer visibilité"}
           </button>
         )}
         {/* Hard submit — admin review required */}
@@ -273,7 +309,7 @@ export function ProfileActionBar({ status, isDirty, onReset, softDirtyCount = 0,
           ) : (
             <span className="material-symbols-outlined" style={{ fontSize: 16 }}>send</span>
           )}
-          {submitting ? "Soumission…" : "Soumettre les modifications"}
+          {submitLabel}
         </button>
       </div>
     </ActionBarShell>

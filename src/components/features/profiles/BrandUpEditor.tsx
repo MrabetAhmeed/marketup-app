@@ -38,11 +38,11 @@ export function BrandUpEditor({ profile, company }: BrandUpEditorProps): JSX.Ele
     },
   });
 
-  // --- Soft state: isPublic ---
+  // --- Soft state: isPublic only ---
   const [isPublic, setIsPublic] = useState(profile.isPublic);
   const isPublicDirty = isPublic !== profile.isPublic;
 
-  // --- Soft state: gallery (order + pending adds/deletes) ---
+  // --- Gallery state (now part of HARD submit) ---
   const [galleryOrder, setGalleryOrder] = useState<GalleryItem[]>(profile.data.gallery);
   const [pendingAdds, setPendingAdds] = useState<GalleryItem[]>([]);
   const [pendingDeletes, setPendingDeletes] = useState<string[]>([]);
@@ -53,13 +53,16 @@ export function BrandUpEditor({ profile, company }: BrandUpEditorProps): JSX.Ele
     ...pendingAdds,
   ];
 
-  // Dirty tracking
+  // Dirty tracking — gallery is now HARD (part of submit)
   const initialOrderIds = profile.data.gallery.map((g) => g.id).join(",");
   const currentOrderIds = galleryOrder.filter((g) => !pendingDeletes.includes(g.id)).map((g) => g.id).join(",");
   const galleryOrderDirty = currentOrderIds !== initialOrderIds;
   const hasGalleryChanges = pendingAdds.length > 0 || pendingDeletes.length > 0 || galleryOrderDirty;
 
-  const softDirtyCount = (isPublicDirty ? 1 : 0) + pendingAdds.length + pendingDeletes.length + (galleryOrderDirty ? 1 : 0);
+  // Soft dirty = only isPublic toggle
+  const softDirtyCount = isPublicDirty ? 1 : 0;
+  // Hard dirty = form fields (pitch/about) OR gallery changes
+  const hardDirty = isDirty || hasGalleryChanges;
   const [saving, setSaving] = useState(false);
 
   const moveGalleryItem = useCallback((fromIdx: number, toIdx: number) => {
@@ -101,14 +104,42 @@ export function BrandUpEditor({ profile, company }: BrandUpEditorProps): JSX.Ele
     setPendingDeletes((prev) => [...prev, imageId]);
   }
 
+  // --- Soft save: isPublic toggle only ---
   async function handleSoftSave(): Promise<void> {
-    if (softDirtyCount === 0) return;
+    if (!isPublicDirty) return;
     setSaving(true);
-
     try {
-      const tempToReal = new Map<string, string>();
+      const res = await fetch(`/api/v1/profiles/${profile.id}/soft`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ isPublic }),
+      });
+      const softJson = await res.json();
+      if (!res.ok) {
+        showToast(softJson.error?.message || "Erreur lors de la sauvegarde");
+        return;
+      }
+      if (softJson.isPublic !== undefined) {
+        setIsPublic(softJson.isPublic);
+      }
+      showToast("Visibilité mise à jour");
+      router.refresh();
+    } catch {
+      showToast("Erreur, veuillez réessayer");
+    } finally {
+      setSaving(false);
+    }
+  }
 
-      // Phase 1: POST new gallery images sequentially
+  // --- Hard submit: pitch + about + gallery snapshot ---
+  const [submitting, setSubmitting] = useState(false);
+
+  async function handleHardSubmit(): Promise<void> {
+    const values = getValues();
+    setSubmitting(true);
+    try {
+      // Phase 1: Upload new gallery images to get real URLs/IDs
+      const tempToReal = new Map<string, string>();
       for (const add of pendingAdds) {
         const res = await fetch(`/api/v1/profiles/${profile.id}/gallery`, {
           method: "POST",
@@ -123,70 +154,23 @@ export function BrandUpEditor({ profile, company }: BrandUpEditorProps): JSX.Ele
         tempToReal.set(add.id, json.id as string);
       }
 
-      // Phase 2: DELETE removed images sequentially
-      for (const deleteId of pendingDeletes) {
-        const res = await fetch(`/api/v1/profiles/${profile.id}/gallery/${deleteId}`, {
-          method: "DELETE",
-        });
-        if (!res.ok) {
-          showToast("Erreur lors de la suppression d'une image");
-          return;
-        }
-      }
+      // Phase 2: Build gallery snapshot with real IDs
+      const gallerySnapshot = combinedGallery.map((g, idx) => ({
+        id: tempToReal.get(g.id) ?? g.id,
+        url: g.url,
+        caption: g.caption,
+        order: idx,
+      }));
 
-      // Phase 3: PATCH /soft with final order + isPublic
-      const patch: Record<string, unknown> = {};
-      if (isPublicDirty) patch.isPublic = isPublic;
-
-      if (hasGalleryChanges) {
-        // Build final order with real IDs
-        const finalOrder = combinedGallery.map((g) => tempToReal.get(g.id) ?? g.id);
-        patch.galleryOrder = finalOrder;
-      }
-
-      if (Object.keys(patch).length > 0) {
-        const res = await fetch(`/api/v1/profiles/${profile.id}/soft`, {
-          method: "PATCH",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(patch),
-        });
-        const softJson = await res.json();
-        if (!res.ok) {
-          showToast(softJson.error?.message || "Erreur lors de la sauvegarde");
-          return;
-        }
-        // Use fresh data from response to reset gallery state
-        if (softJson.data?.gallery) {
-          setGalleryOrder(softJson.data.gallery);
-        }
-        if (softJson.isPublic !== undefined) {
-          setIsPublic(softJson.isPublic);
-        }
-      }
-
-      // Success — reset all pending state
-      setPendingAdds([]);
-      setPendingDeletes([]);
-      showToast("Modifications enregistrées");
-      router.refresh();
-    } catch {
-      showToast("Erreur, veuillez réessayer");
-    } finally {
-      setSaving(false);
-    }
-  }
-
-  // --- Hard submit ---
-  const [submitting, setSubmitting] = useState(false);
-
-  async function handleHardSubmit(): Promise<void> {
-    const values = getValues();
-    setSubmitting(true);
-    try {
+      // Phase 3: Submit all as hard change
       const res = await fetch(`/api/v1/profiles/${profile.id}/submit`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ pitch: values.pitch, about: values.about }),
+        body: JSON.stringify({
+          pitch: values.pitch,
+          about: values.about,
+          gallery: gallerySnapshot,
+        }),
       });
       const json = await res.json();
       if (!res.ok) {
@@ -204,11 +188,36 @@ export function BrandUpEditor({ profile, company }: BrandUpEditorProps): JSX.Ele
       }
       showToast("Profil soumis pour validation");
       reset({ pitch: values.pitch, about: values.about });
+      setPendingAdds([]);
+      setPendingDeletes([]);
       router.refresh();
     } catch {
       showToast("Erreur, veuillez réessayer");
     } finally {
       setSubmitting(false);
+    }
+  }
+
+  // --- Cancel pending submission ---
+  const [cancelling, setCancelling] = useState(false);
+
+  async function handleCancelPending(): Promise<void> {
+    setCancelling(true);
+    try {
+      const res = await fetch(`/api/v1/profiles/${profile.id}/pending`, {
+        method: "DELETE",
+      });
+      if (!res.ok) {
+        const json = await res.json();
+        showToast(json.error?.message || "Erreur");
+        return;
+      }
+      showToast("Soumission annulée");
+      router.refresh();
+    } catch {
+      showToast("Erreur, veuillez réessayer");
+    } finally {
+      setCancelling(false);
     }
   }
 
@@ -429,13 +438,16 @@ export function BrandUpEditor({ profile, company }: BrandUpEditorProps): JSX.Ele
       {/* ═══ ACTION BAR ═══ */}
       <ProfileActionBar
         status={profile.status}
-        isDirty={isDirty}
+        isDirty={hardDirty}
         onReset={handleReset}
         softDirtyCount={softDirtyCount}
         saving={saving}
-        onSoftSave={handleSoftSave}
+        onSoftSave={isPublicDirty ? handleSoftSave : undefined}
         submitting={submitting}
         onHardSubmit={handleSubmit(handleHardSubmit)}
+        singleSubmit
+        onCancelPending={handleCancelPending}
+        cancellingPending={cancelling}
       />
     </div>
   );

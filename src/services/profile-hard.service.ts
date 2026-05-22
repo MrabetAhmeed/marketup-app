@@ -131,6 +131,52 @@ export async function submitProfile(
 }
 
 // ---------------------------------------------------------------------------
+// Cancel pending submission — reset pendingData, status back to previous
+// ---------------------------------------------------------------------------
+
+export async function cancelPendingSubmission(
+  profileId: string,
+  userId: string,
+  lang: SupportedLang = "fr",
+): Promise<ProfileEditorData> {
+  await connectDb();
+
+  const profile = await ProfileModel.findById(profileId).lean();
+  if (!profile) throw new NotFoundError("Profile");
+
+  const user = await UserModel.findById(userId).lean();
+  if (!user) throw new NotFoundError("User");
+  if (profile.companyId.toString() !== user.companyId?.toString()) {
+    throw new AppError("FORBIDDEN", "Vous ne pouvez pas modifier ce profil.", 403);
+  }
+
+  if (profile.status !== "pending") {
+    throw new BusinessRuleError(
+      "NOT_PENDING",
+      "Ce profil n'est pas en attente de validation.",
+    );
+  }
+
+  const kind: ProfileKind = profile.kind;
+  const Model = getModelForKind(kind);
+
+  // Determine previous status: if profile was published before, go back to active; otherwise incomplete
+  const previousStatus = profile.publishedAt ? "active" : "incomplete";
+
+  await Model.findByIdAndUpdate(profileId, {
+    $set: {
+      status: previousStatus,
+      pendingData: null,
+      submittedAt: null,
+    },
+  });
+
+  const updated = await getProfileForEditor(profile.companyId.toString(), kind, lang);
+  if (!updated) throw new NotFoundError("Profile");
+  return updated;
+}
+
+// ---------------------------------------------------------------------------
 // Build pendingData.fields per kind
 // ---------------------------------------------------------------------------
 
@@ -170,6 +216,23 @@ function buildBrandupPendingFields(
     currentValue: data.about ?? { fr: "", ar: "", en: "" },
     newValue: { fr: parsed.about, ar: "", en: "" },
   });
+
+  // Gallery snapshot (Approach C) — full array replacement
+  if (parsed.gallery !== undefined) {
+    const currentGallery = data.gallery ?? [];
+    const newGallery = parsed.gallery.map((item, idx) => ({
+      id: item.id,
+      url: item.url,
+      caption: { fr: item.caption, ar: "", en: "" },
+      order: item.order ?? idx,
+    }));
+    fields.push({
+      key: "gallery",
+      label: "Galerie",
+      currentValue: currentGallery,
+      newValue: newGallery,
+    });
+  }
 
   return fields;
 }

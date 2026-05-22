@@ -9,9 +9,6 @@ const SOCIAL_PLATFORMS = ["website", "linkedin", "facebook", "instagram", "youtu
 
 export const BrandupSoftSchema = z.object({
   isPublic: z.boolean().optional(),
-  galleryOrder: z
-    .array(z.string().min(1, "ID image requis."))
-    .optional(),
 }).strict();
 
 export const TraceupSoftSchema = z.object({
