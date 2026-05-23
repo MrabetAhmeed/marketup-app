@@ -163,6 +163,13 @@ export function BrandUpEditor({ profile, company }: BrandUpEditorProps): JSX.Ele
       }));
 
       // Phase 3: Submit all as hard change
+      // Send original gallery (pre-edit state) so server can compute accurate diff
+      const originalGallery = profile.data.gallery.map((g, idx) => ({
+        id: g.id,
+        url: g.url,
+        caption: g.caption,
+        order: g.order ?? idx,
+      }));
       const res = await fetch(`/api/v1/profiles/${profile.id}/submit`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -170,6 +177,7 @@ export function BrandUpEditor({ profile, company }: BrandUpEditorProps): JSX.Ele
           pitch: values.pitch,
           about: values.about,
           gallery: gallerySnapshot,
+          currentGallery: originalGallery,
         }),
       });
       const json = await res.json();
@@ -229,8 +237,43 @@ export function BrandUpEditor({ profile, company }: BrandUpEditorProps): JSX.Ele
     setPendingDeletes([]);
   }
 
-  const gallery = combinedGallery;
-  const filledSlots = gallery.length;
+  // When pending, show the diff view with tags
+  const isPending = profile.status === "pending";
+  const hasPendingGalleryDiff = isPending && profile.pendingGallery != null;
+
+  // Build gallery diff state for pending mode
+  type ImageDiffStatus = "added" | "kept" | "deleted" | "normal";
+  const galleryDiffMap = new Map<string, ImageDiffStatus>();
+  let pendingViewGallery: GalleryItem[] = combinedGallery;
+
+  if (hasPendingGalleryDiff) {
+    const currentIds = new Set((profile.currentGallery ?? []).map((g) => g.id));
+    const pendingIds = new Set((profile.pendingGallery ?? []).map((g) => g.id));
+
+    // All unique images (current + pending)
+    const allMap = new Map<string, GalleryItem>();
+    for (const g of profile.currentGallery ?? []) allMap.set(g.id, g);
+    for (const g of profile.pendingGallery ?? []) allMap.set(g.id, g);
+
+    // Order: pending gallery order first, then deleted items at the end
+    const ordered: GalleryItem[] = [];
+    for (const g of profile.pendingGallery ?? []) ordered.push(g);
+    for (const g of profile.currentGallery ?? []) {
+      if (!pendingIds.has(g.id)) ordered.push(g); // deleted items
+    }
+    pendingViewGallery = ordered;
+
+    for (const g of ordered) {
+      const inCurrent = currentIds.has(g.id);
+      const inPending = pendingIds.has(g.id);
+      if (!inCurrent && inPending) galleryDiffMap.set(g.id, "added");
+      else if (inCurrent && !inPending) galleryDiffMap.set(g.id, "deleted");
+      else galleryDiffMap.set(g.id, "kept");
+    }
+  }
+
+  const gallery = hasPendingGalleryDiff ? pendingViewGallery : combinedGallery;
+  const filledSlots = hasPendingGalleryDiff ? (profile.pendingGallery ?? []).length : combinedGallery.length;
   const emptySlots = MAX_GALLERY - filledSlots;
 
   return (
@@ -405,6 +448,7 @@ export function BrandUpEditor({ profile, company }: BrandUpEditorProps): JSX.Ele
         <GalleryGrid
           gallery={gallery}
           pendingAddIds={new Set(pendingAdds.map((g) => g.id))}
+          diffMap={galleryDiffMap}
           emptySlots={emptySlots}
           isReadOnly={isReadOnly}
           onMoveUp={(i) => moveGalleryItem(i, i - 1)}
@@ -464,6 +508,7 @@ export function BrandUpEditor({ profile, company }: BrandUpEditorProps): JSX.Ele
 function GalleryGrid({
   gallery,
   pendingAddIds,
+  diffMap,
   emptySlots,
   isReadOnly,
   onMoveUp,
@@ -473,6 +518,7 @@ function GalleryGrid({
 }: {
   gallery: BrandUpEditorData["data"]["gallery"];
   pendingAddIds: Set<string>;
+  diffMap: Map<string, "added" | "kept" | "deleted" | "normal">;
   emptySlots: number;
   isReadOnly: boolean;
   onMoveUp: (index: number) => void;
@@ -486,8 +532,11 @@ function GalleryGrid({
   return (
     <>
       <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3">
-        {gallery.map((item, i) => (
-          <div key={item.id} className="bg-white border border-surface-border rounded-lg overflow-hidden flex flex-col group/slot">
+        {gallery.map((item, i) => {
+          const diffStatus = diffMap.get(item.id);
+          const isDeleted = diffStatus === "deleted";
+          return (
+          <div key={item.id} className={`bg-white border border-surface-border rounded-lg overflow-hidden flex flex-col group/slot ${isDeleted ? "opacity-50" : ""}`}>
             {/* Image preview with delete overlay */}
             <div className="aspect-[4/3] bg-gradient-to-br from-primary/10 to-ink-tertiary/20 relative flex items-center justify-center">
               {item.url ? (
@@ -496,14 +545,27 @@ function GalleryGrid({
               ) : (
                 <span className="material-symbols-outlined text-white" style={{ fontSize: 28 }}>image</span>
               )}
-              {/* HERO / position badge */}
-              <span className={`absolute top-1.5 left-1.5 text-[9px] font-bold px-1.5 py-0.5 rounded ${
-                i === 0 ? "bg-primary text-white" : "bg-white/90 text-ink-secondary border border-surface-border"
-              }`}>
-                {i === 0 ? "★ HERO" : `#${i + 1}`}
-              </span>
-              {/* New badge for pending adds */}
-              {pendingAddIds.has(item.id) && (
+              {/* HERO / position badge (not for deleted items) */}
+              {!isDeleted && (
+                <span className={`absolute top-1.5 left-1.5 text-[9px] font-bold px-1.5 py-0.5 rounded ${
+                  i === 0 ? "bg-primary text-white" : "bg-white/90 text-ink-secondary border border-surface-border"
+                }`}>
+                  {i === 0 ? "★ HERO" : `#${i + 1}`}
+                </span>
+              )}
+              {/* Diff badges for pending mode */}
+              {diffStatus === "added" && (
+                <span className="absolute top-1.5 right-1.5 text-[8px] font-bold px-1.5 py-0.5 rounded bg-[#16A34A] text-white">
+                  NOUVEAU
+                </span>
+              )}
+              {diffStatus === "deleted" && (
+                <span className="absolute top-1.5 right-1.5 text-[8px] font-bold px-1.5 py-0.5 rounded bg-[#DC2626] text-white">
+                  SUPPRIMÉE
+                </span>
+              )}
+              {/* New badge for pending adds (edit mode, not pending diff mode) */}
+              {!diffStatus && pendingAddIds.has(item.id) && (
                 <span className="absolute bottom-1.5 left-1.5 text-[8px] font-bold px-1.5 py-0.5 rounded bg-[#D97706] text-white">
                   Nouveau
                 </span>
@@ -554,7 +616,8 @@ function GalleryGrid({
               )}
             </div>
           </div>
-        ))}
+          );
+        })}
 
         {/* Empty slot → opens AddGalleryImageModal */}
         {!isReadOnly && emptySlots > 0 && (

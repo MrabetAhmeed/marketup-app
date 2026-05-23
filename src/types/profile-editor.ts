@@ -30,6 +30,10 @@ export interface BrandUpEditorData {
     color: string;
     gallery: GalleryItem[];
   };
+  /** Gallery from pendingData (non-null only when status=pending and gallery was modified) */
+  pendingGallery: GalleryItem[] | null;
+  /** Original gallery before pending submission (non-null only when pendingGallery is set) */
+  currentGallery: GalleryItem[] | null;
 }
 
 export interface VideoItem {

@@ -94,7 +94,7 @@ function getPendingFieldMap(profile: any): Record<string, unknown> {
 
 function buildBrandUp(
   profile: any,
-  base: Omit<BrandUpEditorData, "kind" | "data">,
+  base: Omit<BrandUpEditorData, "kind" | "data" | "pendingGallery" | "currentGallery">,
   lang: SupportedLang,
 ): BrandUpEditorData {
   const data = profile.data ?? {};
@@ -113,6 +113,31 @@ function buildBrandUp(
   const pitch = pending.pitch ? pickLocale(pending.pitch as any, lang) : pickLocale(data.pitch, lang);
   const about = pending.about ? pickLocale(pending.about as any, lang) : pickLocale(data.about, lang);
 
+  // Gallery diff: expose both current (pre-edit snapshot) and pending gallery
+  let pendingGallery: GalleryItem[] | null = null;
+  let currentGallery: GalleryItem[] | null = null;
+  // Read directly from pendingData.fields to get BOTH currentValue and newValue
+  const galleryPendingField = (profile.pendingData?.fields ?? [])
+    .find((f: any) => f.key === "gallery");
+  if (galleryPendingField) {
+    // currentValue = pre-edit snapshot (stored at submit time from client-sent originalGallery)
+    currentGallery = ((galleryPendingField.currentValue ?? []) as any[]).map((item: any) => ({
+      id: item.id,
+      url: item.url,
+      caption: pickLocale(item.caption, lang),
+      order: item.order ?? 0,
+    }));
+    currentGallery.sort((a, b) => a.order - b.order);
+    // newValue = proposed gallery state
+    pendingGallery = ((galleryPendingField.newValue ?? []) as any[]).map((item: any) => ({
+      id: item.id,
+      url: item.url,
+      caption: pickLocale(item.caption, lang),
+      order: item.order ?? 0,
+    }));
+    pendingGallery.sort((a, b) => a.order - b.order);
+  }
+
   return {
     kind: "brandup",
     ...base,
@@ -122,6 +147,8 @@ function buildBrandUp(
       color: data.color ?? "#0078D4",
       gallery,
     },
+    pendingGallery,
+    currentGallery,
   };
 }
 

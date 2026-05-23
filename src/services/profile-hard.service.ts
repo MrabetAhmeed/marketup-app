@@ -92,6 +92,7 @@ export async function submitProfile(
       submittedAt: now,
       fields: pendingFields,
       note: null,
+      previousStatus,
     } : null,
   };
 
@@ -160,8 +161,9 @@ export async function cancelPendingSubmission(
   const kind: ProfileKind = profile.kind;
   const Model = getModelForKind(kind);
 
-  // Determine previous status: if profile was published before, go back to active; otherwise incomplete
-  const previousStatus = profile.publishedAt ? "active" : "incomplete";
+  // Restore the status captured at submit time (fallback: publishedAt heuristic for legacy data)
+  const previousStatus = profile.pendingData?.previousStatus
+    ?? (profile.publishedAt ? "active" : "incomplete");
 
   await Model.findByIdAndUpdate(profileId, {
     $set: {
@@ -218,8 +220,17 @@ function buildBrandupPendingFields(
   });
 
   // Gallery snapshot (Approach C) — full array replacement
+  // Use client-sent currentGallery (pre-edit state) instead of data.gallery
+  // because gallery POST in Phase 1 already added new images to data.gallery
   if (parsed.gallery !== undefined) {
-    const currentGallery = data.gallery ?? [];
+    const currentGallery = parsed.currentGallery
+      ? parsed.currentGallery.map((item, idx) => ({
+          id: item.id,
+          url: item.url,
+          caption: { fr: item.caption, ar: "", en: "" },
+          order: item.order ?? idx,
+        }))
+      : (data.gallery ?? []);
     const newGallery = parsed.gallery.map((item, idx) => ({
       id: item.id,
       url: item.url,

@@ -27,6 +27,10 @@ export const BrandupHardSubmitSchema = z.object({
     .array(GalleryItemSchema)
     .max(9, "9 images maximum.")
     .optional(),
+  // Original gallery snapshot (before edits) — used to compute diff for pendingData.currentValue
+  currentGallery: z
+    .array(GalleryItemSchema)
+    .optional(),
 }).strict();
 
 export const TraceupHardSubmitSchema = z.object({

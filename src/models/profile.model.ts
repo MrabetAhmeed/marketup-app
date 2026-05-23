@@ -49,13 +49,15 @@ const ProfileSchema = new Schema(
     rejectedBy: { type: Types.ObjectId, ref: "AdminUser", default: null },
     disabledAt: { type: Date, default: null },
 
-    // Pending modifications (only meaningful when status === "active")
+    // Pending modifications (only meaningful when status === "pending")
     pendingData: {
       type: new Schema(
         {
           submittedAt: { type: Date, required: true },
           fields: { type: [PendingDataFieldSchema], required: true },
           note: { type: String, default: null },
+          // Status before submit (for cancel restore: "active" | "rejected" | "incomplete")
+          previousStatus: { type: String, enum: ["active", "rejected", "incomplete"], default: null },
         },
         { _id: false },
       ),

@@ -74,6 +74,8 @@ export default async function ProfileReviewPage({ params }: PageProps): Promise<
           pitch={profile.pitch}
           about={profile.about}
           gallery={profile.gallery}
+          pendingGallery={profile.pendingGallery}
+          currentGallery={profile.currentGallery}
           pendingKeys={pendingKeys}
           pendingMap={pendingMap}
         />
@@ -120,15 +122,44 @@ function BrandUpContent({
   pitch,
   about,
   gallery,
+  pendingGallery,
+  currentGallery,
   pendingKeys,
   pendingMap,
 }: {
   pitch: string;
   about: string;
   gallery: GalleryItemAdmin[];
+  pendingGallery: GalleryItemAdmin[] | null;
+  currentGallery: GalleryItemAdmin[] | null;
   pendingKeys: Set<string>;
   pendingMap: Map<string, PendingField>;
 }): JSX.Element {
+  // Build gallery diff view when gallery change is pending
+  // Use currentGallery (pre-edit snapshot) for diff, not gallery (data.gallery which includes Phase 1 uploads)
+  const hasGalleryDiff = pendingGallery != null;
+  const diffBase = currentGallery ?? gallery;
+  const currentIds = new Set(diffBase.map((g) => g.id));
+  const pendingIds = new Set((pendingGallery ?? []).map((g) => g.id));
+
+  // All unique images, pending order first then deleted
+  const allGalleryImages: Array<GalleryItemAdmin & { diffStatus: "added" | "kept" | "deleted" | "normal" }> = [];
+  if (hasGalleryDiff) {
+    for (const g of pendingGallery!) {
+      const inCurrent = currentIds.has(g.id);
+      allGalleryImages.push({ ...g, diffStatus: inCurrent ? "kept" : "added" });
+    }
+    for (const g of diffBase) {
+      if (!pendingIds.has(g.id)) {
+        allGalleryImages.push({ ...g, diffStatus: "deleted" });
+      }
+    }
+  } else {
+    for (const g of gallery) {
+      allGalleryImages.push({ ...g, diffStatus: "normal" });
+    }
+  }
+
   return (
     <>
       {/* Présentation */}
@@ -143,26 +174,41 @@ function BrandUpContent({
       </section>
 
       {/* Gallery */}
-      {gallery.length > 0 && (
+      {allGalleryImages.length > 0 && (
         <section className="bg-white border border-surface-border rounded-lg overflow-hidden">
           <div className="px-5 py-4 border-b border-surface-border flex items-center justify-between">
-            <h2 className="font-heading font-bold text-[15px] text-ink-primary">Galerie</h2>
+            <div className="flex items-center gap-2">
+              <h2 className="font-heading font-bold text-[15px] text-ink-primary">Galerie</h2>
+              {hasGalleryDiff && <ModifiedBadge />}
+            </div>
             <span className="text-[11px] font-semibold text-ink-secondary bg-surface-muted border border-surface-border px-2 py-0.5 rounded">
-              {gallery.length} image{gallery.length > 1 ? "s" : ""}
+              {hasGalleryDiff ? `${pendingGallery!.length} image${pendingGallery!.length > 1 ? "s" : ""} (proposé)` : `${gallery.length} image${gallery.length > 1 ? "s" : ""}`}
             </span>
           </div>
           <div className="p-5">
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
-              {gallery.map((item, i) => (
-                <div key={item.id} className="border border-surface-border rounded-lg overflow-hidden">
+              {allGalleryImages.map((item, i) => (
+                <div key={item.id} className={`border border-surface-border rounded-lg overflow-hidden ${item.diffStatus === "deleted" ? "opacity-50" : ""}`}>
                   <div className="aspect-[4/3] bg-surface-muted relative">
                     {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img src={item.url} alt={item.caption || `Image ${i + 1}`} className="w-full h-full object-cover" />
-                    <span className={`absolute top-1.5 left-1.5 text-[9px] font-bold px-1.5 py-0.5 rounded ${
-                      i === 0 ? "bg-primary text-white" : "bg-white/90 text-ink-secondary border border-surface-border"
-                    }`}>
-                      {i === 0 ? "HERO" : `#${i + 1}`}
-                    </span>
+                    {item.diffStatus !== "deleted" && (
+                      <span className={`absolute top-1.5 left-1.5 text-[9px] font-bold px-1.5 py-0.5 rounded ${
+                        i === 0 ? "bg-primary text-white" : "bg-white/90 text-ink-secondary border border-surface-border"
+                      }`}>
+                        {i === 0 ? "HERO" : `#${i + 1}`}
+                      </span>
+                    )}
+                    {item.diffStatus === "added" && (
+                      <span className="absolute top-1.5 right-1.5 text-[8px] font-bold px-1.5 py-0.5 rounded bg-[#16A34A] text-white">
+                        NOUVEAU
+                      </span>
+                    )}
+                    {item.diffStatus === "deleted" && (
+                      <span className="absolute top-1.5 right-1.5 text-[8px] font-bold px-1.5 py-0.5 rounded bg-[#DC2626] text-white">
+                        SUPPRIMÉE
+                      </span>
+                    )}
                   </div>
                   <div className="p-2 border-t border-surface-border bg-surface-subtle">
                     <p className="text-[11px] font-medium text-ink-primary truncate">{item.caption || "Sans titre"}</p>

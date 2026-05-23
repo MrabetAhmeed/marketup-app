@@ -120,6 +120,10 @@ export interface ProfileForAdminReview {
   pitch: string;
   about: string;
   gallery: GalleryItemAdmin[];
+  /** Pending gallery (non-null only when gallery change is pending) */
+  pendingGallery: GalleryItemAdmin[] | null;
+  /** Pre-edit gallery snapshot (non-null only when gallery change is pending) */
+  currentGallery: GalleryItemAdmin[] | null;
   // TraceUP data
   channelName: string;
   channelDescription: string;
@@ -188,6 +192,30 @@ export async function getProfileForAdminReview(
   const contactCard = data.contactCard ?? {};
   const liveData = company.liveData ?? {};
 
+  // Extract pending gallery for diff rendering (both snapshot and proposed)
+  const galleryPendingField = (profile.pendingData?.fields ?? []).find((f: any) => f.key === "gallery");
+  const pendingGallery: GalleryItemAdmin[] | null = galleryPendingField
+    ? ((galleryPendingField.newValue ?? []) as any[])
+        .map((item: any) => ({
+          id: item.id,
+          url: item.url,
+          caption: pickLocale(item.caption, lang),
+          order: item.order ?? 0,
+        }))
+        .sort((a: GalleryItemAdmin, b: GalleryItemAdmin) => a.order - b.order)
+    : null;
+  // Pre-edit snapshot from pendingData.currentValue (not data.gallery which includes Phase 1 uploads)
+  const currentGallerySnapshot: GalleryItemAdmin[] | null = galleryPendingField
+    ? ((galleryPendingField.currentValue ?? []) as any[])
+        .map((item: any) => ({
+          id: item.id,
+          url: item.url,
+          caption: pickLocale(item.caption, lang),
+          order: item.order ?? 0,
+        }))
+        .sort((a: GalleryItemAdmin, b: GalleryItemAdmin) => a.order - b.order)
+    : null;
+
   return {
     id: profile._id.toString(),
     kind: profile.kind,
@@ -205,6 +233,8 @@ export async function getProfileForAdminReview(
     pitch: pickLocale(data.pitch, lang),
     about: pickLocale(data.about, lang),
     gallery,
+    pendingGallery,
+    currentGallery: currentGallerySnapshot,
     // TraceUP
     channelName: pickLocale(data.channelName, lang),
     channelDescription: pickLocale(data.channelDescription, lang),
