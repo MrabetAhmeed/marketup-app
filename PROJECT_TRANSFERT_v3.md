@@ -1,6 +1,6 @@
 # PROJECT TRANSFERT v3 — MARKET-UP
 
-> État au 21 mai 2026 — Phase 5 + 6 complete, production deploy-ready
+> État au 22 mai 2026 — Démo-ready, tag `pre-demo-improvements`
 
 ## Phases complètes
 
@@ -15,12 +15,17 @@
   - Sprint 6.2A : admin login + layout + validation profils
   - Sprint 6.2B : admin validation comptes + RSE + notifications
   - Sprint 6.2C : user-driven correction + suspend/reactivate + 5-layer gating + build fixes + PDF persist fix
+- ✅ Pre-demo improvements COMPLETE (tag `pre-demo-improvements`) :
+  - Sprint 7X : profils auto-créés à signup + lazy login
+  - Sprint 7A : cacher Certifications BrandUP public
+  - Sprint 7B + 7B+ : enrich admin visibility + console-style navigation
+  - Sprint 7C + 7C+ + 7C++ + 7C+++ : tout BrandUP hard change + tags gallery + previousStatus + currentGallery snapshot
 
 ## État technique
 
 - npm run build : PASS (51+ pages, 0 errors)
-- Tests : 34/34 green (20 ESM unit + 14 auth suite skipped)
-- Tags : `phase-5-complete` (commit f0e04a6) + `phase-6-complete` (commit a2a5dc8)
+- Tests : 34/34 green
+- Tags : `phase-5-complete` (f0e04a6) + `phase-6-complete` (a2a5dc8) + `pre-demo-improvements` (0abce76)
 - Deploy OVH : fait par équipe en parallèle
 
 ## Décisions architecturales clés Phase 5
@@ -67,6 +72,19 @@
 10. `guardActiveCompany()` helper centralise rejected/suspended/pending guards
 11. `identityDocumentUrl` modifiable UNIQUEMENT via POST /resubmit (immutable retiré du model)
 
+## Décisions architecturales Sprint 7 (pré-démo)
+
+1. BrandUP : tous les champs hard change (pitch, about, gallery)
+2. isPublic : soft change (toggle owner instantané)
+3. TraceUP videos : soft change (CLAUDE.md §6.10)
+4. LinkUP socials : soft change
+5. pendingData schema étendu : fields[], submittedAt, previousStatus
+6. currentGallery snapshot stocké dans pendingData.fields[gallery].currentValue pour diff stable
+7. Tags visuels NOUVEAU/SUPPRIMÉE gallery (dashboard user + admin review)
+8. Profils auto-créés via discriminator models + filet lazy login
+9. Admin console navigation libre depuis /admin/entreprises
+10. Cancel pending restore previousStatus (pas heuristique publishedAt)
+
 ## Conventions deploy
 
 - Toutes routes API utilisant `headers()`/`getToken()` ont `export const dynamic = "force-dynamic"`
@@ -92,6 +110,12 @@
 - Email user on suspend/reactivate (actuellement silencieux)
 - Real-time JWT refresh on admin status change (actuellement next-click detection)
 - Admin page for "rejected" companies list
+
+### Sprint 7 cleanup
+- Validation/redimensionnement images upload
+- Validation post-création profil
+- Réactiver Certifications BrandUP
+- Services/socials/certifications éditeurs dashboard
 
 ### Autres
 - Path traversal defense in depth (ObjectId validation dans LocalAdapter)
