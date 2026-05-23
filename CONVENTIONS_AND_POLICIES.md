@@ -151,25 +151,28 @@ a2a5dc8 feat(phase-6-sprint-2c): user-driven correction + suspend/reactivate + 5
 
 ## Section 17 — Companies seed actuelles
 
-### Companies dans `reference/marketup_seed_data.js`
+### Companies dans `reference/marketup_seed_data.js` (verifie par extraction du seed le 23 mai 2026)
 
-| ID | Slug | displayName | Type | Secteur | Gouvernorat | Ville | Status Company | BrandUP | TraceUP | LinkUP |
-|----|------|-------------|------|---------|-------------|-------|---------------|---------|---------|--------|
-| c-001 | technofab-industries | TechnoFab Industries | B2B | mecanique | sousse | Sahline | active | **rejected** | **pending** | **active** (boosted) |
-| c-002 | mediacom | MediaCom | B2B | marketing | tunis | Tunis | active | active | active | active |
-| c-003 | greenlife-bio | GreenLife Bio & Naturel | B2C | alimentation | sousse | Sousse | active | active | incomplete | active |
-| c-004 | buildtech-construction | BuildTech Construction | B2B | btp | tunis | Tunis | **pending** | incomplete | active | — |
-| c-005 | foodcorner-restaurant | FoodCorner | B2C | restauration | sfax | Sfax | **suspended** | active | active | active |
-| c-006 | archstudio-architecture | ArchStudio | B2B | architecture | tunis | Tunis | **pending** | active | active | active |
-| c-007 | autoplus | AutoPlus | B2B | automobile-pro | sousse | Sousse | active | active | active | active |
-| c-008 | pharmatn | PharmaTN | B2C | sante | tunis | Tunis | **pending** | incomplete | incomplete | incomplete |
-| c-009 | edupro | EduPro Formation | B2B | formation-pro | tunis | Tunis | active | active | active | — |
-| c-010 | textiltunis | TextilTunis | B2B | textile | monastir | Ksar Hellal | active | **rejected** | **rejected** | active |
+| ID | Slug | displayName | Type | Secteur | Ville | Status Company | BrandUP | TraceUP | LinkUP |
+|----|------|-------------|------|---------|-------|---------------|---------|---------|--------|
+| c-001 | technofab-industries | TechnoFab Industries | B2B | mecanique | Sahline | active | **rejected** | **pending** | **active** (boosted) |
+| c-002 | mediacom | MediaCom | B2B | marketing | Tunis | active | active | active | active |
+| c-003 | greenlife-bio | GreenLife Bio & Naturel | B2C | alimentation | Sousse | active | active | incomplete | active |
+| c-004 | buildtech-construction | BuildTech Construction | B2B | btp | Tunis | **pending** | incomplete | **disabled** | active |
+| c-005 | foodcorner-restaurant | FoodCorner | B2C | restauration | Sfax | **suspended** | active | active | active |
+| c-006 | archstudio-architecture | ArchStudio | B2B | architecture | Tunis | **pending** | active | active | active |
+| c-007 | autoplus | AutoPlus | B2B | automobile-pro | Sousse | active | active | active | active |
+| c-008 | pharmatn | PharmaTN | B2C | sante | Tunis | **pending** | incomplete | incomplete | incomplete |
+| c-009 | edupro | EduPro Formation | B2B | formation-pro | Tunis | active | active | active | **disabled** |
+| c-010 | textiltunis | TextilTunis | B2B | textile | Ksar Hellal | active | **rejected** | **rejected** | active |
 
 **Notes :**
 - c-001 (TechnoFab) est la company canonique de la demo avec les 3 status differents
 - c-005 (FoodCorner) est suspendue (litige facturation — utile pour tester le flow suspended)
 - c-004, c-006, c-008 sont pending (pour tester les queues admin)
+- c-004 TraceUP et c-009 LinkUP sont `disabled` (pas `incomplete` — profils existants desactives intentionnellement dans le seed)
+- 7 companies B2B, 3 companies B2C
+- 5 active, 3 pending, 1 suspended, 0 rejected au niveau company
 
 ### Compte admin
 
@@ -224,34 +227,50 @@ Seul **`Toast.tsx`** est utilise a la fois cote dashboard (pas directement, mais
 
 ---
 
-## Section 19 — Bug cache .next
+## Section 19 — Bug cache .next (Sprint 7C+++)
 
-### Info non documentee dans le code
+### Contexte
 
-Aucun commit ni fichier dans le repo ne documente explicitement un bug de cache `.next`. Le symptome decrit (404 sur des chunks) est un comportement standard de Next.js quand le serveur est redeploy pendant qu'un client a une ancienne version en cache.
+Survenu sur localhost dev (`npm run dev`) apres le Sprint 7C+++ — multiples modifications en cascade : schema Mongoose (ajout `previousStatus` au sub-schema pendingData), types TypeScript, services (profile-hard, profile-editor, admin-profile), et composants React (BrandUpEditor, admin review page).
 
-### Fix standard
+### Symptome exact
 
-```bash
-rm -rf .next
-npm run build
-npm run start
+Apres un hot reload, le navigateur affichait une page blanche avec des erreurs 404 dans la console :
+
+```
+GET http://localhost:3000/_next/static/chunks/main-app.js          404
+GET http://localhost:3000/_next/static/chunks/app-pages-internals.js 404
+GET http://localhost:3000/_next/static/chunks/app/(dashboard)/dashboard/brandup/page.js 404
+GET http://localhost:3000/_next/static/css/app/layout.css           404
 ```
 
-Ou en dev :
+Toutes les pages etaient cassees (pas seulement la page modifiee).
+
+### Cause
+
+Le cache `.next/` a ete corrompu par le hot reload de Next.js apres trop de modifications successives en cascade (schema Mongoose → types TS → services → composants). Next.js tente de servir des chunks compiles references par un manifeste perime, mais les fichiers physiques ont ete regeneres avec de nouveaux hashes.
+
+### Fix applique
+
 ```bash
+# 1. Arreter le serveur dev
+Ctrl+C
+
+# 2. Supprimer le cache .next
+# PowerShell :
+Remove-Item -Recurse -Force .next
+# Ou bash :
 rm -rf .next
+
+# 3. Relancer
 npm run dev
 ```
 
-### Cause probable
-
-Lors du deploy OVH, un hot-reload ou un `npm run build` partiel laisse des chunks orphelins dans `.next/static/`. Le client essaie de charger un chunk qui n'existe plus apres le rebuild.
-
 ### Prevention
 
-- Toujours faire un `rm -rf .next` avant un build de production
-- En dev, si les pages retournent des 404 inexplicables, supprimer `.next/` et relancer
+- **Apres un gros refactor en cascade** (schema → types → services → composants) : arreter le serveur, supprimer `.next/`, relancer
+- **Indicateur :** si les 404 touchent `main-app.js` ou `app-pages-internals.js` (fichiers core Next.js), c'est toujours un probleme de cache — ne pas chercher de bug dans le code
+- **En production :** toujours `rm -rf .next && npm run build` avant de deployer
 
 ---
 
