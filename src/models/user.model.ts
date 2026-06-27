@@ -6,7 +6,6 @@ const UserSchema = new Schema(
     lastName: { type: String, default: null },
     email: { type: String, required: true, unique: true, lowercase: true, trim: true },
     passwordHash: { type: String, default: null },
-    phone: { type: String, default: null },
     languages: [{ type: String, enum: ["fr", "ar", "en"] }],
     role: { type: String, enum: ["OWNER"], default: "OWNER" },
     companyId: { type: Types.ObjectId, ref: "Company", index: true },

@@ -220,7 +220,8 @@ interface SignupUserInput {
   userId: string;
   firstName: string;
   lastName: string;
-  phone?: string | null;
+  phone: string;
+  whatsapp: string;
   languages: string[];
   password: string;
   acceptedTermsAt?: string;
@@ -255,7 +256,6 @@ export async function signupUser(input: SignupUserInput): Promise<SignupUserResu
 
   user.firstName = input.firstName;
   user.lastName = input.lastName;
-  user.phone = input.phone || null;
   user.languages = input.languages;
   user.passwordHash = passwordHash;
   user.acceptedTermsAt = input.acceptedTermsAt ? new Date(input.acceptedTermsAt) : new Date();
@@ -264,6 +264,14 @@ export async function signupUser(input: SignupUserInput): Promise<SignupUserResu
   user.otpAttempts = 0;
   user.otpLastSentAt = new Date();
   await user.save();
+
+  // Write phone + whatsapp to Company.liveData (source of truth for contact info)
+  await CompanyModel.findByIdAndUpdate(user.companyId, {
+    $set: {
+      "liveData.phone": input.phone,
+      "liveData.whatsapp": input.whatsapp,
+    },
+  });
 
   // Send OTP email
   await sendOtpEmail(user.email, otp);

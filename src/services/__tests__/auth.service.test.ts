@@ -96,6 +96,8 @@ async function doFullSignup(email = "test@example.tn") {
     userId: company.userId,
     firstName: "Ahmed",
     lastName: "Test",
+    phone: "+21620123456",
+    whatsapp: "+21620123456",
     languages: ["fr"],
     password: "Password1!",
     acceptedTermsAt: new Date().toISOString(),
@@ -444,5 +446,97 @@ describe("Auth Service", () => {
     }).lean();
 
     expect(linkup.data.contactCard.photo).toBeUndefined();
+  });
+
+  // === (u) signupUser writes phone + whatsapp to Company.liveData ===
+  it("signupUser writes phone + whatsapp to Company.liveData", async () => {
+    const companyResult = await signupCompany({
+      type: "B2B",
+      displayName: "PhoneTest Co",
+      legalId: "PT00001",
+      accountEmail: "phone-test@example.tn",
+      sectorId: "mecanique",
+      gouvernorat: "sousse",
+      ville: "Sousse",
+    });
+
+    await signupUser({
+      userId: companyResult.userId,
+      firstName: "Test",
+      lastName: "Phone",
+      phone: "+21673222333",
+      whatsapp: "+21620999888",
+      languages: ["fr"],
+      password: "Password1!",
+      acceptedTermsAt: new Date().toISOString(),
+    });
+
+    const company = await CompanyModel.findById(companyResult.companyId).lean();
+    expect(company.liveData.phone).toBe("+21673222333");
+    expect(company.liveData.whatsapp).toBe("+21620999888");
+  });
+
+  // === (v) signupUser does not write User.phone (field removed) ===
+  it("signupUser does not set User.phone (field removed)", async () => {
+    const userId = await doFullSignup("no-user-phone@example.tn");
+    const user = await UserModel.findById(userId).lean();
+    expect(user.phone).toBeUndefined();
+  });
+
+  // === (w) verifyOtp creates LinkUP with contactCard.phone from liveData ===
+  it("verifyOtp creates LinkUP with contactCard.phone from Company.liveData", async () => {
+    const userId = await doFullSignup("linkup-phone@example.tn");
+    const otp = getLastOtp();
+    await verifyOtp({ userId, otpCode: otp });
+
+    const user = await UserModel.findById(userId);
+    const linkup = await ProfileModel.findOne({
+      companyId: user.companyId,
+      kind: "linkup",
+    }).lean();
+
+    expect(linkup.data.contactCard.phone).toBe("+21620123456");
+    expect(linkup.data.contactCard.whatsapp).toBe("+21620123456");
+  });
+
+  // === (x) Zod SignupUserSchema rejects missing phone ===
+  it("signupUser rejects missing phone via service interface", async () => {
+    const companyResult = await signupCompany({
+      type: "B2B",
+      displayName: "NoPhone Co",
+      legalId: "NP00001",
+      accountEmail: "no-phone@example.tn",
+      sectorId: "mecanique",
+      gouvernorat: "sousse",
+      ville: "Sousse",
+    });
+
+    // signupUser with empty phone should fail at the Zod API boundary.
+    // At service level, TS enforces required phone — so we test the Zod schema directly.
+    const { SignupUserSchema } = await import("@/schemas/auth.schema");
+    const result = SignupUserSchema.safeParse({
+      userId: companyResult.userId,
+      firstName: "Test",
+      lastName: "NoPhone",
+      languages: ["fr"],
+      password: "Password1!",
+      passwordConfirm: "Password1!",
+    });
+    expect(result.success).toBe(false);
+  });
+
+  // === (y) Zod SignupUserSchema rejects missing whatsapp ===
+  it("Zod SignupUserSchema rejects missing whatsapp", async () => {
+    const { SignupUserSchema } = await import("@/schemas/auth.schema");
+    const result = SignupUserSchema.safeParse({
+      userId: "some-id",
+      firstName: "Test",
+      lastName: "NoWA",
+      phone: "+21620123456",
+      languages: ["fr"],
+      password: "Password1!",
+      passwordConfirm: "Password1!",
+    });
+    expect(result.success).toBe(false);
   });
 });

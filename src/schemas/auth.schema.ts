@@ -23,6 +23,14 @@ export const SignupCompanySchema = z.object({
 });
 export type SignupCompanyInput = z.infer<typeof SignupCompanySchema>;
 
+// --- Shared phone validation (reused in AccountLiveUpdateSchema) ---
+const phoneValidation = z
+  .string()
+  .trim()
+  .refine((v) => /^[+\s\-()0-9]*$/.test(v), "Numéro invalide (format attendu : +216XXXXXXXX).")
+  .transform((v) => v.replace(/[\s\-()]/g, ""))
+  .pipe(z.string().regex(/^\+[0-9]{8,15}$/, "Numéro invalide (format attendu : +216XXXXXXXX)."));
+
 // --- Step 2: Signup User ---
 // Form-level schema: includes passwordConfirm for client-side validation.
 // acceptedTermsAt is added programmatically in the submit handler (not a form field).
@@ -32,7 +40,8 @@ export const SignupUserSchema = z
     userId: z.string().min(1, "userId requis."),
     firstName: z.string().min(1, "Le prénom est obligatoire.").max(60),
     lastName: z.string().min(1, "Le nom est obligatoire.").max(60),
-    phone: z.string().max(30).optional().nullable(),
+    phone: phoneValidation,
+    whatsapp: phoneValidation,
     languages: z.array(z.enum(["fr", "ar", "en"])).min(1),
     password: passwordSchema,
     passwordConfirm: z.string().min(1, "Veuillez confirmer le mot de passe."),

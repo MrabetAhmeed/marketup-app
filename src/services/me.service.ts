@@ -199,7 +199,6 @@ export async function getMe(
       firstName: user.firstName ?? "",
       lastName: user.lastName ?? "",
       email: user.email,
-      phone: user.phone ?? null,
       languages: user.languages ?? ["fr"],
       avatarInitials: getInitials(ownerFullName),
       lastLoginAt: toISOOrNull(user.lastLoginAt),

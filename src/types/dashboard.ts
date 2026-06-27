@@ -39,7 +39,6 @@ export interface MeResponse {
     firstName: string;
     lastName: string;
     email: string;
-    phone: string | null;
     languages: string[];
     avatarInitials: string;
     lastLoginAt: string | null;
