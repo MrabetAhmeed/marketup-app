@@ -82,11 +82,7 @@ export default async function ProfileReviewPage({ params }: PageProps): Promise<
       )}
       {profile.kind === "traceup" && (
         <TraceUpContent
-          channelName={profile.channelName}
-          channelDescription={profile.channelDescription}
           videos={profile.videos}
-          pendingKeys={pendingKeys}
-          pendingMap={pendingMap}
         />
       )}
       {profile.kind === "linkup" && (
@@ -228,31 +224,12 @@ function BrandUpContent({
 // ---------------------------------------------------------------------------
 
 function TraceUpContent({
-  channelName,
-  channelDescription,
   videos,
-  pendingKeys,
-  pendingMap,
 }: {
-  channelName: string;
-  channelDescription: string;
   videos: VideoItemAdmin[];
-  pendingKeys: Set<string>;
-  pendingMap: Map<string, PendingField>;
 }): JSX.Element {
   return (
     <>
-      {/* Channel info */}
-      <section className="bg-white border border-surface-border rounded-lg overflow-hidden">
-        <div className="px-5 py-4 border-b border-surface-border">
-          <h2 className="font-heading font-bold text-[15px] text-ink-primary">Chaîne média</h2>
-        </div>
-        <div className="divide-y divide-surface-border">
-          <FieldRow label="Nom de la chaîne" value={channelName} fieldKey="channelName" pendingKeys={pendingKeys} pendingMap={pendingMap} />
-          <FieldRow label="Description de la chaîne" value={channelDescription} fieldKey="channelDescription" pendingKeys={pendingKeys} pendingMap={pendingMap} multiline />
-        </div>
-      </section>
-
       {/* Videos */}
       {videos.length > 0 && (
         <section className="bg-white border border-surface-border rounded-lg overflow-hidden">

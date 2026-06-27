@@ -16,7 +16,7 @@ import {
   TraceupHardSubmitSchema,
   LinkupHardSubmitSchema,
 } from "@/schemas/profile-hard.schema";
-import type { BrandupHardSubmitInput, TraceupHardSubmitInput } from "@/schemas/profile-hard.schema";
+import type { BrandupHardSubmitInput } from "@/schemas/profile-hard.schema";
 import type { SupportedLang } from "@/lib/i18n";
 import type { ProfileEditorData } from "@/types/profile-editor";
 import type { ProfileKind } from "@/types";
@@ -249,28 +249,12 @@ function buildBrandupPendingFields(
 }
 
 function buildTraceupPendingFields(
-  profile: any,
+  _profile: any,
   rawBody: unknown,
 ): Array<{ key: string; label: string; currentValue: unknown; newValue: unknown }> {
-  const parsed: TraceupHardSubmitInput = TraceupHardSubmitSchema.parse(rawBody);
-  const data = profile.data ?? {};
-  const fields: Array<{ key: string; label: string; currentValue: unknown; newValue: unknown }> = [];
-
-  fields.push({
-    key: "channelName",
-    label: "Nom de la chaîne",
-    currentValue: data.channelName ?? { fr: "", ar: "", en: "" },
-    newValue: { fr: parsed.channelName, ar: "", en: "" },
-  });
-
-  fields.push({
-    key: "channelDescription",
-    label: "Description de la chaîne",
-    currentValue: data.channelDescription ?? { fr: "", ar: "", en: "" },
-    newValue: { fr: parsed.channelDescription, ar: "", en: "" },
-  });
-
-  return fields;
+  // TraceUP has no hard fields — validate that body is empty
+  TraceupHardSubmitSchema.parse(rawBody);
+  return [];
 }
 
 function buildLinkupPendingFields(

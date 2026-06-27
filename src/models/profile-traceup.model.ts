@@ -11,7 +11,6 @@ const I18nStringSchema = new Schema(
 );
 
 // TraceUP videos are direct CRUD on the array — NOT subject to pendingData.
-// Only channelName and channelDescription flow through the base Profile.pendingData.
 // See CLAUDE.md §6.10 and SEED_ARCHITECTURE.md §4.4.1.
 const VideoSchema = new Schema(
   {
@@ -37,11 +36,6 @@ const VideoSchema = new Schema(
 const TraceUpSchema = new Schema(
   {
     data: {
-      channelName: { type: I18nStringSchema, default: () => ({ fr: "", ar: "", en: "" }) },
-      channelDescription: {
-        type: I18nStringSchema,
-        default: () => ({ fr: "", ar: "", en: "" }),
-      },
       videos: { type: [VideoSchema], default: [] },
     },
   },

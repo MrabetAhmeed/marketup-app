@@ -3,7 +3,6 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useForm } from "react-hook-form";
 import { StatusPill } from "@/components/shared/StatusPill";
 import { ProfileStatusBlock } from "@/components/shared/ProfileStatusBlock";
 import { useToast } from "@/components/shared/Toast";
@@ -27,27 +26,13 @@ interface TraceUpEditorProps {
   company: MeResponse["company"];
 }
 
-interface FormValues {
-  channelName: string;
-  channelDescription: string;
-}
-
 export function TraceUpEditor({ profile, company }: TraceUpEditorProps): JSX.Element {
   const router = useRouter();
   const { showToast } = useToast();
-  // Per CLAUDE.md §6.10: videos are direct CRUD, only metadata is pending-gated
-  const isMetadataReadOnly = profile.status === "pending" || profile.status === "disabled";
 
   const [activeTab, setActiveTab] = useState<VideoCategory>("actualite");
   const [addVideoOpen, setAddVideoOpen] = useState(false);
   const [deleteTarget, setDeleteTarget] = useState<{ id: string; title: string } | null>(null);
-
-  const { register, handleSubmit, formState: { isDirty, errors }, reset, setError, getValues } = useForm<FormValues>({
-    defaultValues: {
-      channelName: profile.data.channelName,
-      channelDescription: profile.data.channelDescription,
-    },
-  });
 
   // --- Soft state: isPublic ---
   const [isPublic, setIsPublic] = useState(profile.isPublic);
@@ -85,34 +70,23 @@ export function TraceUpEditor({ profile, company }: TraceUpEditorProps): JSX.Ele
     }
   }
 
-  // --- Hard submit ---
+  // --- Hard submit (empty body — status transition only) ---
   const [submitting, setSubmitting] = useState(false);
 
   async function handleHardSubmit(): Promise<void> {
-    const values = getValues();
     setSubmitting(true);
     try {
       const res = await fetch(`/api/v1/profiles/${profile.id}/submit`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ channelName: values.channelName, channelDescription: values.channelDescription }),
+        body: JSON.stringify({}),
       });
       const json = await res.json();
       if (!res.ok) {
-        if (json.error?.code === "VALIDATION_FAILED" && json.error.fields) {
-          const fields = json.error.fields as Record<string, string[]>;
-          for (const [field, messages] of Object.entries(fields)) {
-            if (field === "channelName" || field === "channelDescription") {
-              setError(field, { message: messages[0] });
-            }
-          }
-          return;
-        }
         showToast(json.error?.message || "Erreur, veuillez réessayer");
         return;
       }
       showToast("Profil soumis pour validation");
-      reset({ channelName: values.channelName, channelDescription: values.channelDescription });
       router.refresh();
     } catch {
       showToast("Erreur, veuillez réessayer");
@@ -122,7 +96,6 @@ export function TraceUpEditor({ profile, company }: TraceUpEditorProps): JSX.Ele
   }
 
   function handleReset(): void {
-    reset();
     setIsPublic(profile.isPublic);
   }
 
@@ -288,60 +261,16 @@ export function TraceUpEditor({ profile, company }: TraceUpEditorProps): JSX.Ele
         </div>
       </section>
 
-      {/* ═══ SECTION: CHANNEL METADATA (HARD_MUTATION — admin gated) ═══ */}
-      <section className="card p-5 md:p-6">
-        <div className="mb-5">
-          <h3 className="font-heading font-bold text-[15px] text-ink-primary">Métadonnées de chaîne</h3>
-          <p className="text-[12px] text-ink-secondary mt-0.5 leading-snug">
-            Nom et description affichés en header de votre profil TraceUP · validation admin requise
-          </p>
-        </div>
-        <div className="space-y-5">
-          <div>
-            <label htmlFor="tu-channel-name" className="field-label">
-              Nom de la chaîne <span className="text-[#B91C1C] font-bold ml-0.5">*</span>
-            </label>
-            <input
-              id="tu-channel-name"
-              type="text"
-              maxLength={80}
-              readOnly={isMetadataReadOnly}
-              className={`field-input ${errors.channelName ? "border-[#B91C1C]" : ""}`}
-              {...register("channelName")}
-            />
-            {errors.channelName && (
-              <p className="text-[12px] text-[#B91C1C] mt-1">{errors.channelName.message}</p>
-            )}
-          </div>
-          <div>
-            <label htmlFor="tu-channel-desc" className="field-label">
-              Description de la chaîne <span className="text-[#B91C1C] font-bold ml-0.5">*</span>
-            </label>
-            <textarea
-              id="tu-channel-desc"
-              rows={4}
-              maxLength={500}
-              readOnly={isMetadataReadOnly}
-              className={`field-input resize-y min-h-[96px] ${errors.channelDescription ? "border-[#B91C1C]" : ""}`}
-              {...register("channelDescription")}
-            />
-            {errors.channelDescription && (
-              <p className="text-[12px] text-[#B91C1C] mt-1">{errors.channelDescription.message}</p>
-            )}
-          </div>
-        </div>
-      </section>
-
       {/* ═══ ACTION BAR ═══ */}
       <ProfileActionBar
         status={profile.status}
-        isDirty={isDirty}
+        isDirty={profile.status === "incomplete" || profile.status === "rejected"}
         onReset={handleReset}
         softDirtyCount={softDirtyCount}
         saving={saving}
         onSoftSave={handleSoftSave}
         submitting={submitting}
-        onHardSubmit={handleSubmit(handleHardSubmit)}
+        onHardSubmit={handleHardSubmit}
       />
 
       {/* ═══ ADD VIDEO MODAL ═══ */}

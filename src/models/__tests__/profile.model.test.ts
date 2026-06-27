@@ -35,12 +35,11 @@ describe("Profile model — discriminators", () => {
     const doc = await TraceUp.create({
       companyId,
       data: {
-        channelName: { fr: "Test Channel", ar: "", en: "" },
         videos: [],
       },
     });
     expect(doc.kind).toBe("traceup");
-    expect(doc.data.channelName.fr).toBe("Test Channel");
+    expect(doc.data.videos).toHaveLength(0);
   });
 
   it("creates a LinkUp profile via the discriminator", async () => {

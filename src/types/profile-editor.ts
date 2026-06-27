@@ -63,8 +63,6 @@ export interface TraceUpEditorData {
   boosted: boolean;
   sponsoring: boolean;
   data: {
-    channelName: string;
-    channelDescription: string;
     videos: VideoItem[];
   };
 }

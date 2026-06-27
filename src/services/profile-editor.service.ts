@@ -175,21 +175,10 @@ function buildTraceUp(
   // Sort videos by order within each category
   videos.sort((a, b) => a.order - b.order);
 
-  // When pending, overlay HARD fields with pendingData values
-  const pending = getPendingFieldMap(profile);
-  const channelName = pending.channelName
-    ? pickLocale(pending.channelName as any, lang)
-    : pickLocale(data.channelName, lang);
-  const channelDescription = pending.channelDescription
-    ? pickLocale(pending.channelDescription as any, lang)
-    : pickLocale(data.channelDescription, lang);
-
   return {
     kind: "traceup",
     ...base,
     data: {
-      channelName,
-      channelDescription,
       videos,
     },
   };

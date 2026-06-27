@@ -125,8 +125,6 @@ export interface ProfileForAdminReview {
   /** Pre-edit gallery snapshot (non-null only when gallery change is pending) */
   currentGallery: GalleryItemAdmin[] | null;
   // TraceUP data
-  channelName: string;
-  channelDescription: string;
   videos: VideoItemAdmin[];
   // LinkUP data
   socials: Array<{ platform: string; url: string | null }>;
@@ -236,8 +234,6 @@ export async function getProfileForAdminReview(
     pendingGallery,
     currentGallery: currentGallerySnapshot,
     // TraceUP
-    channelName: pickLocale(data.channelName, lang),
-    channelDescription: pickLocale(data.channelDescription, lang),
     videos,
     // LinkUP
     socials,

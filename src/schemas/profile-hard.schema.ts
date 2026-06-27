@@ -33,18 +33,7 @@ export const BrandupHardSubmitSchema = z.object({
     .optional(),
 }).strict();
 
-export const TraceupHardSubmitSchema = z.object({
-  channelName: z
-    .string()
-    .trim()
-    .min(1, "Le nom de la chaîne est obligatoire.")
-    .max(60, "60 caractères maximum."),
-  channelDescription: z
-    .string()
-    .trim()
-    .min(1, "La description de la chaîne est obligatoire.")
-    .max(500, "500 caractères maximum."),
-}).strict();
+export const TraceupHardSubmitSchema = z.object({}).strict();
 
 export const LinkupHardSubmitSchema = z.object({}).strict();
 

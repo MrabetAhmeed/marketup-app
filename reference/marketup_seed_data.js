@@ -552,7 +552,6 @@
           type: PROFILE_TYPE.TRACEUP,
           status: PROFILE_STATUS.PENDING,
           data: {
-            channelName: i18n('TechnoFab Studio'),
             videos: [
               {
                 id: 'v-c-001-1',
@@ -1036,7 +1035,6 @@
           type: PROFILE_TYPE.TRACEUP,
           status: PROFILE_STATUS.ACTIVE,
           data: {
-            channelName: i18n('MediaCom Studio'),
             videos: [
               {
                 id: 'v-c-002-1', source: VIDEO_SOURCE.YOUTUBE, videoId: 'kJQP7kiw5Fk',
@@ -1231,7 +1229,6 @@
           type: PROFILE_TYPE.TRACEUP,
           status: PROFILE_STATUS.INCOMPLETE,
           data: {
-            channelName: i18nEmpty(),
             videos: []
           },
           pendingData: null, rejectionReason: null, rejectedAt: null, rejectedBy: null,
@@ -1374,7 +1371,6 @@
           type: PROFILE_TYPE.TRACEUP,
           status: PROFILE_STATUS.DISABLED,
           data: {
-            channelName: i18nEmpty(),
             videos: [
               {
                 id: 'v-c-004-1', source: VIDEO_SOURCE.YOUTUBE, videoId: 'fJ9rUzIMcZQ',
@@ -1507,7 +1503,6 @@
         traceup: {
           type: PROFILE_TYPE.TRACEUP, status: PROFILE_STATUS.ACTIVE,
           data: {
-            channelName: i18n('FoodCorner Cuisine'),
             videos: [
               {
                 id: 'v-c-005-1', source: VIDEO_SOURCE.YOUTUBE, videoId: 'L_jWHffIx5E',
@@ -1661,7 +1656,6 @@
         traceup: {
           type: PROFILE_TYPE.TRACEUP, status: PROFILE_STATUS.ACTIVE,
           data: {
-            channelName: i18n('ArchStudio Films'),
             videos: [
               {
                 id: 'v-c-006-1', source: VIDEO_SOURCE.VIMEO, videoId: '124540516',
@@ -1834,7 +1828,6 @@
         traceup: {
           type: PROFILE_TYPE.TRACEUP, status: PROFILE_STATUS.ACTIVE,
           data: {
-            channelName: i18n('AutoPlus TV'),
             videos: [
               {
                 id: 'v-c-007-1', source: VIDEO_SOURCE.YOUTUBE, videoId: 'YQHsXMglC9A',
@@ -1979,7 +1972,7 @@
         },
         traceup: {
           type: PROFILE_TYPE.TRACEUP, status: PROFILE_STATUS.INCOMPLETE,
-          data: { channelName: i18nEmpty(), videos: [] },
+          data: { videos: [] },
           pendingData: null, rejectionReason: null, rejectedAt: null, rejectedBy: null,
           publishedAt: null, lastValidatedAt: null, lastValidatedBy: null,
           stats: { viewsTotal: 0, views30d: 0, clicksTotal: 0 },
@@ -2108,7 +2101,6 @@
         traceup: {
           type: PROFILE_TYPE.TRACEUP, status: PROFILE_STATUS.ACTIVE,
           data: {
-            channelName: i18n('EduPro Academy'),
             videos: [
               {
                 id: 'v-c-009-1', source: VIDEO_SOURCE.YOUTUBE, videoId: 'V4M_e2wwSUE',
@@ -2132,15 +2124,7 @@
               }
             ]
           },
-          // pendingData : EduPro renomme son channel TraceUP (métadonnées, pas les vidéos cf SEED_ARCHITECTURE §4.4.1)
-          pendingData: {
-            submittedAt: '2026-04-22T15:30:00.000Z',
-            note: i18n('Renommage du channel pour mieux refléter notre repositionnement vers la formation digitale.'),
-            fields: [
-              { key: 'channelName', label: 'Nom du channel', currentValue: 'EduPro Académie',                          newValue: 'EduPro Digital · Formations en ligne' },
-              { key: 'description', label: 'Description',    currentValue: 'Formations professionnelles certifiantes.', newValue: 'Formations professionnelles 100% en ligne, certifiantes, accessibles 7j/7. Plus de 200 modules disponibles.' }
-            ]
-          },
+          pendingData: null,
           rejectionReason: null, rejectedAt: null, rejectedBy: null,
           publishedAt: '2025-09-15T10:00:00.000Z',
           lastValidatedAt: '2025-09-15T10:00:00.000Z', lastValidatedBy: 'u-001',
@@ -2280,7 +2264,6 @@
         traceup: {
           type: PROFILE_TYPE.TRACEUP, status: PROFILE_STATUS.REJECTED,
           data: {
-            channelName: i18nEmpty(),
             videos: [
               {
                 id: 'v-c-010-1', source: VIDEO_SOURCE.YOUTUBE, videoId: 'gPp-ckcBwfA',

@@ -326,7 +326,7 @@ export async function searchTraceUp(
     const liveData = cAny.liveData as Record<string, unknown>;
     const pData = (profile as Record<string, unknown>).data as Record<string, unknown>;
 
-    // Description: BrandUP pitch fallback, then channelName — N videos
+    // Description: BrandUP pitch fallback, then video count
     let pitch = "";
     if (brandupProfile) {
       const bpData = brandupProfile.data as Record<string, unknown>;
@@ -334,8 +334,7 @@ export async function searchTraceUp(
     }
     if (!pitch) {
       const videos = ((pData?.videos as Array<Record<string, unknown>>) ?? []).filter((v) => v.status === "active");
-      const channelName = pickLocale(pData?.channelName as { fr: string } | undefined, lang);
-      pitch = channelName ? `${channelName} — ${videos.length} vidéo${videos.length !== 1 ? "s" : ""}` : "";
+      pitch = videos.length > 0 ? `${videos.length} vidéo${videos.length !== 1 ? "s" : ""}` : "";
     }
 
     return {
