@@ -12,7 +12,6 @@ interface Video {
   title: string;
   description: string;
   publishedAt: string | null;
-  order: number;
 }
 
 interface VideoLibraryProps {

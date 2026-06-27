@@ -565,7 +565,6 @@
                 status: VIDEO_STATUS.ACTIVE,
                 publishedAt: '2026-03-20T10:00:00.000Z',
                 addedAt: '2026-03-20T09:55:00.000Z',
-                order: 1
               },
               {
                 id: 'v-c-001-2',
@@ -579,7 +578,6 @@
                 status: VIDEO_STATUS.ACTIVE,
                 publishedAt: '2026-02-15T14:00:00.000Z',
                 addedAt: '2026-02-15T13:55:00.000Z',
-                order: 2
               },
               {
                 id: 'v-c-001-3',
@@ -593,7 +591,6 @@
                 status: VIDEO_STATUS.ACTIVE,
                 publishedAt: '2026-03-01T10:00:00.000Z',
                 addedAt: '2026-03-01T09:50:00.000Z',
-                order: 3
               },
               {
                 id: 'v-c-001-4',
@@ -607,7 +604,6 @@
                 status: VIDEO_STATUS.ACTIVE,
                 publishedAt: '2026-04-01T08:00:00.000Z',
                 addedAt: '2026-04-01T07:55:00.000Z',
-                order: 4
               },
               {
                 id: 'v-c-001-5',
@@ -621,7 +617,6 @@
                 status: VIDEO_STATUS.ACTIVE,
                 publishedAt: '2026-04-10T09:00:00.000Z',
                 addedAt: '2026-04-10T08:55:00.000Z',
-                order: 5
               },
               {
                 id: 'v-c-001-6',
@@ -635,7 +630,6 @@
                 status: VIDEO_STATUS.ACTIVE,
                 publishedAt: '2026-04-15T10:00:00.000Z',
                 addedAt: '2026-04-15T09:55:00.000Z',
-                order: 6
               }
             ]
           },
@@ -1044,7 +1038,7 @@
                 title: i18n('Rebranding BIAT — making of'),
                 description: i18n('Coulisses du rebranding de la BIAT, de la recherche créative au lancement.'),
                 status: VIDEO_STATUS.ACTIVE,
-                publishedAt: '2026-03-01T10:00:00.000Z', addedAt: '2026-03-01T09:50:00.000Z', order: 1
+                publishedAt: '2026-03-01T10:00:00.000Z', addedAt: '2026-03-01T09:50:00.000Z'
               },
               {
                 id: 'v-c-002-2', source: VIDEO_SOURCE.VIMEO, videoId: '148751763',
@@ -1054,7 +1048,7 @@
                 title: i18n('5 erreurs à éviter en branding'),
                 description: i18n('Les pièges classiques à éviter pour bâtir une marque forte.'),
                 status: VIDEO_STATUS.ACTIVE,
-                publishedAt: '2026-03-15T14:00:00.000Z', addedAt: '2026-03-15T13:55:00.000Z', order: 2
+                publishedAt: '2026-03-15T14:00:00.000Z', addedAt: '2026-03-15T13:55:00.000Z'
               },
               {
                 id: 'v-c-002-3', source: VIDEO_SOURCE.YOUTUBE, videoId: 'tgbNymZ7vqY',
@@ -1064,7 +1058,7 @@
                 title: i18n('Recrutement : Senior Art Director'),
                 description: i18n('Nous cherchons un(e) Senior Art Director pour rejoindre notre équipe créative.'),
                 status: VIDEO_STATUS.ACTIVE,
-                publishedAt: '2026-04-05T10:00:00.000Z', addedAt: '2026-04-05T09:55:00.000Z', order: 3
+                publishedAt: '2026-04-05T10:00:00.000Z', addedAt: '2026-04-05T09:55:00.000Z'
               }
             ]
           },
@@ -1380,7 +1374,7 @@
                 title: i18n('Avancement chantier Lac 2'),
                 description: i18nEmpty(),
                 status: VIDEO_STATUS.ACTIVE,
-                publishedAt: '2026-02-20T10:00:00.000Z', addedAt: '2026-02-20T09:55:00.000Z', order: 1
+                publishedAt: '2026-02-20T10:00:00.000Z', addedAt: '2026-02-20T09:55:00.000Z'
               }
             ]
           },
@@ -1512,7 +1506,7 @@
                 title: i18n('Recette : Couscous royal traditionnel'),
                 description: i18n('Notre chef partage les secrets du couscous royal.'),
                 status: VIDEO_STATUS.ACTIVE,
-                publishedAt: '2025-12-15T10:00:00.000Z', addedAt: '2025-12-15T09:55:00.000Z', order: 1
+                publishedAt: '2025-12-15T10:00:00.000Z', addedAt: '2025-12-15T09:55:00.000Z'
               }
             ]
           },
@@ -1665,7 +1659,7 @@
                 title: i18n('Visite Villa Belvedere'),
                 description: i18n('Visite virtuelle de la Villa Belvedere à Gammarth.'),
                 status: VIDEO_STATUS.ACTIVE,
-                publishedAt: '2026-02-01T10:00:00.000Z', addedAt: '2026-02-01T09:55:00.000Z', order: 1
+                publishedAt: '2026-02-01T10:00:00.000Z', addedAt: '2026-02-01T09:55:00.000Z'
               },
               {
                 id: 'v-c-006-2', source: VIDEO_SOURCE.YOUTUBE, videoId: 'OPf0YbXqDm0',
@@ -1675,7 +1669,7 @@
                 title: i18n('Bien choisir son architecte : 5 conseils'),
                 description: i18n('Conseils pour bien choisir son architecte pour un projet réussi.'),
                 status: VIDEO_STATUS.ACTIVE,
-                publishedAt: '2026-03-10T10:00:00.000Z', addedAt: '2026-03-10T09:55:00.000Z', order: 2
+                publishedAt: '2026-03-10T10:00:00.000Z', addedAt: '2026-03-10T09:55:00.000Z'
               }
             ]
           },
@@ -1837,7 +1831,7 @@
                 title: i18n('Comment changer ses plaquettes de frein'),
                 description: i18n('Tutoriel pas à pas pour changer ses plaquettes de frein.'),
                 status: VIDEO_STATUS.ACTIVE,
-                publishedAt: '2026-01-20T10:00:00.000Z', addedAt: '2026-01-20T09:55:00.000Z', order: 1
+                publishedAt: '2026-01-20T10:00:00.000Z', addedAt: '2026-01-20T09:55:00.000Z'
               },
               {
                 id: 'v-c-007-2', source: VIDEO_SOURCE.DAILYMOTION, videoId: 'x8a3kf9',
@@ -1847,7 +1841,7 @@
                 title: i18n('Promo printemps -15% pneumatiques'),
                 description: i18n('Offre spéciale jusqu\'au 30 mai sur tous les pneumatiques.'),
                 status: VIDEO_STATUS.ACTIVE,
-                publishedAt: '2026-04-01T10:00:00.000Z', addedAt: '2026-04-01T09:55:00.000Z', order: 2
+                publishedAt: '2026-04-01T10:00:00.000Z', addedAt: '2026-04-01T09:55:00.000Z'
               },
               // Video signaled and rejected by admin (kept but hidden)
               {
@@ -1858,7 +1852,7 @@
                 title: i18n('Test live nouvelle Volkswagen Polo'),
                 description: i18n('Essai en direct de la nouvelle Polo dans nos locaux.'),
                 status: VIDEO_STATUS.REJECTED,  // signaled by user, hidden but kept
-                publishedAt: '2026-03-12T10:00:00.000Z', addedAt: '2026-03-12T09:55:00.000Z', order: 3
+                publishedAt: '2026-03-12T10:00:00.000Z', addedAt: '2026-03-12T09:55:00.000Z'
               }
             ]
           },
@@ -2110,7 +2104,7 @@
                 title: i18n('5 conseils pour réussir une certification PMP'),
                 description: i18n('Notre formateur senior partage ses meilleurs conseils.'),
                 status: VIDEO_STATUS.ACTIVE,
-                publishedAt: '2026-02-10T10:00:00.000Z', addedAt: '2026-02-10T09:55:00.000Z', order: 1
+                publishedAt: '2026-02-10T10:00:00.000Z', addedAt: '2026-02-10T09:55:00.000Z'
               },
               {
                 id: 'v-c-009-2', source: VIDEO_SOURCE.VIMEO, videoId: '347119375',
@@ -2120,7 +2114,7 @@
                 title: i18n('Cérémonie de remise des certifications 2025'),
                 description: i18n('Retour sur la cérémonie de remise des certifications 2025.'),
                 status: VIDEO_STATUS.ACTIVE,
-                publishedAt: '2025-12-20T10:00:00.000Z', addedAt: '2025-12-20T09:55:00.000Z', order: 2
+                publishedAt: '2025-12-20T10:00:00.000Z', addedAt: '2025-12-20T09:55:00.000Z'
               }
             ]
           },
@@ -2273,7 +2267,7 @@
                 title: i18n('Visite atelier TextilTunis'),
                 description: i18n('Visite guidée de notre atelier de confection.'),
                 status: VIDEO_STATUS.PENDING,
-                publishedAt: null, addedAt: '2026-04-05T09:55:00.000Z', order: 1
+                publishedAt: null, addedAt: '2026-04-05T09:55:00.000Z'
               }
             ]
           },

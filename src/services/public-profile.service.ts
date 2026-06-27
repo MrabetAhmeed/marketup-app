@@ -84,7 +84,6 @@ export interface PublicTraceUpProfile {
     title: string;
     description: string;
     publishedAt: string | null;
-    order: number;
   }[];
   rseReceipts: PublicRseReceipt[];
 }
@@ -266,7 +265,11 @@ export async function getPublicProfileBySlug(
   if (type === "traceup") {
     const videos = ((data.videos as Array<Record<string, unknown>>) ?? [])
       .filter((v) => v.status === "active")
-      .sort((a, b) => ((a.order as number) ?? 0) - ((b.order as number) ?? 0));
+      .sort((a, b) => {
+        const dateA = a.publishedAt ? new Date(a.publishedAt as string).getTime() : 0;
+        const dateB = b.publishedAt ? new Date(b.publishedAt as string).getTime() : 0;
+        return dateB - dateA;
+      });
 
     return {
       company: companyBase,
@@ -281,7 +284,6 @@ export async function getPublicProfileBySlug(
         title: pickLocale(v.title as { fr: string; ar?: string; en?: string }, lang),
         description: pickLocale(v.description as { fr: string; ar?: string; en?: string }, lang),
         publishedAt: v.publishedAt ? new Date(v.publishedAt as string).toISOString() : null,
-        order: (v.order as number) ?? 0,
       })),
       rseReceipts,
     };

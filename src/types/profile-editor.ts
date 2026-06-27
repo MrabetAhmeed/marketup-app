@@ -47,7 +47,6 @@ export interface VideoItem {
   description: string;
   status: "pending" | "active" | "rejected";
   publishedAt: string | null;
-  order: number;
 }
 
 export interface TraceUpEditorData {

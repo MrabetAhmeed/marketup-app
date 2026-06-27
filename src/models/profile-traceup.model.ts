@@ -28,7 +28,6 @@ const VideoSchema = new Schema(
     description: { type: I18nStringSchema, default: () => ({ fr: "", ar: "", en: "" }) },
     status: { type: String, enum: ["pending", "active", "rejected"], default: "active" },
     publishedAt: { type: Date, default: null },
-    order: { type: Number, default: 0 },
   },
   { _id: false },
 );

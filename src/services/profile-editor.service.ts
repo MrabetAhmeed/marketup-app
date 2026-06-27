@@ -169,11 +169,14 @@ function buildTraceUp(
     description: pickLocale(v.description, lang),
     status: v.status ?? "active",
     publishedAt: v.publishedAt ? new Date(v.publishedAt).toISOString() : null,
-    order: v.order ?? 0,
   }));
 
-  // Sort videos by order within each category
-  videos.sort((a, b) => a.order - b.order);
+  // Sort videos by publishedAt DESC (most recent first)
+  videos.sort((a, b) => {
+    const dateA = a.publishedAt ? new Date(a.publishedAt).getTime() : 0;
+    const dateB = b.publishedAt ? new Date(b.publishedAt).getTime() : 0;
+    return dateB - dateA;
+  });
 
   return {
     kind: "traceup",

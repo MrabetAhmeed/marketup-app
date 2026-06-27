@@ -100,7 +100,7 @@ export interface VideoItemAdmin {
   category: string;
   title: string;
   description: string;
-  order: number;
+  publishedAt: string | null;
 }
 
 export interface ProfileForAdminReview {
@@ -178,9 +178,13 @@ export async function getProfileForAdminReview(
       category: v.category ?? "",
       title: pickLocale(v.title, lang),
       description: pickLocale(v.description, lang),
-      order: v.order ?? 0,
+      publishedAt: v.publishedAt ? new Date(v.publishedAt).toISOString() : null,
     }))
-    .sort((a: VideoItemAdmin, b: VideoItemAdmin) => a.order - b.order);
+    .sort((a: VideoItemAdmin, b: VideoItemAdmin) => {
+      const dateA = a.publishedAt ? new Date(a.publishedAt).getTime() : 0;
+      const dateB = b.publishedAt ? new Date(b.publishedAt).getTime() : 0;
+      return dateB - dateA;
+    });
 
   // LinkUP fields
   const socials = (data.socials ?? []).map((s: any) => ({

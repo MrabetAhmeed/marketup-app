@@ -53,9 +53,6 @@ export async function createVideo(
   const canonicalUrl = buildVideoUrl(platform, videoId);
   const metadata = await fetchVideoMetadata(platform, canonicalUrl, videoId);
 
-  const currentVideos: any[] = profile.data?.videos ?? [];
-  const categoryVideos = currentVideos.filter((v: any) => v.category === parsed.category);
-
   const video = {
     id: crypto.randomUUID(),
     source: platform,
@@ -67,7 +64,6 @@ export async function createVideo(
     description: { fr: parsed.description, ar: "", en: "" },
     status: "active",
     publishedAt: new Date(),
-    order: categoryVideos.length,
   };
 
   await TraceUpModel.findByIdAndUpdate(profileId, {

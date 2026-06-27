@@ -30,7 +30,6 @@ describe("TraceUp — videos direct CRUD (no pendingData)", () => {
       videoId: "abc123",
       category: "actualite",
       title: { fr: "Test video", ar: "", en: "" },
-      order: 1,
     });
     await doc.save();
 
@@ -46,8 +45,8 @@ describe("TraceUp — videos direct CRUD (no pendingData)", () => {
       companyId: new Types.ObjectId(),
       data: {
         videos: [
-          { id: "v-1", source: "youtube", videoId: "aaa", category: "actualite", title: { fr: "A", ar: "", en: "" }, order: 1 },
-          { id: "v-2", source: "vimeo", videoId: "bbb", category: "offres", title: { fr: "B", ar: "", en: "" }, order: 2 },
+          { id: "v-1", source: "youtube", videoId: "aaa", category: "actualite", title: { fr: "A", ar: "", en: "" } },
+          { id: "v-2", source: "vimeo", videoId: "bbb", category: "offres", title: { fr: "B", ar: "", en: "" } },
         ],
       },
     });
