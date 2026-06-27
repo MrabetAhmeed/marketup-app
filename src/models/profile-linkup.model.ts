@@ -14,7 +14,6 @@ const LinkUpSchema = new Schema(
   {
     data: {
       contactCard: {
-        photo: { type: String, default: null },
         fullName: { type: String, default: null },
         title: { type: I18nStringSchema, default: () => ({ fr: "", ar: "", en: "" }) },
         company: { type: I18nStringSchema, default: () => ({ fr: "", ar: "", en: "" }) },

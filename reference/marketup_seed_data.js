@@ -131,11 +131,6 @@
     return `https://picsum.photos/seed/${companyId}-brandup-img-${n}/800/600`;
   }
 
-  /** DiceBear avataaars contact photo. */
-  function avatarUrl(name) {
-    return `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(name)}`;
-  }
-
   /** YouTube thumbnail URL from videoId. */
   function ytThumb(videoId) {
     return `https://img.youtube.com/vi/${videoId}/hqdefault.jpg`;
@@ -384,7 +379,6 @@
       linkup: {
         // Explicit list of required field paths (relative to profile.data)
         requiredFields: [
-          'contactCard.photo',
           'contactCard.fullName',
           'contactCard.title',
           'contactCard.company',
@@ -666,7 +660,6 @@
           status: PROFILE_STATUS.ACTIVE,
           data: {
             contactCard: {
-              photo: avatarUrl('Ahmed Mrabet'),
               fullName: 'Ahmed Mrabet',
               title: i18n('Directeur Général'),
               company: i18n('TechnoFab Industries'),
@@ -1088,7 +1081,6 @@
           status: PROFILE_STATUS.ACTIVE,
           data: {
             contactCard: {
-              photo: avatarUrl('Leila Karoui'),
               fullName: 'Leila Karoui',
               title: i18n('Directrice Associée'),
               company: i18n('MediaCom Communication'),
@@ -1252,7 +1244,6 @@
           status: PROFILE_STATUS.ACTIVE,
           data: {
             contactCard: {
-              photo: avatarUrl('Karim Slim'),
               fullName: 'Karim Slim',
               title: i18n('Fondateur & Gérant'),
               company: i18n('GreenLife'),
@@ -1408,7 +1399,6 @@
           status: PROFILE_STATUS.ACTIVE,
           data: {
             contactCard: {
-              photo: avatarUrl('Sami Bouazizi'),
               fullName: 'Sami Bouazizi',
               title: i18n('Directeur Général'),
               company: i18n('BuildTech Construction'),
@@ -1541,7 +1531,6 @@
           type: PROFILE_TYPE.LINKUP, status: PROFILE_STATUS.ACTIVE,
           data: {
             contactCard: {
-              photo: avatarUrl('Mehdi Trabelsi'),
               fullName: 'Mehdi Trabelsi',
               title: i18n('Chef & Propriétaire'),
               company: i18n('FoodCorner Restaurant'),
@@ -1706,7 +1695,6 @@
           type: PROFILE_TYPE.LINKUP, status: PROFILE_STATUS.ACTIVE,
           data: {
             contactCard: {
-              photo: avatarUrl('Salma Ben Aissa'),
               fullName: 'Salma Ben Aissa',
               title: i18n('Architecte fondatrice'),
               company: i18n('ArchStudio'),
@@ -1901,7 +1889,6 @@
           type: PROFILE_TYPE.LINKUP, status: PROFILE_STATUS.ACTIVE,
           data: {
             contactCard: {
-              photo: avatarUrl('Omar Belhaj'),
               fullName: 'Omar Belhaj',
               title: i18n('Directeur Commercial'),
               company: i18n('AutoPlus'),
@@ -2002,7 +1989,7 @@
           type: PROFILE_TYPE.LINKUP, status: PROFILE_STATUS.INCOMPLETE,
           data: {
             contactCard: {
-              photo: null, fullName: '', title: i18nEmpty(), company: i18nEmpty(), bio: i18nEmpty(),
+              fullName: '', title: i18nEmpty(), company: i18nEmpty(), bio: i18nEmpty(),
               email: '', phone: '', whatsapp: '',
               website: null, address: '', gpsPosition: null
             },
@@ -2164,7 +2151,6 @@
           type: PROFILE_TYPE.LINKUP, status: PROFILE_STATUS.DISABLED,  // user deactivated
           data: {
             contactCard: {
-              photo: avatarUrl('Hatem Gharbi'),
               fullName: 'Hatem Gharbi',
               title: i18n('Directeur Pédagogique'),
               company: i18n('EduPro Formation'),
@@ -2319,7 +2305,6 @@
           type: PROFILE_TYPE.LINKUP, status: PROFILE_STATUS.ACTIVE,
           data: {
             contactCard: {
-              photo: avatarUrl('Ali Ben Amor'),
               fullName: 'Ali Ben Amor',
               title: i18n('Gérant'),
               company: i18n('TextilTunis'),
@@ -2336,10 +2321,10 @@
               { platform: 'twitter', url: null }, { platform: 'youtube', url: null }, { platform: 'tiktok', url: null }
             ]
           },
-          // pendingData : TextilTunis renouvelle la photo + le titre de son contact LinkUP
+          // pendingData : TextilTunis renouvelle le titre de son contact LinkUP
           pendingData: {
             submittedAt: '2026-04-23T17:45:00.000Z',
-            note: i18n('Nouvelle photo professionnelle suite à la prise de fonction comme PDG.'),
+            note: i18n('Mise à jour suite à la prise de fonction comme PDG.'),
             fields: [
               { key: 'title',    label: 'Titre du contact',  currentValue: 'Gérant',                                                            newValue: 'Président Directeur Général' },
               { key: 'bio',      label: 'Biographie',         currentValue: '25 ans d\'expérience dans le textile tunisien.',                    newValue: '25 ans d\'expérience dans le textile tunisien. PDG depuis 2026 — pilotage de la transformation export du groupe.' },

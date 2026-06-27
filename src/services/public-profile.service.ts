@@ -93,7 +93,6 @@ export interface PublicLinkUpProfile {
   company: PublicCompanyBase;
   kind: "linkup";
   contactCard: {
-    photo: string | null;
     fullName: string | null;
     title: string;
     company: string;
@@ -312,7 +311,6 @@ export async function getPublicProfileBySlug(
     company: companyBase,
     kind: "linkup",
     contactCard: {
-      photo: (contactCard.photo as string) ?? null,
       fullName: (contactCard.fullName as string) ?? null,
       title: pickLocale(contactCard.title as { fr: string; ar?: string; en?: string }, lang),
       company: pickLocale(contactCard.company as { fr: string; ar?: string; en?: string }, lang),
