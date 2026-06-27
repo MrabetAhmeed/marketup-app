@@ -348,9 +348,36 @@ describe("Auth Service", () => {
     expect(sendOtpEmail).not.toHaveBeenCalled();
   });
 
-  // === (o) LinkUP contactCard init — fullName ===
-  it("verifyOtp creates LinkUP with contactCard.fullName = FirstName LastName", async () => {
-    const userId = await doFullSignup("linkup-init@example.tn");
+  // === (o) signupUser writes Company.ownerFullName ===
+  it("signupUser writes Company.ownerFullName = FirstName LastName", async () => {
+    const companyResult = await signupCompany({
+      type: "B2B",
+      displayName: "OwnerName Co",
+      legalId: "ON00001",
+      accountEmail: "owner-name@example.tn",
+      sectorId: "mecanique",
+      gouvernorat: "sousse",
+      ville: "Sousse",
+    });
+
+    await signupUser({
+      userId: companyResult.userId,
+      firstName: "Ahmed",
+      lastName: "Mrabet",
+      phone: "+21620123456",
+      whatsapp: "+21620123456",
+      languages: ["fr"],
+      password: "Password1!",
+      acceptedTermsAt: new Date().toISOString(),
+    });
+
+    const company = await CompanyModel.findById(companyResult.companyId).lean();
+    expect(company.ownerFullName).toBe("Ahmed Mrabet");
+  });
+
+  // === (p) verifyOtp creates LinkUP with empty data (no contactCard) ===
+  it("verifyOtp creates LinkUP with data: {} (no contactCard)", async () => {
+    const userId = await doFullSignup("linkup-empty@example.tn");
     const otp = getLastOtp();
     await verifyOtp({ userId, otpCode: otp });
 
@@ -360,49 +387,17 @@ describe("Auth Service", () => {
     }).lean();
 
     expect(linkup).toBeTruthy();
-    expect(linkup.data.contactCard.fullName).toBe("Ahmed Test");
+    expect(linkup.data.contactCard).toBeUndefined();
   });
 
-  // === (p) LinkUP contactCard init — company.fr ===
-  it("verifyOtp creates LinkUP with contactCard.company.fr = displayName", async () => {
-    const userId = await doFullSignup("linkup-co@example.tn");
-    const otp = getLastOtp();
-    await verifyOtp({ userId, otpCode: otp });
-
-    const linkup = await ProfileModel.findOne({
-      companyId: (await UserModel.findById(userId)).companyId,
-      kind: "linkup",
-    }).lean();
-
-    expect(linkup.data.contactCard.company.fr).toBe("Test Company");
-  });
-
-  // === (q) LinkUP contactCard init — email fallback ===
-  it("verifyOtp creates LinkUP with contactCard.email = liveData.contactEmail", async () => {
-    const userId = await doFullSignup("linkup-email@example.tn");
-    const otp = getLastOtp();
-    await verifyOtp({ userId, otpCode: otp });
-
-    const linkup = await ProfileModel.findOne({
-      companyId: (await UserModel.findById(userId)).companyId,
-      kind: "linkup",
-    }).lean();
-
-    // signupCompany sets liveData.contactEmail = accountEmail
-    expect(linkup.data.contactCard.email).toBe("linkup-email@example.tn");
-  });
-
-  // === (r) Login lazy filet applies same init ===
-  it("login lazy filet creates LinkUP with contactCard pre-filled", async () => {
+  // === (q) login lazy filet creates LinkUP with empty data ===
+  it("login lazy filet creates LinkUP with data: {} (idempotent)", async () => {
     const userId = await doFullSignup("lazy@example.tn");
     const otp = getLastOtp();
     await verifyOtp({ userId, otpCode: otp });
 
-    // Activate company for login
     const user = await UserModel.findById(userId);
     await CompanyModel.updateOne({ _id: user.companyId }, { $set: { status: "active" } });
-
-    // Delete LinkUP profile to trigger lazy filet
     await ProfileModel.deleteOne({ companyId: user.companyId, kind: "linkup" });
 
     await login("lazy@example.tn", "Password1!");
@@ -413,39 +408,7 @@ describe("Auth Service", () => {
     }).lean();
 
     expect(linkup).toBeTruthy();
-    expect(linkup.data.contactCard.fullName).toBe("Ahmed Test");
-    expect(linkup.data.contactCard.company.fr).toBe("Test Company");
-    expect(linkup.data.contactCard.email).toBe("lazy@example.tn");
-  });
-
-  // === (s) BrandUP and TraceUP keep empty data ===
-  it("verifyOtp creates BrandUP and TraceUP with data: {}", async () => {
-    const userId = await doFullSignup("empty-data@example.tn");
-    const otp = getLastOtp();
-    await verifyOtp({ userId, otpCode: otp });
-
-    const user = await UserModel.findById(userId);
-    const brandup = await ProfileModel.findOne({ companyId: user.companyId, kind: "brandup" }).lean();
-    const traceup = await ProfileModel.findOne({ companyId: user.companyId, kind: "traceup" }).lean();
-
-    // BrandUP data should have discriminator defaults but no contactCard
-    expect(brandup.data.contactCard).toBeUndefined();
-    // TraceUP data should have discriminator defaults but no contactCard
-    expect(traceup.data.contactCard).toBeUndefined();
-  });
-
-  // === (t) contactCard.photo does not exist ===
-  it("verifyOtp creates LinkUP without contactCard.photo", async () => {
-    const userId = await doFullSignup("no-photo@example.tn");
-    const otp = getLastOtp();
-    await verifyOtp({ userId, otpCode: otp });
-
-    const linkup = await ProfileModel.findOne({
-      companyId: (await UserModel.findById(userId)).companyId,
-      kind: "linkup",
-    }).lean();
-
-    expect(linkup.data.contactCard.photo).toBeUndefined();
+    expect(linkup.data.contactCard).toBeUndefined();
   });
 
   // === (u) signupUser writes phone + whatsapp to Company.liveData ===
@@ -483,21 +446,6 @@ describe("Auth Service", () => {
     expect(user.phone).toBeUndefined();
   });
 
-  // === (w) verifyOtp creates LinkUP with contactCard.phone from liveData ===
-  it("verifyOtp creates LinkUP with contactCard.phone from Company.liveData", async () => {
-    const userId = await doFullSignup("linkup-phone@example.tn");
-    const otp = getLastOtp();
-    await verifyOtp({ userId, otpCode: otp });
-
-    const user = await UserModel.findById(userId);
-    const linkup = await ProfileModel.findOne({
-      companyId: user.companyId,
-      kind: "linkup",
-    }).lean();
-
-    expect(linkup.data.contactCard.phone).toBe("+21620123456");
-    expect(linkup.data.contactCard.whatsapp).toBe("+21620123456");
-  });
 
   // === (x) Zod SignupUserSchema rejects missing phone ===
   it("signupUser rejects missing phone via service interface", async () => {

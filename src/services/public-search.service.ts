@@ -373,17 +373,12 @@ export async function searchLinkUp(
     const regexes = buildAndRegex(filters.q);
     filtered = pairs.filter(({ company, profile }) => {
       const cAny = company as Record<string, unknown>;
-      const pData = (profile as Record<string, unknown>).data as Record<string, unknown>;
       const sectorName = sectorMap.get((cAny.liveData as Record<string, unknown>).sectorId as string) ?? "";
-      const card = (pData?.contactCard as Record<string, unknown>) ?? {};
 
       const haystack = normalize([
         pickLocale((cAny.data as Record<string, unknown>)?.displayName as { fr: string } | undefined, lang),
         sectorName,
-        card.fullName as string ?? "",
-        pickLocale(card.title as { fr: string } | undefined, lang),
-        pickLocale(card.bio as { fr: string } | undefined, lang),
-        pickLocale(card.company as { fr: string } | undefined, lang),
+        (cAny.ownerFullName as string) ?? "",
       ].join(" "));
 
       return regexes.every((r) => r.test(haystack));
@@ -420,17 +415,14 @@ export async function searchLinkUp(
     const cAny = company as Record<string, unknown>;
     const cData = cAny.data as Record<string, unknown>;
     const liveData = cAny.liveData as Record<string, unknown>;
-    const pData = (profile as Record<string, unknown>).data as Record<string, unknown>;
-    const card = (pData?.contactCard as Record<string, unknown>) ?? {};
-
-    // Description: BrandUP pitch fallback, then "Carte de contact — fullName"
+    // Description: BrandUP pitch fallback, then "Carte de contact"
     let pitch = "";
     if (brandupProfile) {
       const bpData = brandupProfile.data as Record<string, unknown>;
       pitch = pickLocale(bpData?.pitch as { fr: string } | undefined, lang);
     }
-    if (!pitch && card.fullName) {
-      pitch = `Carte de contact — ${card.fullName as string}`;
+    if (!pitch) {
+      pitch = "Carte de contact";
     }
 
     return {

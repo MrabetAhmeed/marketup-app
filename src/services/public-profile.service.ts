@@ -91,18 +91,6 @@ export interface PublicTraceUpProfile {
 export interface PublicLinkUpProfile {
   company: PublicCompanyBase;
   kind: "linkup";
-  contactCard: {
-    fullName: string | null;
-    title: string;
-    company: string;
-    bio: string;
-    email: string | null;
-    phone: string | null;
-    whatsapp: string | null;
-    website: string | null;
-    address: string | null;
-    gpsPosition: { type: string; coordinates: number[] } | null;
-  };
   socials: { platform: string; url: string | null }[];
   rseReceipts: PublicRseReceipt[];
   siblingProfiles: { brandup: boolean; traceup: boolean };
@@ -290,7 +278,6 @@ export async function getPublicProfileBySlug(
   }
 
   // linkup
-  const contactCard = (data.contactCard as Record<string, unknown>) ?? {};
   const socials = (data.socials as Array<Record<string, unknown>>) ?? [];
 
   // Check sibling profile visibility
@@ -312,18 +299,6 @@ export async function getPublicProfileBySlug(
   return {
     company: companyBase,
     kind: "linkup",
-    contactCard: {
-      fullName: (contactCard.fullName as string) ?? null,
-      title: pickLocale(contactCard.title as { fr: string; ar?: string; en?: string }, lang),
-      company: pickLocale(contactCard.company as { fr: string; ar?: string; en?: string }, lang),
-      bio: pickLocale(contactCard.bio as { fr: string; ar?: string; en?: string }, lang),
-      email: (contactCard.email as string) ?? null,
-      phone: (contactCard.phone as string) ?? null,
-      whatsapp: (contactCard.whatsapp as string) ?? null,
-      website: (contactCard.website as string) ?? null,
-      address: (contactCard.address as string) ?? null,
-      gpsPosition: (contactCard.gpsPosition as { type: string; coordinates: number[] }) ?? null,
-    },
     socials: socials.map((s) => ({
       platform: s.platform as string,
       url: (s.url as string) ?? null,

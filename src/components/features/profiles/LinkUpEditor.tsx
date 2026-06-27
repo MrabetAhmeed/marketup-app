@@ -278,46 +278,6 @@ export function LinkUpEditor({ profile, company }: LinkUpEditorProps): JSX.Eleme
         </div>
       </section>
 
-      {/* ═══ SECTION: LIENS OBLIGATOIRES ═══ */}
-      <section className="card p-5 md:p-6">
-        <div className="flex items-start justify-between mb-5 flex-wrap gap-2">
-          <div>
-            <h3 className="font-heading font-bold text-[15px] text-ink-primary">Liens obligatoires</h3>
-            <p className="text-[12px] text-ink-secondary mt-0.5 leading-snug">Indispensables pour publier votre profil LinkUP</p>
-          </div>
-          <span className="inline-flex items-center gap-1 text-[10px] font-semibold text-status-active-fg bg-status-active-bg border border-status-active-border px-2 py-1 rounded shrink-0">
-            <span className="material-symbols-outlined icon-fill" style={{ fontSize: 12 }}>check_circle</span>
-            Tous renseignés
-          </span>
-        </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-          <div>
-            <label className="field-label flex items-center gap-2">
-              <span className="inline-flex items-center justify-center w-5 h-5 rounded bg-status-active-bg border border-status-active-border shrink-0">
-                <span className="material-symbols-outlined icon-fill text-status-active-fg" style={{ fontSize: 13 }}>chat</span>
-              </span>
-              WhatsApp <span className="text-[#B91C1C] font-bold ml-0.5">*</span>
-            </label>
-            <div className="relative">
-              <span className="absolute left-3 top-1/2 -translate-y-1/2 material-symbols-outlined text-ink-tertiary pointer-events-none" style={{ fontSize: 16 }}>chat</span>
-              <input type="url" readOnly value={profile.data.contactCard.whatsapp ?? ""} className="field-input pl-9" />
-            </div>
-          </div>
-          <div>
-            <label className="field-label flex items-center gap-2">
-              <span className="inline-flex items-center justify-center w-5 h-5 rounded bg-status-active-bg border border-status-active-border shrink-0">
-                <span className="material-symbols-outlined icon-fill text-status-active-fg" style={{ fontSize: 13 }}>location_on</span>
-              </span>
-              Position GPS (Google Maps) <span className="text-[#B91C1C] font-bold ml-0.5">*</span>
-            </label>
-            <div className="relative">
-              <span className="absolute left-3 top-1/2 -translate-y-1/2 material-symbols-outlined text-ink-tertiary pointer-events-none" style={{ fontSize: 16 }}>location_on</span>
-              <input type="url" readOnly value={profile.data.contactCard.gpsUrl ?? ""} className="field-input pl-9" />
-            </div>
-          </div>
-        </div>
-      </section>
-
       {/* ═══ SECTION: LIENS OPTIONNELS ═══ */}
       <section className="card p-5 md:p-6">
         <div className="flex items-start justify-between mb-5 flex-wrap gap-2">

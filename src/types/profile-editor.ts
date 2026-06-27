@@ -84,11 +84,6 @@ export interface LinkUpEditorData {
   boosted: boolean;
   sponsoring: boolean;
   data: {
-    contactCard: {
-      whatsapp: string | null;
-      gpsUrl: string | null;
-      website: string | null;
-    };
     socials: SocialLink[];
     qrConfig: {
       style: string;

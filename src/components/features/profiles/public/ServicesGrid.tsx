@@ -8,20 +8,15 @@ interface Social {
   url: string | null;
 }
 
-interface ContactCard {
-  website: string | null;
-  phone: string | null;
-  whatsapp: string | null;
-  gpsPosition: { type: string; coordinates: number[] } | null;
-}
-
 interface ServicesGridProps {
   slug: string;
-  contactCard: ContactCard;
   socials: Social[];
   siblingProfiles: { brandup: boolean; traceup: boolean };
   companyWhatsapp?: string | null;
   companyPhone?: string | null;
+  companyAddress?: string | null;
+  companyVille?: string | null;
+  companyGouvernoratName?: string | null;
 }
 
 interface ServiceDef {
@@ -38,15 +33,13 @@ function getWhatsAppLink(phone: string | null): string | null {
   return digits ? `https://wa.me/${digits}` : null;
 }
 
-function getMapsLink(card: ContactCard): string | null {
-  if (card.gpsPosition?.coordinates) {
-    const [lng, lat] = card.gpsPosition.coordinates;
-    if (lat && lng) return `https://www.google.com/maps?q=${lat},${lng}`;
-  }
-  return null;
+function getMapsLink(address: string | null, ville: string | null, gouvernorat: string | null): string | null {
+  const parts = [address, ville, gouvernorat].filter(Boolean).join(", ");
+  if (!parts) return null;
+  return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(parts)}`;
 }
 
-export default function ServicesGrid({ slug, contactCard, socials, siblingProfiles, companyWhatsapp, companyPhone }: ServicesGridProps): JSX.Element {
+export default function ServicesGrid({ slug, socials, siblingProfiles, companyWhatsapp, companyPhone, companyAddress, companyVille, companyGouvernoratName }: ServicesGridProps): JSX.Element {
   const socialUrl = (platform: string): string | null => {
     const s = socials.find((x) => x.platform === platform);
     return s?.url ?? null;
@@ -55,14 +48,14 @@ export default function ServicesGrid({ slug, contactCard, socials, siblingProfil
   const services: ServiceDef[] = [
     { key: "brandup", label: "BrandUP", icon: FaLayerGroup, href: siblingProfiles.brandup ? `/brandup/${slug}` : null, external: false },
     { key: "traceup", label: "TraceUP", icon: FaCirclePlay, href: siblingProfiles.traceup ? `/traceup/${slug}` : null, external: false },
-    { key: "website", label: "Site Web", icon: FaGlobe, href: socialUrl("website") ?? contactCard.website, external: true },
-    { key: "whatsapp", label: "WhatsApp", icon: FaWhatsapp, href: getWhatsAppLink(companyWhatsapp ?? companyPhone ?? contactCard.whatsapp ?? contactCard.phone), external: true },
+    { key: "website", label: "Site Web", icon: FaGlobe, href: socialUrl("website"), external: true },
+    { key: "whatsapp", label: "WhatsApp", icon: FaWhatsapp, href: getWhatsAppLink(companyWhatsapp ?? companyPhone ?? null), external: true },
     { key: "youtube", label: "YouTube", icon: FaYoutube, href: socialUrl("youtube"), external: true },
     { key: "facebook", label: "Facebook", icon: FaFacebook, href: socialUrl("facebook"), external: true },
     { key: "instagram", label: "Instagram", icon: FaInstagram, href: socialUrl("instagram"), external: true },
     { key: "linkedin", label: "LinkedIn", icon: FaLinkedin, href: socialUrl("linkedin"), external: true },
     { key: "twitter", label: "Twitter", icon: FaXTwitter, href: socialUrl("twitter") ?? socialUrl("x"), external: true },
-    { key: "maps", label: "Maps", icon: FaLocationDot, href: getMapsLink(contactCard), external: true },
+    { key: "maps", label: "Maps", icon: FaLocationDot, href: getMapsLink(companyAddress ?? null, companyVille ?? null, companyGouvernoratName ?? null), external: true },
   ].filter((s) => s.href != null);
 
   if (services.length === 0) return <></>;

@@ -841,6 +841,7 @@ async function seedCompanies(
       rseBadgeStatus: c.rseBadgeStatus,
       rseBadgeValidatedAt: c.rseBadgeValidatedAt ?? null,
       ownerUserId: userId,
+      ownerFullName: `${c.user.firstName} ${c.user.lastName}`.trim(),
     });
     const companyId = company._id as Types.ObjectId;
 

@@ -194,32 +194,15 @@ function buildLinkUp(
   company?: any,
 ): LinkUpEditorData {
   const data = profile.data ?? {};
-  const contactCard = data.contactCard ?? {};
-  const liveData = company?.liveData ?? {};
   const socials: SocialLink[] = (data.socials ?? []).map((s: any) => ({
     platform: s.platform,
     url: s.url ?? null,
   }));
 
-  // GPS: extract a maps URL from coordinates if available
-  let gpsUrl: string | null = null;
-  if (contactCard.gpsPosition?.coordinates) {
-    const [lng, lat] = contactCard.gpsPosition.coordinates;
-    if (lat && lng) {
-      gpsUrl = `https://maps.google.com/?q=${lat},${lng}`;
-    }
-  }
-
   return {
     kind: "linkup",
     ...base,
     data: {
-      contactCard: {
-        // Bug C fix: phone/whatsapp/email/address from company.liveData (canon source)
-        whatsapp: liveData.whatsapp ?? contactCard.whatsapp ?? null,
-        gpsUrl,
-        website: contactCard.website ?? null,
-      },
       socials,
       qrConfig: {
         style: data.qrConfig?.style ?? "rounded",

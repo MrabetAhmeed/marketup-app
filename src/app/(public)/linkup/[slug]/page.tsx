@@ -16,9 +16,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const { slug } = await params;
   try {
     const data = await getPublicProfileBySlug("linkup", slug) as PublicLinkUpProfile;
-    const description = data.contactCard.fullName
-      ? `${data.contactCard.fullName} — ${data.company.displayName} sur MARKET-UP`
-      : `${data.company.displayName} sur MARKET-UP`;
+    const description = `${data.company.displayName} · ${data.company.sectorName} · ${data.company.ville} — MARKET-UP`;
     return {
       title: `${data.company.displayName} — MARKET-UP`,
       description,

@@ -46,15 +46,11 @@ describe("Profile model — discriminators", () => {
     const doc = await LinkUp.create({
       companyId,
       data: {
-        contactCard: {
-          fullName: "Test User",
-          email: "test@test.tn",
-          phone: "+216 71 000 000",
-        },
+        socials: [],
       },
     });
     expect(doc.kind).toBe("linkup");
-    expect(doc.data.contactCard.fullName).toBe("Test User");
+    expect(doc.data.contactCard).toBeUndefined();
   });
 
   it("the (companyId, kind) compound index is unique", async () => {

@@ -88,7 +88,6 @@ export default async function ProfileReviewPage({ params }: PageProps): Promise<
       {profile.kind === "linkup" && (
         <LinkUpContent
           socials={profile.socials}
-          contactCard={profile.contactCard}
         />
       )}
 
@@ -278,25 +277,15 @@ function TraceUpContent({
 
 function LinkUpContent({
   socials,
-  contactCard,
 }: {
   socials: Array<{ platform: string; url: string | null }>;
-  contactCard: { whatsapp: string | null; website: string | null };
 }): JSX.Element {
   return (
     <section className="bg-white border border-surface-border rounded-lg overflow-hidden">
       <div className="px-5 py-4 border-b border-surface-border">
-        <h2 className="font-heading font-bold text-[15px] text-ink-primary">Carte de contact</h2>
+        <h2 className="font-heading font-bold text-[15px] text-ink-primary">Réseaux sociaux</h2>
       </div>
       <div className="divide-y divide-surface-border">
-        <div className="px-5 py-3 flex items-start gap-4">
-          <span className="text-[12px] font-semibold text-ink-tertiary w-[160px] shrink-0 pt-0.5">WhatsApp</span>
-          <span className="text-[13px] text-ink-primary">{contactCard.whatsapp || "Non renseigné"}</span>
-        </div>
-        <div className="px-5 py-3 flex items-start gap-4">
-          <span className="text-[12px] font-semibold text-ink-tertiary w-[160px] shrink-0 pt-0.5">Site web</span>
-          <span className="text-[13px] text-ink-primary">{contactCard.website || "Non renseigné"}</span>
-        </div>
         {socials.length > 0 && (
           <div className="px-5 py-3">
             <div className="text-[12px] font-semibold text-ink-tertiary mb-2">Réseaux sociaux</div>

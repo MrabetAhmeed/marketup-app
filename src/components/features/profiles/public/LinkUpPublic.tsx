@@ -37,11 +37,13 @@ export default function LinkUpPublic({ data, embedded }: LinkUpPublicProps): JSX
 
         <ServicesGrid
           slug={c.slug}
-          contactCard={data.contactCard}
           socials={data.socials}
           siblingProfiles={data.siblingProfiles}
           companyWhatsapp={c.whatsapp}
           companyPhone={c.phone}
+          companyAddress={c.address}
+          companyVille={c.ville}
+          companyGouvernoratName={c.gouvernoratName}
         />
 
         <RseSection receipts={data.rseReceipts} />

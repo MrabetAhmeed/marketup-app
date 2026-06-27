@@ -53,32 +53,6 @@ function maskEmail(email: string): string {
   return `${visible}***@${domain}`;
 }
 
-/**
- * Build initial LinkUP contactCard data from User + Company.
- * Called at verifyOtp and login lazy filet so new LinkUP profiles
- * are pre-filled instead of empty.
- */
-function buildLinkupInitialData(user: any, company: any): Record<string, unknown> {
-  return {
-    contactCard: {
-      fullName: `${user.firstName ?? ""} ${user.lastName ?? ""}`.trim() || null,
-      company: {
-        fr: company?.data?.displayName?.fr ?? "",
-        ar: "",
-        en: "",
-      },
-      title: { fr: "", ar: "", en: "" },
-      bio: { fr: "", ar: "", en: "" },
-      email: company?.liveData?.contactEmail ?? company?.accountEmail ?? null,
-      phone: company?.liveData?.phone ?? null,
-      whatsapp: company?.liveData?.whatsapp ?? null,
-      website: null,
-      address: company?.liveData?.address ?? null,
-      gpsPosition: null,
-    },
-  };
-}
-
 // ---------------------------------------------------------------------------
 // Step 1: Signup Company
 // ---------------------------------------------------------------------------
@@ -265,11 +239,12 @@ export async function signupUser(input: SignupUserInput): Promise<SignupUserResu
   user.otpLastSentAt = new Date();
   await user.save();
 
-  // Write phone + whatsapp to Company.liveData (source of truth for contact info)
+  // Write phone + whatsapp to Company.liveData + ownerFullName (denormalized for search)
   await CompanyModel.findByIdAndUpdate(user.companyId, {
     $set: {
       "liveData.phone": input.phone,
       "liveData.whatsapp": input.whatsapp,
+      ownerFullName: `${input.firstName} ${input.lastName}`.trim(),
     },
   });
 
@@ -339,17 +314,14 @@ export async function verifyOtp(input: VerifyOtpInput): Promise<VerifyOtpResult>
   user.otpLastSentAt = null;
   await user.save();
 
-  // Load company before creating profiles (needed for LinkUP contactCard init)
-  const company = await CompanyModel.findById(user.companyId);
-
-  // Create 3 profiles for the company via discriminator models
+  // Create 3 empty profiles for the company via discriminator models
   for (const kind of ["brandup", "traceup", "linkup"] as const) {
     try {
       await PROFILE_MODELS[kind].create({
         companyId: user.companyId,
         status: "incomplete",
         isPublic: true,
-        data: kind === "linkup" ? buildLinkupInitialData(user, company) : {},
+        data: {},
         stats: { viewsTotal: 0, views30d: 0, clicksTotal: 0 },
       });
     } catch (err: unknown) {
@@ -357,6 +329,8 @@ export async function verifyOtp(input: VerifyOtpInput): Promise<VerifyOtpResult>
       if (err instanceof Error && "code" in err && (err as any).code !== 11000) throw err;
     }
   }
+
+  const company = await CompanyModel.findById(user.companyId);
 
   return {
     user: {
@@ -442,7 +416,7 @@ export async function login(email: string, password: string): Promise<LoginResul
             companyId: company._id,
             status: "incomplete",
             isPublic: true,
-            data: kind === "linkup" ? buildLinkupInitialData(user, company) : {},
+            data: {},
             stats: { viewsTotal: 0, views30d: 0, clicksTotal: 0 },
           });
         } catch (err: unknown) {

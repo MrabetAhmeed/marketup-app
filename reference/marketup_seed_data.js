@@ -377,17 +377,7 @@
         videoDescriptionMaxLength: 280
       },
       linkup: {
-        // Explicit list of required field paths (relative to profile.data)
-        requiredFields: [
-          'contactCard.fullName',
-          'contactCard.title',
-          'contactCard.company',
-          'contactCard.email',
-          'contactCard.phone',
-          'contactCard.whatsapp',
-          'contactCard.address',
-          'contactCard.gpsPosition'
-        ]
+        // No required fields — contactCard removed in PP-5
       }
     },
     limits: {
@@ -652,18 +642,6 @@
           type: PROFILE_TYPE.LINKUP,
           status: PROFILE_STATUS.ACTIVE,
           data: {
-            contactCard: {
-              fullName: 'Ahmed Mrabet',
-              title: i18n('Directeur Général'),
-              company: i18n('TechnoFab Industries'),
-              bio: i18n('Passionné par l\'industrie 4.0 et la mécanique de précision. 20 ans d\'expérience dans le secteur. Disponible pour tout projet de partenariat industriel.'),
-              email: 'ahmed@technofab.tn',
-              phone: '+216 71 234 567',
-              whatsapp: '+216 71 234 567',
-              website: 'https://technofab.tn',
-              address: 'Rue de l\'Industrie, ZI Sahline, Sousse',
-              gpsPosition: { type: 'Point', coordinates: [10.5907, 35.7628] }
-            },
             qrConfig: {
               style: 'rounded',
               colorForeground: '#000000',
@@ -1072,18 +1050,6 @@
           type: PROFILE_TYPE.LINKUP,
           status: PROFILE_STATUS.ACTIVE,
           data: {
-            contactCard: {
-              fullName: 'Leila Karoui',
-              title: i18n('Directrice Associée'),
-              company: i18n('MediaCom Communication'),
-              bio: i18n('15 ans d\'expérience en communication. Passionnée par les marques qui osent.'),
-              email: 'leila@mediacom.tn',
-              phone: '+216 71 555 100',
-              whatsapp: '+216 71 555 100',
-              website: 'https://mediacom.tn',
-              address: 'Avenue Habib Bourguiba, Tunis Centre',
-              gpsPosition: { type: 'Point', coordinates: [10.1815, 36.8065] }
-            },
             qrConfig: { style: 'rounded', colorForeground: '#000000', colorBackground: '#FFFFFF', logoOverlay: true },
             socials: [
               { platform: 'linkedin', url: 'https://linkedin.com/in/leilakaroui' },
@@ -1234,18 +1200,6 @@
           type: PROFILE_TYPE.LINKUP,
           status: PROFILE_STATUS.ACTIVE,
           data: {
-            contactCard: {
-              fullName: 'Karim Slim',
-              title: i18n('Fondateur & Gérant'),
-              company: i18n('GreenLife'),
-              bio: i18n('Passionné par l\'alimentation saine et durable.'),
-              email: 'karim@greenlife.tn',
-              phone: '+216 73 411 222',
-              whatsapp: '+216 73 411 222',
-              website: 'https://greenlife.tn',
-              address: 'Avenue Mohamed V, Sousse',
-              gpsPosition: { type: 'Point', coordinates: [10.6411, 35.8254] }
-            },
             qrConfig: { style: 'square', colorForeground: '#10B981', colorBackground: '#FFFFFF', logoOverlay: true },
             socials: [
               { platform: 'instagram', url: 'https://instagram.com/greenlife.tn' },
@@ -1388,18 +1342,6 @@
           type: PROFILE_TYPE.LINKUP,
           status: PROFILE_STATUS.ACTIVE,
           data: {
-            contactCard: {
-              fullName: 'Sami Bouazizi',
-              title: i18n('Directeur Général'),
-              company: i18n('BuildTech Construction'),
-              bio: i18n('20 ans d\'expérience BTP en Tunisie.'),
-              email: 'sami@buildtech.tn',
-              phone: '+216 71 877 555',
-              whatsapp: '+216 71 877 555',
-              website: null,
-              address: 'Z.I. Charguia II, Tunis',
-              gpsPosition: { type: 'Point', coordinates: [10.2274, 36.8485] }
-            },
             qrConfig: { style: 'rounded', colorForeground: '#F59E0B', colorBackground: '#FFFFFF', logoOverlay: true },
             socials: [
               { platform: 'linkedin', url: 'https://linkedin.com/in/samibouazizi' },
@@ -1519,16 +1461,6 @@
         linkup: {
           type: PROFILE_TYPE.LINKUP, status: PROFILE_STATUS.ACTIVE,
           data: {
-            contactCard: {
-              fullName: 'Mehdi Trabelsi',
-              title: i18n('Chef & Propriétaire'),
-              company: i18n('FoodCorner Restaurant'),
-              bio: i18n('Passionné de cuisine tunisienne depuis 25 ans.'),
-              email: 'mehdi@foodcorner.tn', phone: '+216 74 222 100', whatsapp: '+216 74 222 100',
-              website: 'https://foodcorner.tn',
-              address: 'Avenue Hedi Chaker, Sfax',
-              gpsPosition: { type: 'Point', coordinates: [10.7603, 34.7406] }
-            },
             qrConfig: { style: 'rounded', colorForeground: '#EF4444', colorBackground: '#FFFFFF', logoOverlay: true },
             socials: [
               { platform: 'instagram', url: 'https://instagram.com/foodcorner.tn' },
@@ -1682,16 +1614,6 @@
         linkup: {
           type: PROFILE_TYPE.LINKUP, status: PROFILE_STATUS.ACTIVE,
           data: {
-            contactCard: {
-              fullName: 'Salma Ben Aissa',
-              title: i18n('Architecte fondatrice'),
-              company: i18n('ArchStudio'),
-              bio: i18n('Architecte DPLG · Diplômée ENSA Paris-La Villette.'),
-              email: 'salma@archstudio.tn', phone: '+216 71 333 100', whatsapp: '+216 71 333 100',
-              website: 'https://archstudio.tn',
-              address: 'Rue de Marseille, Tunis',
-              gpsPosition: { type: 'Point', coordinates: [10.1815, 36.8005] }
-            },
             qrConfig: { style: 'dots', colorForeground: '#8B5CF6', colorBackground: '#FFFFFF', logoOverlay: true },
             socials: [
               { platform: 'linkedin', url: 'https://linkedin.com/in/salmabenaissa' },
@@ -1875,16 +1797,6 @@
         linkup: {
           type: PROFILE_TYPE.LINKUP, status: PROFILE_STATUS.ACTIVE,
           data: {
-            contactCard: {
-              fullName: 'Omar Belhaj',
-              title: i18n('Directeur Commercial'),
-              company: i18n('AutoPlus'),
-              bio: i18n('15 ans dans la distribution automobile en Tunisie.'),
-              email: 'omar@autoplus.tn', phone: '+216 73 600 100', whatsapp: '+216 73 600 100',
-              website: 'https://autoplus.tn',
-              address: 'Route de Sahline, Sousse',
-              gpsPosition: { type: 'Point', coordinates: [10.6411, 35.8254] }
-            },
             qrConfig: { style: 'rounded', colorForeground: '#DC2626', colorBackground: '#FFFFFF', logoOverlay: true },
             socials: [
               { platform: 'linkedin', url: 'https://linkedin.com/in/omarbelhaj' },
@@ -1975,11 +1887,6 @@
         linkup: {
           type: PROFILE_TYPE.LINKUP, status: PROFILE_STATUS.INCOMPLETE,
           data: {
-            contactCard: {
-              fullName: '', title: i18nEmpty(), company: i18nEmpty(), bio: i18nEmpty(),
-              email: '', phone: '', whatsapp: '',
-              website: null, address: '', gpsPosition: null
-            },
             qrConfig: { style: 'rounded', colorForeground: '#000000', colorBackground: '#FFFFFF', logoOverlay: false },
             socials: []
           },
@@ -2128,16 +2035,6 @@
         linkup: {
           type: PROFILE_TYPE.LINKUP, status: PROFILE_STATUS.DISABLED,  // user deactivated
           data: {
-            contactCard: {
-              fullName: 'Hatem Gharbi',
-              title: i18n('Directeur Pédagogique'),
-              company: i18n('EduPro Formation'),
-              bio: i18n('Passionné par la formation et le développement des compétences.'),
-              email: 'hatem@edupro.tn', phone: '+216 71 444 100', whatsapp: '+216 71 444 100',
-              website: 'https://edupro.tn',
-              address: 'Avenue Mohamed V, Tunis',
-              gpsPosition: { type: 'Point', coordinates: [10.1816, 36.8001] }
-            },
             qrConfig: { style: 'rounded', colorForeground: '#7C3AED', colorBackground: '#FFFFFF', logoOverlay: true },
             socials: [
               { platform: 'linkedin', url: 'https://linkedin.com/in/hatemgharbi' },
@@ -2281,16 +2178,6 @@
         linkup: {
           type: PROFILE_TYPE.LINKUP, status: PROFILE_STATUS.ACTIVE,
           data: {
-            contactCard: {
-              fullName: 'Ali Ben Amor',
-              title: i18n('Gérant'),
-              company: i18n('TextilTunis'),
-              bio: i18n('25 ans d\'expérience dans le textile tunisien.'),
-              email: 'ali@textiltunis.tn', phone: '+216 73 700 100', whatsapp: '+216 73 700 100',
-              website: 'https://textiltunis.tn',
-              address: 'Z.I. Ksar Hellal, Monastir',
-              gpsPosition: { type: 'Point', coordinates: [10.8917, 35.6483] }
-            },
             qrConfig: { style: 'rounded', colorForeground: '#0891B2', colorBackground: '#FFFFFF', logoOverlay: true },
             socials: [
               { platform: 'linkedin', url: 'https://linkedin.com/in/alibenamor' },

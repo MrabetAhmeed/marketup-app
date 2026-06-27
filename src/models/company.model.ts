@@ -108,6 +108,7 @@ const CompanySchema = new Schema(
 
     // Owner (denormalized for fast access)
     ownerUserId: { type: Types.ObjectId, ref: "User", required: true, unique: true },
+    ownerFullName: { type: String, default: null },
 
     // Soft delete
     deletedAt: { type: Date, default: null, index: true },

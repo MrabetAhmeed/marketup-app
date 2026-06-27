@@ -128,10 +128,6 @@ export interface ProfileForAdminReview {
   videos: VideoItemAdmin[];
   // LinkUP data
   socials: Array<{ platform: string; url: string | null }>;
-  contactCard: {
-    whatsapp: string | null;
-    website: string | null;
-  };
 }
 
 export async function getProfileForAdminReview(
@@ -191,8 +187,6 @@ export async function getProfileForAdminReview(
     platform: s.platform ?? "",
     url: s.url ?? null,
   }));
-  const contactCard = data.contactCard ?? {};
-  const liveData = company.liveData ?? {};
 
   // Extract pending gallery for diff rendering (both snapshot and proposed)
   const galleryPendingField = (profile.pendingData?.fields ?? []).find((f: any) => f.key === "gallery");
@@ -241,10 +235,6 @@ export async function getProfileForAdminReview(
     videos,
     // LinkUP
     socials,
-    contactCard: {
-      whatsapp: liveData.whatsapp ?? contactCard.whatsapp ?? null,
-      website: contactCard.website ?? null,
-    },
   };
 }
 
