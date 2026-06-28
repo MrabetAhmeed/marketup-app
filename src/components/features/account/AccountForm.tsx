@@ -15,6 +15,8 @@ import { BannerUploadZone } from "./BannerUploadZone";
 import { AccountActionBar } from "./AccountActionBar";
 
 interface AccountFormValues {
+  firstName: string;
+  lastName: string;
   displayName: string;
   contactEmail: string;
   phone: string;
@@ -23,8 +25,9 @@ interface AccountFormValues {
   address: string;
 }
 
-/** The 5 LIVE fields that the PATCH endpoint accepts */
+/** LIVE fields that the PATCH endpoint accepts */
 const LIVE_KEYS = ["contactEmail", "phone", "whatsapp", "ville", "address"] as const;
+const IDENTITY_KEYS = ["firstName", "lastName"] as const;
 
 interface AccountFormProps {
   me: MeResponse;
@@ -39,6 +42,8 @@ export function AccountForm({ me }: AccountFormProps): JSX.Element {
 
   const { register, handleSubmit, formState: { isDirty, dirtyFields, errors }, reset, setError } = useForm<AccountFormValues>({
     defaultValues: {
+      firstName: me.user.firstName,
+      lastName: me.user.lastName,
       displayName: company.displayName,
       contactEmail: company.contactEmail,
       phone: company.phone ?? "",
@@ -51,8 +56,13 @@ export function AccountForm({ me }: AccountFormProps): JSX.Element {
   const dirtyCount = Object.keys(dirtyFields).length;
 
   async function onSubmit(values: AccountFormValues): Promise<void> {
-    // Build patch with only dirty LIVE fields
+    // Build patch with only dirty fields (identity + live)
     const patch: Record<string, string> = {};
+    for (const key of IDENTITY_KEYS) {
+      if (dirtyFields[key]) {
+        patch[key] = values[key];
+      }
+    }
     for (const key of LIVE_KEYS) {
       if (dirtyFields[key]) {
         patch[key] = values[key];
@@ -75,8 +85,9 @@ export function AccountForm({ me }: AccountFormProps): JSX.Element {
         // Zod field-level errors → inline under each field
         if (json.error?.code === "VALIDATION_FAILED" && json.error.fields) {
           const fields = json.error.fields as Record<string, string[]>;
+          const allKeys = [...IDENTITY_KEYS, ...LIVE_KEYS] as readonly string[];
           for (const [field, messages] of Object.entries(fields)) {
-            if (LIVE_KEYS.includes(field as typeof LIVE_KEYS[number])) {
+            if (allKeys.includes(field)) {
               setError(field as keyof AccountFormValues, { message: messages[0] });
             }
           }
@@ -90,6 +101,8 @@ export function AccountForm({ me }: AccountFormProps): JSX.Element {
       // Success — reset form with updated values from response
       const meData = json as MeResponse;
       reset({
+        firstName: meData.user.firstName,
+        lastName: meData.user.lastName,
         displayName: meData.company.displayName,
         contactEmail: meData.company.contactEmail,
         phone: meData.company.phone ?? "",
@@ -309,6 +322,75 @@ export function AccountForm({ me }: AccountFormProps): JSX.Element {
                 Document fourni à l&apos;inscription
               </div>
             </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ═══ SECTION: IDENTITÉ GÉRANT ═══ */}
+      <section className="card p-5 md:p-6">
+        <div className="flex items-start justify-between mb-5 flex-wrap gap-2">
+          <div>
+            <h3 className="font-heading font-bold text-[15px] text-ink-primary">
+              Identité gérant
+            </h3>
+            <p className="text-[12px] text-ink-secondary mt-0.5 leading-snug">
+              Vos coordonnées personnelles · mises à jour instantanément
+            </p>
+          </div>
+          <FieldBadge kind="live" />
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+          {/* Prénom */}
+          <div>
+            <label htmlFor="acc-firstname" className="field-label">
+              Prénom <span className="text-[#B91C1C] font-bold ml-0.5">*</span>
+            </label>
+            <div className="relative">
+              <span className="absolute left-3 top-1/2 -translate-y-1/2 material-symbols-outlined text-ink-tertiary pointer-events-none" style={{ fontSize: 16 }}>
+                person
+              </span>
+              <input
+                id="acc-firstname"
+                type="text"
+                className={`field-input pl-9 ${errors.firstName ? "border-[#B91C1C]" : ""}`}
+                {...register("firstName", { required: "Le prénom est obligatoire." })}
+              />
+            </div>
+            {errors.firstName ? (
+              <p className="text-[12px] text-[#B91C1C] mt-1">{errors.firstName.message}</p>
+            ) : (
+              <div className="field-help">
+                <span className="material-symbols-outlined" style={{ fontSize: 13 }}>info</span>
+                Modifiable instantanément · utilisé pour la recherche par nom
+              </div>
+            )}
+          </div>
+
+          {/* Nom */}
+          <div>
+            <label htmlFor="acc-lastname" className="field-label">
+              Nom <span className="text-[#B91C1C] font-bold ml-0.5">*</span>
+            </label>
+            <div className="relative">
+              <span className="absolute left-3 top-1/2 -translate-y-1/2 material-symbols-outlined text-ink-tertiary pointer-events-none" style={{ fontSize: 16 }}>
+                badge
+              </span>
+              <input
+                id="acc-lastname"
+                type="text"
+                className={`field-input pl-9 ${errors.lastName ? "border-[#B91C1C]" : ""}`}
+                {...register("lastName", { required: "Le nom est obligatoire." })}
+              />
+            </div>
+            {errors.lastName ? (
+              <p className="text-[12px] text-[#B91C1C] mt-1">{errors.lastName.message}</p>
+            ) : (
+              <div className="field-help">
+                <span className="material-symbols-outlined" style={{ fontSize: 13 }}>info</span>
+                Modifiable instantanément · utilisé pour la recherche par nom
+              </div>
+            )}
           </div>
         </div>
       </section>

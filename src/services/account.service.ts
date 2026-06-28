@@ -13,7 +13,20 @@ const CompanyModel = Company as any;
 const UserModel = User as any;
 
 // ---------------------------------------------------------------------------
-// updateMeAccount — apply LIVE field patch to Company.liveData
+// syncOwnerFullName — recompute Company.ownerFullName from User names
+// ---------------------------------------------------------------------------
+
+export async function syncOwnerFullName(
+  companyId: string,
+  firstName: string,
+  lastName: string,
+): Promise<void> {
+  const ownerFullName = `${firstName} ${lastName}`.trim();
+  await CompanyModel.findByIdAndUpdate(companyId, { ownerFullName });
+}
+
+// ---------------------------------------------------------------------------
+// updateMeAccount — apply LIVE field patch to Company.liveData + User identity
 // ---------------------------------------------------------------------------
 
 export async function updateMeAccount(
@@ -30,7 +43,28 @@ export async function updateMeAccount(
   const companyId = user.companyId?.toString();
   if (!companyId) throw new NotFoundError("Company");
 
-  // Build $set map — only include keys actually present in the patch
+  // --- Handle User identity fields (firstName / lastName) ---
+  const hasIdentity = patch.firstName !== undefined || patch.lastName !== undefined;
+
+  if (hasIdentity) {
+    const userUpdate: Record<string, string> = {};
+    if (patch.firstName !== undefined) userUpdate.firstName = patch.firstName;
+    if (patch.lastName !== undefined) userUpdate.lastName = patch.lastName;
+
+    await UserModel.findByIdAndUpdate(userId, { $set: userUpdate });
+
+    // Recompute ownerFullName with merged values
+    const newFirst = patch.firstName ?? (user.firstName || "");
+    const newLast = patch.lastName ?? (user.lastName || "");
+
+    try {
+      await syncOwnerFullName(companyId, newFirst, newLast);
+    } catch (err) {
+      console.warn("[updateMeAccount] syncOwnerFullName failed, denormalization stale:", err);
+    }
+  }
+
+  // --- Handle Company.liveData fields ---
   const setMap: Record<string, unknown> = {};
   if (patch.contactEmail !== undefined) setMap["liveData.contactEmail"] = patch.contactEmail;
   if (patch.phone !== undefined) setMap["liveData.phone"] = patch.phone;
@@ -38,20 +72,22 @@ export async function updateMeAccount(
   if (patch.ville !== undefined) setMap["liveData.ville"] = patch.ville;
   if (patch.address !== undefined) setMap["liveData.address"] = patch.address;
 
-  if (Object.keys(setMap).length === 0) {
-    // Nothing to update — return current state
+  if (Object.keys(setMap).length > 0) {
+    const updated = await CompanyModel.findByIdAndUpdate(
+      companyId,
+      { $set: setMap },
+      { new: true },
+    ).lean();
+
+    if (!updated) throw new NotFoundError("Company");
+  }
+
+  // Nothing at all? (no identity, no liveData)
+  if (!hasIdentity && Object.keys(setMap).length === 0) {
     const me = await getMe(userId, companyId, lang);
     if (!me) throw new NotFoundError("Company");
     return me;
   }
-
-  const updated = await CompanyModel.findByIdAndUpdate(
-    companyId,
-    { $set: setMap },
-    { new: true },
-  ).lean();
-
-  if (!updated) throw new NotFoundError("Company");
 
   // Return fresh MeResponse
   const me = await getMe(userId, companyId, lang);
