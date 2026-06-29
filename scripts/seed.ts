@@ -329,6 +329,7 @@ interface CompanySeedData {
     ville: string;
     sectorId: string;
     languages: string[];
+    gpsPosition?: { type: string; coordinates: number[] } | null;
   };
   data: {
     displayName: { fr: string; ar: string; en: string };
@@ -441,7 +442,7 @@ function buildCompanies(): CompanySeedData[] {
       legalId: "B12345",
       accountEmail: "ahmed@technofab.tn",
       user: { firstName: "Ahmed", lastName: "Mrabet", phone: "+216 71 234 567", languages: ["fr"] },
-      liveData: { contactEmail: "contact@technofab.tn", phone: "+216 73 222 333", whatsapp: "+216 20 123 456", address: "Rue de l'Industrie, ZI Sahline", gouvernorat: "sousse", ville: "Sahline", sectorId: "mecanique", languages: ["fr"] },
+      liveData: { contactEmail: "contact@technofab.tn", phone: "+216 73 222 333", whatsapp: "+216 20 123 456", address: "Rue de l'Industrie, ZI Sahline", gouvernorat: "sousse", ville: "Sahline", sectorId: "mecanique", languages: ["fr"], gpsPosition: { type: "Point", coordinates: [10.7148, 35.7628] } },
       data: { displayName: i18n("TechnoFab Industries"), logoUrl: logoUrl("TechnoFab", "0078D4"), bannerUrl: bannerUrl("c-001") },
       status: "active",
       pendingUpdates: null,
@@ -586,7 +587,7 @@ function buildCompanies(): CompanySeedData[] {
     {
       seedId: "c-002", slug: "mediacom-communication", type: "B2B", legalId: "B98765", accountEmail: "leila@mediacom.tn",
       user: { firstName: "Leila", lastName: "Karoui", phone: "+216 71 555 100", languages: ["fr"] },
-      liveData: { contactEmail: "contact@mediacom.tn", phone: "+216 71 555 200", whatsapp: "+216 20 555 200", address: "Avenue Habib Bourguiba, Tunis Centre", gouvernorat: "tunis", ville: "Tunis", sectorId: "marketing", languages: ["fr"] },
+      liveData: { contactEmail: "contact@mediacom.tn", phone: "+216 71 555 200", whatsapp: "+216 20 555 200", address: "Avenue Habib Bourguiba, Tunis Centre", gouvernorat: "tunis", ville: "Tunis", sectorId: "marketing", languages: ["fr"], gpsPosition: { type: "Point", coordinates: [10.1815, 36.8065] } },
       data: { displayName: i18n("MediaCom Communication & Stratégie de Marque"), logoUrl: logoUrl("MediaCom", "6366F1"), bannerUrl: bannerUrl("c-002") },
       status: "active", registeredAt: daysAgo(80), validatedAt: daysAgo(79), rseBadgeStatus: "none",
       pendingUpdates: { submittedAt: daysAgo(2), fields: [{ key: "phone", label: "Téléphone", currentValue: "+216 71 555 100", newValue: "+216 71 555 200" }, { key: "address", label: "Adresse", currentValue: "Rue Mohamed V, Tunis", newValue: "Avenue Habib Bourguiba, Tunis-Centre" }], note: "Déménagement du siège — nouveaux locaux et nouvelle ligne directe." },
@@ -621,7 +622,7 @@ function buildCompanies(): CompanySeedData[] {
     {
       seedId: "c-003", slug: "greenlife-bio", type: "B2C", legalId: "B33445", accountEmail: "karim@greenlife.tn",
       user: { firstName: "Karim", lastName: "Slim", phone: "+216 73 411 222", languages: ["fr"] },
-      liveData: { contactEmail: "hello@greenlife.tn", phone: "+216 73 411 333", whatsapp: "+216 20 411 333", address: "Avenue Mohamed V, Sousse", gouvernorat: "sousse", ville: "Sousse", sectorId: "alimentation", languages: ["fr"] },
+      liveData: { contactEmail: "hello@greenlife.tn", phone: "+216 73 411 333", whatsapp: "+216 20 411 333", address: "Avenue Mohamed V, Sousse", gouvernorat: "sousse", ville: "Sousse", sectorId: "alimentation", languages: ["fr"], gpsPosition: { type: "Point", coordinates: [10.6411, 35.8245] } },
       data: { displayName: i18n("GreenLife — Bio & Naturel"), logoUrl: logoUrl("GreenLife", "10B981"), bannerUrl: bannerUrl("c-003") },
       status: "active", registeredAt: daysAgo(173), validatedAt: daysAgo(172), rseBadgeStatus: "validated",
       profiles: {
@@ -638,7 +639,7 @@ function buildCompanies(): CompanySeedData[] {
     {
       seedId: "c-004", slug: "buildtech-construction", type: "B2B", legalId: "B77123", accountEmail: "sami@buildtech.tn",
       user: { firstName: "Sami", lastName: "Bouazizi", phone: "+216 71 877 555", languages: ["fr"] },
-      liveData: { contactEmail: "contact@buildtech.tn", phone: "+216 71 877 600", whatsapp: "+216 20 877 600", address: "Z.I. Charguia II, Tunis", gouvernorat: "tunis", ville: "Tunis", sectorId: "btp", languages: ["fr"] },
+      liveData: { contactEmail: "contact@buildtech.tn", phone: "+216 71 877 600", whatsapp: "+216 20 877 600", address: "Z.I. Charguia II, Tunis", gouvernorat: "tunis", ville: "Tunis", sectorId: "btp", languages: ["fr"], gpsPosition: { type: "Point", coordinates: [10.1553, 36.8375] } },
       data: { displayName: i18n("BuildTech Construction"), logoUrl: logoUrl("BuildTech", "F59E0B"), bannerUrl: bannerUrl("c-004") },
       status: "pending", registeredAt: daysAgo(58), validatedAt: daysAgo(57), rseBadgeStatus: "none",
       pendingUpdates: { submittedAt: daysAgo(3), fields: [{ key: "bannerUrl", label: "Bannière", currentValue: bannerUrl("c-004"), newValue: "https://picsum.photos/seed/c-004-banner-v2/1200/400" }] },
@@ -653,7 +654,7 @@ function buildCompanies(): CompanySeedData[] {
     {
       seedId: "c-005", slug: "foodcorner-restaurant", type: "B2C", legalId: "B55678", accountEmail: "mehdi@foodcorner.tn",
       user: { firstName: "Mehdi", lastName: "Trabelsi", phone: "+216 74 222 100", languages: ["fr"] },
-      liveData: { contactEmail: "contact@foodcorner.tn", phone: "+216 74 222 200", whatsapp: "+216 20 222 200", address: "Avenue Hedi Chaker, Sfax", gouvernorat: "sfax", ville: "Sfax", sectorId: "restauration", languages: ["fr"] },
+      liveData: { contactEmail: "contact@foodcorner.tn", phone: "+216 74 222 200", whatsapp: "+216 20 222 200", address: "Avenue Hedi Chaker, Sfax", gouvernorat: "sfax", ville: "Sfax", sectorId: "restauration", languages: ["fr"], gpsPosition: { type: "Point", coordinates: [10.7603, 34.7406] } },
       data: { displayName: i18n("FoodCorner — Cuisine Tunisienne"), logoUrl: logoUrl("FoodCorner", "EF4444"), bannerUrl: bannerUrl("c-005") },
       status: "suspended", registeredAt: daysAgo(244), validatedAt: daysAgo(242), suspendedAt: daysAgo(21), suspendedReason: "Suspension suite à litige de facturation non résolu (boost facturé en double, dispute en cours).", rseBadgeStatus: "none",
       profiles: {
@@ -671,7 +672,7 @@ function buildCompanies(): CompanySeedData[] {
     {
       seedId: "c-006", slug: "archstudio-architecture", type: "B2B", legalId: "B66890", accountEmail: "salma@archstudio.tn",
       user: { firstName: "Salma", lastName: "Ben Aissa", phone: "+216 71 333 100", languages: ["fr"] },
-      liveData: { contactEmail: "studio@archstudio.tn", phone: "+216 71 333 200", whatsapp: "+216 20 333 200", address: "Rue de Marseille, Tunis", gouvernorat: "tunis", ville: "Tunis", sectorId: "architecture", languages: ["fr"] },
+      liveData: { contactEmail: "studio@archstudio.tn", phone: "+216 71 333 200", whatsapp: "+216 20 333 200", address: "Rue de Marseille, Tunis", gouvernorat: "tunis", ville: "Tunis", sectorId: "architecture", languages: ["fr"], gpsPosition: { type: "Point", coordinates: [10.1658, 36.7998] } },
       data: { displayName: i18n("ArchStudio"), logoUrl: logoUrl("ArchStudio", "8B5CF6"), bannerUrl: bannerUrl("c-006") },
       status: "pending", registeredAt: daysAgo(158), validatedAt: daysAgo(157), rseBadgeStatus: "validated",
       pendingUpdates: { submittedAt: daysAgo(7), fields: [{ key: "logoUrl", label: "Logo", currentValue: logoUrl("ArchStudio", "8B5CF6"), newValue: logoUrl("ArchStudioNew", "7C3AED") }] },
@@ -690,7 +691,7 @@ function buildCompanies(): CompanySeedData[] {
     {
       seedId: "c-007", slug: "autoplus", type: "B2B", legalId: "B22334", accountEmail: "omar@autoplus.tn",
       user: { firstName: "Omar", lastName: "Belhaj", phone: "+216 73 600 100", languages: ["fr"] },
-      liveData: { contactEmail: "contact@autoplus.tn", phone: "+216 73 600 200", whatsapp: "+216 20 600 200", address: "Route de Sahline, Sousse", gouvernorat: "sousse", ville: "Sousse", sectorId: "automobile-pro", languages: ["fr"] },
+      liveData: { contactEmail: "contact@autoplus.tn", phone: "+216 73 600 200", whatsapp: "+216 20 600 200", address: "Route de Sahline, Sousse", gouvernorat: "sousse", ville: "Sousse", sectorId: "automobile-pro", languages: ["fr"], gpsPosition: { type: "Point", coordinates: [10.6350, 35.8280] } },
       data: { displayName: i18n("AutoPlus"), logoUrl: logoUrl("AutoPlus", "DC2626"), bannerUrl: bannerUrl("c-007") },
       status: "active", registeredAt: daysAgo(203), validatedAt: daysAgo(202), rseBadgeStatus: "none",
       profiles: {
@@ -711,7 +712,7 @@ function buildCompanies(): CompanySeedData[] {
     {
       seedId: "c-008", slug: "pharmatn", type: "B2C", legalId: "B11225", accountEmail: "nadia@pharmatn.tn",
       user: { firstName: "Nadia", lastName: "Saidi", phone: "+216 71 999 100", languages: ["fr"] },
-      liveData: { contactEmail: "contact@pharmatn.tn", phone: "+216 71 999 200", whatsapp: "+216 20 999 200", address: "Avenue de la Liberté, Tunis", gouvernorat: "tunis", ville: "Tunis", sectorId: "sante", languages: ["fr"] },
+      liveData: { contactEmail: "contact@pharmatn.tn", phone: "+216 71 999 200", whatsapp: "+216 20 999 200", address: "Avenue de la Liberté, Tunis", gouvernorat: "tunis", ville: "Tunis", sectorId: "sante", languages: ["fr"], gpsPosition: { type: "Point", coordinates: [10.1797, 36.8008] } },
       data: { displayName: i18n("PharmaTN"), logoUrl: logoUrl("PharmaTN", "0EA5E9"), bannerUrl: bannerUrl("c-008") },
       status: "pending", registeredAt: daysAgo(2), rseBadgeStatus: "none",
       profiles: {
@@ -725,7 +726,7 @@ function buildCompanies(): CompanySeedData[] {
     {
       seedId: "c-009", slug: "edupro", type: "B2B", legalId: "B44556", accountEmail: "hatem@edupro.tn",
       user: { firstName: "Hatem", lastName: "Gharbi", phone: "+216 71 444 100", languages: ["fr"] },
-      liveData: { contactEmail: "contact@edupro.tn", phone: "+216 71 444 200", whatsapp: "+216 20 444 200", address: "Avenue Mohamed V, Tunis", gouvernorat: "tunis", ville: "Tunis", sectorId: "formation-pro", languages: ["fr"] },
+      liveData: { contactEmail: "contact@edupro.tn", phone: "+216 71 444 200", whatsapp: "+216 20 444 200", address: "Avenue Mohamed V, Tunis", gouvernorat: "tunis", ville: "Tunis", sectorId: "formation-pro", languages: ["fr"], gpsPosition: { type: "Point", coordinates: [10.1720, 36.8028] } },
       data: { displayName: i18n("EduPro Formation"), logoUrl: logoUrl("EduPro", "7C3AED"), bannerUrl: bannerUrl("c-009") },
       status: "active", registeredAt: daysAgo(260), validatedAt: daysAgo(259), rseBadgeStatus: "validated",
       profiles: {
@@ -743,7 +744,7 @@ function buildCompanies(): CompanySeedData[] {
     {
       seedId: "c-010", slug: "textiltunis", type: "B2B", legalId: "B99887", accountEmail: "ali@textiltunis.tn",
       user: { firstName: "Ali", lastName: "Ben Amor", phone: "+216 71 888 100", languages: ["fr"] },
-      liveData: { contactEmail: "contact@textiltunis.tn", phone: "+216 71 888 200", whatsapp: "+216 20 888 200", address: "Z.I. Mégrine, Ben Arous", gouvernorat: "ben-arous", ville: "Mégrine", sectorId: "textile", languages: ["fr"] },
+      liveData: { contactEmail: "contact@textiltunis.tn", phone: "+216 71 888 200", whatsapp: "+216 20 888 200", address: "Z.I. Mégrine, Ben Arous", gouvernorat: "ben-arous", ville: "Mégrine", sectorId: "textile", languages: ["fr"], gpsPosition: { type: "Point", coordinates: [10.2320, 36.7680] } },
       data: { displayName: i18n("TextilTunis"), logoUrl: logoUrl("TextilTunis", "EC4899"), bannerUrl: bannerUrl("c-010") },
       status: "active", registeredAt: daysAgo(220), validatedAt: daysAgo(219), rseBadgeStatus: "none",
       profiles: {
@@ -771,7 +772,7 @@ function buildCompanies(): CompanySeedData[] {
     {
       seedId: "c-011", slug: "digiagency", type: "B2B", legalId: "B11011", accountEmail: "youssef@digiagency.tn",
       user: { firstName: "Youssef", lastName: "Hamdi", phone: "+216 71 222 300", languages: ["fr"] },
-      liveData: { contactEmail: "hello@digiagency.tn", phone: "+216 71 222 400", whatsapp: "+216 20 222 400", address: "Rue du Lac Léman, Les Berges du Lac", gouvernorat: "tunis", ville: "Tunis", sectorId: "informatique", languages: ["fr"] },
+      liveData: { contactEmail: "hello@digiagency.tn", phone: "+216 71 222 400", whatsapp: "+216 20 222 400", address: "Rue du Lac Léman, Les Berges du Lac", gouvernorat: "tunis", ville: "Tunis", sectorId: "informatique", languages: ["fr"], gpsPosition: { type: "Point", coordinates: [10.2100, 36.8420] } },
       data: { displayName: i18n("Digital Agency Tunis"), logoUrl: logoUrl("DigiAgency", "3B82F6"), bannerUrl: "" },
       status: "active", registeredAt: daysAgo(45), validatedAt: daysAgo(44), rseBadgeStatus: "none",
       profiles: {

@@ -80,6 +80,12 @@ export async function updateMeAccount(
     ).lean();
 
     if (!updated) throw new NotFoundError("Company");
+
+    // Re-géocodage désactivé (V1.1 backlog : picker carte manuel)
+    // Nominatim a une couverture médiocre des villes secondaires tunisiennes
+    // (ex: "Kalaa Sghira" introuvable, "Sousse" → Msaken). La gpsPosition
+    // n'est géocodée automatiquement qu'au signup. Corrections manuelles
+    // prévues en V1.1 (Leaflet + marker drag&drop).
   }
 
   // Nothing at all? (no identity, no liveData)

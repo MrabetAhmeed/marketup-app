@@ -28,10 +28,17 @@ vi.mock("@/lib/env", () => ({
     NEXTAUTH_URL: "http://localhost:3000",
     RESEND_API_KEY: "",
     EMAIL_FROM: "test@test.dev",
+    NOMINATIM_USER_AGENT: "TEST/1.0",
   },
 }));
 
+// Mock geocoding
+vi.mock("@/lib/geocoding/nominatim", () => ({
+  geocodeAddress: vi.fn().mockResolvedValue(null),
+}));
+
 import { updateMeAccount, syncOwnerFullName } from "@/services/account.service";
+import { geocodeAddress } from "@/lib/geocoding/nominatim";
 import { AccountLiveUpdateSchema } from "@/schemas/account.schema";
 
 const SectorModel = Sector as any;
@@ -179,5 +186,23 @@ describe("syncOwnerFullName", () => {
     await syncOwnerFullName(companyId, "Youssef", "Trabelsi");
     const company = await CompanyModel.findById(companyId).lean();
     expect(company.ownerFullName).toBe("Youssef Trabelsi");
+  });
+});
+
+describe("updateMeAccount — geocoding disabled", () => {
+  it("does NOT trigger geocoding when ville changes (disabled V1.1)", async () => {
+    const mockGeocode = geocodeAddress as ReturnType<typeof vi.fn>;
+
+    await updateMeAccount(userId, { ville: "Sahline" });
+
+    expect(mockGeocode).not.toHaveBeenCalled();
+  });
+
+  it("does NOT trigger geocoding when only phone changes", async () => {
+    const mockGeocode = geocodeAddress as ReturnType<typeof vi.fn>;
+
+    await updateMeAccount(userId, { phone: "+21699000000" });
+
+    expect(mockGeocode).not.toHaveBeenCalled();
   });
 });

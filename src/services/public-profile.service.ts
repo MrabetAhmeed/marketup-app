@@ -45,6 +45,7 @@ interface PublicCompanyBase {
   phone: string | null;
   whatsapp: string | null;
   address: string | null;
+  gpsPosition: { type: string; coordinates: number[] } | null;
   rseBadgeStatus: string;
   boosted: boolean;
 }
@@ -134,6 +135,7 @@ async function resolveCompanyBase(
     phone: company.liveData.phone ?? null,
     whatsapp: company.liveData.whatsapp ?? null,
     address: company.liveData.address ?? null,
+    gpsPosition: company.liveData.gpsPosition ?? null,
     rseBadgeStatus: company.rseBadgeStatus ?? "none",
     boosted: activeBoost != null,
   };

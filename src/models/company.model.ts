@@ -85,6 +85,16 @@ const CompanySchema = new Schema(
       phone: { type: String, default: null },
       whatsapp: { type: String, default: null },
       languages: [{ type: String, enum: ["fr", "ar", "en"] }],
+      gpsPosition: {
+        type: new Schema(
+          {
+            type: { type: String, enum: ["Point"], default: "Point" },
+            coordinates: { type: [Number], required: true },
+          },
+          { _id: false },
+        ),
+        default: null,
+      },
     },
 
     // Lifecycle
@@ -123,6 +133,7 @@ const CompanySchema = new Schema(
 CompanySchema.index({ status: 1, registeredAt: 1 });
 CompanySchema.index({ "liveData.sectorId": 1, status: 1 });
 CompanySchema.index({ "liveData.gouvernorat": 1, status: 1 });
+CompanySchema.index({ "liveData.gpsPosition": "2dsphere" });
 
 // Soft-delete filter
 CompanySchema.pre(/^find/, function (this: { getOptions(): { withDeleted?: boolean }; where(condition: Record<string, unknown>): void }) {

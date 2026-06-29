@@ -332,3 +332,40 @@ Estimated effort: 4-6 hours (adapter + migration script + cutover).
 - Mettre à jour FROM_EMAIL dans .env (passe de onboarding@resend.dev à no-reply@vivasky.media)
 - Les emails passent à tous les destinataires
 - Effort : 10 min config + 10-30 min propagation DNS
+
+## V1.1 — Picker carte LinkUP (priorité haute)
+
+**Problème identifié (PP-6b 28 juin)** :
+Nominatim a une couverture médiocre des villes secondaires tunisiennes.
+Exemples observés en test :
+- "Kalaa Sghira, Sousse" → introuvable
+- "Sousse" seul → Msaken (8 km du vrai centre)
+- Adresses précises souvent imprécises (rues mal géocodées en OSM Tunisie)
+
+**Conséquence en prod** : LinkUP affiche un Maps link qui pointe à plusieurs km
+de l'adresse réelle de l'entreprise. Inacceptable pour une "carte de visite
+numérique" qui sert à localiser les pros tunisiens.
+
+**Spec V1.1** :
+1. Composant <MapPicker /> dans /dashboard/account
+   - Carte interactive (Leaflet ou Google Maps)
+   - Marker déplaçable
+   - Auto-centrage sur les coords actuelles si présentes
+   - Centrage par défaut sur la ville/gouvernorat
+   - Saved coords = override le géocodage auto
+
+2. Au signup :
+   - Géocodage Nominatim conservé (tentative au moins)
+   - Si null/fail → fallback Maps texte (déjà OK)
+
+3. À l'update /account :
+   - Si l'user modifie address/ville/gouvernorat seul → pas de re-géocodage auto
+   - Si l'user clique sur la carte → coords mises à jour
+   - Bouton "Re-géocoder automatiquement" pour les users avancés
+
+4. Tech stack :
+   - Leaflet (gratuit, OSM tiles)
+   - Marker drag&drop
+   - Reverse geocoding au drop (afficher l'adresse trouvée)
+
+**Effort estimé** : 1 sprint complet (4-5h CC + tests)

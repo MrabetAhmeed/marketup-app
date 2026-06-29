@@ -44,6 +44,7 @@ export default function LinkUpPublic({ data, embedded }: LinkUpPublicProps): JSX
           companyAddress={c.address}
           companyVille={c.ville}
           companyGouvernoratName={c.gouvernoratName}
+          companyGpsPosition={c.gpsPosition}
         />
 
         <RseSection receipts={data.rseReceipts} />

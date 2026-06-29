@@ -8,6 +8,7 @@ import { sendOtpEmail, sendPasswordResetEmail } from "@/lib/email/sender";
 import { env } from "@/lib/env";
 import { otpSendLimit, passwordResetLimit } from "@/lib/rate-limit";
 import { generateSlug, ensureUniqueSlug } from "@/lib/slug";
+import { geocodeAddress } from "@/lib/geocoding/nominatim";
 import { AdminUser } from "@/models/admin-user.model";
 import { Company } from "@/models/company.model";
 import { Gouvernorat } from "@/models/gouvernorat.model";
@@ -172,6 +173,25 @@ export async function signupCompany(input: SignupCompanyInput): Promise<SignupCo
     await company.save({ session });
 
     await session.commitTransaction();
+
+    // Geocode address (non-blocking, after transaction committed)
+    try {
+      const geocode = await geocodeAddress({
+        address: input.address,
+        ville: input.ville,
+        gouvernorat: input.gouvernorat,
+      });
+      if (geocode) {
+        await CompanyModel.findByIdAndUpdate(company._id, {
+          "liveData.gpsPosition": {
+            type: "Point",
+            coordinates: [geocode.lng, geocode.lat], // GeoJSON: [lng, lat]
+          },
+        });
+      }
+    } catch (err) {
+      console.warn("[signupCompany] Geocoding failed, gpsPosition stays null:", err);
+    }
 
     return {
       userId: (user._id as mongoose.Types.ObjectId).toString(),

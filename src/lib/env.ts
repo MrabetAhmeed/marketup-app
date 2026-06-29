@@ -39,6 +39,9 @@ const envSchema = z.object({
   R2_BUCKET_NAME: z.string().default("marketup-uploads"),
   R2_ENDPOINT: z.string().default(""),
   R2_PUBLIC_URL: z.string().default(""),
+
+  // Nominatim geocoding (required by OSM usage policy)
+  NOMINATIM_USER_AGENT: z.string().default("MARKET-UP/1.0 (contact@vivasky.media)"),
 });
 
 export type Env = z.infer<typeof envSchema>;

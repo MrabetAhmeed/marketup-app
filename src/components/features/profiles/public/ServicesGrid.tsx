@@ -17,6 +17,7 @@ interface ServicesGridProps {
   companyAddress?: string | null;
   companyVille?: string | null;
   companyGouvernoratName?: string | null;
+  companyGpsPosition?: { type: string; coordinates: number[] } | null;
 }
 
 interface ServiceDef {
@@ -33,13 +34,25 @@ function getWhatsAppLink(phone: string | null): string | null {
   return digits ? `https://wa.me/${digits}` : null;
 }
 
-function getMapsLink(address: string | null, ville: string | null, gouvernorat: string | null): string | null {
+function getMapsLink(
+  address: string | null,
+  ville: string | null,
+  gouvernorat: string | null,
+  gpsPosition?: { type: string; coordinates: number[] } | null,
+): string | null {
+  // Priority: stored coordinates (precise)
+  const coords = gpsPosition?.coordinates;
+  if (coords && coords.length === 2) {
+    const [lng, lat] = coords;
+    return `https://www.google.com/maps/search/?api=1&query=${lat},${lng}`;
+  }
+  // Fallback: text-based geocoding URL
   const parts = [address, ville, gouvernorat].filter(Boolean).join(", ");
   if (!parts) return null;
   return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(parts)}`;
 }
 
-export default function ServicesGrid({ slug, socials, siblingProfiles, companyWhatsapp, companyPhone, companyAddress, companyVille, companyGouvernoratName }: ServicesGridProps): JSX.Element {
+export default function ServicesGrid({ slug, socials, siblingProfiles, companyWhatsapp, companyPhone, companyAddress, companyVille, companyGouvernoratName, companyGpsPosition }: ServicesGridProps): JSX.Element {
   const socialUrl = (platform: string): string | null => {
     const s = socials.find((x) => x.platform === platform);
     return s?.url ?? null;
@@ -55,7 +68,7 @@ export default function ServicesGrid({ slug, socials, siblingProfiles, companyWh
     { key: "instagram", label: "Instagram", icon: FaInstagram, href: socialUrl("instagram"), external: true },
     { key: "linkedin", label: "LinkedIn", icon: FaLinkedin, href: socialUrl("linkedin"), external: true },
     { key: "twitter", label: "Twitter", icon: FaXTwitter, href: socialUrl("twitter") ?? socialUrl("x"), external: true },
-    { key: "maps", label: "Maps", icon: FaLocationDot, href: getMapsLink(companyAddress ?? null, companyVille ?? null, companyGouvernoratName ?? null), external: true },
+    { key: "maps", label: "Maps", icon: FaLocationDot, href: getMapsLink(companyAddress ?? null, companyVille ?? null, companyGouvernoratName ?? null, companyGpsPosition), external: true },
   ].filter((s) => s.href != null);
 
   if (services.length === 0) return <></>;
