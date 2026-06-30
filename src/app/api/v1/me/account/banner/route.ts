@@ -6,7 +6,6 @@ import { connectDb } from "@/lib/db";
 import { User } from "@/models/user.model";
 import { Company } from "@/models/company.model";
 import { NotFoundError } from "@/lib/api-error";
-import { storage } from "@/lib/storage";
 export const dynamic = "force-dynamic";
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
@@ -28,17 +27,29 @@ export async function POST(req: NextRequest): Promise<Response> {
       category: "banners",
     });
 
-    // Delete old banner if exists
+    // Write to pendingUpdates instead of data.bannerUrl (hard change PP-10)
     const company = await CompanyModel.findById(companyId).lean();
-    if (company?.data?.bannerUrl) {
-      try { await storage.delete(company.data.bannerUrl); } catch { /* ignore */ }
-    }
+    if (!company) throw new NotFoundError("Company");
 
-    await CompanyModel.findByIdAndUpdate(companyId, {
-      $set: { "data.bannerUrl": result.url },
+    const currentBannerUrl = company.data?.bannerUrl ?? null;
+    const existing = company.pendingUpdates?.fields ?? [];
+    const filtered = existing.filter((f: { key: string }) => f.key !== "data.bannerUrl");
+    filtered.push({
+      key: "data.bannerUrl",
+      label: "Bannière",
+      currentValue: currentBannerUrl,
+      newValue: result.url,
     });
 
-    return jsonOk({ url: result.url });
+    await CompanyModel.findByIdAndUpdate(companyId, {
+      pendingUpdates: {
+        submittedAt: new Date(),
+        fields: filtered,
+        note: null,
+      },
+    });
+
+    return jsonOk({ url: result.url, pending: true });
   } catch (err) {
     return handleApiError(err);
   }

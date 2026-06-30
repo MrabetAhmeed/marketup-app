@@ -85,6 +85,9 @@ export function AccountForm({ me, gouvernorats }: AccountFormProps): JSX.Element
     return { current: currentName, next: nextName };
   })();
 
+  const pendingLogoUrl = pendingFields?.fields?.find((x) => x.key === "data.logoUrl")?.newValue as string | undefined ?? null;
+  const pendingBannerUrl = pendingFields?.fields?.find((x) => x.key === "data.bannerUrl")?.newValue as string | undefined ?? null;
+
   async function onSubmit(values: AccountFormValues): Promise<void> {
     // Build patch with only dirty fields (identity + live + hard)
     const patch: Record<string, string> = {};
@@ -220,7 +223,7 @@ export function AccountForm({ me, gouvernorats }: AccountFormProps): JSX.Element
               Logo de l&apos;entreprise <span className="text-[#B91C1C] font-bold ml-0.5">*</span>
               <FieldBadge kind="validation" />
             </label>
-            <LogoUploadZone initials={company.avatarInitials} logoUrl={company.logoUrl} />
+            <LogoUploadZone initials={company.avatarInitials} logoUrl={company.logoUrl} pendingLogoUrl={pendingLogoUrl} />
           </div>
 
           {/* Banner */}
@@ -229,7 +232,7 @@ export function AccountForm({ me, gouvernorats }: AccountFormProps): JSX.Element
               Bannière <span className="text-ink-tertiary font-normal normal-case tracking-normal ml-1">(optionnel)</span>
               <FieldBadge kind="validation" />
             </label>
-            <BannerUploadZone bannerUrl={company.bannerUrl} />
+            <BannerUploadZone bannerUrl={company.bannerUrl} pendingBannerUrl={pendingBannerUrl} />
           </div>
 
           {/* Display name */}

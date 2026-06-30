@@ -6,9 +6,10 @@ import { useToast } from "@/components/shared/Toast";
 
 interface BannerUploadZoneProps {
   bannerUrl: string | null;
+  pendingBannerUrl?: string | null;
 }
 
-export function BannerUploadZone({ bannerUrl }: BannerUploadZoneProps): JSX.Element {
+export function BannerUploadZone({ bannerUrl, pendingBannerUrl }: BannerUploadZoneProps): JSX.Element {
   const router = useRouter();
   const { showToast } = useToast();
   const fileRef = useRef<HTMLInputElement>(null);
@@ -30,7 +31,7 @@ export function BannerUploadZone({ bannerUrl }: BannerUploadZoneProps): JSX.Elem
         return;
       }
       setPreviewUrl(json.url);
-      showToast("Bannière mise à jour");
+      showToast("Bannière soumise · en attente de validation admin");
       router.refresh();
     } catch {
       showToast("Erreur, veuillez réessayer");
@@ -86,10 +87,17 @@ export function BannerUploadZone({ bannerUrl }: BannerUploadZoneProps): JSX.Elem
           </div>
         )}
       </div>
-      <div className="flex items-center gap-1 text-[11px] text-ink-tertiary mt-1">
-        <span className="material-symbols-outlined" style={{ fontSize: 13 }}>info</span>
-        Affichée en haut de votre profil BrandUP · format paysage 4:1 (ex : 1200×300) · JPG/PNG · 5 Mo max
-      </div>
+      {pendingBannerUrl ? (
+        <div className="mt-1.5 px-3 py-2 bg-[#FEF3C7] border border-[#FDE68A] rounded text-[12px] text-[#92400E] flex items-start gap-2">
+          <span className="material-symbols-outlined shrink-0 mt-[1px]" style={{ fontSize: 14 }}>schedule</span>
+          <span>Nouvelle bannière en attente de validation admin</span>
+        </div>
+      ) : (
+        <div className="flex items-center gap-1 text-[11px] text-ink-tertiary mt-1">
+          <span className="material-symbols-outlined" style={{ fontSize: 13 }}>info</span>
+          Affichée en haut de votre profil BrandUP · format paysage 4:1 (ex : 1200×300) · JPG/PNG · 5 Mo max
+        </div>
+      )}
     </div>
   );
 }

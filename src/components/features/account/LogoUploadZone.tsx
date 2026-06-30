@@ -7,9 +7,10 @@ import { useToast } from "@/components/shared/Toast";
 interface LogoUploadZoneProps {
   initials: string;
   logoUrl: string | null;
+  pendingLogoUrl?: string | null;
 }
 
-export function LogoUploadZone({ initials, logoUrl }: LogoUploadZoneProps): JSX.Element {
+export function LogoUploadZone({ initials, logoUrl, pendingLogoUrl }: LogoUploadZoneProps): JSX.Element {
   const router = useRouter();
   const { showToast } = useToast();
   const fileRef = useRef<HTMLInputElement>(null);
@@ -29,7 +30,7 @@ export function LogoUploadZone({ initials, logoUrl }: LogoUploadZoneProps): JSX.
         return;
       }
       setPreviewUrl(json.url);
-      showToast("Logo mis à jour");
+      showToast("Logo soumis · en attente de validation admin");
       router.refresh();
     } catch {
       showToast("Erreur, veuillez réessayer");
@@ -40,6 +41,7 @@ export function LogoUploadZone({ initials, logoUrl }: LogoUploadZoneProps): JSX.
   }
 
   return (
+    <>
     <div className="flex items-center gap-[18px] p-4 bg-surface-muted border border-dashed border-[#D1D1D1] rounded-lg hover:border-primary hover:bg-primary-light transition-colors">
       <input
         ref={fileRef}
@@ -84,5 +86,12 @@ export function LogoUploadZone({ initials, logoUrl }: LogoUploadZoneProps): JSX.
         </div>
       </div>
     </div>
+    {pendingLogoUrl && (
+      <div className="mt-1.5 px-3 py-2 bg-[#FEF3C7] border border-[#FDE68A] rounded text-[12px] text-[#92400E] flex items-start gap-2">
+        <span className="material-symbols-outlined shrink-0 mt-[1px]" style={{ fontSize: 14 }}>schedule</span>
+        <span>Nouveau logo en attente de validation admin</span>
+      </div>
+    )}
+    </>
   );
 }

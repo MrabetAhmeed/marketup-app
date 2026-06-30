@@ -6,7 +6,6 @@ import { connectDb } from "@/lib/db";
 import { User } from "@/models/user.model";
 import { Company } from "@/models/company.model";
 import { NotFoundError } from "@/lib/api-error";
-import { storage } from "@/lib/storage";
 export const dynamic = "force-dynamic";
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
@@ -28,18 +27,29 @@ export async function POST(req: NextRequest): Promise<Response> {
       category: "logos",
     });
 
-    // Delete old logo if exists
+    // Write to pendingUpdates instead of data.logoUrl (hard change PP-10)
     const company = await CompanyModel.findById(companyId).lean();
-    if (company?.data?.logoUrl) {
-      // Try to extract key from old URL for cleanup (best-effort)
-      try { await storage.delete(company.data.logoUrl); } catch { /* ignore */ }
-    }
+    if (!company) throw new NotFoundError("Company");
 
-    await CompanyModel.findByIdAndUpdate(companyId, {
-      $set: { "data.logoUrl": result.url },
+    const currentLogoUrl = company.data?.logoUrl ?? null;
+    const existing = company.pendingUpdates?.fields ?? [];
+    const filtered = existing.filter((f: { key: string }) => f.key !== "data.logoUrl");
+    filtered.push({
+      key: "data.logoUrl",
+      label: "Logo",
+      currentValue: currentLogoUrl,
+      newValue: result.url,
     });
 
-    return jsonOk({ url: result.url });
+    await CompanyModel.findByIdAndUpdate(companyId, {
+      pendingUpdates: {
+        submittedAt: new Date(),
+        fields: filtered,
+        note: null,
+      },
+    });
+
+    return jsonOk({ url: result.url, pending: true });
   } catch (err) {
     return handleApiError(err);
   }

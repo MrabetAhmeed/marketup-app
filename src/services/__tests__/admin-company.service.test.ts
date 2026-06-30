@@ -203,3 +203,88 @@ describe("approvePendingUpdates — gouvernorat", () => {
     expect(company.pendingUpdates).toBeNull();
   });
 });
+
+describe("approvePendingUpdates — logoUrl + bannerUrl (PP-10)", () => {
+  it("merges data.logoUrl from pendingUpdates", async () => {
+    await CompanyModel.findByIdAndUpdate(companyId, {
+      pendingUpdates: {
+        submittedAt: new Date(),
+        fields: [{
+          key: "data.logoUrl",
+          label: "Logo",
+          currentValue: null,
+          newValue: "https://res.cloudinary.com/test/logo-new.png",
+        }],
+      },
+    });
+
+    await approvePendingUpdates(companyId, adminId);
+
+    const company = await CompanyModel.findById(companyId).lean();
+    expect(company.data.logoUrl).toBe("https://res.cloudinary.com/test/logo-new.png");
+    expect(company.pendingUpdates).toBeNull();
+  });
+
+  it("merges data.bannerUrl from pendingUpdates", async () => {
+    await CompanyModel.findByIdAndUpdate(companyId, {
+      pendingUpdates: {
+        submittedAt: new Date(),
+        fields: [{
+          key: "data.bannerUrl",
+          label: "Bannière",
+          currentValue: null,
+          newValue: "https://res.cloudinary.com/test/banner-new.png",
+        }],
+      },
+    });
+
+    await approvePendingUpdates(companyId, adminId);
+
+    const company = await CompanyModel.findById(companyId).lean();
+    expect(company.data.bannerUrl).toBe("https://res.cloudinary.com/test/banner-new.png");
+    expect(company.pendingUpdates).toBeNull();
+  });
+
+  it("merges logo + banner + displayName together (3 fields)", async () => {
+    await CompanyModel.findByIdAndUpdate(companyId, {
+      pendingUpdates: {
+        submittedAt: new Date(),
+        fields: [
+          { key: "data.logoUrl", label: "Logo", currentValue: null, newValue: "https://logo.png" },
+          { key: "data.bannerUrl", label: "Bannière", currentValue: null, newValue: "https://banner.png" },
+          { key: "data.displayName", label: "Nom", currentValue: { fr: "Old", ar: "", en: "" }, newValue: { fr: "New", ar: "", en: "" } },
+        ],
+      },
+    });
+
+    await approvePendingUpdates(companyId, adminId);
+
+    const company = await CompanyModel.findById(companyId).lean();
+    expect(company.data.logoUrl).toBe("https://logo.png");
+    expect(company.data.bannerUrl).toBe("https://banner.png");
+    expect(company.data.displayName.fr).toBe("New");
+    expect(company.pendingUpdates).toBeNull();
+  });
+
+  it("reject clears logoUrl pending but keeps data unchanged", async () => {
+    const originalLogo = "https://original-logo.png";
+    await CompanyModel.findByIdAndUpdate(companyId, { "data.logoUrl": originalLogo });
+    await CompanyModel.findByIdAndUpdate(companyId, {
+      pendingUpdates: {
+        submittedAt: new Date(),
+        fields: [{
+          key: "data.logoUrl",
+          label: "Logo",
+          currentValue: originalLogo,
+          newValue: "https://new-logo.png",
+        }],
+      },
+    });
+
+    await rejectPendingUpdates(companyId, adminId, "Logo non conforme");
+
+    const company = await CompanyModel.findById(companyId).lean();
+    expect(company.pendingUpdates).toBeNull();
+    expect(company.data.logoUrl).toBe(originalLogo);
+  });
+});
