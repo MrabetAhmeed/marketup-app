@@ -128,6 +128,7 @@ export interface ProfileForAdminReview {
   videos: VideoItemAdmin[];
   // LinkUP data
   socials: Array<{ platform: string; url: string | null }>;
+  pendingSocials: Array<{ platform: string; url: string | null }> | null;
 }
 
 export async function getProfileForAdminReview(
@@ -235,6 +236,14 @@ export async function getProfileForAdminReview(
     videos,
     // LinkUP
     socials,
+    pendingSocials: (() => {
+      const socialField = (profile.pendingData?.fields ?? []).find((f: any) => f.key === "socials");
+      if (!socialField) return null;
+      return ((socialField.newValue ?? []) as any[]).map((s: any) => ({
+        platform: s.platform ?? "",
+        url: s.url ?? null,
+      }));
+    })(),
   };
 }
 

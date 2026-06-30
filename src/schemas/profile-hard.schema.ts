@@ -35,7 +35,19 @@ export const BrandupHardSubmitSchema = z.object({
 
 export const TraceupHardSubmitSchema = z.object({}).strict();
 
-export const LinkupHardSubmitSchema = z.object({}).strict();
+import { SocialEntrySchema } from "@/schemas/profile-soft.schema";
+
+export const LinkupHardSubmitSchema = z.object({
+  socials: z
+    .array(SocialEntrySchema)
+    .refine(
+      (arr) => {
+        const platforms = arr.map((s) => s.platform);
+        return new Set(platforms).size === platforms.length;
+      },
+      { message: "Chaque plateforme ne peut apparaître qu'une seule fois." },
+    ),
+}).strict();
 
 export type BrandupHardSubmitInput = z.infer<typeof BrandupHardSubmitSchema>;
 export type TraceupHardSubmitInput = z.infer<typeof TraceupHardSubmitSchema>;

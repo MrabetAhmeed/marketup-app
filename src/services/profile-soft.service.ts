@@ -101,7 +101,7 @@ async function applyTraceupSoft(
 }
 
 // ---------------------------------------------------------------------------
-// LinkUP soft: isPublic + socials
+// LinkUP soft: isPublic only (socials moved to hard submit in PP-9)
 // ---------------------------------------------------------------------------
 
 async function applyLinkupSoft(
@@ -110,21 +110,7 @@ async function applyLinkupSoft(
 ): Promise<void> {
   const patch: LinkupSoftInput = LinkupSoftSchema.parse(rawPatch);
 
-  const setMap: Record<string, unknown> = {};
-
   if (patch.isPublic !== undefined) {
-    setMap.isPublic = patch.isPublic;
-  }
-
-  if (patch.socials !== undefined) {
-    setMap["data.socials"] = patch.socials.map((s) => ({
-      platform: s.platform,
-      url: s.url || null,
-    }));
-  }
-
-  if (Object.keys(setMap).length > 0) {
-    // Must use LinkUp discriminator model — base Profile strips data.* fields
-    await LinkUpModel.findByIdAndUpdate(profileId, { $set: setMap });
+    await LinkUpModel.findByIdAndUpdate(profileId, { $set: { isPublic: patch.isPublic } });
   }
 }

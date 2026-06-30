@@ -369,3 +369,78 @@ numérique" qui sert à localiser les pros tunisiens.
    - Reverse geocoding au drop (afficher l'adresse trouvée)
 
 **Effort estimé** : 1 sprint complet (4-5h CC + tests)
+
+## V1.1 — UX
+
+### Exception visibilité LinkUP pending
+À évaluer après observation pré-prod : si la disparition temporaire de LinkUP
+pendant la validation admin est problématique (QR codes physiques, signatures
+email partagées), introduire une exception dans isProfileVisible() pour 
+LinkUP uniquement (garder visible avec data validée tant que pendingData 
+existe). Voir aussi : pré-soumission incrémentale, ou validation accélérée 
+des socials LinkUP (priorité spéciale admin).
+
+## V1.1 — Polish UI/UX
+
+### Visibilité & status
+- Exception visibilité LinkUP pendant pending (QR codes critiques)
+- Badge StatusPill prend isPublic en compte ("Masqué" si active + !isPublic)
+
+### Admin
+- Hub admin unifié /admin/validation/comptes avec onglets
+  (inscriptions à valider + modifications de compte + modifications de profile)
+- Note : agréger pendingUpdates (Company) + pendingData (Profile)
+
+### SEO & URLs
+- Slug management γ : regénération auto + redirect 301 quand displayName change
+- Conservation historique slugs (table companySlugHistory)
+
+### Géocodage
+- Picker carte Leaflet + marker drag&drop (Nominatim imprécis pour TN)
+- Retry pattern Nominatim (queue 1 req/sec)
+- Cache résultats Nominatim (~250 villes)
+
+### Code quality
+- Warning Mongoose { new: true } → returnDocument: "after" (1 occurrence)
+- 3 lints pré-existants (profile-editor, public-search unused vars)
+- Retry pattern TransientTransactionError MongoDB Atlas
+
+### Recherche & rendu
+- Requêtes "à proximité" via index 2dsphere
+
+## V1.1 — UI badges StatusPill cohérence
+
+### Problème détecté
+**Source** : smoke PP-9 (28 juin), bug pré-existant depuis Phase 5.
+**Pages affectées** : /dashboard/brandup, /dashboard/traceup, /dashboard/linkup
+
+Le badge StatusPill en haut de chaque page profile affiche le `status` 
+(Actif/En attente/Refusé/etc.) MAIS ne reflète PAS l'état `isPublic`.
+
+### Conséquence UX
+Quand l'owner désactive son profile (toggle isPublic=false) :
+- Badge reste "Actif" (vert)
+- Mais le profile est invisible publiquement (404)
+- Confusion : "Pourquoi mon profile est-il caché alors qu'il est Actif ?"
+
+### Spec V1.1
+Hiérarchie des badges (par priorité) :
+
+| status | isPublic | Badge affiché |
+|--------|----------|---------------|
+| draft | (any) | "Brouillon" (gris) |
+| pending | (any) | "En attente" (jaune) |
+| rejected | (any) | "Refusé" (rouge) |
+| active | true | "Actif" (vert) |
+| **active** | **false** | **"Masqué" (gris ou orange clair)** ← NOUVEAU |
+
+### Implémentation
+- Composant : StatusPill (chercher le bon nom dans le code)
+- Props à ajouter : `isPublic?: boolean`
+- Appliquer aux 3 pages dashboard profile
+- Aucune modification backend nécessaire (juste UI)
+
+### Effort estimé
+- CC : 30-45 min
+- Smoke : 5 min (vérifier sur 3 profils)
+- Tests Vitest : optionnels (visuel pur)

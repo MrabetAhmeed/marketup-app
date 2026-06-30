@@ -88,6 +88,7 @@ export default async function ProfileReviewPage({ params }: PageProps): Promise<
       {profile.kind === "linkup" && (
         <LinkUpContent
           socials={profile.socials}
+          pendingSocials={profile.pendingSocials}
         />
       )}
 
@@ -277,28 +278,58 @@ function TraceUpContent({
 
 function LinkUpContent({
   socials,
+  pendingSocials,
 }: {
   socials: Array<{ platform: string; url: string | null }>;
+  pendingSocials: Array<{ platform: string; url: string | null }> | null;
 }): JSX.Element {
+  const hasDiff = pendingSocials != null;
+  const currentMap = new Map(socials.map((s) => [s.platform, s.url ?? ""]));
+  const pendingMap = hasDiff ? new Map(pendingSocials.map((s) => [s.platform, s.url ?? ""])) : null;
+
+  // All platforms (union of current + pending)
+  const allPlatforms = Array.from(new Set([
+    ...socials.map((s) => s.platform),
+    ...(pendingSocials ?? []).map((s) => s.platform),
+  ]));
+
   return (
     <section className="bg-white border border-surface-border rounded-lg overflow-hidden">
-      <div className="px-5 py-4 border-b border-surface-border">
+      <div className="px-5 py-4 border-b border-surface-border flex items-center gap-2">
         <h2 className="font-heading font-bold text-[15px] text-ink-primary">Réseaux sociaux</h2>
+        {hasDiff && <ModifiedBadge />}
       </div>
       <div className="divide-y divide-surface-border">
-        {socials.length > 0 && (
-          <div className="px-5 py-3">
-            <div className="text-[12px] font-semibold text-ink-tertiary mb-2">Réseaux sociaux</div>
-            <div className="space-y-1.5">
-              {socials.map((s) => (
-                <div key={s.platform} className="flex items-center gap-2 text-[13px]">
-                  <span className="font-medium text-ink-secondary w-[100px] capitalize">{s.platform}</span>
-                  <span className="text-ink-primary truncate">{s.url || "Non renseigné"}</span>
+        {allPlatforms.map((platform) => {
+          const current = currentMap.get(platform) ?? "";
+          const pending = pendingMap?.get(platform);
+          const isModified = hasDiff && pending !== undefined && pending !== current;
+
+          return (
+            <div key={platform} className="px-5 py-3">
+              <div className="flex items-center gap-2 mb-1">
+                <span className="text-[11px] font-bold uppercase tracking-[0.06em] text-ink-secondary capitalize">{platform}</span>
+                {isModified && <ModifiedBadge />}
+              </div>
+              {isModified ? (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                  <div className="p-3 bg-surface-muted rounded border border-surface-border">
+                    <div className="text-[10px] font-semibold text-ink-tertiary mb-1">ACTUEL</div>
+                    <div className="text-[13px] text-ink-secondary truncate">{current || "(vide)"}</div>
+                  </div>
+                  <div className="p-3 bg-[#F0FDF4] rounded border border-[#86EFAC]">
+                    <div className="text-[10px] font-semibold text-[#166534] mb-1">PROPOSÉ</div>
+                    <div className="text-[13px] text-ink-primary truncate">{pending || "(vide)"}</div>
+                  </div>
                 </div>
-              ))}
+              ) : (
+                <div className="text-[13px] text-ink-primary truncate">
+                  {(hasDiff ? (pending ?? current) : current) || "Non renseigné"}
+                </div>
+              )}
             </div>
-          </div>
-        )}
+          );
+        })}
       </div>
     </section>
   );

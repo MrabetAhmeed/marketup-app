@@ -16,7 +16,7 @@ import {
   TraceupHardSubmitSchema,
   LinkupHardSubmitSchema,
 } from "@/schemas/profile-hard.schema";
-import type { BrandupHardSubmitInput } from "@/schemas/profile-hard.schema";
+import type { BrandupHardSubmitInput, LinkupHardSubmitInput } from "@/schemas/profile-hard.schema";
 import type { SupportedLang } from "@/lib/i18n";
 import type { ProfileEditorData } from "@/types/profile-editor";
 import type { ProfileKind } from "@/types";
@@ -193,7 +193,7 @@ function buildPendingFields(
     case "traceup":
       return buildTraceupPendingFields(profile, rawBody);
     case "linkup":
-      return buildLinkupPendingFields(rawBody);
+      return buildLinkupPendingFields(profile, rawBody);
   }
 }
 
@@ -258,9 +258,29 @@ function buildTraceupPendingFields(
 }
 
 function buildLinkupPendingFields(
+  profile: any,
   rawBody: unknown,
 ): Array<{ key: string; label: string; currentValue: unknown; newValue: unknown }> {
-  // LinkUP has no hard fields — validate that body is empty
-  LinkupHardSubmitSchema.parse(rawBody);
-  return [];
+  const parsed: LinkupHardSubmitInput = LinkupHardSubmitSchema.parse(rawBody);
+  const data = profile.data ?? {};
+  const fields: Array<{ key: string; label: string; currentValue: unknown; newValue: unknown }> = [];
+
+  const currentSocials = (data.socials ?? []).map((s: any) => ({
+    platform: s.platform,
+    url: s.url ?? "",
+  }));
+
+  const newSocials = parsed.socials.map((s) => ({
+    platform: s.platform,
+    url: s.url || "",
+  }));
+
+  fields.push({
+    key: "socials",
+    label: "Réseaux sociaux",
+    currentValue: currentSocials,
+    newValue: newSocials,
+  });
+
+  return fields;
 }
