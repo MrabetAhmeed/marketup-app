@@ -28,6 +28,7 @@ interface AccountFormValues {
 /** LIVE fields that the PATCH endpoint accepts */
 const LIVE_KEYS = ["contactEmail", "phone", "whatsapp", "ville", "address"] as const;
 const IDENTITY_KEYS = ["firstName", "lastName"] as const;
+const HARD_KEYS = ["displayName"] as const;
 
 interface AccountFormProps {
   me: MeResponse;
@@ -55,10 +56,23 @@ export function AccountForm({ me }: AccountFormProps): JSX.Element {
 
   const dirtyCount = Object.keys(dirtyFields).length;
 
+  // Detect pending displayName from MeResponse
+  const pendingDisplayName = (() => {
+    const pu = me.company.pendingUpdates as { fields?: Array<{ key: string; currentValue: { fr: string }; newValue: { fr: string } }> } | null;
+    if (!pu?.fields) return null;
+    const f = pu.fields.find((x) => x.key === "data.displayName");
+    return f ? { current: f.currentValue.fr, next: f.newValue.fr } : null;
+  })();
+
   async function onSubmit(values: AccountFormValues): Promise<void> {
-    // Build patch with only dirty fields (identity + live)
+    // Build patch with only dirty fields (identity + live + hard)
     const patch: Record<string, string> = {};
     for (const key of IDENTITY_KEYS) {
+      if (dirtyFields[key]) {
+        patch[key] = values[key];
+      }
+    }
+    for (const key of HARD_KEYS) {
       if (dirtyFields[key]) {
         patch[key] = values[key];
       }
@@ -85,7 +99,7 @@ export function AccountForm({ me }: AccountFormProps): JSX.Element {
         // Zod field-level errors → inline under each field
         if (json.error?.code === "VALIDATION_FAILED" && json.error.fields) {
           const fields = json.error.fields as Record<string, string[]>;
-          const allKeys = [...IDENTITY_KEYS, ...LIVE_KEYS] as readonly string[];
+          const allKeys = [...IDENTITY_KEYS, ...HARD_KEYS, ...LIVE_KEYS] as readonly string[];
           for (const [field, messages] of Object.entries(fields)) {
             if (allKeys.includes(field)) {
               setError(field as keyof AccountFormValues, { message: messages[0] });
@@ -110,7 +124,10 @@ export function AccountForm({ me }: AccountFormProps): JSX.Element {
         ville: meData.company.ville,
         address: meData.company.address ?? "",
       });
-      showToast("Modifications enregistrées");
+      const hasHardChange = HARD_KEYS.some((k) => dirtyFields[k]);
+      showToast(hasHardChange
+        ? "Modification soumise · en attente de validation admin"
+        : "Modifications enregistrées");
       router.refresh();
     } catch {
       showToast("Erreur, veuillez réessayer");
@@ -202,13 +219,24 @@ export function AccountForm({ me }: AccountFormProps): JSX.Element {
             <input
               id="acc-name"
               type="text"
-              className="field-input"
+              className={`field-input ${errors.displayName ? "border-[#B91C1C]" : ""}`}
               {...register("displayName")}
             />
-            <div className="field-help">
-              <span className="material-symbols-outlined" style={{ fontSize: 13 }}>info</span>
-              Affiché en header de vos 3 profils publics · 3 à 80 caractères
-            </div>
+            {errors.displayName ? (
+              <p className="text-[12px] text-[#B91C1C] mt-1">{errors.displayName.message}</p>
+            ) : pendingDisplayName ? (
+              <div className="mt-1.5 px-3 py-2 bg-[#FEF3C7] border border-[#FDE68A] rounded text-[12px] text-[#92400E] flex items-start gap-2">
+                <span className="material-symbols-outlined shrink-0 mt-[1px]" style={{ fontSize: 14 }}>schedule</span>
+                <span>
+                  Modification en attente de validation : <strong>{pendingDisplayName.current}</strong> → <strong>{pendingDisplayName.next}</strong>
+                </span>
+              </div>
+            ) : (
+              <div className="field-help">
+                <span className="material-symbols-outlined" style={{ fontSize: 13 }}>info</span>
+                Affiché en header de vos 3 profils publics · la modification nécessite une validation admin
+              </div>
+            )}
           </div>
 
           {/* Type B2B/B2C (locked) */}

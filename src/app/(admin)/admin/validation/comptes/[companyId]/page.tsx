@@ -1,7 +1,9 @@
 import Link from "next/link";
+import { pickLocale } from "@/lib/i18n";
 import { getCompanyForAdminReview } from "@/services/admin-company.service";
 import { ensurePdfExtension } from "@/lib/upload";
 import { CompanyReviewActions } from "@/components/features/admin/CompanyReviewActions";
+import { PendingUpdatesActions } from "@/components/features/admin/PendingUpdatesActions";
 import type { LinkedProfile } from "@/services/admin-company.service";
 
 interface PageProps {
@@ -71,6 +73,42 @@ export default async function CompanyReviewPage({ params }: PageProps): Promise<
           ))}
         </div>
       </section>
+
+      {/* Pending updates */}
+      {company.pendingUpdates && company.pendingUpdates.fields.length > 0 && (
+        <section className="bg-white border border-[#FDE68A] rounded-lg overflow-hidden">
+          <div className="px-5 py-4 border-b border-[#FDE68A] bg-[#FFFBEB] flex items-center justify-between gap-4 flex-wrap">
+            <div>
+              <h2 className="font-heading font-bold text-[15px] text-[#92400E]">Modifications en attente</h2>
+              <p className="text-[12px] text-[#92400E]/70 mt-0.5">
+                Soumises le {new Date(company.pendingUpdates.submittedAt).toLocaleDateString("fr-FR", { day: "numeric", month: "long", year: "numeric" })}
+              </p>
+            </div>
+            <PendingUpdatesActions companyId={companyId} />
+          </div>
+          <div className="divide-y divide-surface-border">
+            {company.pendingUpdates.fields.map((f) => {
+              const current = typeof f.currentValue === "object" && f.currentValue !== null
+                ? pickLocale(f.currentValue as { fr: string; ar: string; en: string }, "fr")
+                : String(f.currentValue);
+              const next = typeof f.newValue === "object" && f.newValue !== null
+                ? pickLocale(f.newValue as { fr: string; ar: string; en: string }, "fr")
+                : String(f.newValue);
+
+              return (
+                <div key={f.key} className="px-5 py-3 flex items-start gap-4">
+                  <span className="text-[12px] font-semibold text-ink-tertiary w-[160px] shrink-0 pt-0.5">{f.label}</span>
+                  <div className="text-[13px] flex items-center gap-2 flex-wrap">
+                    <span className="text-ink-secondary line-through">{current}</span>
+                    <span className="material-symbols-outlined text-ink-tertiary" style={{ fontSize: 14 }}>arrow_forward</span>
+                    <span className="text-ink-primary font-semibold">{next}</span>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </section>
+      )}
 
       {/* Legal document */}
       <section className="bg-white border border-surface-border rounded-lg p-5">

@@ -86,6 +86,13 @@ export interface LinkedProfile {
   status: string;
 }
 
+export interface PendingUpdateField {
+  key: string;
+  label: string;
+  currentValue: unknown;
+  newValue: unknown;
+}
+
 export interface CompanyForAdminReview {
   id: string;
   displayName: string;
@@ -105,6 +112,10 @@ export interface CompanyForAdminReview {
   ownerName: string;
   ownerEmail: string;
   profiles: LinkedProfile[];
+  pendingUpdates: {
+    submittedAt: string;
+    fields: PendingUpdateField[];
+  } | null;
 }
 
 export async function getCompanyForAdminReview(
@@ -152,6 +163,17 @@ export async function getCompanyForAdminReview(
     ownerName: user ? `${user.firstName ?? ""} ${user.lastName ?? ""}`.trim() : "",
     ownerEmail: user?.email ?? company.accountEmail,
     profiles: linkedProfiles,
+    pendingUpdates: company.pendingUpdates
+      ? {
+          submittedAt: new Date(company.pendingUpdates.submittedAt).toISOString(),
+          fields: (company.pendingUpdates.fields ?? []).map((f: { key: string; label: string; currentValue: unknown; newValue: unknown }) => ({
+            key: f.key,
+            label: f.label,
+            currentValue: f.currentValue,
+            newValue: f.newValue,
+          })),
+        }
+      : null,
   };
 }
 
@@ -285,6 +307,82 @@ export async function reactivateCompanyByAdmin(
 
   await CompanyModel.findByIdAndUpdate(companyId, {
     $set: { status: "active", suspendedAt: null, suspendedReason: null },
+  });
+}
+
+// ---------------------------------------------------------------------------
+// Approve pending updates on active company
+// ---------------------------------------------------------------------------
+
+export async function approvePendingUpdates(
+  companyId: string,
+  adminId: string,
+): Promise<void> {
+  if (!isValidObjectId(companyId)) {
+    throw new BusinessRuleError("INVALID_ID", "Identifiant invalide.");
+  }
+  await connectDb();
+
+  const company = await CompanyModel.findById(companyId).lean();
+  if (!company) throw new NotFoundError("Company");
+  if (!company.pendingUpdates || !company.pendingUpdates.fields?.length) {
+    throw new BusinessRuleError("NO_PENDING", "Aucune modification en attente.");
+  }
+
+  // Merge each pending field into data
+  const setMap: Record<string, unknown> = {};
+  for (const field of company.pendingUpdates.fields) {
+    setMap[field.key] = field.newValue;
+  }
+
+  await CompanyModel.findByIdAndUpdate(companyId, {
+    $set: { ...setMap, pendingUpdates: null },
+    $push: {
+      auditTrail: {
+        at: new Date(),
+        by: new mongoose.Types.ObjectId(adminId),
+        byRole: "SUPER_ADMIN",
+        action: "approve_pending_updates",
+        details: { fields: company.pendingUpdates.fields.map((f: { key: string }) => f.key) },
+      },
+    },
+  });
+}
+
+// ---------------------------------------------------------------------------
+// Reject pending updates on active company
+// ---------------------------------------------------------------------------
+
+export async function rejectPendingUpdates(
+  companyId: string,
+  adminId: string,
+  rejectionNote?: string,
+): Promise<void> {
+  if (!isValidObjectId(companyId)) {
+    throw new BusinessRuleError("INVALID_ID", "Identifiant invalide.");
+  }
+  await connectDb();
+
+  const company = await CompanyModel.findById(companyId).lean();
+  if (!company) throw new NotFoundError("Company");
+  if (!company.pendingUpdates || !company.pendingUpdates.fields?.length) {
+    throw new BusinessRuleError("NO_PENDING", "Aucune modification en attente.");
+  }
+
+  await CompanyModel.findByIdAndUpdate(companyId, {
+    $set: { pendingUpdates: null },
+    $push: {
+      auditTrail: {
+        at: new Date(),
+        by: new mongoose.Types.ObjectId(adminId),
+        byRole: "SUPER_ADMIN",
+        action: "reject_pending_updates",
+        details: {
+          fields: company.pendingUpdates.fields.map((f: { key: string }) => f.key),
+          note: rejectionNote ?? null,
+        },
+      },
+    },
   });
 }
 

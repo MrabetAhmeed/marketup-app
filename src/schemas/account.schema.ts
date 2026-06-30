@@ -1,11 +1,18 @@
 import { z } from "zod";
 
 // ---------------------------------------------------------------------------
-// Account LIVE update — instantly-editable fields
-// Uses .strip() (Zod default) so extra keys like displayName are silently dropped.
+// Account update — live fields + hard fields (displayName → pendingUpdates)
 // ---------------------------------------------------------------------------
 
 export const AccountLiveUpdateSchema = z.object({
+  // --- Hard field (validation-gated → pendingUpdates) ---
+  displayName: z
+    .string()
+    .trim()
+    .min(1, "Le nom de l'entreprise est obligatoire.")
+    .max(100, "100 caractères maximum.")
+    .optional(),
+
   // --- Identity fields (User table) ---
   firstName: z
     .string()

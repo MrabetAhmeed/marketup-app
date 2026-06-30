@@ -206,3 +206,58 @@ describe("updateMeAccount — geocoding disabled", () => {
     expect(mockGeocode).not.toHaveBeenCalled();
   });
 });
+
+describe("updateMeAccount — displayName hard change", () => {
+  it("creates pendingUpdates when displayName differs from current", async () => {
+    await updateMeAccount(userId, { displayName: "TechnoFab International" });
+
+    const company = await CompanyModel.findById(companyId).lean();
+    expect(company.pendingUpdates).not.toBeNull();
+    expect(company.pendingUpdates.fields).toHaveLength(1);
+    expect(company.pendingUpdates.fields[0].key).toBe("data.displayName");
+    expect(company.pendingUpdates.fields[0].currentValue).toEqual({ fr: "TechnoFab Industries", ar: "", en: "" });
+    expect(company.pendingUpdates.fields[0].newValue).toEqual({ fr: "TechnoFab International", ar: "", en: "" });
+    // data.displayName unchanged
+    expect(company.data.displayName.fr).toBe("TechnoFab Industries");
+  });
+
+  it("no-op when displayName is same as current", async () => {
+    await updateMeAccount(userId, { displayName: "TechnoFab Industries" });
+
+    const company = await CompanyModel.findById(companyId).lean();
+    expect(company.pendingUpdates).toBeNull();
+  });
+
+  it("does not touch pendingUpdates when displayName not in patch", async () => {
+    await updateMeAccount(userId, { ville: "Monastir" });
+
+    const company = await CompanyModel.findById(companyId).lean();
+    expect(company.pendingUpdates).toBeNull();
+  });
+
+  it("overwrites existing pending displayName with new submission", async () => {
+    await updateMeAccount(userId, { displayName: "TechnoFab V2" });
+    await updateMeAccount(userId, { displayName: "TechnoFab V3" });
+
+    const company = await CompanyModel.findById(companyId).lean();
+    expect(company.pendingUpdates.fields).toHaveLength(1);
+    expect(company.pendingUpdates.fields[0].newValue.fr).toBe("TechnoFab V3");
+  });
+});
+
+describe("AccountLiveUpdateSchema — displayName validation", () => {
+  it("rejects empty displayName", () => {
+    const result = AccountLiveUpdateSchema.safeParse({ displayName: "" });
+    expect(result.success).toBe(false);
+  });
+
+  it("rejects displayName > 100 chars", () => {
+    const result = AccountLiveUpdateSchema.safeParse({ displayName: "X".repeat(101) });
+    expect(result.success).toBe(false);
+  });
+
+  it("accepts valid displayName", () => {
+    const result = AccountLiveUpdateSchema.safeParse({ displayName: "TechnoFab International" });
+    expect(result.success).toBe(true);
+  });
+});

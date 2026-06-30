@@ -64,6 +64,37 @@ export async function updateMeAccount(
     }
   }
 
+  // --- Handle hard field: displayName → pendingUpdates ---
+  if (patch.displayName !== undefined) {
+    const company = await CompanyModel.findById(companyId).lean();
+    if (!company) throw new NotFoundError("Company");
+
+    const currentFr: string = company.data?.displayName?.fr ?? "";
+
+    if (patch.displayName !== currentFr) {
+      const pendingField = {
+        key: "data.displayName",
+        label: "Nom de l'entreprise",
+        currentValue: { fr: currentFr, ar: "", en: "" },
+        newValue: { fr: patch.displayName, ar: "", en: "" },
+      };
+
+      // Replace existing displayName field or push new one
+      const existing = company.pendingUpdates?.fields ?? [];
+      const filtered = existing.filter((f: { key: string }) => f.key !== "data.displayName");
+      filtered.push(pendingField);
+
+      await CompanyModel.findByIdAndUpdate(companyId, {
+        pendingUpdates: {
+          submittedAt: new Date(),
+          fields: filtered,
+          note: null,
+        },
+      });
+    }
+    // If same value: no-op
+  }
+
   // --- Handle Company.liveData fields ---
   const setMap: Record<string, unknown> = {};
   if (patch.contactEmail !== undefined) setMap["liveData.contactEmail"] = patch.contactEmail;
@@ -88,8 +119,9 @@ export async function updateMeAccount(
     // prévues en V1.1 (Leaflet + marker drag&drop).
   }
 
-  // Nothing at all? (no identity, no liveData)
-  if (!hasIdentity && Object.keys(setMap).length === 0) {
+  // Nothing at all? (no identity, no liveData, no displayName)
+  const hasDisplayName = patch.displayName !== undefined;
+  if (!hasIdentity && !hasDisplayName && Object.keys(setMap).length === 0) {
     const me = await getMe(userId, companyId, lang);
     if (!me) throw new NotFoundError("Company");
     return me;
