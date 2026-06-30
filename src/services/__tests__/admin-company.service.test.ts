@@ -151,3 +151,55 @@ describe("rejectPendingUpdates", () => {
     expect(lastAudit.details.note).toBe("Nom non conforme");
   });
 });
+
+describe("approvePendingUpdates — gouvernorat", () => {
+  it("merges liveData.gouvernorat from pendingUpdates", async () => {
+    // Replace default pendingUpdates with gouvernorat
+    await CompanyModel.findByIdAndUpdate(companyId, {
+      pendingUpdates: {
+        submittedAt: new Date(),
+        fields: [{
+          key: "liveData.gouvernorat",
+          label: "Gouvernorat",
+          currentValue: "sousse",
+          newValue: "tunis",
+        }],
+      },
+    });
+
+    await approvePendingUpdates(companyId, adminId);
+
+    const company = await CompanyModel.findById(companyId).lean();
+    expect(company.liveData.gouvernorat).toBe("tunis");
+    expect(company.pendingUpdates).toBeNull();
+  });
+
+  it("merges displayName + gouvernorat together", async () => {
+    await CompanyModel.findByIdAndUpdate(companyId, {
+      pendingUpdates: {
+        submittedAt: new Date(),
+        fields: [
+          {
+            key: "data.displayName",
+            label: "Nom de l'entreprise",
+            currentValue: { fr: "TechnoFab Industries", ar: "", en: "" },
+            newValue: { fr: "TechnoFab Global", ar: "", en: "" },
+          },
+          {
+            key: "liveData.gouvernorat",
+            label: "Gouvernorat",
+            currentValue: "sousse",
+            newValue: "sfax",
+          },
+        ],
+      },
+    });
+
+    await approvePendingUpdates(companyId, adminId);
+
+    const company = await CompanyModel.findById(companyId).lean();
+    expect(company.data.displayName.fr).toBe("TechnoFab Global");
+    expect(company.liveData.gouvernorat).toBe("sfax");
+    expect(company.pendingUpdates).toBeNull();
+  });
+});

@@ -261,3 +261,63 @@ describe("AccountLiveUpdateSchema — displayName validation", () => {
     expect(result.success).toBe(true);
   });
 });
+
+describe("updateMeAccount — gouvernorat hard change", () => {
+  it("creates pendingUpdates when gouvernorat differs from current", async () => {
+    await updateMeAccount(userId, { gouvernorat: "tunis" });
+
+    const company = await CompanyModel.findById(companyId).lean();
+    expect(company.pendingUpdates).not.toBeNull();
+    const gField = company.pendingUpdates.fields.find((f: any) => f.key === "liveData.gouvernorat");
+    expect(gField).toBeDefined();
+    expect(gField.currentValue).toBe("sousse");
+    expect(gField.newValue).toBe("tunis");
+    // liveData.gouvernorat unchanged
+    expect(company.liveData.gouvernorat).toBe("sousse");
+  });
+
+  it("no-op when gouvernorat is same as current", async () => {
+    await updateMeAccount(userId, { gouvernorat: "sousse" });
+
+    const company = await CompanyModel.findById(companyId).lean();
+    expect(company.pendingUpdates).toBeNull();
+  });
+
+  it("does not touch pendingUpdates when gouvernorat not in patch", async () => {
+    await updateMeAccount(userId, { ville: "Monastir" });
+
+    const company = await CompanyModel.findById(companyId).lean();
+    expect(company.pendingUpdates).toBeNull();
+  });
+
+  it("overwrites existing pending gouvernorat", async () => {
+    await updateMeAccount(userId, { gouvernorat: "tunis" });
+    await updateMeAccount(userId, { gouvernorat: "sfax" });
+
+    const company = await CompanyModel.findById(companyId).lean();
+    const gFields = company.pendingUpdates.fields.filter((f: any) => f.key === "liveData.gouvernorat");
+    expect(gFields).toHaveLength(1);
+    expect(gFields[0].newValue).toBe("sfax");
+  });
+
+  it("handles displayName + gouvernorat together → 2 fields", async () => {
+    await updateMeAccount(userId, { displayName: "TechnoFab International", gouvernorat: "tunis" });
+
+    const company = await CompanyModel.findById(companyId).lean();
+    expect(company.pendingUpdates.fields).toHaveLength(2);
+    const keys = company.pendingUpdates.fields.map((f: any) => f.key).sort();
+    expect(keys).toEqual(["data.displayName", "liveData.gouvernorat"]);
+  });
+});
+
+describe("AccountLiveUpdateSchema — gouvernorat validation", () => {
+  it("rejects empty gouvernorat", () => {
+    const result = AccountLiveUpdateSchema.safeParse({ gouvernorat: "" });
+    expect(result.success).toBe(false);
+  });
+
+  it("accepts valid gouvernorat slug", () => {
+    const result = AccountLiveUpdateSchema.safeParse({ gouvernorat: "sousse" });
+    expect(result.success).toBe(true);
+  });
+});

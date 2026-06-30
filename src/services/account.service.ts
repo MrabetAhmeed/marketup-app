@@ -64,35 +64,56 @@ export async function updateMeAccount(
     }
   }
 
-  // --- Handle hard field: displayName → pendingUpdates ---
-  if (patch.displayName !== undefined) {
+  // --- Handle hard fields → pendingUpdates ---
+  const hasHardChange = patch.displayName !== undefined || patch.gouvernorat !== undefined;
+
+  if (hasHardChange) {
     const company = await CompanyModel.findById(companyId).lean();
     if (!company) throw new NotFoundError("Company");
 
-    const currentFr: string = company.data?.displayName?.fr ?? "";
+    let fields: Array<{ key: string; label: string; currentValue: unknown; newValue: unknown }> =
+      [...(company.pendingUpdates?.fields ?? [])];
+    let changed = false;
 
-    if (patch.displayName !== currentFr) {
-      const pendingField = {
-        key: "data.displayName",
-        label: "Nom de l'entreprise",
-        currentValue: { fr: currentFr, ar: "", en: "" },
-        newValue: { fr: patch.displayName, ar: "", en: "" },
-      };
+    // displayName hard change
+    if (patch.displayName !== undefined) {
+      const currentFr: string = company.data?.displayName?.fr ?? "";
+      if (patch.displayName !== currentFr) {
+        fields = fields.filter((f) => f.key !== "data.displayName");
+        fields.push({
+          key: "data.displayName",
+          label: "Nom de l'entreprise",
+          currentValue: { fr: currentFr, ar: "", en: "" },
+          newValue: { fr: patch.displayName, ar: "", en: "" },
+        });
+        changed = true;
+      }
+    }
 
-      // Replace existing displayName field or push new one
-      const existing = company.pendingUpdates?.fields ?? [];
-      const filtered = existing.filter((f: { key: string }) => f.key !== "data.displayName");
-      filtered.push(pendingField);
+    // gouvernorat hard change
+    if (patch.gouvernorat !== undefined) {
+      const currentGouv: string = company.liveData?.gouvernorat ?? "";
+      if (patch.gouvernorat !== currentGouv) {
+        fields = fields.filter((f) => f.key !== "liveData.gouvernorat");
+        fields.push({
+          key: "liveData.gouvernorat",
+          label: "Gouvernorat",
+          currentValue: currentGouv,
+          newValue: patch.gouvernorat,
+        });
+        changed = true;
+      }
+    }
 
+    if (changed) {
       await CompanyModel.findByIdAndUpdate(companyId, {
         pendingUpdates: {
           submittedAt: new Date(),
-          fields: filtered,
+          fields,
           note: null,
         },
       });
     }
-    // If same value: no-op
   }
 
   // --- Handle Company.liveData fields ---
@@ -119,9 +140,8 @@ export async function updateMeAccount(
     // prévues en V1.1 (Leaflet + marker drag&drop).
   }
 
-  // Nothing at all? (no identity, no liveData, no displayName)
-  const hasDisplayName = patch.displayName !== undefined;
-  if (!hasIdentity && !hasDisplayName && Object.keys(setMap).length === 0) {
+  // Nothing at all? (no identity, no liveData, no hard change)
+  if (!hasIdentity && !hasHardChange && Object.keys(setMap).length === 0) {
     const me = await getMe(userId, companyId, lang);
     if (!me) throw new NotFoundError("Company");
     return me;

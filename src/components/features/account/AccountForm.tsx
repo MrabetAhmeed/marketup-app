@@ -18,6 +18,7 @@ interface AccountFormValues {
   firstName: string;
   lastName: string;
   displayName: string;
+  gouvernorat: string;
   contactEmail: string;
   phone: string;
   whatsapp: string;
@@ -28,13 +29,19 @@ interface AccountFormValues {
 /** LIVE fields that the PATCH endpoint accepts */
 const LIVE_KEYS = ["contactEmail", "phone", "whatsapp", "ville", "address"] as const;
 const IDENTITY_KEYS = ["firstName", "lastName"] as const;
-const HARD_KEYS = ["displayName"] as const;
+const HARD_KEYS = ["displayName", "gouvernorat"] as const;
+
+interface GouvernoratOption {
+  slug: string;
+  name: string;
+}
 
 interface AccountFormProps {
   me: MeResponse;
+  gouvernorats: GouvernoratOption[];
 }
 
-export function AccountForm({ me }: AccountFormProps): JSX.Element {
+export function AccountForm({ me, gouvernorats }: AccountFormProps): JSX.Element {
   const { company } = me;
   const baseUrl = "https://vivasky.media";
   const router = useRouter();
@@ -46,6 +53,7 @@ export function AccountForm({ me }: AccountFormProps): JSX.Element {
       firstName: me.user.firstName,
       lastName: me.user.lastName,
       displayName: company.displayName,
+      gouvernorat: company.gouvernorat.slug,
       contactEmail: company.contactEmail,
       phone: company.phone ?? "",
       whatsapp: company.whatsapp ?? "",
@@ -56,12 +64,25 @@ export function AccountForm({ me }: AccountFormProps): JSX.Element {
 
   const dirtyCount = Object.keys(dirtyFields).length;
 
-  // Detect pending displayName from MeResponse
+  // Detect pending fields from MeResponse
+  const pendingFields = me.company.pendingUpdates as { fields?: Array<{ key: string; currentValue: unknown; newValue: unknown }> } | null;
+
   const pendingDisplayName = (() => {
-    const pu = me.company.pendingUpdates as { fields?: Array<{ key: string; currentValue: { fr: string }; newValue: { fr: string } }> } | null;
-    if (!pu?.fields) return null;
-    const f = pu.fields.find((x) => x.key === "data.displayName");
-    return f ? { current: f.currentValue.fr, next: f.newValue.fr } : null;
+    if (!pendingFields?.fields) return null;
+    const f = pendingFields.fields.find((x) => x.key === "data.displayName");
+    if (!f) return null;
+    const cv = f.currentValue as { fr: string };
+    const nv = f.newValue as { fr: string };
+    return { current: cv.fr, next: nv.fr };
+  })();
+
+  const pendingGouvernorat = (() => {
+    if (!pendingFields?.fields) return null;
+    const f = pendingFields.fields.find((x) => x.key === "liveData.gouvernorat");
+    if (!f) return null;
+    const currentName = gouvernorats.find((g) => g.slug === f.currentValue)?.name ?? String(f.currentValue);
+    const nextName = gouvernorats.find((g) => g.slug === f.newValue)?.name ?? String(f.newValue);
+    return { current: currentName, next: nextName };
   })();
 
   async function onSubmit(values: AccountFormValues): Promise<void> {
@@ -118,6 +139,7 @@ export function AccountForm({ me }: AccountFormProps): JSX.Element {
         firstName: meData.user.firstName,
         lastName: meData.user.lastName,
         displayName: meData.company.displayName,
+        gouvernorat: meData.company.gouvernorat.slug,
         contactEmail: meData.company.contactEmail,
         phone: meData.company.phone ?? "",
         whatsapp: meData.company.whatsapp ?? "",
@@ -532,18 +554,36 @@ export function AccountForm({ me }: AccountFormProps): JSX.Element {
             <input type="text" readOnly value="🇹🇳 Tunisie" className="field-input" />
           </div>
 
-          {/* Gouvernorat (live) */}
+          {/* Gouvernorat (hard change) */}
           <div>
-            <label htmlFor="acc-gov" className="field-label">
+            <label htmlFor="acc-gov" className="field-label flex items-center gap-2 flex-wrap">
               Gouvernorat <span className="text-[#B91C1C] font-bold ml-0.5">*</span>
+              <FieldBadge kind="validation" />
             </label>
-            <input
+            <select
               id="acc-gov"
-              type="text"
-              readOnly
-              value={company.gouvernorat.name}
-              className="field-input"
-            />
+              className={`field-input ${errors.gouvernorat ? "border-[#B91C1C]" : ""}`}
+              {...register("gouvernorat")}
+            >
+              {gouvernorats.map((g) => (
+                <option key={g.slug} value={g.slug}>{g.name}</option>
+              ))}
+            </select>
+            {errors.gouvernorat ? (
+              <p className="text-[12px] text-[#B91C1C] mt-1">{errors.gouvernorat.message}</p>
+            ) : pendingGouvernorat ? (
+              <div className="mt-1.5 px-3 py-2 bg-[#FEF3C7] border border-[#FDE68A] rounded text-[12px] text-[#92400E] flex items-start gap-2">
+                <span className="material-symbols-outlined shrink-0 mt-[1px]" style={{ fontSize: 14 }}>schedule</span>
+                <span>
+                  Modification en attente de validation : <strong>{pendingGouvernorat.current}</strong> → <strong>{pendingGouvernorat.next}</strong>
+                </span>
+              </div>
+            ) : (
+              <div className="field-help">
+                <span className="material-symbols-outlined" style={{ fontSize: 13 }}>info</span>
+                La modification nécessite une validation admin
+              </div>
+            )}
           </div>
 
           {/* Ville (live) */}

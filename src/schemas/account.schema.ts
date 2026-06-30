@@ -5,12 +5,19 @@ import { z } from "zod";
 // ---------------------------------------------------------------------------
 
 export const AccountLiveUpdateSchema = z.object({
-  // --- Hard field (validation-gated → pendingUpdates) ---
+  // --- Hard fields (validation-gated → pendingUpdates) ---
   displayName: z
     .string()
     .trim()
     .min(1, "Le nom de l'entreprise est obligatoire.")
     .max(100, "100 caractères maximum.")
+    .optional(),
+
+  gouvernorat: z
+    .string()
+    .trim()
+    .min(1, "Le gouvernorat est obligatoire.")
+    .max(50, "50 caractères maximum.")
     .optional(),
 
   // --- Identity fields (User table) ---
