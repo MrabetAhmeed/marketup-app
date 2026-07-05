@@ -154,7 +154,7 @@ function buildBrandUp(
 
 function buildTraceUp(
   profile: any,
-  base: Omit<TraceUpEditorData, "kind" | "data">,
+  base: Omit<TraceUpEditorData, "kind" | "data" | "pendingVideos">,
   lang: SupportedLang,
 ): TraceUpEditorData {
   const data = profile.data ?? {};
@@ -178,12 +178,30 @@ function buildTraceUp(
     return dateB - dateA;
   });
 
+  // Extract pending videos snapshot
+  const videoField = (profile.pendingData?.fields ?? []).find((f: any) => f.key === "videos");
+  const pendingVideos: VideoItem[] | null = videoField
+    ? ((videoField.newValue ?? []) as any[]).map((v: any) => ({
+        id: v.id,
+        source: v.source,
+        videoId: v.videoId,
+        videoUrl: v.videoUrl ?? null,
+        thumbnailUrl: v.thumbnailUrl ?? null,
+        category: v.category,
+        title: pickLocale(v.title, lang),
+        description: pickLocale(v.description, lang),
+        status: v.status ?? "active",
+        publishedAt: v.publishedAt ? new Date(v.publishedAt).toISOString() : null,
+      }))
+    : null;
+
   return {
     kind: "traceup",
     ...base,
     data: {
       videos,
     },
+    pendingVideos,
   };
 }
 

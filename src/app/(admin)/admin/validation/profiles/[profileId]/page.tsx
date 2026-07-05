@@ -83,6 +83,7 @@ export default async function ProfileReviewPage({ params }: PageProps): Promise<
       {profile.kind === "traceup" && (
         <TraceUpContent
           videos={profile.videos}
+          pendingVideos={profile.pendingVideos}
         />
       )}
       {profile.kind === "linkup" && (
@@ -225,16 +226,64 @@ function BrandUpContent({
 
 function TraceUpContent({
   videos,
+  pendingVideos,
 }: {
   videos: VideoItemAdmin[];
+  pendingVideos: VideoItemAdmin[] | null;
 }): JSX.Element {
+  const publishedIds = new Set(videos.map((v) => v.id));
+  const newPendingVideos = (pendingVideos ?? []).filter((v) => !publishedIds.has(v.id));
+  const hasNewPending = newPendingVideos.length > 0;
+
   return (
     <>
-      {/* Videos */}
+      {/* Pending new videos */}
+      {hasNewPending && (
+        <section className="bg-white border border-[#FDE68A] rounded-lg overflow-hidden">
+          <div className="px-5 py-4 border-b border-[#FDE68A] bg-[#FFFBEB] flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <h2 className="font-heading font-bold text-[15px] text-[#92400E]">Vidéos en attente d&apos;ajout</h2>
+              <ModifiedBadge />
+            </div>
+            <span className="text-[11px] font-semibold text-[#92400E] bg-[#FDE68A] px-2 py-0.5 rounded">
+              {newPendingVideos.length} nouvelle{newPendingVideos.length > 1 ? "s" : ""}
+            </span>
+          </div>
+          <div className="p-5">
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
+              {newPendingVideos.map((v) => (
+                <div key={v.id} className="border border-[#FDE68A] rounded-lg overflow-hidden">
+                  <div className="aspect-video bg-surface-muted relative">
+                    {v.thumbnailUrl ? (
+                      /* eslint-disable-next-line @next/next/no-img-element */
+                      <img src={v.thumbnailUrl} alt={v.title} className="w-full h-full object-cover" />
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center">
+                        <span className="material-symbols-outlined text-ink-tertiary" style={{ fontSize: 32 }}>play_circle</span>
+                      </div>
+                    )}
+                    <span className="absolute top-1.5 left-1.5 text-[9px] font-bold px-1.5 py-0.5 rounded bg-white/90 text-ink-secondary border border-surface-border">
+                      {v.source}
+                    </span>
+                    <span className="absolute top-1.5 right-1.5 text-[8px] font-bold px-1.5 py-0.5 rounded bg-[#D97706] text-white">
+                      AJOUT
+                    </span>
+                  </div>
+                  <div className="p-2 border-t border-[#FDE68A] bg-[#FFFBEB]">
+                    <p className="text-[11px] font-medium text-ink-primary truncate">{v.title || "Sans titre"}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* Published videos */}
       {videos.length > 0 && (
         <section className="bg-white border border-surface-border rounded-lg overflow-hidden">
           <div className="px-5 py-4 border-b border-surface-border flex items-center justify-between">
-            <h2 className="font-heading font-bold text-[15px] text-ink-primary">Vidéos</h2>
+            <h2 className="font-heading font-bold text-[15px] text-ink-primary">Vidéos publiées</h2>
             <span className="text-[11px] font-semibold text-ink-secondary bg-surface-muted border border-surface-border px-2 py-0.5 rounded">
               {videos.length} vidéo{videos.length > 1 ? "s" : ""}
             </span>

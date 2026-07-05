@@ -435,9 +435,15 @@ export class BusinessRuleError extends AppError { /* 422 */ }
 
 `POST /me/boost/checkout` and `POST /me/sponsoring/checkout` accept an `Idempotency-Key` header. Cache responses 24h keyed by `(userId, idempotencyKey)`. Return the cached response on retry.
 
-### 6.10 TraceUP videos exception
+### 6.10 TraceUP videos — hybrid hard/soft (updated PP-11, June 30 2026)
 
-Per `SEED_ARCHITECTURE §4.4.1` (decision Apr 19, 2026): TraceUP **videos** are added/removed by the owner **without admin review**. Only the channel **metadata** (channelName, channelDescription) uses `pendingData`. This is a deliberate exception to the 3-tier pattern.
+Per client feedback (demo May 22, decision Ahmed June 29): TraceUP video **additions** require admin review (hard change via `pendingData`). Video **deletions** remain instant (soft) when profile is active. Deletions are blocked during pending status.
+
+- `createVideo()` writes to `pendingData.fields[key="videos"]` with a full snapshot (not to `data.videos`)
+- Profile transitions to `pending` on first add (hidden publicly until admin validates)
+- `deleteVideo()` is soft instant (active/rejected), blocked during pending
+- `removeVideoFromPending()` lets the owner retract pending videos before admin review
+- Auto-recovery: if pending snapshot matches `data.videos` → clear pending, restore previous status
 
 ---
 

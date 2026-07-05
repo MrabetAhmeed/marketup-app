@@ -64,6 +64,7 @@ export interface TraceUpEditorData {
   data: {
     videos: VideoItem[];
   };
+  pendingVideos: VideoItem[] | null;
 }
 
 export interface SocialLink {

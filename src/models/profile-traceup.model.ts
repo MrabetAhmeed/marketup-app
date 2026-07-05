@@ -10,8 +10,8 @@ const I18nStringSchema = new Schema(
   { _id: false },
 );
 
-// TraceUP videos are direct CRUD on the array — NOT subject to pendingData.
-// See CLAUDE.md §6.10 and SEED_ARCHITECTURE.md §4.4.1.
+// TraceUP videos: additions are hard change (pendingData), deletions are soft instant.
+// See CLAUDE.md §6.10 (updated PP-11, June 30 2026).
 const VideoSchema = new Schema(
   {
     id: { type: String, required: true },

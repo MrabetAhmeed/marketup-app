@@ -126,6 +126,7 @@ export interface ProfileForAdminReview {
   currentGallery: GalleryItemAdmin[] | null;
   // TraceUP data
   videos: VideoItemAdmin[];
+  pendingVideos: VideoItemAdmin[] | null;
   // LinkUP data
   socials: Array<{ platform: string; url: string | null }>;
   pendingSocials: Array<{ platform: string; url: string | null }> | null;
@@ -234,6 +235,27 @@ export async function getProfileForAdminReview(
     currentGallery: currentGallerySnapshot,
     // TraceUP
     videos,
+    pendingVideos: (() => {
+      const videoField = (profile.pendingData?.fields ?? []).find((f: any) => f.key === "videos");
+      if (!videoField) return null;
+      return ((videoField.newValue ?? []) as any[])
+        .map((v: any) => ({
+          id: v.id,
+          source: v.source ?? "",
+          videoId: v.videoId ?? "",
+          videoUrl: v.videoUrl ?? null,
+          thumbnailUrl: v.thumbnailUrl ?? null,
+          category: v.category ?? "",
+          title: pickLocale(v.title, lang),
+          description: pickLocale(v.description, lang),
+          publishedAt: v.publishedAt ? new Date(v.publishedAt).toISOString() : null,
+        }))
+        .sort((a: VideoItemAdmin, b: VideoItemAdmin) => {
+          const dateA = a.publishedAt ? new Date(a.publishedAt).getTime() : 0;
+          const dateB = b.publishedAt ? new Date(b.publishedAt).getTime() : 0;
+          return dateB - dateA;
+        });
+    })(),
     // LinkUP
     socials,
     pendingSocials: (() => {

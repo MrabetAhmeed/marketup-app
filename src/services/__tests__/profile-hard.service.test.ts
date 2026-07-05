@@ -8,8 +8,8 @@ import { User } from "@/models/user.model";
 import { Company } from "@/models/company.model";
 import { Profile } from "@/models/profile.model";
 import { LinkUp } from "@/models/profile-linkup.model";
+import { TraceUp } from "@/models/profile-traceup.model";
 import "@/models/profile-brandup.model";
-import "@/models/profile-traceup.model";
 
 vi.mock("@/lib/db", () => ({
   connectDb: vi.fn().mockResolvedValue(undefined),
@@ -36,9 +36,18 @@ vi.mock("@/lib/env", () => ({
 vi.mock("@/lib/geocoding/nominatim", () => ({
   geocodeAddress: vi.fn().mockResolvedValue(null),
 }));
+vi.mock("@/lib/video/parsers", () => ({
+  extractVideoId: vi.fn().mockImplementation((_p: string, url: string) => url.split("v=")[1] ?? url.split("/").pop() ?? "mockId"),
+  buildVideoUrl: vi.fn().mockImplementation((_p: string, id: string) => `https://youtube.com/watch?v=${id}`),
+  isValidVideoUrl: vi.fn().mockReturnValue(true),
+}));
+vi.mock("@/lib/video/oembed", () => ({
+  fetchVideoMetadata: vi.fn().mockResolvedValue({ thumbnailUrl: "https://thumb.test/img.jpg" }),
+}));
 
 import { submitProfile, cancelPendingSubmission } from "@/services/profile-hard.service";
 import { validateProfileByAdmin, rejectProfileByAdmin } from "@/services/admin-profile.service";
+import { createVideo, deleteVideo, removeVideoFromPending } from "@/services/profile-video.service";
 
 const SectorModel = Sector as any;
 const GouvernoratModel = Gouvernorat as any;
@@ -46,11 +55,13 @@ const UserModel = User as any;
 const CompanyModel = Company as any;
 const ProfileModel = Profile as any;
 const LinkUpModel = LinkUp as any;
+const TraceUpModel = TraceUp as any;
 
 let replSet: MongoMemoryReplSet;
 let userId: string;
 let companyId: string;
 let linkupProfileId: string;
+let traceupProfileId: string;
 const adminId = new mongoose.Types.ObjectId().toString();
 
 beforeAll(async () => {
@@ -122,9 +133,24 @@ beforeEach(async () => {
     stats: { viewsTotal: 0, views30d: 0, clicksTotal: 0 },
   });
 
+  const traceup = await TraceUpModel.create({
+    companyId: company._id,
+    status: "active",
+    isPublic: true,
+    data: {
+      videos: [
+        { id: "v1", source: "youtube", videoId: "abc123", videoUrl: "https://youtube.com/watch?v=abc123", thumbnailUrl: null, category: "actualite", title: { fr: "Video 1" }, description: { fr: "" }, status: "active", publishedAt: new Date() },
+        { id: "v2", source: "youtube", videoId: "def456", videoUrl: "https://youtube.com/watch?v=def456", thumbnailUrl: null, category: "offres", title: { fr: "Video 2" }, description: { fr: "" }, status: "active", publishedAt: new Date() },
+      ],
+    },
+    publishedAt: new Date(),
+    stats: { viewsTotal: 0, views30d: 0, clicksTotal: 0 },
+  });
+
   userId = user._id.toString();
   companyId = company._id.toString();
   linkupProfileId = linkup._id.toString();
+  traceupProfileId = traceup._id.toString();
 });
 
 describe("LinkUP hard submit — socials", () => {
@@ -266,5 +292,140 @@ describe("LinkUP hard submit — socials", () => {
         ],
       }),
     ).rejects.toThrow();
+  });
+});
+
+// ---------------------------------------------------------------------------
+// TraceUP videos hard change (PP-11)
+// ---------------------------------------------------------------------------
+
+describe("TraceUP hard change — createVideo → pendingData", () => {
+  it("createVideo writes to pendingData and transitions to pending", async () => {
+    await createVideo(traceupProfileId, userId, {
+      platform: "youtube",
+      url: "https://youtube.com/watch?v=newVid1",
+      title: "New Video",
+      description: "Desc",
+      category: "actualite",
+    });
+
+    const profile = await ProfileModel.findById(traceupProfileId).lean();
+    expect(profile.status).toBe("pending");
+    expect(profile.pendingData).not.toBeNull();
+    expect(profile.pendingData.fields[0].key).toBe("videos");
+    // Snapshot = data videos (v1, v2) + new video
+    const snapshot = profile.pendingData.fields[0].newValue;
+    expect(snapshot.length).toBe(3);
+    // data.videos unchanged (still 2)
+    expect(profile.data.videos.length).toBe(2);
+  });
+
+  it("second createVideo during pending updates snapshot", async () => {
+    await createVideo(traceupProfileId, userId, {
+      platform: "youtube", url: "https://youtube.com/watch?v=vid3",
+      title: "V3", description: "", category: "offres",
+    });
+    await createVideo(traceupProfileId, userId, {
+      platform: "youtube", url: "https://youtube.com/watch?v=vid4",
+      title: "V4", description: "", category: "astuces",
+    });
+
+    const profile = await ProfileModel.findById(traceupProfileId).lean();
+    const snapshot = profile.pendingData.fields[0].newValue;
+    expect(snapshot.length).toBe(4); // v1 + v2 + vid3 + vid4
+  });
+});
+
+describe("TraceUP hard change — deleteVideo guard", () => {
+  it("deleteVideo blocked during pending", async () => {
+    await createVideo(traceupProfileId, userId, {
+      platform: "youtube", url: "https://youtube.com/watch?v=newVid",
+      title: "New", description: "", category: "actualite",
+    });
+
+    await expect(
+      deleteVideo(traceupProfileId, userId, "v1"),
+    ).rejects.toThrow("validation en cours");
+  });
+
+  it("deleteVideo works during active", async () => {
+    await deleteVideo(traceupProfileId, userId, "v1");
+    const profile = await ProfileModel.findById(traceupProfileId).lean();
+    expect(profile.data.videos.length).toBe(1);
+    expect(profile.data.videos[0].id).toBe("v2");
+  });
+});
+
+describe("TraceUP hard change — removeVideoFromPending + auto-recovery", () => {
+  it("removeVideoFromPending removes from snapshot", async () => {
+    const result = await createVideo(traceupProfileId, userId, {
+      platform: "youtube", url: "https://youtube.com/watch?v=newVid",
+      title: "New", description: "", category: "actualite",
+    });
+
+    const profile = await ProfileModel.findById(traceupProfileId).lean();
+    const snapshot = profile.pendingData.fields[0].newValue;
+    const newVideoId = snapshot[snapshot.length - 1].id;
+
+    await removeVideoFromPending(traceupProfileId, userId, newVideoId);
+
+    // Auto-recovery: snapshot (v1,v2) == data (v1,v2) → pending cleared
+    const p2 = await ProfileModel.findById(traceupProfileId).lean();
+    expect(p2.pendingData).toBeNull();
+    expect(p2.status).toBe("active");
+  });
+});
+
+describe("TraceUP hard change — admin validate/reject", () => {
+  it("validate merges pending videos into data.videos", async () => {
+    await createVideo(traceupProfileId, userId, {
+      platform: "youtube", url: "https://youtube.com/watch?v=newVid",
+      title: "New Vid", description: "", category: "actualite",
+    });
+
+    await validateProfileByAdmin(traceupProfileId, adminId);
+
+    const profile = await ProfileModel.findById(traceupProfileId).lean();
+    expect(profile.status).toBe("active");
+    expect(profile.pendingData).toBeNull();
+    expect(profile.data.videos.length).toBe(3);
+  });
+
+  it("reject keeps pendingData with note, status=rejected", async () => {
+    await createVideo(traceupProfileId, userId, {
+      platform: "youtube", url: "https://youtube.com/watch?v=newVid",
+      title: "New Vid", description: "", category: "actualite",
+    });
+
+    await rejectProfileByAdmin(traceupProfileId, adminId, "Contenu inapproprié");
+
+    const profile = await ProfileModel.findById(traceupProfileId).lean();
+    expect(profile.status).toBe("rejected");
+    expect(profile.rejectionReason).toBe("Contenu inapproprié");
+    expect(profile.data.videos.length).toBe(2); // unchanged
+  });
+
+  it("re-submit from rejected: owner adds new video then submits", async () => {
+    // Setup: add video, get rejected (reject clears pendingData)
+    await createVideo(traceupProfileId, userId, {
+      platform: "youtube", url: "https://youtube.com/watch?v=newVid",
+      title: "New", description: "", category: "actualite",
+    });
+    await rejectProfileByAdmin(traceupProfileId, adminId, "bad");
+
+    // Owner adds a new video after rejection (creates new pendingData)
+    await createVideo(traceupProfileId, userId, {
+      platform: "youtube", url: "https://youtube.com/watch?v=newVid2",
+      title: "New V2", description: "", category: "offres",
+    });
+
+    // Re-submit from rejected → pending
+    await submitProfile(traceupProfileId, userId, {});
+
+    const profile = await ProfileModel.findById(traceupProfileId).lean();
+    expect(profile.status).toBe("pending");
+    expect(profile.pendingData.fields[0].key).toBe("videos");
+    // data (v1,v2) + new video added after reject
+    expect(profile.pendingData.fields[0].newValue.length).toBe(3);
   });
 });

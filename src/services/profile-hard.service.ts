@@ -249,11 +249,14 @@ function buildBrandupPendingFields(
 }
 
 function buildTraceupPendingFields(
-  _profile: any,
+  profile: any,
   rawBody: unknown,
 ): Array<{ key: string; label: string; currentValue: unknown; newValue: unknown }> {
-  // TraceUP has no hard fields — validate that body is empty
   TraceupHardSubmitSchema.parse(rawBody);
+  // Preserve existing pending videos (from createVideo calls) on re-submit
+  if (profile.pendingData?.fields?.length > 0) {
+    return profile.pendingData.fields;
+  }
   return [];
 }
 
