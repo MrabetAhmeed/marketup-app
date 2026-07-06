@@ -327,6 +327,7 @@ export function BrandUpEditor({ profile, company }: BrandUpEditorProps): JSX.Ele
         rejectionReason={profile.rejectionReason}
         submittedAt={profile.submittedAt}
         rejectedAt={profile.rejectedAt}
+        publishedAt={profile.publishedAt}
       />
 
       {/* ═══ CONTEXT BANNER ═══ */}
@@ -473,8 +474,11 @@ export function BrandUpEditor({ profile, company }: BrandUpEditorProps): JSX.Ele
         <section className="bg-[#FFFBEB] border border-[#FDE68A] rounded-lg px-4 py-3 flex items-start gap-3" role="status">
           <span className="material-symbols-outlined icon-fill text-[#D97706] shrink-0 mt-[1px]" style={{ fontSize: 20 }}>info</span>
           <div className="min-w-0 flex-1 text-[12.5px] text-[#92400E] leading-snug">
-            <strong>En resoumettant ces modifications</strong>, votre profil BrandUP restera{" "}
-            <strong>invisible</strong> sur le moteur MARKET-UP pendant la période de validation (24-48 h).
+            <strong>En resoumettant ces modifications</strong>, votre profil BrandUP{" "}
+            {profile.publishedAt
+              ? <>restera <strong>visible</strong> avec vos données validées pendant la période de validation (24-48 h).</>
+              : <>sera <strong>invisible</strong> sur le moteur MARKET-UP pendant la période de validation (24-48 h).</>
+            }
           </div>
         </section>
       )}

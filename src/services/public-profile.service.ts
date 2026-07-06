@@ -198,7 +198,7 @@ export async function getPublicProfileBySlug(
     {
       status: profileAny.status as "active",
       isPublic: profileAny.isPublic as boolean,
-      pendingData: profileAny.pendingData,
+      publishedAt: profileAny.publishedAt as Date | null,
     },
     { status: companyAny.status as "active" },
   );
@@ -291,7 +291,7 @@ export async function getPublicProfileBySlug(
   for (const s of siblings) {
     const sAny = s as Record<string, unknown>;
     const sVisible = isProfileVisible(
-      { status: sAny.status as "active", isPublic: sAny.isPublic as boolean, pendingData: sAny.pendingData },
+      { status: sAny.status as "active", isPublic: sAny.isPublic as boolean, publishedAt: sAny.publishedAt as Date | null },
       { status: companyAny.status as "active" },
     );
     if (sVisible && sAny.kind === "brandup") siblingProfiles.brandup = true;

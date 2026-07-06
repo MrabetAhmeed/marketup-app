@@ -59,7 +59,7 @@ const TraceUpModel = TraceUp as any;
 
 let replSet: MongoMemoryReplSet;
 let userId: string;
-let companyId: string;
+let _companyId: string;
 let linkupProfileId: string;
 let traceupProfileId: string;
 const adminId = new mongoose.Types.ObjectId().toString();
@@ -148,7 +148,7 @@ beforeEach(async () => {
   });
 
   userId = user._id.toString();
-  companyId = company._id.toString();
+  _companyId = company._id.toString();
   linkupProfileId = linkup._id.toString();
   traceupProfileId = traceup._id.toString();
 });
@@ -358,7 +358,7 @@ describe("TraceUP hard change — deleteVideo guard", () => {
 
 describe("TraceUP hard change — removeVideoFromPending + auto-recovery", () => {
   it("removeVideoFromPending removes from snapshot", async () => {
-    const result = await createVideo(traceupProfileId, userId, {
+    const _result = await createVideo(traceupProfileId, userId, {
       platform: "youtube", url: "https://youtube.com/watch?v=newVid",
       title: "New", description: "", category: "actualite",
     });
@@ -405,7 +405,7 @@ describe("TraceUP hard change — admin validate/reject", () => {
     expect(profile.data.videos.length).toBe(2); // unchanged
   });
 
-  it("re-submit from rejected: owner adds new video then submits", async () => {
+  it("re-submit from rejected: createVideo auto-transitions rejected → pending (fix α)", async () => {
     // Setup: add video, get rejected (reject clears pendingData)
     await createVideo(traceupProfileId, userId, {
       platform: "youtube", url: "https://youtube.com/watch?v=newVid",
@@ -413,14 +413,14 @@ describe("TraceUP hard change — admin validate/reject", () => {
     });
     await rejectProfileByAdmin(traceupProfileId, adminId, "bad");
 
-    // Owner adds a new video after rejection (creates new pendingData)
+    const rejected = await ProfileModel.findById(traceupProfileId).lean();
+    expect(rejected.status).toBe("rejected");
+
+    // Owner adds a new video after rejection → auto-transitions to pending (fix α PP-11.5)
     await createVideo(traceupProfileId, userId, {
       platform: "youtube", url: "https://youtube.com/watch?v=newVid2",
       title: "New V2", description: "", category: "offres",
     });
-
-    // Re-submit from rejected → pending
-    await submitProfile(traceupProfileId, userId, {});
 
     const profile = await ProfileModel.findById(traceupProfileId).lean();
     expect(profile.status).toBe("pending");

@@ -130,7 +130,10 @@ function ProfileStatCard({
         <>
           <div className="font-heading font-bold text-ink-tertiary text-[26px] leading-none">—</div>
           <div className="text-[11px] text-ink-tertiary mt-1">
-            {STATUS_SUBLABEL[status] ?? "Profil invisible"}
+            {(status === "rejected" || status === "pending") && profile?.publishedAt
+              ? (status === "pending" ? "Validation en cours — profil visible" : "Refusé — profil visible")
+              : (STATUS_SUBLABEL[status] ?? "Profil invisible")
+            }
           </div>
         </>
       )}

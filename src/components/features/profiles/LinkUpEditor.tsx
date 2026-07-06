@@ -194,6 +194,7 @@ export function LinkUpEditor({ profile, company }: LinkUpEditorProps): JSX.Eleme
         rejectionReason={profile.rejectionReason}
         submittedAt={profile.submittedAt}
         rejectedAt={profile.rejectedAt}
+        publishedAt={profile.publishedAt}
       />
 
       {/* ═══ CONTEXT BANNER ═══ */}
@@ -215,7 +216,10 @@ export function LinkUpEditor({ profile, company }: LinkUpEditorProps): JSX.Eleme
           <span className="material-symbols-outlined text-[#D97706] shrink-0 mt-[1px] md:mt-0" style={{ fontSize: 20 }}>schedule</span>
           <div className="min-w-0 flex-1 text-[12.5px] text-[#92400E] leading-snug">
             <strong>Profil en cours de validation par l&apos;administrateur.</strong>{" "}
-            Le profil est temporairement masqué publiquement jusqu&apos;à la validation.
+            {profile.publishedAt
+              ? "Le profil reste visible avec vos données actuelles."
+              : "Le profil est temporairement masqué publiquement jusqu\u0027à la validation."
+            }
           </div>
           <button
             type="button"

@@ -64,7 +64,7 @@ async function writePendingSnapshot(
   }
 
   const previousStatus = profile.pendingData?.previousStatus ?? profile.status;
-  const newStatus = profile.status === "rejected" ? "rejected" : "pending";
+  const newStatus = "pending";
 
   const pendingField = {
     key: "videos",

@@ -209,7 +209,7 @@ function buildLinkUp(
   profile: any,
   base: Omit<LinkUpEditorData, "kind" | "data">,
   _lang: SupportedLang,
-  company?: any,
+  _company?: any,
 ): LinkUpEditorData {
   const data = profile.data ?? {};
   const socials: SocialLink[] = (data.socials ?? []).map((s: any) => ({

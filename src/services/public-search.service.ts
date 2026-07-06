@@ -132,12 +132,15 @@ async function findVisibleCompaniesWithProfile(
   );
 
   // Step 2: Find visible profiles of the requested kind
+  // Visibility matrice PP-11.5: publishedAt profiles stay visible even if pending/rejected
   const profiles = await ProfileModel.find({
     companyId: { $in: companyIds },
     kind: profileKind,
-    status: "active",
     isPublic: true,
-    pendingData: null,
+    $or: [
+      { publishedAt: { $ne: null }, status: { $in: ["active", "pending", "rejected"] } },
+      { publishedAt: null, status: "active" },
+    ],
   }).lean();
 
   // Step 3: Also fetch BrandUP profiles for pitch (description fallback)
@@ -146,9 +149,11 @@ async function findVisibleCompaniesWithProfile(
     brandupProfiles = (await ProfileModel.find({
       companyId: { $in: companyIds },
       kind: "brandup",
-      status: "active",
       isPublic: true,
-      pendingData: null,
+      $or: [
+        { publishedAt: { $ne: null }, status: { $in: ["active", "pending", "rejected"] } },
+        { publishedAt: null, status: "active" },
+      ],
     }).lean()) as Record<string, unknown>[];
   }
   const brandupMap = new Map(
@@ -371,7 +376,7 @@ export async function searchLinkUp(
   let filtered = pairs;
   if (filters.q && filters.q.trim()) {
     const regexes = buildAndRegex(filters.q);
-    filtered = pairs.filter(({ company, profile }) => {
+    filtered = pairs.filter(({ company, profile: _profile }) => {
       const cAny = company as Record<string, unknown>;
       const sectorName = sectorMap.get((cAny.liveData as Record<string, unknown>).sectorId as string) ?? "";
 
@@ -411,7 +416,7 @@ export async function searchLinkUp(
   const totalPages = Math.ceil(total / limit);
   const paginated = filtered.slice((page - 1) * limit, page * limit);
 
-  const items: SearchResultCard[] = paginated.map(({ company, profile, brandupProfile }) => {
+  const items: SearchResultCard[] = paginated.map(({ company, profile: _profile, brandupProfile }) => {
     const cAny = company as Record<string, unknown>;
     const cData = cAny.data as Record<string, unknown>;
     const liveData = cAny.liveData as Record<string, unknown>;

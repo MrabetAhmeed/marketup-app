@@ -360,18 +360,30 @@ For company-level edits to validation-gated fields (logo, displayName): write to
 
 **Read `reference/SEED_ARCHITECTURE.md` §4 before writing any service that touches profile or company content.**
 
-### 6.2 Profile visibility is **computed**, never stored
+### 6.2 Profile visibility is **computed**, never stored (PP-11.5 matrice 4 cas)
 
 ```ts
-function isProfileVisible(profile: Profile, company: Company): boolean {
-  return company.status === "active"
-      && profile.status === "active"
-      && profile.isPublic === true
-      && profile.pendingData == null;
+function isProfileVisible(
+  profile: { status: ProfileStatus; isPublic: boolean; publishedAt?: Date | string | null },
+  company: { status: CompanyStatus },
+): boolean {
+  if (company.status !== "active") return false;
+  if (profile.status === "disabled" || profile.status === "incomplete") return false;
+  if (!profile.isPublic) return false;
+  // Cas 3: already published → visible even if pending/rejected (shows data, never pendingData)
+  if (profile.publishedAt != null) {
+    return profile.status === "active" || profile.status === "pending" || profile.status === "rejected";
+  }
+  // Cas 4: never published → only active
+  return profile.status === "active";
 }
 ```
 
+A profile already validated at least once (`publishedAt` set) remains publicly visible with its **validated `data`** even while `pendingData` awaits admin review. This ensures QR codes, shared links, and SEO rankings are not disrupted by minor edits.
+
 Never persist a `visible` column. Compute on every read. This makes suspension/reactivation reversible without dirty writes.
+
+**Important:** `pendingData` is **never** exposed to the public. Public pages always read from `profile.data`.
 
 ### 6.3 Money is **HT in storage, TTC at read**
 

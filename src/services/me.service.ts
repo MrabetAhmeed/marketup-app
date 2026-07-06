@@ -131,7 +131,7 @@ export async function getMe(
       kind,
       status: p.status,
       visible: isProfileVisible(
-        { status: p.status, isPublic: p.isPublic, pendingData: p.pendingData },
+        { status: p.status, isPublic: p.isPublic, publishedAt: p.publishedAt },
         { status: company.status },
       ),
       isPublic: p.isPublic ?? true,

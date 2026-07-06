@@ -5,6 +5,7 @@ interface ProfileStatusBlockProps {
   rejectionReason: string | null;
   submittedAt: string | null;
   rejectedAt: string | null;
+  publishedAt?: string | null;
 }
 
 export function ProfileStatusBlock({
@@ -12,6 +13,7 @@ export function ProfileStatusBlock({
   rejectionReason,
   submittedAt,
   rejectedAt,
+  publishedAt,
 }: ProfileStatusBlockProps): JSX.Element | null {
   if (status === "active" || status === "incomplete") return null;
 
@@ -41,8 +43,11 @@ export function ProfileStatusBlock({
                 <span>Tous les champs du profil sont <strong>en lecture seule</strong></span>
               </li>
               <li className="flex items-start gap-2">
-                <span className="material-symbols-outlined shrink-0 mt-[1px] text-[#D97706]" style={{ fontSize: 14 }}>visibility_off</span>
-                <span>Votre profil est <strong>invisible</strong> sur le moteur public</span>
+                <span className="material-symbols-outlined shrink-0 mt-[1px] text-[#D97706]" style={{ fontSize: 14 }}>{publishedAt ? "visibility" : "visibility_off"}</span>
+                <span>{publishedAt
+                  ? <>Votre profil reste <strong>visible</strong> sur le moteur public avec vos données validées</>
+                  : <>Votre profil est <strong>invisible</strong> sur le moteur public</>
+                }</span>
               </li>
               <li className="flex items-start gap-2">
                 <span className="material-symbols-outlined shrink-0 mt-[1px] text-[#D97706]" style={{ fontSize: 14 }}>mail</span>
@@ -94,6 +99,12 @@ export function ProfileStatusBlock({
             <p className="text-[12px] text-[#991B1B] leading-relaxed">
               Corrigez les points mentionnés puis cliquez sur <strong>Enregistrer et resoumettre</strong> en bas de page.
             </p>
+            {publishedAt && (
+              <p className="text-[12px] text-[#92400E] mt-2 flex items-start gap-1.5">
+                <span className="material-symbols-outlined shrink-0 mt-[1px] text-[#D97706]" style={{ fontSize: 14 }}>visibility</span>
+                Votre profil reste <strong>visible</strong> sur le moteur public avec vos données précédemment validées.
+              </p>
+            )}
           </div>
         </div>
       </section>

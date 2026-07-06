@@ -1321,6 +1321,8 @@ type Locale = "fr" | "ar" | "en";
 
 ### 10.1 Règle de visibilité publique
 
+> **⚠️ OBSOLÈTE** — cette section était une spec pré-implémentation qui divergeait déjà du code (company.pendingData/deletedAt jamais vérifiés, validationStatus → status, isPublic absent). Depuis PP-11.5, la visibilité suit la matrice 4 cas avec publishedAt — voir CLAUDE.md §6.2.
+
 Un profil est **visible publiquement** si et seulement si :
 
 ```js

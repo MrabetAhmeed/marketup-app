@@ -372,18 +372,16 @@ numérique" qui sert à localiser les pros tunisiens.
 
 ## V1.1 — UX
 
-### Exception visibilité LinkUP pending
-À évaluer après observation pré-prod : si la disparition temporaire de LinkUP
-pendant la validation admin est problématique (QR codes physiques, signatures
-email partagées), introduire une exception dans isProfileVisible() pour 
-LinkUP uniquement (garder visible avec data validée tant que pendingData 
-existe). Voir aussi : pré-soumission incrémentale, ou validation accélérée 
-des socials LinkUP (priorité spéciale admin).
+### ✅ RÉSOLU en V1 par PP-11.5 — Exception visibilité pendant pending/rejected
+Étendu aux 3 profils (pas seulement LinkUP). Un profil avec publishedAt
+renseigné (déjà validé au moins 1 fois) reste visible publiquement avec
+ses données validées (data) même pendant status pending ou rejected.
+Voir CLAUDE.md §6.2 (matrice 4 cas avec publishedAt).
 
 ## V1.1 — Polish UI/UX
 
 ### Visibilité & status
-- Exception visibilité LinkUP pendant pending (QR codes critiques)
+- ~~Exception visibilité LinkUP pendant pending~~ → ✅ RÉSOLU PP-11.5 (tous profils)
 - Badge StatusPill prend isPublic en compte ("Masqué" si active + !isPublic)
 
 ### Admin
@@ -400,9 +398,18 @@ des socials LinkUP (priorité spéciale admin).
 - Retry pattern Nominatim (queue 1 req/sec)
 - Cache résultats Nominatim (~250 villes)
 
+### Email rejet — mention visibilité continue
+Ajouter une ligne conditionnelle dans le template email de rejet profil
+(si publishedAt renseigné) : "votre profil reste visible avec les données
+validées précédemment". Chaîne à modifier : admin-profile.service.ts
+(passer publishedAt aux params) → sender.ts (signature
+sendProfileRejectedEmail) → templates/profile-rejected.ts (paramètre
++ ligne conditionnelle HTML). Reporté de PP-11.5 — cosmétique. Vérifier
+profile-validated.ts au passage.
+
 ### Code quality
 - Warning Mongoose { new: true } → returnDocument: "after" (1 occurrence)
-- 3 lints pré-existants (profile-editor, public-search unused vars)
+- ~~3 lints pré-existants (profile-editor, public-search unused vars)~~ → ✅ RÉSOLU PP-11.5 (5 lints fixés : 3 documentés + 2 découverts dans profile-hard.service.test.ts)
 - Retry pattern TransientTransactionError MongoDB Atlas
 
 ### Recherche & rendu
@@ -444,3 +451,32 @@ Hiérarchie des badges (par priorité) :
 - CC : 30-45 min
 - Smoke : 5 min (vérifier sur 3 profils)
 - Tests Vitest : optionnels (visuel pur)
+
+### PP-11.5 audit UX — Cycle rejected TraceUP (5 juillet)
+
+1. **Banner rejected adapté par kind** — ProfileStatusBlock dit "cliquez
+   sur Enregistrer et resoumettre" mais TraceUP n'a pas ce bouton (la
+   re-soumission passe par l'ajout de vidéo, auto-transition fix α).
+   Ajouter prop `kind` + texte conditionnel TraceUP : "Ajoutez une
+   nouvelle vidéo conforme — la soumission sera automatique."
+   Fichier : ProfileStatusBlock.tsx.
+
+2. **Badge AJOUT socials (diff admin LinkUP)** — actuellement tout écart
+   = MODIFIÉ, même (vide) → URL. Aligner sur gallery (NOUVEAU) et vidéos
+   (AJOUT) : si current vide/absent et pending renseigné → AJOUT.
+   Fichier : admin/validation/profiles/[profileId]/page.tsx,
+   LinkUpContent() condition :355.
+
+3. **previousStatus perdu au reject** — retirer toutes les vidéos pending
+   après un cycle reject restaure "rejected" (pas "active"). Si le cas
+   d'usage "abandon pur" est demandé : préserver le previousStatus
+   original à travers le cycle reject. Complexité M. À évaluer après
+   feedback pré-prod. Note : le retour à active via validation admin
+   uniquement est un choix défendable (anti-contournement).
+
+4. **Perte du contenu au reject** — rejectProfileByAdmin() efface
+   pendingData : si l'owner avait soumis 5 vidéos et qu'une seule posait
+   problème, il perd les 5 (URLs à re-saisir). À évaluer : conserver une
+   copie du pendingData refusé (champ rejectedData ou historique) pour
+   permettre la correction sans re-saisie. Concerne aussi BrandUP/LinkUP
+   (même service reject). À croiser avec feedback client pré-prod.

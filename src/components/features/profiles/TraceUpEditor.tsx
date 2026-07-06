@@ -177,6 +177,7 @@ export function TraceUpEditor({ profile, company }: TraceUpEditorProps): JSX.Ele
         rejectionReason={profile.rejectionReason}
         submittedAt={profile.submittedAt}
         rejectedAt={profile.rejectedAt}
+        publishedAt={profile.publishedAt}
       />
 
       {/* ═══ PENDING BANNER ═══ */}
@@ -185,7 +186,10 @@ export function TraceUpEditor({ profile, company }: TraceUpEditorProps): JSX.Ele
           <span className="material-symbols-outlined text-[#D97706] shrink-0 mt-[1px] md:mt-0" style={{ fontSize: 20 }}>schedule</span>
           <div className="min-w-0 flex-1 text-[12.5px] text-[#92400E] leading-snug">
             <strong>Profil en cours de validation par l&apos;administrateur.</strong>{" "}
-            Le profil est temporairement masqué publiquement. Les suppressions de vidéos publiées sont bloquées.
+            {profile.publishedAt
+              ? "Le profil reste visible avec vos vidéos publiées."
+              : "Le profil est temporairement masqué publiquement."
+            }{" "}Les suppressions de vidéos publiées sont bloquées.
           </div>
           <button
             type="button"
