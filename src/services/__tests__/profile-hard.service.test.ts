@@ -9,7 +9,7 @@ import { Company } from "@/models/company.model";
 import { Profile } from "@/models/profile.model";
 import { LinkUp } from "@/models/profile-linkup.model";
 import { TraceUp } from "@/models/profile-traceup.model";
-import "@/models/profile-brandup.model";
+import { BrandUp } from "@/models/profile-brandup.model";
 
 vi.mock("@/lib/db", () => ({
   connectDb: vi.fn().mockResolvedValue(undefined),
@@ -29,12 +29,8 @@ vi.mock("@/lib/env", () => ({
     NEXTAUTH_URL: "http://localhost:3000",
     RESEND_API_KEY: "",
     EMAIL_FROM: "test@test.dev",
-    NOMINATIM_USER_AGENT: "TEST/1.0",
     ADMIN_NOTIFICATION_EMAIL: "admin@test.dev",
   },
-}));
-vi.mock("@/lib/geocoding/nominatim", () => ({
-  geocodeAddress: vi.fn().mockResolvedValue(null),
 }));
 vi.mock("@/lib/video/parsers", () => ({
   extractVideoId: vi.fn().mockImplementation((_p: string, url: string) => url.split("v=")[1] ?? url.split("/").pop() ?? "mockId"),
@@ -56,6 +52,7 @@ const CompanyModel = Company as any;
 const ProfileModel = Profile as any;
 const LinkUpModel = LinkUp as any;
 const TraceUpModel = TraceUp as any;
+const BrandUpModel = BrandUp as any;
 
 let replSet: MongoMemoryReplSet;
 let userId: string;
@@ -98,6 +95,7 @@ beforeEach(async () => {
       ville: "Sousse",
       contactEmail: "ahmed@technofab.tn",
       languages: ["fr"],
+      gpsPosition: { type: "Point", coordinates: [10.71, 35.76] },
     },
     status: "active",
     ownerUserId: new mongoose.Types.ObjectId(),
@@ -427,5 +425,79 @@ describe("TraceUP hard change — admin validate/reject", () => {
     expect(profile.pendingData.fields[0].key).toBe("videos");
     // data (v1,v2) + new video added after reject
     expect(profile.pendingData.fields[0].newValue.length).toBe(3);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// PP-12.6 — MISSING_GPS guard (LinkUP only)
+// ---------------------------------------------------------------------------
+
+describe("submitProfile — MISSING_GPS guard", () => {
+  it("submit LinkUP without gpsPosition → 422 MISSING_GPS", async () => {
+    // Remove gpsPosition from company fixture
+    await CompanyModel.findByIdAndUpdate(_companyId, {
+      $unset: { "liveData.gpsPosition": 1 },
+    });
+
+    await expect(
+      submitProfile(linkupProfileId, userId, {
+        socials: [
+          { platform: "website", url: "" },
+          { platform: "linkedin", url: "https://linkedin.com/test" },
+          { platform: "facebook", url: "" },
+          { platform: "instagram", url: "" },
+          { platform: "youtube", url: "" },
+        ],
+      }),
+    ).rejects.toThrow("Positionnez votre entreprise");
+  });
+
+  it("submit LinkUP WITH gpsPosition → passes (pending)", async () => {
+    // Set gpsPosition on company
+    await CompanyModel.findByIdAndUpdate(_companyId, {
+      "liveData.gpsPosition": { type: "Point", coordinates: [10.71, 35.76] },
+    });
+
+    await submitProfile(linkupProfileId, userId, {
+      socials: [
+        { platform: "website", url: "" },
+        { platform: "linkedin", url: "https://linkedin.com/test" },
+        { platform: "facebook", url: "" },
+        { platform: "instagram", url: "" },
+        { platform: "youtube", url: "" },
+      ],
+    });
+
+    const profile = await ProfileModel.findById(linkupProfileId).lean();
+    expect(profile.status).toBe("pending");
+  });
+
+  it("submit BrandUP without gpsPosition → passes (guard scoped to LinkUP)", async () => {
+    // Remove gpsPosition
+    await CompanyModel.findByIdAndUpdate(_companyId, {
+      $unset: { "liveData.gpsPosition": 1 },
+    });
+
+    // Create a BrandUP profile
+    const brandup = await BrandUpModel.create({
+      companyId: _companyId,
+      status: "active",
+      isPublic: true,
+      data: {
+        pitch: { fr: "Test", ar: "", en: "" },
+        about: { fr: "Test", ar: "", en: "" },
+        gallery: [],
+      },
+      publishedAt: new Date(),
+      stats: { viewsTotal: 0, views30d: 0, clicksTotal: 0 },
+    });
+
+    await submitProfile(brandup._id.toString(), userId, {
+      pitch: "New pitch",
+      about: "New about",
+    });
+
+    const profile = await ProfileModel.findById(brandup._id).lean();
+    expect(profile.status).toBe("pending");
   });
 });

@@ -84,6 +84,7 @@ export interface LinkUpEditorData {
   hasPendingData: boolean;
   boosted: boolean;
   sponsoring: boolean;
+  gpsPosition: { type: string; coordinates: [number, number] } | null;
   data: {
     socials: SocialLink[];
     qrConfig: {

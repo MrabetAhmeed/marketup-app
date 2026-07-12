@@ -77,6 +77,17 @@ export const AccountLiveUpdateSchema = z.object({
     )
     .optional(),
 
+  // --- GPS position (live, set via Leaflet pin in LinkUP dashboard) ---
+  gpsPosition: z
+    .object({
+      type: z.literal("Point"),
+      coordinates: z.tuple([
+        z.number().min(-180).max(180),
+        z.number().min(-90).max(90),
+      ]),
+    })
+    .optional(),
+
 });
 
 export type AccountLiveUpdateInput = z.infer<typeof AccountLiveUpdateSchema>;

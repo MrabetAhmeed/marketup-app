@@ -25,11 +25,7 @@ vi.mock("@/lib/env", () => ({
     NEXTAUTH_URL: "http://localhost:3000",
     RESEND_API_KEY: "",
     EMAIL_FROM: "test@test.dev",
-    NOMINATIM_USER_AGENT: "TEST/1.0",
   },
-}));
-vi.mock("@/lib/geocoding/nominatim", () => ({
-  geocodeAddress: vi.fn().mockResolvedValue(null),
 }));
 
 import { approvePendingUpdates, rejectPendingUpdates } from "@/services/admin-company.service";

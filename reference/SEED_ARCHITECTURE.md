@@ -753,9 +753,7 @@ linkup: {
 ```
 
 **Champs spécifiques** :
-- `contactCard.photo` : avatar du contact (généré DiceBear en seed, upload S3 en prod)
-- `contactCard.title/company/bio` : multilingue
-- `contactCard.gpsPosition` : **GeoJSON Point** `{ type: "Point", coordinates: [longitude, latitude] }`. Format MongoDB-natif compatible avec l'index `2dsphere` pour les requêtes "à proximité" V1.1+. Renseigné via picker carte dans le formulaire LinkUP (Leaflet/Mapbox côté frontend).
+- ~~`contactCard.*`~~ : **OBSOLETE (PP-12.6)** — `contactCard` n'a jamais été implémenté dans le code. La position GPS réelle est `Company.liveData.gpsPosition` (GeoJSON Point), posée par l'owner via un marker Leaflet dans le dashboard LinkUP. Voir CLAUDE.md §6.1.
 - `qrConfig` : personnalisation du QR code généré dynamiquement à l'affichage
 - `socials[]` : liste fixe de 7-10 plateformes possibles, `url: null` si non renseigné
 

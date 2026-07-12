@@ -333,42 +333,15 @@ Estimated effort: 4-6 hours (adapter + migration script + cutover).
 - Les emails passent à tous les destinataires
 - Effort : 10 min config + 10-30 min propagation DNS
 
-## V1.1 — Picker carte LinkUP (priorité haute)
+## ✅ RÉSOLU PP-12.6 — Picker carte LinkUP
 
-**Problème identifié (PP-6b 28 juin)** :
-Nominatim a une couverture médiocre des villes secondaires tunisiennes.
-Exemples observés en test :
-- "Kalaa Sghira, Sousse" → introuvable
-- "Sousse" seul → Msaken (8 km du vrai centre)
-- Adresses précises souvent imprécises (rues mal géocodées en OSM Tunisie)
+Nominatim entièrement retiré. Position GPS posée par l'owner via marker
+Leaflet draggable dans le dashboard LinkUP (édition live instantanée).
+GPS obligatoire pour soumettre un profil LinkUP (guard MISSING_GPS 422).
 
-**Conséquence en prod** : LinkUP affiche un Maps link qui pointe à plusieurs km
-de l'adresse réelle de l'entreprise. Inacceptable pour une "carte de visite
-numérique" qui sert à localiser les pros tunisiens.
-
-**Spec V1.1** :
-1. Composant <MapPicker /> dans /dashboard/account
-   - Carte interactive (Leaflet ou Google Maps)
-   - Marker déplaçable
-   - Auto-centrage sur les coords actuelles si présentes
-   - Centrage par défaut sur la ville/gouvernorat
-   - Saved coords = override le géocodage auto
-
-2. Au signup :
-   - Géocodage Nominatim conservé (tentative au moins)
-   - Si null/fail → fallback Maps texte (déjà OK)
-
-3. À l'update /account :
-   - Si l'user modifie address/ville/gouvernorat seul → pas de re-géocodage auto
-   - Si l'user clique sur la carte → coords mises à jour
-   - Bouton "Re-géocoder automatiquement" pour les users avancés
-
-4. Tech stack :
-   - Leaflet (gratuit, OSM tiles)
-   - Marker drag&drop
-   - Reverse geocoding au drop (afficher l'adresse trouvée)
-
-**Effort estimé** : 1 sprint complet (4-5h CC + tests)
+### Items V1.1 restants (issus de ce bloc) :
+- Reverse geocoding au drop du pin (afficher l'adresse trouvée — optionnel UX)
+- Bouton Maps sur BrandUP/TraceUP (donnée déjà exposée dans PublicCompanyBase)
 
 ## V1.1 — UX
 
@@ -405,9 +378,9 @@ Voir CLAUDE.md §6.2 (matrice 4 cas avec publishedAt).
   (gouvernorat + ville + adresse) comme un seul "bloc localisation" dans la diff admin et
   dans le formulaire owner (soumission/approbation groupée). À évaluer si friction terrain
   après pré-prod (owners modifiant souvent les 3 en même temps).
-- Picker carte Leaflet + marker drag&drop (Nominatim imprécis pour TN)
-- Retry pattern Nominatim (queue 1 req/sec)
-- Cache résultats Nominatim (~250 villes)
+- ~~Picker carte Leaflet~~ → ✅ RÉSOLU PP-12.6
+- ~~Retry pattern Nominatim~~ → ❌ OBSOLÈTE (Nominatim retiré PP-12.6)
+- ~~Cache résultats Nominatim~~ → ❌ OBSOLÈTE (Nominatim retiré PP-12.6)
 
 ### Email rejet — mention visibilité continue
 Ajouter une ligne conditionnelle dans le template email de rejet profil
@@ -493,18 +466,7 @@ Hiérarchie des badges (par priorité) :
    (même service reject). À croiser avec feedback client pré-prod.
    
    
-   ### GPS position — cycle de vie complet (priorité HAUTE, remontée 12/07 post-PP-12.5)
-Problème : gpsPosition géocodée uniquement au signup, jamais mise à jour.
-Depuis PP-12.5 (adresse/ville/gouvernorat en hard), l'approbation d'un
-déménagement laisse le lien Maps sur l'ancienne position — incohérence
-visible publiquement.
-À faire (audit fonction totale + fix) :
-1. Auditer tous les consommateurs de gpsPosition (Maps public LinkUP,
-   recherche à proximité future, autres)
-2. Re-géocodage Nominatim déclenché à l'APPROVE d'un field localisation
-   (pas au submit — cohérent hard change) avec fallback si Nominatim
-   échoue (garder l'ancienne position + flag)
-3. Ou/et : picker carte Leaflet owner (item existant, fusionner)
-4. Vérifier le seed : gpsPosition cohérentes avec les villes seed
-Candidat : sprint dédié V1.1 ou PP-12.6 si le client considère Maps
-critique pour la démo pré-prod.
+   ### ✅ RÉSOLU PP-12.6 — GPS position — cycle de vie complet
+Nominatim retiré. L'owner pose un pin Leaflet dans le dashboard LinkUP
+(édition live instantanée). Le déménagement est résolu : l'owner
+déplace son pin quand il veut, sans dépendre de l'approbation admin.

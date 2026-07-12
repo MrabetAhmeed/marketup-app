@@ -156,7 +156,7 @@ export async function updateMeAccount(
   if (patch.contactEmail !== undefined) setMap["liveData.contactEmail"] = patch.contactEmail;
   if (patch.phone !== undefined) setMap["liveData.phone"] = patch.phone;
   if (patch.whatsapp !== undefined) setMap["liveData.whatsapp"] = patch.whatsapp;
-  // ville and address are now hard-change fields → routed to pendingUpdates above
+  if (patch.gpsPosition !== undefined) setMap["liveData.gpsPosition"] = patch.gpsPosition;
 
   if (Object.keys(setMap).length > 0) {
     const updated = await CompanyModel.findByIdAndUpdate(
@@ -166,12 +166,6 @@ export async function updateMeAccount(
     ).lean();
 
     if (!updated) throw new NotFoundError("Company");
-
-    // Re-géocodage désactivé (V1.1 backlog : picker carte manuel)
-    // Nominatim a une couverture médiocre des villes secondaires tunisiennes
-    // (ex: "Kalaa Sghira" introuvable, "Sousse" → Msaken). La gpsPosition
-    // n'est géocodée automatiquement qu'au signup. Corrections manuelles
-    // prévues en V1.1 (Leaflet + marker drag&drop).
   }
 
   // Nothing at all? (no identity, no liveData, no hard change)

@@ -367,7 +367,9 @@ For company-level edits to validation-gated fields, write to `company.pendingUpd
 | Ville | `liveData.ville` |
 | Adresse | `liveData.address` |
 
-Live Company fields (instant, no admin review): `liveData.phone`, `liveData.whatsapp`, `liveData.contactEmail`, `liveData.languages`, `liveData.sectorId`, `liveData.gpsPosition`. Identity fields (User table): `firstName`, `lastName`.
+Live Company fields (instant, no admin review): `liveData.phone`, `liveData.whatsapp`, `liveData.contactEmail`, `liveData.languages`, `liveData.sectorId`, `liveData.gpsPosition` (set via Leaflet pin in LinkUP dashboard — Nominatim removed in PP-12.6). Identity fields (User table): `firstName`, `lastName`.
+
+**GPS position (PP-12.6):** `Company.liveData.gpsPosition` is a GeoJSON Point set by the owner via a draggable map marker in the LinkUP dashboard editor. It is a live field (instant, no admin review). Submitting a LinkUP profile requires `gpsPosition != null` (guard `MISSING_GPS` 422). The Nominatim geocoding service has been fully removed — the pin is the sole source of GPS coordinates.
 
 **Read `reference/SEED_ARCHITECTURE.md` §4 before writing any service that touches profile or company content.**
 

@@ -207,9 +207,9 @@ function buildTraceUp(
 
 function buildLinkUp(
   profile: any,
-  base: Omit<LinkUpEditorData, "kind" | "data">,
+  base: Omit<LinkUpEditorData, "kind" | "data" | "gpsPosition">,
   _lang: SupportedLang,
-  _company?: any,
+  company?: any,
 ): LinkUpEditorData {
   const data = profile.data ?? {};
   const socials: SocialLink[] = (data.socials ?? []).map((s: any) => ({
@@ -217,9 +217,12 @@ function buildLinkUp(
     url: s.url ?? null,
   }));
 
+  const gps = company?.liveData?.gpsPosition;
+
   return {
     kind: "linkup",
     ...base,
+    gpsPosition: gps ? { type: gps.type, coordinates: gps.coordinates } : null,
     data: {
       socials,
       qrConfig: {

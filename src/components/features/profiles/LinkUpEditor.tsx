@@ -1,7 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import Link from "next/link";
+import dynamic from "next/dynamic";
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { StatusPill } from "@/components/shared/StatusPill";
@@ -10,6 +11,8 @@ import { CopyGroup } from "@/components/shared/CopyGroup";
 import { useToast } from "@/components/shared/Toast";
 import type { LinkUpEditorData } from "@/types/profile-editor";
 import type { MeResponse } from "@/types/dashboard";
+
+const MapPicker = dynamic(() => import("@/components/features/profiles/MapPicker"), { ssr: false });
 
 const LINK_PLATFORMS = [
   { id: "website", label: "Site web", icon: "language", placeholder: "https://www.votre-site.tn" },
@@ -66,6 +69,42 @@ export function LinkUpEditor({ profile, company }: LinkUpEditorProps): JSX.Eleme
       setSavingPublic(false);
     }
   }
+
+  // --- GPS position (live, independent of profile status) ---
+  const [gpsCoords, setGpsCoords] = useState<[number, number] | null>(
+    profile.gpsPosition ? (profile.gpsPosition.coordinates as [number, number]) : null,
+  );
+  const [gpsDirty, setGpsDirty] = useState(false);
+  const [savingGps, setSavingGps] = useState(false);
+
+  const handleGpsChange = useCallback((coords: [number, number]) => {
+    setGpsCoords(coords);
+    setGpsDirty(true);
+  }, []);
+
+  async function handleGpsSave(): Promise<void> {
+    if (!gpsCoords || !gpsDirty) return;
+    setSavingGps(true);
+    try {
+      const res = await fetch("/api/v1/me/account", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          gpsPosition: { type: "Point", coordinates: gpsCoords },
+        }),
+      });
+      if (!res.ok) { showToast("Erreur, veuillez réessayer"); return; }
+      showToast("Position enregistrée");
+      setGpsDirty(false);
+      router.refresh();
+    } catch {
+      showToast("Erreur, veuillez réessayer");
+    } finally {
+      setSavingGps(false);
+    }
+  }
+
+  const hasGps = gpsCoords != null;
 
   // --- Hard state: socials ---
   const socialsDirtyCount = Object.keys(dirtyFields).length;
@@ -259,6 +298,47 @@ export function LinkUpEditor({ profile, company }: LinkUpEditorProps): JSX.Eleme
         </div>
       </section>
 
+      {/* ═══ SECTION: POSITION SUR LA CARTE ═══ */}
+      <section className="card p-5 md:p-6">
+        <div className="flex items-start justify-between mb-4 flex-wrap gap-2">
+          <div>
+            <h3 className="font-heading font-bold text-[15px] text-ink-primary">Position sur la carte</h3>
+            <p className="text-[12px] text-ink-secondary mt-0.5 leading-snug">
+              Placez ou déplacez le marqueur pour localiser votre entreprise sur Google Maps
+            </p>
+          </div>
+          <span className="inline-flex items-center gap-1 text-[10px] font-semibold text-[#0E7C42] bg-[#E6F4ED] border border-[#B7E1CD] px-2 py-1 rounded shrink-0">
+            <span className="material-symbols-outlined" style={{ fontSize: 12 }}>bolt</span>
+            Mise à jour instantanée
+          </span>
+        </div>
+        {!hasGps && !gpsDirty && (
+          <div className="mb-3 flex items-center gap-2 text-[12px] text-[#B45309] bg-[#FEF3C7] border border-[#FDE68A] rounded px-3 py-2">
+            <span className="material-symbols-outlined" style={{ fontSize: 16 }}>warning</span>
+            Positionnez votre entreprise sur la carte avant de soumettre le profil LinkUP.
+          </div>
+        )}
+        <MapPicker position={gpsCoords} onPositionChange={handleGpsChange} />
+        {gpsDirty && gpsCoords && (
+          <div className="mt-3 flex items-center justify-end gap-2">
+            <span className="text-[12px] text-ink-secondary">
+              {gpsCoords[1].toFixed(5)}, {gpsCoords[0].toFixed(5)}
+            </span>
+            <button
+              type="button"
+              disabled={savingGps}
+              onClick={handleGpsSave}
+              className="inline-flex items-center gap-1.5 px-4 py-[9px] text-[13px] font-semibold text-white bg-primary hover:bg-primary-hover rounded transition-colors disabled:opacity-60"
+            >
+              {savingGps
+                ? <span className="material-symbols-outlined animate-spin" style={{ fontSize: 16 }}>progress_activity</span>
+                : <span className="material-symbols-outlined" style={{ fontSize: 16 }}>save</span>}
+              {savingGps ? "Enregistrement…" : "Enregistrer la position"}
+            </button>
+          </div>
+        )}
+      </section>
+
       {/* ═══ SECTION: LIENS AUTOMATIQUES ═══ */}
       <section className="card p-5 md:p-6">
         <div className="mb-5">
@@ -378,7 +458,8 @@ export function LinkUpEditor({ profile, company }: LinkUpEditorProps): JSX.Eleme
               <span className="material-symbols-outlined" style={{ fontSize: 16 }}>undo</span>
               Annuler
             </button>
-            <button type="button" disabled={saving} onClick={handleSocialsSubmit}
+            <button type="button" disabled={saving || !hasGps} onClick={handleSocialsSubmit}
+              title={!hasGps ? "Positionnez votre entreprise sur la carte avant de soumettre" : undefined}
               className="inline-flex items-center gap-1.5 px-5 py-[9px] text-[13px] font-semibold text-white bg-primary hover:bg-primary-hover rounded transition-colors disabled:opacity-60">
               {saving
                 ? <span className="material-symbols-outlined animate-spin" style={{ fontSize: 16 }}>progress_activity</span>
@@ -390,7 +471,8 @@ export function LinkUpEditor({ profile, company }: LinkUpEditorProps): JSX.Eleme
       )}
       {!isPending && (profile.status === "incomplete" || profile.status === "rejected") && socialsDirtyCount === 0 && (
         <div className="sticky bottom-0 z-30 bg-white border-t border-surface-border px-4 py-3 flex items-center justify-end gap-4 shadow-[0_-2px_8px_rgba(0,0,0,0.04)]">
-          <button type="button" disabled={saving} onClick={handleSocialsSubmit}
+          <button type="button" disabled={saving || !hasGps} onClick={handleSocialsSubmit}
+            title={!hasGps ? "Positionnez votre entreprise sur la carte avant de soumettre" : undefined}
             className="inline-flex items-center gap-1.5 px-5 py-[9px] text-[13px] font-semibold text-white bg-primary hover:bg-primary-hover rounded transition-colors disabled:opacity-60">
             <span className="material-symbols-outlined" style={{ fontSize: 16 }}>send</span>
             Soumettre pour validation

@@ -31,13 +31,7 @@ vi.mock("@/lib/env", () => ({
     NEXTAUTH_URL: "http://localhost:3000",
     RESEND_API_KEY: "",
     EMAIL_FROM: "test@test.dev",
-    NOMINATIM_USER_AGENT: "TEST/1.0",
   },
-}));
-
-// Mock geocoding
-vi.mock("@/lib/geocoding/nominatim", () => ({
-  geocodeAddress: vi.fn().mockResolvedValue(null),
 }));
 
 import {
@@ -50,7 +44,6 @@ import {
   resendValidationEmail,
 } from "@/services/auth.service";
 import { sendOtpEmail, sendPasswordResetEmail } from "@/lib/email/sender";
-import { geocodeAddress } from "@/lib/geocoding/nominatim";
 import { otpSendLimit, passwordResetLimit } from "@/lib/rate-limit";
 
 const SectorModel = Sector as any;
@@ -496,32 +489,3 @@ describe("Auth Service", () => {
   });
 });
 
-describe("signupCompany — geocoding", () => {
-  it("geocodes address after company creation", async () => {
-    const mockGeocode = geocodeAddress as ReturnType<typeof vi.fn>;
-    mockGeocode.mockResolvedValueOnce({ lat: 35.76, lng: 10.71, displayName: "Sahline, Tunisia" });
-
-    const result = await signupCompany({
-      type: "B2B",
-      displayName: "GeoTest Corp",
-      legalId: "GEO-001",
-      accountEmail: "geo@test.tn",
-      sectorId: "mecanique",
-      gouvernorat: "sousse",
-      ville: "Sahline",
-      address: "Rue Test",
-    });
-
-    expect(mockGeocode).toHaveBeenCalledWith({
-      address: "Rue Test",
-      ville: "Sahline",
-      gouvernorat: "sousse",
-    });
-
-    const company = await CompanyModel.findById(result.companyId).lean();
-    expect(company.liveData.gpsPosition).toEqual({
-      type: "Point",
-      coordinates: [10.71, 35.76],
-    });
-  });
-});

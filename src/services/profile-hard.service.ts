@@ -77,6 +77,17 @@ export async function submitProfile(
     );
   }
 
+  // LinkUP: require GPS position before submission
+  if (profile.kind === "linkup") {
+    const company = await CompanyModel.findById(user.companyId).lean();
+    if (!company?.liveData?.gpsPosition) {
+      throw new BusinessRuleError(
+        "MISSING_GPS",
+        "Positionnez votre entreprise sur la carte avant de soumettre le profil LinkUP.",
+      );
+    }
+  }
+
   const kind: ProfileKind = profile.kind;
   const previousStatus = profile.status;
   const now = new Date();

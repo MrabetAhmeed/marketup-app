@@ -28,17 +28,10 @@ vi.mock("@/lib/env", () => ({
     NEXTAUTH_URL: "http://localhost:3000",
     RESEND_API_KEY: "",
     EMAIL_FROM: "test@test.dev",
-    NOMINATIM_USER_AGENT: "TEST/1.0",
   },
 }));
 
-// Mock geocoding
-vi.mock("@/lib/geocoding/nominatim", () => ({
-  geocodeAddress: vi.fn().mockResolvedValue(null),
-}));
-
 import { updateMeAccount, syncOwnerFullName } from "@/services/account.service";
-import { geocodeAddress } from "@/lib/geocoding/nominatim";
 import { AccountLiveUpdateSchema } from "@/schemas/account.schema";
 
 const SectorModel = Sector as any;
@@ -187,24 +180,6 @@ describe("syncOwnerFullName", () => {
     await syncOwnerFullName(companyId, "Youssef", "Trabelsi");
     const company = await CompanyModel.findById(companyId).lean();
     expect(company.ownerFullName).toBe("Youssef Trabelsi");
-  });
-});
-
-describe("updateMeAccount — geocoding disabled", () => {
-  it("does NOT trigger geocoding when ville changes (disabled V1.1)", async () => {
-    const mockGeocode = geocodeAddress as ReturnType<typeof vi.fn>;
-
-    await updateMeAccount(userId, { ville: "Sahline" });
-
-    expect(mockGeocode).not.toHaveBeenCalled();
-  });
-
-  it("does NOT trigger geocoding when only phone changes", async () => {
-    const mockGeocode = geocodeAddress as ReturnType<typeof vi.fn>;
-
-    await updateMeAccount(userId, { phone: "+21699000000" });
-
-    expect(mockGeocode).not.toHaveBeenCalled();
   });
 });
 
@@ -409,5 +384,98 @@ describe("updateMeAccount — phone stays live (non-regression)", () => {
     const company = await CompanyModel.findById(companyId).lean();
     expect(company.liveData.phone).toBe("+21699123456");
     expect(company.pendingUpdates).toBeNull();
+  });
+});
+
+// ---------------------------------------------------------------------------
+// PP-12.6 — gpsPosition live field (Leaflet pin)
+// ---------------------------------------------------------------------------
+
+describe("updateMeAccount — gpsPosition live field", () => {
+  it("PATCH gpsPosition valid → liveData updated, NO pendingUpdates", async () => {
+    await updateMeAccount(userId, {
+      gpsPosition: { type: "Point", coordinates: [10.7148, 35.7628] },
+    });
+
+    const company = await CompanyModel.findById(companyId).lean();
+    expect(company.liveData.gpsPosition).toEqual({
+      type: "Point",
+      coordinates: [10.7148, 35.7628],
+    });
+    expect(company.pendingUpdates).toBeNull();
+  });
+
+  it("PATCH gpsPosition overwrite → updates to new coords", async () => {
+    await updateMeAccount(userId, {
+      gpsPosition: { type: "Point", coordinates: [10.7148, 35.7628] },
+    });
+    await updateMeAccount(userId, {
+      gpsPosition: { type: "Point", coordinates: [10.18, 36.81] },
+    });
+
+    const company = await CompanyModel.findById(companyId).lean();
+    expect(company.liveData.gpsPosition.coordinates).toEqual([10.18, 36.81]);
+  });
+
+  it("PATCH gpsPosition + phone → both applied live, no pendingUpdates", async () => {
+    await updateMeAccount(userId, {
+      gpsPosition: { type: "Point", coordinates: [10.5, 35.5] },
+      phone: "+21698888888",
+    });
+
+    const company = await CompanyModel.findById(companyId).lean();
+    expect(company.liveData.gpsPosition.coordinates).toEqual([10.5, 35.5]);
+    expect(company.liveData.phone).toBe("+21698888888");
+    expect(company.pendingUpdates).toBeNull();
+  });
+
+  it("PATCH gpsPosition + ville → gps live, ville pending (no conflict)", async () => {
+    await updateMeAccount(userId, {
+      gpsPosition: { type: "Point", coordinates: [10.1, 36.8] },
+      ville: "Monastir",
+    });
+
+    const company = await CompanyModel.findById(companyId).lean();
+    expect(company.liveData.gpsPosition.coordinates).toEqual([10.1, 36.8]);
+    // ville is hard-change → pendingUpdates
+    expect(company.pendingUpdates).not.toBeNull();
+    expect(company.liveData.ville).toBe("Sousse"); // unchanged
+  });
+});
+
+describe("AccountLiveUpdateSchema — gpsPosition validation", () => {
+  it("rejects coordinates out of bounds (lng > 180)", () => {
+    const result = AccountLiveUpdateSchema.safeParse({
+      gpsPosition: { type: "Point", coordinates: [200, 35] },
+    });
+    expect(result.success).toBe(false);
+  });
+
+  it("rejects coordinates out of bounds (lat > 90)", () => {
+    const result = AccountLiveUpdateSchema.safeParse({
+      gpsPosition: { type: "Point", coordinates: [10, 100] },
+    });
+    expect(result.success).toBe(false);
+  });
+
+  it("rejects wrong type value", () => {
+    const result = AccountLiveUpdateSchema.safeParse({
+      gpsPosition: { type: "Polygon", coordinates: [10, 35] },
+    });
+    expect(result.success).toBe(false);
+  });
+
+  it("rejects string instead of object", () => {
+    const result = AccountLiveUpdateSchema.safeParse({
+      gpsPosition: "invalid",
+    });
+    expect(result.success).toBe(false);
+  });
+
+  it("accepts valid GeoJSON Point", () => {
+    const result = AccountLiveUpdateSchema.safeParse({
+      gpsPosition: { type: "Point", coordinates: [10.7148, 35.7628] },
+    });
+    expect(result.success).toBe(true);
   });
 });
