@@ -147,7 +147,7 @@ describe("updateMeAccount — identity fields", () => {
   });
 
   it("PATCH without firstName/lastName does NOT touch User or ownerFullName", async () => {
-    const me = await updateMeAccount(userId, { ville: "Monastir" });
+    const me = await updateMeAccount(userId, { phone: "+21699000001" });
 
     // User unchanged
     expect(me.user.firstName).toBe("Ahmed");
@@ -156,7 +156,8 @@ describe("updateMeAccount — identity fields", () => {
     // ownerFullName unchanged
     const company = await CompanyModel.findById(companyId).lean();
     expect(company.ownerFullName).toBe("Ahmed Mrabet");
-    expect(company.liveData.ville).toBe("Monastir");
+    // phone is live → updated immediately
+    expect(company.liveData.phone).toBe("+21699000001");
   });
 });
 
@@ -229,7 +230,7 @@ describe("updateMeAccount — displayName hard change", () => {
   });
 
   it("does not touch pendingUpdates when displayName not in patch", async () => {
-    await updateMeAccount(userId, { ville: "Monastir" });
+    await updateMeAccount(userId, { phone: "+21699000002" });
 
     const company = await CompanyModel.findById(companyId).lean();
     expect(company.pendingUpdates).toBeNull();
@@ -284,7 +285,7 @@ describe("updateMeAccount — gouvernorat hard change", () => {
   });
 
   it("does not touch pendingUpdates when gouvernorat not in patch", async () => {
-    await updateMeAccount(userId, { ville: "Monastir" });
+    await updateMeAccount(userId, { phone: "+21699000003" });
 
     const company = await CompanyModel.findById(companyId).lean();
     expect(company.pendingUpdates).toBeNull();
@@ -319,5 +320,94 @@ describe("AccountLiveUpdateSchema — gouvernorat validation", () => {
   it("accepts valid gouvernorat slug", () => {
     const result = AccountLiveUpdateSchema.safeParse({ gouvernorat: "sousse" });
     expect(result.success).toBe(true);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// PP-12.5 — ville + address as hard change
+// ---------------------------------------------------------------------------
+
+describe("updateMeAccount — ville hard change", () => {
+  it("creates pendingUpdates when ville differs from current", async () => {
+    await updateMeAccount(userId, { ville: "Monastir" });
+
+    const company = await CompanyModel.findById(companyId).lean();
+    expect(company.pendingUpdates).not.toBeNull();
+    const f = company.pendingUpdates.fields.find((x: any) => x.key === "liveData.ville");
+    expect(f).toBeDefined();
+    expect(f.currentValue).toBe("Sousse");
+    expect(f.newValue).toBe("Monastir");
+    // liveData.ville must NOT have changed
+    expect(company.liveData.ville).toBe("Sousse");
+  });
+
+  it("no-op when ville is same as current", async () => {
+    await updateMeAccount(userId, { ville: "Sousse" });
+
+    const company = await CompanyModel.findById(companyId).lean();
+    expect(company.pendingUpdates).toBeNull();
+  });
+
+  it("overwrites existing pending ville with new submission", async () => {
+    await updateMeAccount(userId, { ville: "Monastir" });
+    await updateMeAccount(userId, { ville: "Sfax" });
+
+    const company = await CompanyModel.findById(companyId).lean();
+    const villeFields = company.pendingUpdates.fields.filter((f: any) => f.key === "liveData.ville");
+    expect(villeFields).toHaveLength(1);
+    expect(villeFields[0].newValue).toBe("Sfax");
+  });
+});
+
+describe("updateMeAccount — address hard change", () => {
+  it("creates pendingUpdates when address differs from current", async () => {
+    await updateMeAccount(userId, { address: "Rue de la Liberté, Sousse" });
+
+    const company = await CompanyModel.findById(companyId).lean();
+    expect(company.pendingUpdates).not.toBeNull();
+    const f = company.pendingUpdates.fields.find((x: any) => x.key === "liveData.address");
+    expect(f).toBeDefined();
+    expect(f.currentValue).toBeNull();
+    expect(f.newValue).toBe("Rue de la Liberté, Sousse");
+    // liveData.address unchanged
+    expect(company.liveData.address ?? null).toBeNull();
+  });
+
+  it("no-op when address is same as current (both null)", async () => {
+    // liveData.address is null in fixture; sending "" transforms to null → same → no-op
+    await updateMeAccount(userId, { address: "" });
+
+    const company = await CompanyModel.findById(companyId).lean();
+    expect(company.pendingUpdates).toBeNull();
+  });
+});
+
+describe("updateMeAccount — triple cluster gouvernorat+ville+address", () => {
+  it("PATCH with gouvernorat + ville + address → 3 separate fields in pendingUpdates", async () => {
+    await updateMeAccount(userId, {
+      gouvernorat: "tunis",
+      ville: "Ariana",
+      address: "Avenue de la République, Ariana",
+    });
+
+    const company = await CompanyModel.findById(companyId).lean();
+    expect(company.pendingUpdates.fields).toHaveLength(3);
+    const keys = company.pendingUpdates.fields.map((f: any) => f.key).sort();
+    expect(keys).toEqual(["liveData.address", "liveData.gouvernorat", "liveData.ville"]);
+
+    // liveData untouched
+    expect(company.liveData.gouvernorat).toBe("sousse");
+    expect(company.liveData.ville).toBe("Sousse");
+    expect(company.liveData.address ?? null).toBeNull();
+  });
+});
+
+describe("updateMeAccount — phone stays live (non-regression)", () => {
+  it("PATCH phone → liveData.phone updated, no pendingUpdates created", async () => {
+    await updateMeAccount(userId, { phone: "+21699123456" });
+
+    const company = await CompanyModel.findById(companyId).lean();
+    expect(company.liveData.phone).toBe("+21699123456");
+    expect(company.pendingUpdates).toBeNull();
   });
 });

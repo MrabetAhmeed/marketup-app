@@ -356,7 +356,18 @@ Every editable field in `Company` and in each `Profile` falls into one of three 
 
 For profile-level edits: when a profile is `active` and the owner submits changes, write to `profile.pendingData` (not to `data`). The profile becomes **invisible publicly** until admin approves. On approve: merge `pendingData` into `data`, clear `pendingData`, re-publish. On reject: discard `pendingData`, keep `data`.
 
-For company-level edits to validation-gated fields (logo, displayName): write to `company.pendingUpdates` (the company stays `active`, profiles stay visible).
+For company-level edits to validation-gated fields, write to `company.pendingUpdates` (the company stays `active`, profiles stay visible). Hard-change Company fields as of PP-12.5:
+
+| Field | key in pendingUpdates |
+|---|---|
+| Nom d'entreprise | `data.displayName` |
+| Logo | `data.logoUrl` |
+| Bannière | `data.bannerUrl` |
+| Gouvernorat | `liveData.gouvernorat` |
+| Ville | `liveData.ville` |
+| Adresse | `liveData.address` |
+
+Live Company fields (instant, no admin review): `liveData.phone`, `liveData.whatsapp`, `liveData.contactEmail`, `liveData.languages`, `liveData.sectorId`, `liveData.gpsPosition`. Identity fields (User table): `firstName`, `lastName`.
 
 **Read `reference/SEED_ARCHITECTURE.md` §4 before writing any service that touches profile or company content.**
 

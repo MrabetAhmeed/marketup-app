@@ -65,7 +65,11 @@ export async function updateMeAccount(
   }
 
   // --- Handle hard fields → pendingUpdates ---
-  const hasHardChange = patch.displayName !== undefined || patch.gouvernorat !== undefined;
+  const hasHardChange =
+    patch.displayName !== undefined ||
+    patch.gouvernorat !== undefined ||
+    patch.ville !== undefined ||
+    patch.address !== undefined;
 
   if (hasHardChange) {
     const company = await CompanyModel.findById(companyId).lean();
@@ -105,6 +109,37 @@ export async function updateMeAccount(
       }
     }
 
+    // ville hard change
+    if (patch.ville !== undefined) {
+      const currentVille: string = company.liveData?.ville ?? "";
+      if (patch.ville !== currentVille) {
+        fields = fields.filter((f) => f.key !== "liveData.ville");
+        fields.push({
+          key: "liveData.ville",
+          label: "Ville",
+          currentValue: currentVille,
+          newValue: patch.ville,
+        });
+        changed = true;
+      }
+    }
+
+    // address hard change
+    if (patch.address !== undefined) {
+      const currentAddress: string | null = company.liveData?.address ?? null;
+      const newAddress = patch.address === "" ? null : patch.address;
+      if (newAddress !== currentAddress) {
+        fields = fields.filter((f) => f.key !== "liveData.address");
+        fields.push({
+          key: "liveData.address",
+          label: "Adresse",
+          currentValue: currentAddress,
+          newValue: newAddress,
+        });
+        changed = true;
+      }
+    }
+
     if (changed) {
       await CompanyModel.findByIdAndUpdate(companyId, {
         pendingUpdates: {
@@ -121,8 +156,7 @@ export async function updateMeAccount(
   if (patch.contactEmail !== undefined) setMap["liveData.contactEmail"] = patch.contactEmail;
   if (patch.phone !== undefined) setMap["liveData.phone"] = patch.phone;
   if (patch.whatsapp !== undefined) setMap["liveData.whatsapp"] = patch.whatsapp;
-  if (patch.ville !== undefined) setMap["liveData.ville"] = patch.ville;
-  if (patch.address !== undefined) setMap["liveData.address"] = patch.address;
+  // ville and address are now hard-change fields → routed to pendingUpdates above
 
   if (Object.keys(setMap).length > 0) {
     const updated = await CompanyModel.findByIdAndUpdate(

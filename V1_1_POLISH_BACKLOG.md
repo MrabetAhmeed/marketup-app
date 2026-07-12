@@ -396,7 +396,15 @@ Voir CLAUDE.md §6.2 (matrice 4 cas avec publishedAt).
 - ~~Conservation historique slugs (table companySlugHistory)~~ ✅ RÉSOLU PP-12
   Implémenté comme Company.slugHistory[] (array) + index multikey, pas collection séparée
 
-### Géocodage
+### Localisation
+- ~~Cluster localisation en hard change (gouvernorat + ville + adresse)~~ ✅ RÉSOLU PP-12.5 (July 12 2026)
+  Ville et adresse rejoignent gouvernorat dans pendingUpdates. Pattern granulaire 3 fields séparés.
+  Account.service.ts + schema + AccountForm + 7 nouveaux tests (120/120 green) + audit 19/19.
+  Seed MediaCom étendu à 3 fields déménagement complet.
+- **Option V1.1 — groupement conditionnel cluster localisation** : afficher les 3 champs
+  (gouvernorat + ville + adresse) comme un seul "bloc localisation" dans la diff admin et
+  dans le formulaire owner (soumission/approbation groupée). À évaluer si friction terrain
+  après pré-prod (owners modifiant souvent les 3 en même temps).
 - Picker carte Leaflet + marker drag&drop (Nominatim imprécis pour TN)
 - Retry pattern Nominatim (queue 1 req/sec)
 - Cache résultats Nominatim (~250 villes)
@@ -483,3 +491,20 @@ Hiérarchie des badges (par priorité) :
    copie du pendingData refusé (champ rejectedData ou historique) pour
    permettre la correction sans re-saisie. Concerne aussi BrandUP/LinkUP
    (même service reject). À croiser avec feedback client pré-prod.
+   
+   
+   ### GPS position — cycle de vie complet (priorité HAUTE, remontée 12/07 post-PP-12.5)
+Problème : gpsPosition géocodée uniquement au signup, jamais mise à jour.
+Depuis PP-12.5 (adresse/ville/gouvernorat en hard), l'approbation d'un
+déménagement laisse le lien Maps sur l'ancienne position — incohérence
+visible publiquement.
+À faire (audit fonction totale + fix) :
+1. Auditer tous les consommateurs de gpsPosition (Maps public LinkUP,
+   recherche à proximité future, autres)
+2. Re-géocodage Nominatim déclenché à l'APPROVE d'un field localisation
+   (pas au submit — cohérent hard change) avec fallback si Nominatim
+   échoue (garder l'ancienne position + flag)
+3. Ou/et : picker carte Leaflet owner (item existant, fusionner)
+4. Vérifier le seed : gpsPosition cohérentes avec les villes seed
+Candidat : sprint dédié V1.1 ou PP-12.6 si le client considère Maps
+critique pour la démo pré-prod.

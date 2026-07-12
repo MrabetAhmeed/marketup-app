@@ -27,9 +27,9 @@ interface AccountFormValues {
 }
 
 /** LIVE fields that the PATCH endpoint accepts */
-const LIVE_KEYS = ["contactEmail", "phone", "whatsapp", "ville", "address"] as const;
+const LIVE_KEYS = ["contactEmail", "phone", "whatsapp"] as const;
 const IDENTITY_KEYS = ["firstName", "lastName"] as const;
-const HARD_KEYS = ["displayName", "gouvernorat"] as const;
+const HARD_KEYS = ["displayName", "gouvernorat", "ville", "address"] as const;
 
 interface GouvernoratOption {
   slug: string;
@@ -83,6 +83,20 @@ export function AccountForm({ me, gouvernorats }: AccountFormProps): JSX.Element
     const currentName = gouvernorats.find((g) => g.slug === f.currentValue)?.name ?? String(f.currentValue);
     const nextName = gouvernorats.find((g) => g.slug === f.newValue)?.name ?? String(f.newValue);
     return { current: currentName, next: nextName };
+  })();
+
+  const pendingVille = (() => {
+    if (!pendingFields?.fields) return null;
+    const f = pendingFields.fields.find((x) => x.key === "liveData.ville");
+    if (!f) return null;
+    return { current: String(f.currentValue ?? ""), next: String(f.newValue ?? "") };
+  })();
+
+  const pendingAddress = (() => {
+    if (!pendingFields?.fields) return null;
+    const f = pendingFields.fields.find((x) => x.key === "liveData.address");
+    if (!f) return null;
+    return { current: String(f.currentValue ?? ""), next: String(f.newValue ?? "") };
   })();
 
   const pendingLogoUrl = pendingFields?.fields?.find((x) => x.key === "data.logoUrl")?.newValue as string | undefined ?? null;
@@ -199,9 +213,9 @@ export function AccountForm({ me, gouvernorats }: AccountFormProps): JSX.Element
         </span>
         <div className="min-w-0 flex-1 text-[12.5px] text-ink-primary leading-snug">
           Les informations ci-dessous alimentent vos <strong>3 profils publics</strong>.
-          La modification du <strong>logo</strong> ou du <strong>nom d&apos;entreprise</strong>{" "}
-          nécessite une validation admin (24-48 h). Les autres champs (contact,
-          localisation, langues) sont mis à jour <strong>instantanément</strong>.
+          La modification du <strong>logo</strong>, du <strong>nom d&apos;entreprise</strong>{" "}
+          ou de la <strong>localisation</strong> (gouvernorat, ville, adresse){" "}
+          nécessite une validation admin (24-48 h). Les champs contact, identité gérant et langues sont mis à jour <strong>instantanément</strong>.
         </div>
       </section>
 
@@ -456,10 +470,9 @@ export function AccountForm({ me, gouvernorats }: AccountFormProps): JSX.Element
               Contact &amp; localisation
             </h3>
             <p className="text-[12px] text-ink-secondary mt-0.5 leading-snug">
-              Coordonnées affichées sur vos profils · mises à jour instantanément
+              Coordonnées affichées sur vos profils · contact instantané · localisation soumise à validation admin
             </p>
           </div>
-          <FieldBadge kind="live" label="Tous en direct" />
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
@@ -589,21 +602,35 @@ export function AccountForm({ me, gouvernorats }: AccountFormProps): JSX.Element
             )}
           </div>
 
-          {/* Ville (live) */}
+          {/* Ville (hard change) */}
           <div>
-            <label htmlFor="acc-city" className="field-label">
+            <label htmlFor="acc-city" className="field-label flex items-center gap-2 flex-wrap">
               Ville <span className="text-[#B91C1C] font-bold ml-0.5">*</span>
+              <FieldBadge kind="validation" />
             </label>
             <input id="acc-city" type="text" className={`field-input ${errors.ville ? "border-[#B91C1C]" : ""}`} {...register("ville")} />
-            {errors.ville && (
+            {errors.ville ? (
               <p className="text-[12px] text-[#B91C1C] mt-1">{errors.ville.message}</p>
+            ) : pendingVille ? (
+              <div className="mt-1.5 px-3 py-2 bg-[#FEF3C7] border border-[#FDE68A] rounded text-[12px] text-[#92400E] flex items-start gap-2">
+                <span className="material-symbols-outlined shrink-0 mt-[1px]" style={{ fontSize: 14 }}>schedule</span>
+                <span>
+                  Modification en attente de validation : <strong>{pendingVille.current}</strong> → <strong>{pendingVille.next}</strong>
+                </span>
+              </div>
+            ) : (
+              <div className="field-help">
+                <span className="material-symbols-outlined" style={{ fontSize: 13 }}>info</span>
+                La modification nécessite une validation admin
+              </div>
             )}
           </div>
 
-          {/* Address (live, optional) */}
+          {/* Address (hard change, optional) */}
           <div className="md:col-span-2">
-            <label htmlFor="acc-address" className="field-label">
+            <label htmlFor="acc-address" className="field-label flex items-center gap-2 flex-wrap">
               Adresse <span className="text-ink-tertiary font-normal normal-case tracking-normal ml-1">(optionnel)</span>
+              <FieldBadge kind="validation" />
             </label>
             <div className="relative">
               <span className="absolute left-3 top-1/2 -translate-y-1/2 material-symbols-outlined text-ink-tertiary pointer-events-none" style={{ fontSize: 16 }}>
@@ -611,8 +638,20 @@ export function AccountForm({ me, gouvernorats }: AccountFormProps): JSX.Element
               </span>
               <input id="acc-address" type="text" className={`field-input pl-9 ${errors.address ? "border-[#B91C1C]" : ""}`} {...register("address")} />
             </div>
-            {errors.address && (
+            {errors.address ? (
               <p className="text-[12px] text-[#B91C1C] mt-1">{errors.address.message}</p>
+            ) : pendingAddress ? (
+              <div className="mt-1.5 px-3 py-2 bg-[#FEF3C7] border border-[#FDE68A] rounded text-[12px] text-[#92400E] flex items-start gap-2">
+                <span className="material-symbols-outlined shrink-0 mt-[1px]" style={{ fontSize: 14 }}>schedule</span>
+                <span>
+                  Modification en attente de validation : <strong>{pendingAddress.current || "(vide)"}</strong> → <strong>{pendingAddress.next || "(vide)"}</strong>
+                </span>
+              </div>
+            ) : (
+              <div className="field-help">
+                <span className="material-symbols-outlined" style={{ fontSize: 13 }}>info</span>
+                La modification nécessite une validation admin
+              </div>
             )}
           </div>
         </div>

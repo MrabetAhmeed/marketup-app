@@ -20,6 +20,20 @@ export const AccountLiveUpdateSchema = z.object({
     .max(50, "50 caractères maximum.")
     .optional(),
 
+  ville: z
+    .string()
+    .trim()
+    .min(1, "La ville est obligatoire.")
+    .max(100, "100 caractères maximum.")
+    .optional(),
+
+  address: z
+    .string()
+    .trim()
+    .max(300, "300 caractères maximum.")
+    .optional()
+    .transform((v) => (v === "" ? null : v)),
+
   // --- Identity fields (User table) ---
   firstName: z
     .string()
@@ -35,7 +49,7 @@ export const AccountLiveUpdateSchema = z.object({
     .max(60, "60 caractères maximum.")
     .optional(),
 
-  // --- Company.liveData fields ---
+  // --- Company.liveData fields (instantaneous) ---
   contactEmail: z
     .string()
     .trim()
@@ -63,19 +77,6 @@ export const AccountLiveUpdateSchema = z.object({
     )
     .optional(),
 
-  ville: z
-    .string()
-    .trim()
-    .min(1, "La ville est obligatoire.")
-    .max(100, "100 caractères maximum.")
-    .optional(),
-
-  address: z
-    .string()
-    .trim()
-    .max(300, "300 caractères maximum.")
-    .optional()
-    .transform((v) => (v === "" ? null : v)),
 });
 
 export type AccountLiveUpdateInput = z.infer<typeof AccountLiveUpdateSchema>;
