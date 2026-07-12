@@ -385,13 +385,16 @@ Voir CLAUDE.md §6.2 (matrice 4 cas avec publishedAt).
 - Badge StatusPill prend isPublic en compte ("Masqué" si active + !isPublic)
 
 ### Admin
-- Hub admin unifié /admin/validation/comptes avec onglets
-  (inscriptions à valider + modifications de compte + modifications de profile)
-- Note : agréger pendingUpdates (Company) + pendingData (Profile)
+- ~~Hub admin unifié /admin/validation/comptes avec onglets~~ ✅ RÉSOLU PP-12 (July 6 2026)
+  Page hub /admin/validation avec 4 onglets, 4e compteur companyUpdates, sidebar simplifiée
+- Anomalie seed : BuildTech (c-004) et ArchStudio (c-006) ont status "pending" + pendingUpdates — incohérent avec le design PP-7 (pendingUpdates réservé aux actives). Sans impact fonctionnel (filtre active les exclut du hub). À corriger dans un nettoyage seed V1.1.
 
 ### SEO & URLs
-- Slug management γ : regénération auto + redirect 301 quand displayName change
-- Conservation historique slugs (table companySlugHistory)
+- ~~Slug management γ : regénération auto + redirect 301 quand displayName change~~ ✅ RÉSOLU PP-12 (July 6 2026)
+  Slug régénéré dans approvePendingUpdates, slugHistory[] sur Company, redirect 308/301,
+  anti-collision via ensureUniqueSlug $or, retour interne supporté
+- ~~Conservation historique slugs (table companySlugHistory)~~ ✅ RÉSOLU PP-12
+  Implémenté comme Company.slugHistory[] (array) + index multikey, pas collection séparée
 
 ### Géocodage
 - Picker carte Leaflet + marker drag&drop (Nominatim imprécis pour TN)

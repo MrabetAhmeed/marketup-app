@@ -19,13 +19,31 @@ export function generateSlug(displayName: string): string {
 
 /**
  * Ensure slug uniqueness by appending a numeric suffix if needed.
- * e.g. "technofab-industries" → "technofab-industries-2"
+ * Checks both active slugs and slugHistory (reserved for 301 redirects).
+ *
+ * @param base - The candidate slug to check
+ * @param excludeCompanyId - Optional company ID to exclude from the check
+ *   (used during slug regeneration so the company's own slugHistory
+ *   doesn't block a "retour interne" to a previous name)
  */
-export async function ensureUniqueSlug(base: string): Promise<string> {
+export async function ensureUniqueSlug(
+  base: string,
+  excludeCompanyId?: string,
+): Promise<string> {
   let slug = base;
   let suffix = 2;
 
-  while (await (Company as any).exists({ slug })) {
+  const buildQuery = (candidate: string): Record<string, unknown> => {
+    const filter: Record<string, unknown> = {
+      $or: [{ slug: candidate }, { slugHistory: candidate }],
+    };
+    if (excludeCompanyId) {
+      filter._id = { $ne: excludeCompanyId };
+    }
+    return filter;
+  };
+
+  while (await (Company as any).exists(buildQuery(slug))) {
     slug = `${base}-${suffix}`;
     suffix++;
   }

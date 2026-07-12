@@ -457,6 +457,33 @@ Per client feedback (demo May 22, decision Ahmed June 29): TraceUP video **addit
 - `removeVideoFromPending()` lets the owner retract pending videos before admin review
 - Auto-recovery: if pending snapshot matches `data.videos` → clear pending, restore previous status
 
+### 6.11 Slug lifecycle — regeneration + 301 redirect (PP-12, July 6 2026)
+
+When admin approves a `data.displayName` change via `approvePendingUpdates()`:
+1. `generateSlug(newDisplayName)` produces a candidate slug
+2. If candidate === current slug (no-op): skip — no slug change, no slugHistory entry
+3. `ensureUniqueSlug(candidate, companyId)` checks uniqueness against all slugs **and** all `slugHistory` entries (excluding the company itself via `excludeCompanyId`)
+4. Old slug → `company.slugHistory[]` ($addToSet); new slug → `company.slug`
+5. "Retour interne" (reclaim own old slug): allowed, removed from slugHistory
+
+**Anti-collision:** `ensureUniqueSlug()` checks `{ $or: [{ slug }, { slugHistory }] }`. An old slug is reserved forever for redirect. A new company signup that collides with another company's slugHistory gets a `-2` suffix.
+
+**Redirect:** `getPublicProfileBySlug()` falls back to `Company.findOne({ slugHistory: slug })` when primary lookup fails. If found → throws `SlugRedirectError(kind, newSlug)`. Consumers:
+- 3 SSR pages: catch → `permanentRedirect()` (308 Permanent Redirect)
+- 3 API routes: catch → `NextResponse.redirect(newUrl, 301)`
+- `generateMetadata()`: catch → return `{}` (empty metadata, page redirect handles it)
+
+`SlugRedirectError` extends `Error` (NOT `AppError`) to avoid being caught by `handleApiError`.
+
+### 6.12 Admin validation hub (PP-12, July 6 2026)
+
+Single page `/admin/validation` with 4 tabs: Inscriptions · Modifications comptes · Profils · RSE. Tab active controlled by `?tab=` query param (deep-linkable).
+
+- `listCompaniesWithPendingUpdates()`: active companies with `pendingUpdates !== null`
+- 4th counter `companyUpdates` in `getPendingCountsForAdmin()`
+- Old validation list pages (`/comptes`, `/profiles`, `/rse`) redirect to the hub
+- Detail page "Retour" link infers tab from company status (pending → inscriptions, active → modifications)
+
 ---
 
 ## 7. API Conventions

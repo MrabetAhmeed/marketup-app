@@ -5,7 +5,7 @@ import { AdminNotificationBell } from "./AdminNotificationBell";
 
 interface AdminTopbarProps {
   initials: string;
-  pendingCounts: { profiles: number; companies: number; rse: number };
+  pendingCounts: { profiles: number; companies: number; companyUpdates: number; rse: number };
 }
 
 export function AdminTopbar({ initials, pendingCounts }: AdminTopbarProps): JSX.Element {

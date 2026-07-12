@@ -1,6 +1,7 @@
-import { notFound } from "next/navigation";
+import { notFound, permanentRedirect } from "next/navigation";
 import type { Metadata } from "next";
 import { getPublicProfileBySlug } from "@/services/public-profile.service";
+import { SlugRedirectError } from "@/lib/api-error";
 import PublicProfileHeader from "@/components/shared/PublicProfileHeader";
 import PublicFooter from "@/components/shared/PublicFooter";
 import BrandUpPublic from "@/components/features/profiles/public/BrandUpPublic";
@@ -26,7 +27,8 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
         images: data.company.logoUrl ? [{ url: data.company.logoUrl }] : [],
       },
     };
-  } catch {
+  } catch (e) {
+    if (e instanceof SlugRedirectError) return {};
     return { title: "Profil introuvable — MARKET-UP" };
   }
 }
@@ -34,16 +36,19 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 export default async function BrandUpProfilePage({ params }: PageProps): Promise<JSX.Element> {
   const { slug } = await params;
   let data: PublicBrandUpProfile;
+  let redirectTo: string | null = null;
   try {
     data = await getPublicProfileBySlug("brandup", slug) as PublicBrandUpProfile;
-  } catch {
-    notFound();
+  } catch (e) {
+    if (e instanceof SlugRedirectError) redirectTo = e.newSlug;
+    else notFound();
   }
+  if (redirectTo) permanentRedirect(`/brandup/${redirectTo}`);
 
   return (
     <div className="min-h-screen bg-[#fbf9f8]">
       <PublicProfileHeader product="brandup" />
-      <BrandUpPublic data={data} />
+      <BrandUpPublic data={data!} />
       <PublicFooter />
     </div>
   );

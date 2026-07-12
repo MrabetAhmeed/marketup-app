@@ -13,7 +13,7 @@ import { Gouvernorat } from "@/models/gouvernorat.model";
 import { isProfileVisible } from "@/lib/visibility";
 import { pickLocale } from "@/lib/i18n";
 import type { SupportedLang } from "@/lib/i18n";
-import { NotFoundError } from "@/lib/api-error";
+import { NotFoundError, SlugRedirectError } from "@/lib/api-error";
 
 // Mongoose 9 strict types require casts for dynamic queries
 const CompanyModel = Company as any;
@@ -183,8 +183,15 @@ export async function getPublicProfileBySlug(
 ): Promise<PublicProfile> {
   await connectDb();
 
-  const company = await CompanyModel.findOne({ slug }).lean();
-  if (!company) throw new NotFoundError("Entreprise");
+  let company = await CompanyModel.findOne({ slug }).lean();
+  if (!company) {
+    // Fallback: check slugHistory for 301 redirect
+    company = await CompanyModel.findOne({ slugHistory: slug }).lean();
+    if (company) {
+      throw new SlugRedirectError(type, (company as Record<string, unknown>).slug as string);
+    }
+    throw new NotFoundError("Entreprise");
+  }
 
   const companyAny = company as Record<string, unknown>;
   const profile = await ProfileModel.findOne({

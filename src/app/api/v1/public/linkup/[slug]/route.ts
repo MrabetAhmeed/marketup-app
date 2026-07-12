@@ -1,5 +1,6 @@
-import { NextRequest } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { jsonOk, handleApiError } from "@/lib/api-response";
+import { SlugRedirectError } from "@/lib/api-error";
 import { getPublicProfileBySlug } from "@/services/public-profile.service";
 
 export const dynamic = "force-dynamic";
@@ -14,6 +15,12 @@ export async function GET(
     const result = await getPublicProfileBySlug("linkup", slug, lang);
     return jsonOk(result);
   } catch (err) {
+    if (err instanceof SlugRedirectError) {
+      return NextResponse.redirect(
+        new URL(`/api/v1/public/linkup/${err.newSlug}`, req.url),
+        301,
+      );
+    }
     return handleApiError(err);
   }
 }

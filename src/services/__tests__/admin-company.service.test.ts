@@ -108,12 +108,14 @@ beforeEach(async () => {
 });
 
 describe("approvePendingUpdates", () => {
-  it("merges data.displayName and clears pendingUpdates", async () => {
+  it("merges data.displayName, regenerates slug, and records slugHistory", async () => {
     await approvePendingUpdates(companyId, adminId);
 
     const company = await CompanyModel.findById(companyId).lean();
     expect(company.data.displayName).toEqual({ fr: "TechnoFab International", ar: "", en: "" });
     expect(company.pendingUpdates).toBeNull();
+    expect(company.slug).toBe("technofab-international");
+    expect(company.slugHistory).toContain("technofab-industries");
   });
 
   it("adds audit trail entry", async () => {
@@ -174,7 +176,7 @@ describe("approvePendingUpdates — gouvernorat", () => {
     expect(company.pendingUpdates).toBeNull();
   });
 
-  it("merges displayName + gouvernorat together", async () => {
+  it("merges displayName + gouvernorat together + regenerates slug", async () => {
     await CompanyModel.findByIdAndUpdate(companyId, {
       pendingUpdates: {
         submittedAt: new Date(),
@@ -200,6 +202,8 @@ describe("approvePendingUpdates — gouvernorat", () => {
     const company = await CompanyModel.findById(companyId).lean();
     expect(company.data.displayName.fr).toBe("TechnoFab Global");
     expect(company.liveData.gouvernorat).toBe("sfax");
+    expect(company.slug).toBe("technofab-global");
+    expect(company.slugHistory).toContain("technofab-industries");
     expect(company.pendingUpdates).toBeNull();
   });
 });
@@ -245,14 +249,14 @@ describe("approvePendingUpdates — logoUrl + bannerUrl (PP-10)", () => {
     expect(company.pendingUpdates).toBeNull();
   });
 
-  it("merges logo + banner + displayName together (3 fields)", async () => {
+  it("merges logo + banner + displayName together (3 fields) + slug regen", async () => {
     await CompanyModel.findByIdAndUpdate(companyId, {
       pendingUpdates: {
         submittedAt: new Date(),
         fields: [
           { key: "data.logoUrl", label: "Logo", currentValue: null, newValue: "https://logo.png" },
           { key: "data.bannerUrl", label: "Bannière", currentValue: null, newValue: "https://banner.png" },
-          { key: "data.displayName", label: "Nom", currentValue: { fr: "Old", ar: "", en: "" }, newValue: { fr: "New", ar: "", en: "" } },
+          { key: "data.displayName", label: "Nom", currentValue: { fr: "Old", ar: "", en: "" }, newValue: { fr: "New Company", ar: "", en: "" } },
         ],
       },
     });
@@ -262,7 +266,9 @@ describe("approvePendingUpdates — logoUrl + bannerUrl (PP-10)", () => {
     const company = await CompanyModel.findById(companyId).lean();
     expect(company.data.logoUrl).toBe("https://logo.png");
     expect(company.data.bannerUrl).toBe("https://banner.png");
-    expect(company.data.displayName.fr).toBe("New");
+    expect(company.data.displayName.fr).toBe("New Company");
+    expect(company.slug).toBe("new-company");
+    expect(company.slugHistory).toContain("technofab-industries");
     expect(company.pendingUpdates).toBeNull();
   });
 
@@ -286,5 +292,169 @@ describe("approvePendingUpdates — logoUrl + bannerUrl (PP-10)", () => {
     const company = await CompanyModel.findById(companyId).lean();
     expect(company.pendingUpdates).toBeNull();
     expect(company.data.logoUrl).toBe(originalLogo);
+  });
+});
+
+// =========================================================================
+// Slug γ — PP-12
+// =========================================================================
+
+describe("approvePendingUpdates — slug γ", () => {
+  it("no-op: slug unchanged when displayName produces same slug", async () => {
+    // "TechnoFab Industries" → "technofab-industries" (same as current)
+    await CompanyModel.findByIdAndUpdate(companyId, {
+      pendingUpdates: {
+        submittedAt: new Date(),
+        fields: [{
+          key: "data.displayName",
+          label: "Nom",
+          currentValue: { fr: "TechnoFab Industries", ar: "", en: "" },
+          newValue: { fr: "Technofab Industries", ar: "", en: "" }, // same slug
+        }],
+      },
+    });
+
+    await approvePendingUpdates(companyId, adminId);
+
+    const company = await CompanyModel.findById(companyId).lean();
+    expect(company.slug).toBe("technofab-industries");
+    expect(company.slugHistory).toHaveLength(0);
+  });
+
+  it("no slug change when only gouvernorat pending (no displayName)", async () => {
+    await CompanyModel.findByIdAndUpdate(companyId, {
+      pendingUpdates: {
+        submittedAt: new Date(),
+        fields: [{
+          key: "liveData.gouvernorat",
+          label: "Gouvernorat",
+          currentValue: "sousse",
+          newValue: "tunis",
+        }],
+      },
+    });
+
+    await approvePendingUpdates(companyId, adminId);
+
+    const company = await CompanyModel.findById(companyId).lean();
+    expect(company.slug).toBe("technofab-industries");
+    expect(company.slugHistory).toHaveLength(0);
+  });
+
+  it("reject displayName: slug intact, no slugHistory entry", async () => {
+    await rejectPendingUpdates(companyId, adminId, "Nom non conforme");
+
+    const company = await CompanyModel.findById(companyId).lean();
+    expect(company.slug).toBe("technofab-industries");
+    expect(company.slugHistory).toHaveLength(0);
+  });
+
+  it("no duplicate slugHistory entries on sequential renames", async () => {
+    // First rename
+    await approvePendingUpdates(companyId, adminId);
+    let company = await CompanyModel.findById(companyId).lean();
+    expect(company.slug).toBe("technofab-international");
+    expect(company.slugHistory).toEqual(["technofab-industries"]);
+
+    // Second rename
+    await CompanyModel.findByIdAndUpdate(companyId, {
+      pendingUpdates: {
+        submittedAt: new Date(),
+        fields: [{
+          key: "data.displayName",
+          label: "Nom",
+          currentValue: { fr: "TechnoFab International", ar: "", en: "" },
+          newValue: { fr: "TechnoFab Worldwide", ar: "", en: "" },
+        }],
+      },
+    });
+    await approvePendingUpdates(companyId, adminId);
+
+    company = await CompanyModel.findById(companyId).lean();
+    expect(company.slug).toBe("technofab-worldwide");
+    expect(company.slugHistory).toContain("technofab-industries");
+    expect(company.slugHistory).toContain("technofab-international");
+    expect(company.slugHistory).toHaveLength(2);
+  });
+
+  it("retour interne: company reclaims its own old slug", async () => {
+    // First rename: technofab-industries → technofab-international
+    await approvePendingUpdates(companyId, adminId);
+
+    // Rename back to original
+    await CompanyModel.findByIdAndUpdate(companyId, {
+      pendingUpdates: {
+        submittedAt: new Date(),
+        fields: [{
+          key: "data.displayName",
+          label: "Nom",
+          currentValue: { fr: "TechnoFab International", ar: "", en: "" },
+          newValue: { fr: "TechnoFab Industries", ar: "", en: "" },
+        }],
+      },
+    });
+    await approvePendingUpdates(companyId, adminId);
+
+    const company = await CompanyModel.findById(companyId).lean();
+    expect(company.slug).toBe("technofab-industries");
+    // Old slug "technofab-international" should be in history
+    expect(company.slugHistory).toContain("technofab-international");
+    // Reclaimed slug should NOT be in history
+    expect(company.slugHistory).not.toContain("technofab-industries");
+  });
+
+  it("anti-collision: another company's slugHistory blocks new slug", async () => {
+    // Create a second company that has "acme-corp" in its slugHistory
+    const user2 = await UserModel.create({
+      email: "other@acme.tn",
+      firstName: "Other",
+      lastName: "Owner",
+      passwordHash: "hashedpw",
+      role: "OWNER",
+      emailVerifiedAt: new Date(),
+      languages: ["fr"],
+    });
+    await CompanyModel.create({
+      slug: "acme-renamed",
+      type: "B2B",
+      legalId: "TN-RNE-999",
+      accountEmail: "other@acme.tn",
+      country: "TN",
+      data: { displayName: { fr: "ACME Renamed", ar: "", en: "" } },
+      liveData: { sectorId: "mecanique", gouvernorat: "sousse", ville: "Sousse", contactEmail: "other@acme.tn", languages: ["fr"] },
+      status: "active",
+      ownerUserId: user2._id,
+      slugHistory: ["acme-corp"],
+    });
+
+    // Try to rename TechnoFab to "ACME Corp" — "acme-corp" is reserved
+    await CompanyModel.findByIdAndUpdate(companyId, {
+      pendingUpdates: {
+        submittedAt: new Date(),
+        fields: [{
+          key: "data.displayName",
+          label: "Nom",
+          currentValue: { fr: "TechnoFab Industries", ar: "", en: "" },
+          newValue: { fr: "ACME Corp", ar: "", en: "" },
+        }],
+      },
+    });
+    await approvePendingUpdates(companyId, adminId);
+
+    const company = await CompanyModel.findById(companyId).lean();
+    // Should get a suffixed slug since "acme-corp" is reserved
+    expect(company.slug).toBe("acme-corp-2");
+    expect(company.slugHistory).toContain("technofab-industries");
+  });
+
+  it("audit trail records slugChange details", async () => {
+    await approvePendingUpdates(companyId, adminId);
+
+    const company = await CompanyModel.findById(companyId).lean();
+    const lastAudit = company.auditTrail[company.auditTrail.length - 1];
+    expect(lastAudit.details.slugChange).toEqual({
+      from: "technofab-industries",
+      to: "technofab-international",
+    });
   });
 });

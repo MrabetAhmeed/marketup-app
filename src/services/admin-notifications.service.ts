@@ -11,17 +11,19 @@ const RseReceiptModel = RseReceipt as any;
 export interface AdminPendingCounts {
   profiles: number;
   companies: number;
+  companyUpdates: number;
   rse: number;
 }
 
 export async function getPendingCountsForAdmin(): Promise<AdminPendingCounts> {
   await connectDb();
 
-  const [profiles, companies, rse] = await Promise.all([
+  const [profiles, companies, companyUpdates, rse] = await Promise.all([
     ProfileModel.countDocuments({ status: "pending", deletedAt: null }),
     CompanyModel.countDocuments({ status: "pending", deletedAt: null }),
+    CompanyModel.countDocuments({ pendingUpdates: { $ne: null }, status: "active", deletedAt: null }),
     RseReceiptModel.countDocuments({ status: "pending", deletedAt: null }),
   ]);
 
-  return { profiles, companies, rse };
+  return { profiles, companies, companyUpdates, rse };
 }

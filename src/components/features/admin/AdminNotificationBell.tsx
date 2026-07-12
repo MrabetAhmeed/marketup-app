@@ -4,13 +4,13 @@ import { useState, useRef, useEffect } from "react";
 import Link from "next/link";
 
 interface AdminNotificationBellProps {
-  counts: { profiles: number; companies: number; rse: number };
+  counts: { profiles: number; companies: number; companyUpdates: number; rse: number };
 }
 
 export function AdminNotificationBell({ counts }: AdminNotificationBellProps): JSX.Element {
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
-  const total = counts.profiles + counts.companies + counts.rse;
+  const total = counts.profiles + counts.companies + counts.companyUpdates + counts.rse;
 
   useEffect(() => {
     function handleClickOutside(e: MouseEvent): void {
@@ -38,13 +38,13 @@ export function AdminNotificationBell({ counts }: AdminNotificationBellProps): J
       </button>
 
       {open && (
-        <div className="absolute right-0 top-full mt-1 w-[280px] bg-white border border-surface-border rounded-lg shadow-lg z-50 overflow-hidden">
+        <div className="absolute right-0 top-full mt-1 w-[300px] bg-white border border-surface-border rounded-lg shadow-lg z-50 overflow-hidden">
           <div className="px-4 py-3 border-b border-surface-border">
             <h3 className="font-heading font-bold text-[13px] text-ink-primary">En attente de validation</h3>
           </div>
           <div className="py-1">
             <Link
-              href="/admin/validation/profiles"
+              href="/admin/validation?tab=profils"
               onClick={() => setOpen(false)}
               className="flex items-center gap-3 px-4 py-2.5 hover:bg-surface-muted transition-colors"
             >
@@ -53,16 +53,25 @@ export function AdminNotificationBell({ counts }: AdminNotificationBellProps): J
               {counts.profiles > 0 && <span className="w-2 h-2 rounded-full bg-[#DC2626]" />}
             </Link>
             <Link
-              href="/admin/validation/comptes"
+              href="/admin/validation?tab=inscriptions"
               onClick={() => setOpen(false)}
               className="flex items-center gap-3 px-4 py-2.5 hover:bg-surface-muted transition-colors"
             >
               <span className="material-symbols-outlined text-[#D97706]" style={{ fontSize: 20 }}>how_to_reg</span>
-              <span className="flex-1 text-[13px] text-ink-primary">{counts.companies} compte{counts.companies !== 1 ? "s" : ""}</span>
+              <span className="flex-1 text-[13px] text-ink-primary">{counts.companies} inscription{counts.companies !== 1 ? "s" : ""}</span>
               {counts.companies > 0 && <span className="w-2 h-2 rounded-full bg-[#DC2626]" />}
             </Link>
             <Link
-              href="/admin/validation/rse"
+              href="/admin/validation?tab=modifications"
+              onClick={() => setOpen(false)}
+              className="flex items-center gap-3 px-4 py-2.5 hover:bg-surface-muted transition-colors"
+            >
+              <span className="material-symbols-outlined text-[#D97706]" style={{ fontSize: 20 }}>edit_note</span>
+              <span className="flex-1 text-[13px] text-ink-primary">{counts.companyUpdates} modification{counts.companyUpdates !== 1 ? "s" : ""}</span>
+              {counts.companyUpdates > 0 && <span className="w-2 h-2 rounded-full bg-[#DC2626]" />}
+            </Link>
+            <Link
+              href="/admin/validation?tab=rse"
               onClick={() => setOpen(false)}
               className="flex items-center gap-3 px-4 py-2.5 hover:bg-surface-muted transition-colors"
             >

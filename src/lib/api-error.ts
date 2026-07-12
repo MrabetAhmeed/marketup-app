@@ -39,3 +39,18 @@ export class ConflictError extends AppError {
     super(code, message, 409, details);
   }
 }
+
+/**
+ * Thrown when a slug lookup matches a company's slugHistory instead of
+ * its current slug. Consumers catch this to issue a 301/308 redirect.
+ * Extends Error (NOT AppError) to avoid being caught by handleApiError.
+ */
+export class SlugRedirectError extends Error {
+  constructor(
+    public kind: string,
+    public newSlug: string,
+  ) {
+    super(`Slug redirect: ${kind}/${newSlug}`);
+    this.name = "SlugRedirectError";
+  }
+}

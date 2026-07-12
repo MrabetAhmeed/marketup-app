@@ -31,7 +31,7 @@ export default async function CompanyReviewPage({ params }: PageProps): Promise<
 
   return (
     <div className="max-w-[800px] mx-auto space-y-6">
-      <Link href="/admin/validation/comptes" className="inline-flex items-center gap-1 text-[13px] text-ink-secondary hover:text-ink-primary transition-colors">
+      <Link href={`/admin/validation?tab=${company.status === "pending" ? "inscriptions" : "modifications"}`} className="inline-flex items-center gap-1 text-[13px] text-ink-secondary hover:text-ink-primary transition-colors">
         <span className="material-symbols-outlined" style={{ fontSize: 16 }}>arrow_back</span>
         Retour à la liste
       </Link>

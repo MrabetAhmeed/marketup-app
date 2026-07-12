@@ -3,6 +3,7 @@ import mongoose from "mongoose";
 import { connectDb } from "@/lib/db";
 import { env } from "@/lib/env";
 import { NotFoundError, BusinessRuleError } from "@/lib/api-error";
+import { generateSlug, ensureUniqueSlug } from "@/lib/slug";
 import { pickLocale } from "@/lib/i18n";
 import { Company } from "@/models/company.model";
 import { Profile } from "@/models/profile.model";
@@ -335,18 +336,67 @@ export async function approvePendingUpdates(
     setMap[field.key] = field.newValue;
   }
 
-  await CompanyModel.findByIdAndUpdate(companyId, {
-    $set: { ...setMap, pendingUpdates: null },
+  // --- Slug γ: regenerate slug when displayName changes ---
+  const displayNameField = company.pendingUpdates.fields.find(
+    (f: { key: string }) => f.key === "data.displayName",
+  );
+
+  let newSlug: string | null = null;
+  let slugChanged = false;
+
+  if (displayNameField) {
+    const newDisplayName: string =
+      typeof displayNameField.newValue === "object" && displayNameField.newValue !== null
+        ? (displayNameField.newValue as { fr?: string }).fr ?? ""
+        : String(displayNameField.newValue);
+
+    const candidateSlug = generateSlug(newDisplayName);
+    const currentSlug: string = company.slug;
+
+    // No-op guard: if generated slug === current slug, skip
+    if (candidateSlug !== currentSlug) {
+      newSlug = await ensureUniqueSlug(candidateSlug, companyId);
+      slugChanged = true;
+    }
+  }
+
+  // Build the update operations
+  const updateOps: Record<string, unknown> = {
+    $set: { ...setMap, pendingUpdates: null } as Record<string, unknown>,
     $push: {
       auditTrail: {
         at: new Date(),
         by: new mongoose.Types.ObjectId(adminId),
         byRole: "SUPER_ADMIN",
         action: "approve_pending_updates",
-        details: { fields: company.pendingUpdates.fields.map((f: { key: string }) => f.key) },
+        details: {
+          fields: company.pendingUpdates.fields.map((f: { key: string }) => f.key),
+          ...(slugChanged ? { slugChange: { from: company.slug, to: newSlug } } : {}),
+        },
       },
     },
-  });
+  };
+
+  if (slugChanged && newSlug) {
+    const currentSlug: string = company.slug;
+    const currentHistory: string[] = company.slugHistory ?? [];
+
+    // Retour interne: if newSlug is in own slugHistory, remove it
+    const isRetourInterne = currentHistory.includes(newSlug);
+
+    // Compute new slugHistory: add old slug, remove newSlug if retour interne
+    const updatedHistory = isRetourInterne
+      ? currentHistory.filter((s: string) => s !== newSlug)
+      : [...currentHistory];
+    if (!updatedHistory.includes(currentSlug)) {
+      updatedHistory.push(currentSlug);
+    }
+
+    (updateOps.$set as Record<string, unknown>).slug = newSlug;
+    (updateOps.$set as Record<string, unknown>).slugHistory = updatedHistory;
+  }
+
+  await CompanyModel.findByIdAndUpdate(companyId, updateOps);
 }
 
 // ---------------------------------------------------------------------------
@@ -424,5 +474,39 @@ export async function listAllCompanies(
     sector: sectorMap.get(c.liveData?.sectorId) ?? c.liveData?.sectorId ?? "",
     ville: c.liveData?.ville ?? "",
     registeredAt: new Date(c.registeredAt).toISOString(),
+  }));
+}
+
+// ---------------------------------------------------------------------------
+// List active companies with pendingUpdates (for admin hub "Modifications")
+// ---------------------------------------------------------------------------
+
+export interface PendingUpdateCompanyItem {
+  id: string;
+  displayName: string;
+  slug: string;
+  fieldsCount: number;
+  submittedAt: string;
+}
+
+export async function listCompaniesWithPendingUpdates(
+  lang: SupportedLang = "fr",
+): Promise<PendingUpdateCompanyItem[]> {
+  await connectDb();
+
+  const companies = await CompanyModel.find({
+    pendingUpdates: { $ne: null },
+    status: "active",
+    deletedAt: null,
+  }).sort({ "pendingUpdates.submittedAt": 1 }).lean();
+
+  return (companies as any[]).map((c) => ({
+    id: c._id.toString(),
+    displayName: pickLocale(c.data?.displayName, lang),
+    slug: c.slug,
+    fieldsCount: c.pendingUpdates?.fields?.length ?? 0,
+    submittedAt: c.pendingUpdates?.submittedAt
+      ? new Date(c.pendingUpdates.submittedAt).toISOString()
+      : "",
   }));
 }

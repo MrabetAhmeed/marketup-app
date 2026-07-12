@@ -120,6 +120,9 @@ const CompanySchema = new Schema(
     ownerUserId: { type: Types.ObjectId, ref: "User", required: true, unique: true },
     ownerFullName: { type: String, default: null },
 
+    // Slug history for 301 redirects after displayName change
+    slugHistory: { type: [String], default: [] },
+
     // Soft delete
     deletedAt: { type: Date, default: null, index: true },
 
@@ -134,6 +137,7 @@ CompanySchema.index({ status: 1, registeredAt: 1 });
 CompanySchema.index({ "liveData.sectorId": 1, status: 1 });
 CompanySchema.index({ "liveData.gouvernorat": 1, status: 1 });
 CompanySchema.index({ "liveData.gpsPosition": "2dsphere" });
+CompanySchema.index({ slugHistory: 1 });
 
 // Soft-delete filter
 CompanySchema.pre(/^find/, function (this: { getOptions(): { withDeleted?: boolean }; where(condition: Record<string, unknown>): void }) {

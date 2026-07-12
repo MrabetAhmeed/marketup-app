@@ -21,7 +21,7 @@ export default async function ProfileReviewPage({ params }: PageProps): Promise<
   return (
     <div className="max-w-[900px] mx-auto space-y-6">
       {/* Back link */}
-      <Link href="/admin/validation/profiles" className="inline-flex items-center gap-1 text-[13px] text-ink-secondary hover:text-ink-primary transition-colors">
+      <Link href="/admin/validation?tab=profils" className="inline-flex items-center gap-1 text-[13px] text-ink-secondary hover:text-ink-primary transition-colors">
         <span className="material-symbols-outlined" style={{ fontSize: 16 }}>arrow_back</span>
         Retour à la liste
       </Link>

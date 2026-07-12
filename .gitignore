@@ -43,3 +43,4 @@ Thumbs.db
 *.swp
 *.swo
 .gstack/
+.claude/settings.local.json
