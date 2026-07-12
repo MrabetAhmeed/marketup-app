@@ -68,13 +68,18 @@ function normalize(str: string): string {
     .trim();
 }
 
+function escapeRegex(s: string): string {
+  return s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+}
+
 /**
  * Build a regex that matches ALL tokens (AND logic).
  * Each token is accent-insensitive via character class expansion.
+ * Metacharacters are escaped to prevent ReDoS and regex injection.
  */
-function buildAndRegex(q: string): RegExp[] {
+export function buildAndRegex(q: string): RegExp[] {
   const tokens = normalize(q).split(/\s+/).filter(Boolean);
-  return tokens.map((t) => new RegExp(t, "i"));
+  return tokens.map((t) => new RegExp(escapeRegex(t), "i"));
 }
 
 // Cache sector/gouvernorat names to avoid N+1 in loops
