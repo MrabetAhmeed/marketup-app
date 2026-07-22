@@ -1,0 +1,113 @@
+# ═══════════════════════════════════════════════════════════════════
+# MARKET-UP — Environment Variables (LOCAL DEVELOPMENT ONLY)
+# ═══════════════════════════════════════════════════════════════════
+# ⚠️ DO NOT COMMIT THIS FILE TO GIT
+# ⚠️ Already excluded by .gitignore — verify with `git status` after editing
+# ═══════════════════════════════════════════════════════════════════
+
+
+# ─────────────────────────────────────────────────────────────────
+# 1. MONGODB ATLAS  (REQUIRED — Phase 1 needs this)
+# ─────────────────────────────────────────────────────────────────
+# How to get this:
+#   1. Go to https://cloud.mongodb.com
+#   2. Create a free M0 cluster (region: Paris eu-west-3 or Frankfurt eu-central-1)
+#   3. Database Access → Add Database User (username + password)
+#   4. Network Access → Add IP Address → 0.0.0.0/0 (allow from anywhere, dev only)
+#   5. Cluster → Connect → Drivers → Node.js → Copy connection string
+#   6. Replace <db_password> with your real password
+#   7. Add the database name "marketup-dev" before the "?" in the URL
+#
+# Format: mongodb+srv://USER:PASSWORD@cluster.mongodb.net/marketup-dev?retryWrites=true&w=majority
+
+MONGODB_URI=mongodb+srv://ahmed:PhOG1laQixxxxxxx@marketup-dev.ki53iym.mongodb.net/marketup-dev?appName=marketup-dev
+
+
+# ─────────────────────────────────────────────────────────────────
+# 2. NEXTAUTH  (REQUIRED — needed for auth Phase 2)
+# ─────────────────────────────────────────────────────────────────
+# NEXTAUTH_URL: your local dev URL (already set, don't change)
+
+NEXTAUTH_URL=http://localhost:3000
+
+# NEXTAUTH_SECRET: a random 32-byte base64 string
+# Generate it by running this command in your terminal:
+#
+#   node -e "console.log(require('crypto').randomBytes(32).toString('base64'))"
+#
+# Then paste the output AFTER the = sign below.
+# Example: NEXTAUTH_SECRET=k3F8d92mQpL1xR4nY7vB6wE5tA0sH3jK8cD2gF1pZ9o=
+
+NEXTAUTH_SECRET=t6LuZPZxxxxxxxxxx/WhKR+xxxxxxxxxxxxxxxxxxxx=
+
+
+# ─────────────────────────────────────────────────────────────────
+# 3. RESEND  (OPTIONAL for Phase 1 — REQUIRED for Phase 2 auth emails)
+# ─────────────────────────────────────────────────────────────────
+# How to get this:
+#   1. Sign up at https://resend.com (free tier: 3000 emails/month)
+#   2. API Keys → Create API Key → copy
+#   3. Paste below (starts with "re_")
+
+RESEND_API_KEY=re_Dq49NxmH_4oz4kGgQjB7C2Exxxxxxxxxx
+
+# Option A: utilise l'expéditeur par défaut Resend
+EMAIL_FROM=onboarding@resend.dev
+
+
+# ─────────────────────────────────────────────────────────────────
+# 4. PUSHER  (OPTIONAL — used only at Phase 9 for real-time events)
+# ─────────────────────────────────────────────────────────────────
+# Leave empty for now. Fill in before Phase 9.
+# How to get later:
+#   1. Sign up at https://pusher.com (Channels product, free tier)
+#   2. Create a new Channels app → cluster "eu"
+#   3. App Keys → copy app_id, key, secret, cluster
+
+PUSHER_APP_ID=
+PUSHER_KEY=
+PUSHER_SECRET=
+PUSHER_CLUSTER=eu
+
+
+# ─────────────────────────────────────────────────────────────────
+# 5. STORAGE  (local filesystem for V1, R2 for V1.1)
+# ─────────────────────────────────────────────────────────────────
+STORAGE_ADAPTER=cloudinary
+UPLOAD_MAX_SIZE_MB=5
+UPLOAD_ALLOWED_IMAGE_TYPES=image/jpeg,image/png,image/webp
+UPLOAD_ALLOWED_DOC_TYPES=application/pdf
+
+
+# ─────────────────────────────────────────────────────────────────
+# 6. CLOUDFLARE R2  (OPTIONAL — V1.1 when STORAGE_ADAPTER=r2)
+# ─────────────────────────────────────────────────────────────────
+# Leave empty for now. Fill in before Phase 4.
+# How to get later:
+#   1. Sign up at https://cloudflare.com
+#   2. R2 → Create bucket "marketup-uploads" (location WEUR or EEUR)
+#   3. R2 → Manage R2 API Tokens → Create API Token (Object Read & Write)
+#   4. Copy account_id, access_key, secret_key, endpoint
+#   5. Optional: connect a custom domain (e.g. cdn.vivasky.media) → use as R2_PUBLIC_URL
+
+R2_ACCOUNT_ID=
+R2_ACCESS_KEY_ID=
+R2_SECRET_ACCESS_KEY=
+R2_BUCKET_NAME=marketup-uploads
+R2_ENDPOINT=
+R2_PUBLIC_URL=
+
+
+# ─────────────────────────────────────────────────────────────────
+# Node environment (don't change for local dev)
+# ─────────────────────────────────────────────────────────────────
+NODE_ENV=development
+
+# ============================================
+# Cloudinary (Sprint 4 — Media uploads)
+# ============================================
+CLOUDINARY_CLOUD_NAME=deimbnay0
+CLOUDINARY_API_KEY=43292xxxxxxxxxx
+CLOUDINARY_API_SECRET=FaQ5l9kxxxxxxxxxxxxxxxxxxxx
+CLOUDINARY_UPLOAD_PRESET_IMAGES=marketup_images
+CLOUDINARY_UPLOAD_PRESET_DOCUMENTS=marketup_documents
