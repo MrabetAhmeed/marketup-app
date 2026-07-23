@@ -396,6 +396,15 @@ profile-validated.ts au passage.
 - ~~3 lints pré-existants (profile-editor, public-search unused vars)~~ → ✅ RÉSOLU PP-11.5 (5 lints fixés : 3 documentés + 2 découverts dans profile-hard.service.test.ts)
 - Retry pattern TransientTransactionError MongoDB Atlas
 
+### Sécurité sessions
+- ~~S8 : owner suspendu garde ses accès API via JWT stateless~~ → ✅ RÉSOLU PP-13 (July 23 2026)
+  jwt() callback vérifie company.status sur chaque requête authentifiée. suspended/deleted → session tuée.
+- ~~S2 : messages login distinguent email inconnu vs mauvais mdp~~ → ✅ FAUX POSITIF (confirmé audit PP-13)
+  Les 3 branches retournent "Email ou mot de passe incorrect." — anti-enumeration conforme.
+- Cache TTL court sur le check session jwt() — 2 queries par page load protégée.
+  Option V1.1 : cache in-memory TTL 30s sur { passwordChangedAt, company.status } par userId.
+  Réduirait les hits DB de ~90% sur les navigations rapides. Non implémenté en V1.
+
 ### Recherche & rendu
 - Requêtes "à proximité" via index 2dsphere
 

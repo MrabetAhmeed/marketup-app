@@ -2,7 +2,9 @@
 
 import { useState, useCallback } from "react";
 import Link from "next/link";
-import { useFeatureSoonToast } from "@/hooks/useFeatureSoonToast";
+import { signIn } from "next-auth/react";
+import { useRouter } from "next/navigation";
+import { useToast } from "@/components/shared/Toast";
 import { DeleteAccountModal } from "./DeleteAccountModal";
 
 interface SettingsFormProps {
@@ -37,7 +39,8 @@ const RULES_CONFIG = [
 ];
 
 export function SettingsForm({ companyName, accountEmail }: SettingsFormProps): JSX.Element {
-  const toast = useFeatureSoonToast();
+  const { showToast } = useToast();
+  const router = useRouter();
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
 
   // Password form state
@@ -45,15 +48,82 @@ export function SettingsForm({ companyName, accountEmail }: SettingsFormProps): 
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [visibleFields, setVisibleFields] = useState<Record<string, boolean>>({});
+  const [submitting, setSubmitting] = useState(false);
+  const [fieldError, setFieldError] = useState<string | null>(null);
 
   const { level, rules } = computeStrength(newPassword);
   const passwordsMatch = confirmPassword.length > 0 && newPassword === confirmPassword;
   const passwordsMismatch = confirmPassword.length > 0 && newPassword !== confirmPassword;
-  const canSubmit = level >= 3 && passwordsMatch && currentPassword.length > 0;
+  const canSubmit = level >= 3 && passwordsMatch && currentPassword.length > 0 && !submitting;
 
   const toggleVisibility = useCallback((field: string) => {
     setVisibleFields((prev) => ({ ...prev, [field]: !prev[field] }));
   }, []);
+
+  const resetForm = useCallback(() => {
+    setCurrentPassword("");
+    setNewPassword("");
+    setConfirmPassword("");
+    setFieldError(null);
+  }, []);
+
+  const handleChangePassword = useCallback(async () => {
+    if (!canSubmit) return;
+    setSubmitting(true);
+    setFieldError(null);
+
+    try {
+      const res = await fetch("/api/v1/me/settings/password", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          currentPassword,
+          newPassword,
+          confirmPassword,
+        }),
+      });
+
+      const json = await res.json();
+
+      if (!res.ok) {
+        const code = json?.error?.code;
+        if (code === "INVALID_CURRENT_PASSWORD") {
+          setFieldError("Le mot de passe actuel est incorrect.");
+        } else if (code === "SAME_PASSWORD") {
+          setFieldError("Le nouveau mot de passe doit être différent de l'ancien.");
+        } else if (code === "RATE_LIMITED") {
+          showToast("Trop de tentatives. Réessayez plus tard.");
+        } else {
+          showToast(json?.error?.message || "Une erreur est survenue.");
+        }
+        return;
+      }
+
+      // Success: reset form, show toast
+      showToast("Mot de passe modifié avec succès.");
+      const savedNewPassword = newPassword;
+      resetForm();
+
+      // Silent re-sign to get a fresh JWT (so this device stays logged in)
+      // The signIn call goes through the full login() flow (company status check,
+      // lastLoginAt update) — this is expected behavior (M2).
+      const signInResult = await signIn("credentials", {
+        email: accountEmail,
+        password: savedNewPassword,
+        redirect: false,
+      });
+
+      if (!signInResult?.ok) {
+        // Edge case: company suspended between password change and re-sign
+        // Graceful degradation: redirect to login
+        router.push("/login?reason=session_expired");
+      }
+    } catch {
+      showToast("Erreur réseau. Vérifiez votre connexion.");
+    } finally {
+      setSubmitting(false);
+    }
+  }, [canSubmit, currentPassword, newPassword, confirmPassword, accountEmail, showToast, resetForm, router]);
 
   return (
     <div className="max-w-[720px] mx-auto space-y-6">
@@ -100,8 +170,8 @@ export function SettingsForm({ companyName, accountEmail }: SettingsFormProps): 
                 autoComplete="current-password"
                 placeholder="Saisissez votre mot de passe actuel"
                 value={currentPassword}
-                onChange={(e) => setCurrentPassword(e.target.value)}
-                className="field-input pl-9 pr-10"
+                onChange={(e) => { setCurrentPassword(e.target.value); setFieldError(null); }}
+                className={`field-input pl-9 pr-10 ${fieldError ? "border-[#DC2626]" : ""}`}
               />
               <button
                 type="button"
@@ -114,6 +184,12 @@ export function SettingsForm({ companyName, accountEmail }: SettingsFormProps): 
                 </span>
               </button>
             </div>
+            {fieldError && (
+              <div className="field-help text-[#DC2626] mt-1">
+                <span className="material-symbols-outlined" style={{ fontSize: 13 }}>error</span>
+                {fieldError}
+              </div>
+            )}
           </div>
 
           {/* New password */}
@@ -241,22 +317,27 @@ export function SettingsForm({ companyName, accountEmail }: SettingsFormProps): 
             <button
               type="button"
               className="px-4 py-[9px] text-[13px] font-semibold text-primary hover:bg-primary-light rounded transition-colors"
-              onClick={() => {
-                setCurrentPassword("");
-                setNewPassword("");
-                setConfirmPassword("");
-              }}
+              onClick={resetForm}
             >
               Annuler
             </button>
             <button
               type="button"
               disabled={!canSubmit}
-              onClick={() => toast()}
+              onClick={handleChangePassword}
               className="inline-flex items-center gap-1.5 px-4 py-[9px] text-[13px] font-semibold text-white bg-primary hover:bg-primary-hover rounded transition-colors disabled:bg-[#E0E0E0] disabled:text-[#A8A8A8] disabled:cursor-not-allowed"
             >
-              <span className="material-symbols-outlined" style={{ fontSize: 16 }}>lock_reset</span>
-              Mettre à jour le mot de passe
+              {submitting ? (
+                <>
+                  <span className="material-symbols-outlined animate-spin" style={{ fontSize: 16 }}>progress_activity</span>
+                  Modification...
+                </>
+              ) : (
+                <>
+                  <span className="material-symbols-outlined" style={{ fontSize: 16 }}>lock_reset</span>
+                  Mettre à jour le mot de passe
+                </>
+              )}
             </button>
           </div>
         </div>

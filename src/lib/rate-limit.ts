@@ -85,6 +85,9 @@ export const forgotPasswordIpLimit = createRateLimit(5 * 60_000, 10);
 /** Signup document upload: 10 per hour per IP */
 export const signupDocUploadIpLimit = createRateLimit(60 * 60_000, 10);
 
+/** Change password: 5 per hour per userId */
+export const changePasswordLimit = createRateLimit(60 * 60_000, 5);
+
 /**
  * Extract client IP from request headers.
  * Checks X-Forwarded-For, X-Real-IP, then falls back to "unknown".

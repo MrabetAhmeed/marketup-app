@@ -10,6 +10,7 @@ import { companyRejectedEmailTemplate } from "./templates/company-rejected";
 import { rseReceiptValidatedEmailTemplate } from "./templates/rse-receipt-validated";
 import { rseReceiptRejectedEmailTemplate } from "./templates/rse-receipt-rejected";
 import { companyResubmittedEmailTemplate } from "./templates/company-resubmitted";
+import { passwordChangedEmailTemplate } from "./templates/password-changed";
 
 const FROM_ADDRESS = `MARKET-UP <${env.EMAIL_FROM}>`;
 
@@ -186,4 +187,11 @@ export async function sendCompanyResubmittedEmail(params: {
     adminUrl: params.adminUrl,
   });
   await sendEmail(params.adminEmail, subject, html);
+}
+
+/** Notify user that their password has been changed. */
+export async function sendPasswordChangedEmail(to: string): Promise<void> {
+  const forgotUrl = `${env.NEXTAUTH_URL}/forgot`;
+  const { subject, html } = passwordChangedEmailTemplate(forgotUrl);
+  await sendEmail(to, subject, html);
 }

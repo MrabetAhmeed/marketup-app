@@ -32,7 +32,7 @@ export default async function DashboardLayout({
   const headersList = await headers();
   const currentPath = headersList.get("x-current-path") ?? "";
 
-  if (me.company.status === "rejected" && !currentPath.startsWith("/dashboard/account/edit")) {
+  if (me.company.status === "rejected" && !currentPath.startsWith("/dashboard/account/edit") && !currentPath.startsWith("/dashboard/settings")) {
     redirect("/dashboard/account/edit?reason=rejected");
   }
   if (me.company.status === "suspended") {

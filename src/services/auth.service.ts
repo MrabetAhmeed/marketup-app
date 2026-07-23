@@ -4,7 +4,7 @@ import bcrypt from "bcryptjs";
 import mongoose from "mongoose";
 import { connectDb } from "@/lib/db";
 import { AuthError, ConflictError, AppError } from "@/lib/api-error";
-import { sendOtpEmail, sendPasswordResetEmail } from "@/lib/email/sender";
+import { sendOtpEmail, sendPasswordResetEmail, sendPasswordChangedEmail } from "@/lib/email/sender";
 import { env } from "@/lib/env";
 import { otpSendLimit, passwordResetLimit } from "@/lib/rate-limit";
 import { generateSlug, ensureUniqueSlug } from "@/lib/slug";
@@ -32,8 +32,7 @@ const LinkUpModel = LinkUp as any;
 
 const PROFILE_MODELS = { brandup: BrandUpModel, traceup: TraceUpModel, linkup: LinkUpModel } as const;
 
-const BCRYPT_ROUNDS = 12;
-const BCRYPT_OTP_ROUNDS = 10;
+import { BCRYPT_ROUNDS, BCRYPT_OTP_ROUNDS } from "@/lib/crypto";
 const OTP_EXPIRY_MS = 10 * 60 * 1000; // 10 minutes
 const OTP_MAX_ATTEMPTS = 5;
 const RESET_TOKEN_EXPIRY_MS = 60 * 60 * 1000; // 60 minutes
@@ -602,4 +601,46 @@ export async function resetPassword(token: string, newPassword: string): Promise
   user.passwordResetTokenPrefix = null;
   user.passwordResetExpiresAt = null;
   await user.save();
+}
+
+// ---------------------------------------------------------------------------
+// Change Password (authenticated owner, from /dashboard/settings)
+// ---------------------------------------------------------------------------
+
+export async function changePassword(
+  userId: string,
+  input: { currentPassword: string; newPassword: string },
+): Promise<void> {
+  await connectDb();
+
+  const user = await UserModel.findById(userId);
+  if (!user || !user.passwordHash) {
+    throw new AuthError("USER_NOT_FOUND", "Utilisateur introuvable.", 404);
+  }
+
+  // Verify current password
+  const valid = await bcrypt.compare(input.currentPassword, user.passwordHash);
+  if (!valid) {
+    throw new AuthError("INVALID_CURRENT_PASSWORD", "Le mot de passe actuel est incorrect.", 401);
+  }
+
+  // Reject same password
+  const isSame = await bcrypt.compare(input.newPassword, user.passwordHash);
+  if (isSame) {
+    throw new AppError("SAME_PASSWORD", "Le nouveau mot de passe doit être différent de l'ancien.", 422);
+  }
+
+  // Hash new password — NEVER log the plaintext
+  const newHash = await bcrypt.hash(input.newPassword, BCRYPT_ROUNDS);
+
+  user.passwordHash = newHash;
+  user.passwordChangedAt = new Date();
+  await user.save();
+
+  // Non-blocking email confirmation
+  try {
+    await sendPasswordChangedEmail(user.email);
+  } catch (err) {
+    console.warn("[changePassword] Email failed (non-blocking):", err);
+  }
 }

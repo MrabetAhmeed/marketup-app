@@ -497,6 +497,30 @@ Single page `/admin/validation` with 4 tabs: Inscriptions · Modifications compt
 - Old validation list pages (`/comptes`, `/profiles`, `/rse`) redirect to the hub
 - Detail page "Retour" link infers tab from company status (pending → inscriptions, active → modifications)
 
+### 6.13 Session invalidation — passwordChangedAt + S8 (PP-13, July 23 2026)
+
+The NextAuth jwt() callback checks session validity against the DB on every authenticated request (Owner role only, SUPER_ADMIN skipped):
+
+**Two parallel queries** per invocation (`.select().lean()`, minimal cost):
+1. `User.findById(token.id).select("passwordChangedAt")`
+2. `Company.findById(token.companyId).select("status")`
+
+**Invalidation triggers:**
+- `Math.floor(passwordChangedAt.getTime() / 1000) > token.iat` → password changed after token was issued (strict `>`, same-second sessions survive so the device that changed the password keeps its fresh JWT via signIn silencieux)
+- `company.status ∈ ["suspended", "deleted"]` → S8 fix: suspended/deleted companies lose all active sessions
+
+**Fail-open:** if the DB is unreachable, the request proceeds (avoid logging out all users on a transient DB blip).
+
+**Cost:** 2 queries per page load on protected routes (middleware + getServerSession each trigger jwt()). Acceptable for V1 single-instance. V1.1 item: add a short TTL cache (~30s) to reduce DB hits.
+
+**Password change flow:**
+- `PUT /api/v1/me/settings/password` — no company.status guard (accessible to rejected owners)
+- After success, client calls `signIn("credentials", { email, newPassword, redirect: false })` for a fresh JWT
+- Non-blocking confirmation email sent to owner (template: password-changed)
+- Rate limited: 5/hour per userId
+
+**Settings page:** exempt from `guardActiveCompany()` (like `/account/edit`) — rejected owners can change their password. Layout exemption added for `/dashboard/settings`.
+
 ---
 
 ## 7. API Conventions

@@ -28,5 +28,7 @@ declare module "next-auth/jwt" {
     role: "OWNER" | "SUPER_ADMIN";
     email: string;
     companyStatus: CompanyStatus | null;
+    /** Standard JWT claim — seconds since epoch. Set automatically by NextAuth v4. */
+    iat?: number;
   }
 }

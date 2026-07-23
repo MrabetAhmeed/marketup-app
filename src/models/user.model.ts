@@ -19,6 +19,9 @@ const UserSchema = new Schema(
     // Login tracking
     lastLoginAt: { type: Date, default: null },
 
+    // Password change tracking (for session invalidation)
+    passwordChangedAt: { type: Date, default: null },
+
     // Password reset
     passwordResetTokenHash: { type: String, default: null },
     passwordResetTokenPrefix: { type: String, default: null },
