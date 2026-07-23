@@ -38,6 +38,11 @@ const ProfileSchema = new Schema(
       index: true,
     },
     isPublic: { type: Boolean, default: true },
+    placeholderMode: {
+      type: String,
+      enum: ["hidden", "coming_soon"],
+      default: "hidden",
+    },
 
     // Workflow timestamps
     submittedAt: { type: Date, default: null },

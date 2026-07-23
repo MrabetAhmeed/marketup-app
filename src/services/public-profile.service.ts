@@ -97,7 +97,14 @@ export interface PublicLinkUpProfile {
   siblingProfiles: { brandup: boolean; traceup: boolean };
 }
 
+export interface PublicPlaceholderProfile {
+  kind: "brandup" | "traceup" | "linkup";
+  placeholder: true;
+  company: { displayName: string; logoUrl: string | null; slug: string };
+}
+
 export type PublicProfile = PublicBrandUpProfile | PublicTraceUpProfile | PublicLinkUpProfile;
+export type PublicProfileOrPlaceholder = PublicProfile | PublicPlaceholderProfile;
 
 // ---------------------------------------------------------------------------
 // Helpers
@@ -180,7 +187,7 @@ export async function getPublicProfileBySlug(
   type: "brandup" | "traceup" | "linkup",
   slug: string,
   lang: SupportedLang = "fr",
-): Promise<PublicProfile> {
+): Promise<PublicProfileOrPlaceholder> {
   await connectDb();
 
   let company = await CompanyModel.findOne({ slug }).lean();
@@ -201,15 +208,38 @@ export async function getPublicProfileBySlug(
   if (!profile) throw new NotFoundError("Profil");
 
   const profileAny = profile as Record<string, unknown>;
-  const visible = isProfileVisible(
-    {
-      status: profileAny.status as "active",
-      isPublic: profileAny.isPublic as boolean,
-      publishedAt: profileAny.publishedAt as Date | null,
-    },
-    { status: companyAny.status as "active" },
-  );
-  if (!visible) throw new NotFoundError("Profil");
+  const companyStatus = companyAny.status as string;
+  const profileStatus = profileAny.status as string;
+  const isPublic = profileAny.isPublic as boolean;
+  const publishedAt = profileAny.publishedAt as Date | null;
+  const placeholderMode = (profileAny.placeholderMode as string) ?? "hidden";
+
+  // --- Cause-based visibility (order matters) ---
+  // 1. Company not active → always 404 (sanctions, pending signup)
+  if (companyStatus !== "active") throw new NotFoundError("Profil");
+  // 2. Profile disabled/incomplete → always 404
+  if (profileStatus === "disabled" || profileStatus === "incomplete") throw new NotFoundError("Profil");
+  // 3. Profile never published (publishedAt null) + not active → 404
+  if (publishedAt == null && profileStatus !== "active") throw new NotFoundError("Profil");
+  // 4. isPublic false → placeholder or 404 (owner voluntary hide)
+  if (!isPublic) {
+    if (placeholderMode === "coming_soon" && publishedAt != null) {
+      // Minimal DTO — no data, no socials, no coordinates
+      const compData = companyAny.data as Record<string, unknown> | undefined;
+      return {
+        kind: type,
+        placeholder: true,
+        company: {
+          displayName: pickLocale(compData?.displayName as { fr: string; ar?: string; en?: string } | undefined, lang),
+          logoUrl: (compData?.logoUrl as string) ?? null,
+          slug: companyAny.slug as string,
+        },
+      };
+    }
+    throw new NotFoundError("Profil");
+  }
+  // 5. isPublic true but never published + not active → 404 (Cas 4 from visibility)
+  if (publishedAt == null && profileStatus !== "active") throw new NotFoundError("Profil");
 
   const companyBase = await resolveCompanyBase(companyAny, lang);
   const rseReceipts = await getValidatedReceipts(companyAny._id, lang);

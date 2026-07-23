@@ -37,19 +37,24 @@ export function TraceUpEditor({ profile, company }: TraceUpEditorProps): JSX.Ele
   const isRejected = profile.status === "rejected";
   const isDisabled = profile.status === "disabled";
 
-  // --- Soft state: isPublic ---
+  // --- Soft state: isPublic + placeholderMode ---
   const [isPublic, setIsPublic] = useState(profile.isPublic);
+  const [placeholderMode, setPlaceholderMode] = useState<string>(profile.placeholderMode ?? "hidden");
   const isPublicDirty = isPublic !== profile.isPublic;
+  const placeholderDirty = placeholderMode !== (profile.placeholderMode ?? "hidden");
   const [savingPublic, setSavingPublic] = useState(false);
 
   async function handleIsPublicSave(): Promise<void> {
-    if (!isPublicDirty) return;
+    if (!isPublicDirty && !placeholderDirty) return;
     setSavingPublic(true);
     try {
+      const patch: Record<string, unknown> = {};
+      if (isPublicDirty) patch.isPublic = isPublic;
+      if (placeholderDirty) patch.placeholderMode = placeholderMode;
       const res = await fetch(`/api/v1/profiles/${profile.id}/soft`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ isPublic }),
+        body: JSON.stringify(patch),
       });
       if (!res.ok) { showToast("Erreur, veuillez réessayer"); return; }
       showToast("Visibilité mise à jour");
@@ -227,7 +232,7 @@ export function TraceUpEditor({ profile, company }: TraceUpEditorProps): JSX.Ele
             <span className="absolute inset-0 cursor-pointer rounded-[10px] bg-[#C8C6C4] transition-colors peer-checked:bg-primary peer-disabled:opacity-60 peer-disabled:cursor-not-allowed" />
             <span className="absolute left-[3px] top-[3px] h-3.5 w-3.5 rounded-full bg-white shadow-sm transition-transform peer-checked:translate-x-4" />
           </label>
-          {isPublicDirty && (
+          {(isPublicDirty || placeholderDirty) && (
             <button type="button" disabled={savingPublic} onClick={handleIsPublicSave}
               className="inline-flex items-center gap-1 px-3 py-1.5 text-[12px] font-semibold text-white bg-primary hover:bg-primary-hover rounded transition-colors disabled:opacity-60">
               {savingPublic ? "…" : "Enregistrer"}
@@ -235,6 +240,30 @@ export function TraceUpEditor({ profile, company }: TraceUpEditorProps): JSX.Ele
           )}
         </div>
       </section>
+
+      {/* ═══ PLACEHOLDER MODE (when toggle OFF) ═══ */}
+      {!isPublic && (
+        <section className="card p-5 border-l-2 border-[#E8E6E4] ml-4">
+          <div className="text-[13px] font-semibold text-ink-primary mb-2">Quand le profil est masqué :</div>
+          <div className="flex flex-col gap-2">
+            <label className={`flex items-center gap-2 cursor-pointer ${(isPending || isDisabled) ? "opacity-60 pointer-events-none" : ""}`}>
+              <input type="radio" name="placeholderMode" value="hidden" checked={placeholderMode === "hidden"}
+                onChange={() => setPlaceholderMode("hidden")} disabled={isPending || isDisabled}
+                className="w-4 h-4 text-primary border-[#D1D1D1] focus:ring-primary" />
+              <span className="text-[13px] text-ink-primary">Masquer complètement</span>
+            </label>
+            <label className={`flex items-center gap-2 cursor-pointer ${(isPending || isDisabled) ? "opacity-60 pointer-events-none" : ""}`}>
+              <input type="radio" name="placeholderMode" value="coming_soon" checked={placeholderMode === "coming_soon"}
+                onChange={() => setPlaceholderMode("coming_soon")} disabled={isPending || isDisabled}
+                className="w-4 h-4 text-primary border-[#D1D1D1] focus:ring-primary" />
+              <span className="text-[13px] text-ink-primary">Afficher &laquo;&nbsp;Bient&ocirc;t disponible&nbsp;&raquo;</span>
+            </label>
+          </div>
+          <p className="text-[11px] text-ink-secondary mt-2 leading-snug">
+            Les visiteurs de votre lien/QR verront une page d&apos;attente au lieu d&apos;une erreur
+          </p>
+        </section>
+      )}
 
       {/* ═══ SECTION: PENDING VIDEOS ═══ */}
       {pendingNewVideos.length > 0 && (

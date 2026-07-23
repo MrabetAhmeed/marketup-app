@@ -521,6 +521,33 @@ The NextAuth jwt() callback checks session validity against the DB on every auth
 
 **Settings page:** exempt from `guardActiveCompany()` (like `/account/edit`) — rejected owners can change their password. Layout exemption added for `/dashboard/settings`.
 
+### 6.15 Placeholder mode — "Bientôt disponible" (PP-14.5, July 23 2026)
+
+`Profile.placeholderMode` is an enum `"hidden" | "coming_soon"` (default `"hidden"`). It controls what visitors see when the owner voluntarily hides a profile (`isPublic: false`).
+
+**Public page decision matrix** (evaluated in `getPublicProfileBySlug`, in this order):
+
+| company.status | profile.status | isPublic | placeholderMode | publishedAt | Result |
+|---|---|---|---|---|---|
+| not active | any | any | any | any | **404** |
+| active | disabled/incomplete | any | any | any | **404** |
+| active | any | any | any | null + not active | **404** |
+| active | any | false | coming_soon | renseigné | **Placeholder DTO** |
+| active | any | false | hidden | any | **404** |
+| active | active/pending/rejected | true | any | any | **Full profile** |
+
+**Placeholder DTO** — minimal, strict whitelist: `{ kind, placeholder: true, company: { displayName, logoUrl, slug } }`. No data, socials, coordinates, pendingData, or contact info. Prevents information leakage.
+
+**Guard: publishedAt required** — a profile never validated by admin (`publishedAt null`) cannot show a placeholder. This prevents leaking company name/logo before admin validation.
+
+**Pages:** the 3 `[slug]/page.tsx` detect `placeholder: true` in the DTO and render `<ComingSoonPage>` with the engine accent colour. `generateMetadata` returns `robots: { index: false }` for placeholders. HTTP status is 200 with noindex (App Router limitation — no custom status on SSR pages).
+
+**Search engines:** a profile with `isPublic: false` remains **absent** from search results regardless of `placeholderMode`. The placeholder is only accessible via direct URL/QR.
+
+**Mutation:** `placeholderMode` is a soft field (instant, no admin review) mutated via `PUT /profiles/[id]/soft` alongside `isPublic`. Zod enum strict.
+
+**UI:** sub-choice appears under the "Profil public" toggle when OFF — two radio buttons: "Masquer complètement" (hidden) / "Afficher « Bientôt disponible »" (coming_soon). Disabled conditions match the isPublic toggle per kind.
+
 ---
 
 ## 7. API Conventions

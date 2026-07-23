@@ -38,9 +38,11 @@ export function BrandUpEditor({ profile, company }: BrandUpEditorProps): JSX.Ele
     },
   });
 
-  // --- Soft state: isPublic only ---
+  // --- Soft state: isPublic + placeholderMode ---
   const [isPublic, setIsPublic] = useState(profile.isPublic);
+  const [placeholderMode, setPlaceholderMode] = useState<string>(profile.placeholderMode ?? "hidden");
   const isPublicDirty = isPublic !== profile.isPublic;
+  const placeholderDirty = placeholderMode !== (profile.placeholderMode ?? "hidden");
 
   // --- Gallery state (now part of HARD submit) ---
   const [galleryOrder, setGalleryOrder] = useState<GalleryItem[]>(profile.data.gallery);
@@ -59,8 +61,8 @@ export function BrandUpEditor({ profile, company }: BrandUpEditorProps): JSX.Ele
   const galleryOrderDirty = currentOrderIds !== initialOrderIds;
   const hasGalleryChanges = pendingAdds.length > 0 || pendingDeletes.length > 0 || galleryOrderDirty;
 
-  // Soft dirty = only isPublic toggle
-  const softDirtyCount = isPublicDirty ? 1 : 0;
+  // Soft dirty = isPublic toggle + placeholderMode
+  const softDirtyCount = (isPublicDirty ? 1 : 0) + (placeholderDirty ? 1 : 0);
   // Hard dirty = form fields (pitch/about) OR gallery changes
   const hardDirty = isDirty || hasGalleryChanges;
   const [saving, setSaving] = useState(false);
@@ -104,24 +106,26 @@ export function BrandUpEditor({ profile, company }: BrandUpEditorProps): JSX.Ele
     setPendingDeletes((prev) => [...prev, imageId]);
   }
 
-  // --- Soft save: isPublic toggle only ---
+  // --- Soft save: isPublic + placeholderMode ---
   async function handleSoftSave(): Promise<void> {
-    if (!isPublicDirty) return;
+    if (!isPublicDirty && !placeholderDirty) return;
     setSaving(true);
     try {
+      const patch: Record<string, unknown> = {};
+      if (isPublicDirty) patch.isPublic = isPublic;
+      if (placeholderDirty) patch.placeholderMode = placeholderMode;
       const res = await fetch(`/api/v1/profiles/${profile.id}/soft`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ isPublic }),
+        body: JSON.stringify(patch),
       });
       const softJson = await res.json();
       if (!res.ok) {
         showToast(softJson.error?.message || "Erreur lors de la sauvegarde");
         return;
       }
-      if (softJson.isPublic !== undefined) {
-        setIsPublic(softJson.isPublic);
-      }
+      if (softJson.isPublic !== undefined) setIsPublic(softJson.isPublic);
+      if (softJson.placeholderMode !== undefined) setPlaceholderMode(softJson.placeholderMode);
       showToast("Visibilité mise à jour");
       router.refresh();
     } catch {
@@ -232,6 +236,7 @@ export function BrandUpEditor({ profile, company }: BrandUpEditorProps): JSX.Ele
   function handleReset(): void {
     reset();
     setIsPublic(profile.isPublic);
+    setPlaceholderMode(profile.placeholderMode ?? "hidden");
     setGalleryOrder(profile.data.gallery);
     setPendingAdds([]);
     setPendingDeletes([]);
@@ -370,6 +375,30 @@ export function BrandUpEditor({ profile, company }: BrandUpEditorProps): JSX.Ele
         </label>
       </section>
 
+      {/* ═══ PLACEHOLDER MODE (when toggle OFF) ═══ */}
+      {!isPublic && (
+        <section className="card p-5 border-l-2 border-[#E8E6E4] ml-4">
+          <div className="text-[13px] font-semibold text-ink-primary mb-2">Quand le profil est masqué :</div>
+          <div className="flex flex-col gap-2">
+            <label className={`flex items-center gap-2 cursor-pointer ${(isReadOnly || profile.status !== "active") ? "opacity-60 pointer-events-none" : ""}`}>
+              <input type="radio" name="placeholderMode" value="hidden" checked={placeholderMode === "hidden"}
+                onChange={() => setPlaceholderMode("hidden")} disabled={isReadOnly || profile.status !== "active"}
+                className="w-4 h-4 text-primary border-[#D1D1D1] focus:ring-primary" />
+              <span className="text-[13px] text-ink-primary">Masquer complètement</span>
+            </label>
+            <label className={`flex items-center gap-2 cursor-pointer ${(isReadOnly || profile.status !== "active") ? "opacity-60 pointer-events-none" : ""}`}>
+              <input type="radio" name="placeholderMode" value="coming_soon" checked={placeholderMode === "coming_soon"}
+                onChange={() => setPlaceholderMode("coming_soon")} disabled={isReadOnly || profile.status !== "active"}
+                className="w-4 h-4 text-primary border-[#D1D1D1] focus:ring-primary" />
+              <span className="text-[13px] text-ink-primary">Afficher &laquo;&nbsp;Bient&ocirc;t disponible&nbsp;&raquo;</span>
+            </label>
+          </div>
+          <p className="text-[11px] text-ink-secondary mt-2 leading-snug">
+            Les visiteurs de votre lien/QR verront une page d&apos;attente au lieu d&apos;une erreur
+          </p>
+        </section>
+      )}
+
       {/* ═══ SECTION: PRÉSENTATION ═══ */}
       <section className="card p-5 md:p-6">
         <div className="mb-5">
@@ -490,7 +519,7 @@ export function BrandUpEditor({ profile, company }: BrandUpEditorProps): JSX.Ele
         onReset={handleReset}
         softDirtyCount={softDirtyCount}
         saving={saving}
-        onSoftSave={isPublicDirty ? handleSoftSave : undefined}
+        onSoftSave={(isPublicDirty || placeholderDirty) ? handleSoftSave : undefined}
         submitting={submitting}
         onHardSubmit={handleSubmit(handleHardSubmit)}
         singleSubmit

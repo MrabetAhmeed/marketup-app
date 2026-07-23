@@ -17,6 +17,7 @@ export interface BrandUpEditorData {
   kind: "brandup";
   status: ProfileStatus;
   isPublic: boolean;
+  placeholderMode: "hidden" | "coming_soon";
   rejectionReason: string | null;
   submittedAt: string | null;
   rejectedAt: string | null;
@@ -54,6 +55,7 @@ export interface TraceUpEditorData {
   kind: "traceup";
   status: ProfileStatus;
   isPublic: boolean;
+  placeholderMode: "hidden" | "coming_soon";
   rejectionReason: string | null;
   submittedAt: string | null;
   rejectedAt: string | null;
@@ -77,6 +79,7 @@ export interface LinkUpEditorData {
   kind: "linkup";
   status: ProfileStatus;
   isPublic: boolean;
+  placeholderMode: "hidden" | "coming_soon";
   rejectionReason: string | null;
   submittedAt: string | null;
   rejectedAt: string | null;

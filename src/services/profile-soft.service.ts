@@ -69,7 +69,18 @@ export async function updateProfileSoft(
 }
 
 // ---------------------------------------------------------------------------
-// BrandUP soft: isPublic only (gallery is now HARD — Sprint 7C)
+// Shared: build $set for soft fields (isPublic + placeholderMode)
+// ---------------------------------------------------------------------------
+
+function buildSoftSet(patch: { isPublic?: boolean; placeholderMode?: string }): Record<string, unknown> {
+  const $set: Record<string, unknown> = {};
+  if (patch.isPublic !== undefined) $set.isPublic = patch.isPublic;
+  if (patch.placeholderMode !== undefined) $set.placeholderMode = patch.placeholderMode;
+  return $set;
+}
+
+// ---------------------------------------------------------------------------
+// BrandUP soft: isPublic + placeholderMode (gallery is HARD — Sprint 7C)
 // ---------------------------------------------------------------------------
 
 async function applyBrandupSoft(
@@ -78,14 +89,14 @@ async function applyBrandupSoft(
   rawPatch: unknown,
 ): Promise<void> {
   const patch: BrandupSoftInput = BrandupSoftSchema.parse(rawPatch);
-
-  if (patch.isPublic !== undefined) {
-    await BrandUpModel.findByIdAndUpdate(profileId, { $set: { isPublic: patch.isPublic } });
+  const $set = buildSoftSet(patch);
+  if (Object.keys($set).length > 0) {
+    await BrandUpModel.findByIdAndUpdate(profileId, { $set });
   }
 }
 
 // ---------------------------------------------------------------------------
-// TraceUP soft: isPublic only
+// TraceUP soft: isPublic + placeholderMode
 // ---------------------------------------------------------------------------
 
 async function applyTraceupSoft(
@@ -93,15 +104,14 @@ async function applyTraceupSoft(
   rawPatch: unknown,
 ): Promise<void> {
   const patch = TraceupSoftSchema.parse(rawPatch);
-
-  if (patch.isPublic !== undefined) {
-    // isPublic is on the base schema, but use discriminator for consistency
-    await TraceUpModel.findByIdAndUpdate(profileId, { $set: { isPublic: patch.isPublic } });
+  const $set = buildSoftSet(patch);
+  if (Object.keys($set).length > 0) {
+    await TraceUpModel.findByIdAndUpdate(profileId, { $set });
   }
 }
 
 // ---------------------------------------------------------------------------
-// LinkUP soft: isPublic only (socials moved to hard submit in PP-9)
+// LinkUP soft: isPublic + placeholderMode (socials moved to hard in PP-9)
 // ---------------------------------------------------------------------------
 
 async function applyLinkupSoft(
@@ -109,8 +119,8 @@ async function applyLinkupSoft(
   rawPatch: unknown,
 ): Promise<void> {
   const patch: LinkupSoftInput = LinkupSoftSchema.parse(rawPatch);
-
-  if (patch.isPublic !== undefined) {
-    await LinkUpModel.findByIdAndUpdate(profileId, { $set: { isPublic: patch.isPublic } });
+  const $set = buildSoftSet(patch);
+  if (Object.keys($set).length > 0) {
+    await LinkUpModel.findByIdAndUpdate(profileId, { $set });
   }
 }

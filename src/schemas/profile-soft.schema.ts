@@ -15,17 +15,22 @@ export const SocialEntrySchema = z.object({
   ]),
 });
 
+const PlaceholderModeSchema = z.enum(["hidden", "coming_soon"]).optional();
+
 export const BrandupSoftSchema = z.object({
   isPublic: z.boolean().optional(),
+  placeholderMode: PlaceholderModeSchema,
 }).strict();
 
 export const TraceupSoftSchema = z.object({
   isPublic: z.boolean().optional(),
+  placeholderMode: PlaceholderModeSchema,
 }).strict();
 
 // LinkUP soft: isPublic only (socials moved to hard submit in PP-9)
 export const LinkupSoftSchema = z.object({
   isPublic: z.boolean().optional(),
+  placeholderMode: PlaceholderModeSchema,
 }).strict();
 
 export type BrandupSoftInput = z.infer<typeof BrandupSoftSchema>;

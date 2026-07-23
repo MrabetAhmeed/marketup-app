@@ -50,6 +50,7 @@ export async function getProfileForEditor(
     id: profile._id.toString(),
     status: profile.status,
     isPublic: profile.isPublic ?? true,
+    placeholderMode: profile.placeholderMode ?? "hidden",
     rejectionReason: profile.rejectionReason ?? null,
     submittedAt: profile.submittedAt ? new Date(profile.submittedAt).toISOString() : null,
     rejectedAt: profile.rejectedAt ? new Date(profile.rejectedAt).toISOString() : null,

@@ -5,7 +5,8 @@ import { SlugRedirectError } from "@/lib/api-error";
 import PublicProfileHeader from "@/components/shared/PublicProfileHeader";
 import PublicFooter from "@/components/shared/PublicFooter";
 import LinkUpPublic from "@/components/features/profiles/public/LinkUpPublic";
-import type { PublicLinkUpProfile } from "@/services/public-profile.service";
+import ComingSoonPage from "@/components/shared/ComingSoonPage";
+import type { PublicLinkUpProfile, PublicProfileOrPlaceholder } from "@/services/public-profile.service";
 
 export const dynamic = "force-dynamic";
 
@@ -16,15 +17,22 @@ interface PageProps {
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { slug } = await params;
   try {
-    const data = await getPublicProfileBySlug("linkup", slug) as PublicLinkUpProfile;
-    const description = `${data.company.displayName} · ${data.company.sectorName} · ${data.company.ville} — MARKET-UP`;
+    const data = await getPublicProfileBySlug("linkup", slug);
+    if ("placeholder" in data && data.placeholder) {
+      return {
+        title: `${data.company.displayName} — Bientôt disponible`,
+        robots: { index: false },
+      };
+    }
+    const profile = data as PublicLinkUpProfile;
+    const description = `${profile.company.displayName} · ${profile.company.sectorName} · ${profile.company.ville} — MARKET-UP`;
     return {
-      title: `${data.company.displayName} — MARKET-UP`,
+      title: `${profile.company.displayName} — MARKET-UP`,
       description,
       openGraph: {
-        title: `${data.company.displayName} — MARKET-UP`,
+        title: `${profile.company.displayName} — MARKET-UP`,
         description,
-        images: data.company.logoUrl ? [{ url: data.company.logoUrl }] : [],
+        images: profile.company.logoUrl ? [{ url: profile.company.logoUrl }] : [],
       },
     };
   } catch (e) {
@@ -35,20 +43,30 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
 export default async function LinkUpProfilePage({ params }: PageProps): Promise<JSX.Element> {
   const { slug } = await params;
-  let data: PublicLinkUpProfile;
+  let data: PublicProfileOrPlaceholder;
   let redirectTo: string | null = null;
   try {
-    data = await getPublicProfileBySlug("linkup", slug) as PublicLinkUpProfile;
+    data = await getPublicProfileBySlug("linkup", slug);
   } catch (e) {
     if (e instanceof SlugRedirectError) redirectTo = e.newSlug;
     else notFound();
   }
   if (redirectTo) permanentRedirect(`/linkup/${redirectTo}`);
 
+  if ("placeholder" in data! && data!.placeholder) {
+    return (
+      <div className="min-h-screen bg-[#fbf9f8]">
+        <PublicProfileHeader product="linkup" />
+        <ComingSoonPage kind="linkup" displayName={data!.company.displayName} logoUrl={data!.company.logoUrl} />
+        <PublicFooter />
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-[#fbf9f8]">
       <PublicProfileHeader product="linkup" />
-      <LinkUpPublic data={data!} />
+      <LinkUpPublic data={data! as PublicLinkUpProfile} />
       <PublicFooter />
     </div>
   );

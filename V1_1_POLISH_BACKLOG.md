@@ -479,3 +479,21 @@ Hiérarchie des badges (par priorité) :
 Nominatim retiré. L'owner pose un pin Leaflet dans le dashboard LinkUP
 (édition live instantanée). Le déménagement est résolu : l'owner
 déplace son pin quand il veut, sans dépendre de l'approbation admin.
+
+### ✅ RÉSOLU PP-14.5 — Mode "Bientôt disponible" (placeholder public)
+Profile.placeholderMode (hidden | coming_soon, default hidden). Quand
+isPublic=false + coming_soon + publishedAt renseigné → page minimale
+(logo, nom, "Bientôt disponible") au lieu de 404. DTO strict whitelist
+(aucune fuite data/socials/coordonnées). Guard publishedAt obligatoire
+(pas de placeholder avant validation admin). 3 pages publiques +
+3 editors (sous-choix radio sous le toggle). 20 tests, build OK.
+Voir CLAUDE.md §6.15.
+
+### Harmoniser conditions disabled toggle isPublic entre les 3 editors
+**Source** : audit PP-14.5 (23 juillet 2026).
+BrandUpEditor : toggle disabled en `isReadOnly || profile.status !== "active"`
+(bloqué en pending + rejected + disabled).
+TraceUpEditor : toggle disabled en `isPending || isDisabled` (actif en rejected).
+LinkUpEditor : toggle disabled en `isReadOnly` (actif en rejected).
+Trois comportements différents. Harmoniser si friction terrain constatée.
+Estimé : 15 min.
