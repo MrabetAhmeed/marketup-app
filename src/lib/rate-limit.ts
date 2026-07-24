@@ -88,6 +88,9 @@ export const signupDocUploadIpLimit = createRateLimit(60 * 60_000, 10);
 /** Change password: 5 per hour per userId */
 export const changePasswordLimit = createRateLimit(60 * 60_000, 5);
 
+/** Delete account: 3 per hour per userId */
+export const deleteAccountLimit = createRateLimit(60 * 60_000, 3);
+
 /**
  * Extract client IP from request headers.
  * Checks X-Forwarded-For, X-Real-IP, then falls back to "unknown".

@@ -1,7 +1,8 @@
 "use client";
 
 import { useState, useCallback } from "react";
-import { useFeatureSoonToast } from "@/hooks/useFeatureSoonToast";
+import { signOut } from "next-auth/react";
+import { useToast } from "@/components/shared/Toast";
 import {
   Dialog,
   DialogContent,
@@ -20,24 +21,60 @@ export function DeleteAccountModal({
   companyName,
   accountEmail,
 }: DeleteAccountModalProps): JSX.Element {
-  const toast = useFeatureSoonToast();
+  const { showToast } = useToast();
   const [confirmText, setConfirmText] = useState("");
   const [password, setPassword] = useState("");
   const [passwordVisible, setPasswordVisible] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-  const canSubmit = confirmText.trim() === "SUPPRIMER" && password.length > 0;
+  const canSubmit = confirmText.trim() === "SUPPRIMER" && password.length > 0 && !loading;
 
-  const handleSubmit = useCallback(() => {
-    toast("FEATURE_COMING_SOON_DELETE");
-    onClose();
-  }, [toast, onClose]);
+  const handleSubmit = useCallback(async () => {
+    if (!canSubmit) return;
+    setLoading(true);
+    setError(null);
+
+    try {
+      const res = await fetch("/api/v1/me", {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ password }),
+      });
+
+      if (!res.ok) {
+        const errJson = await res.json().catch(() => null);
+        const code = errJson?.error?.code;
+        if (code === "INVALID_PASSWORD") {
+          setError("Mot de passe incorrect.");
+          setLoading(false);
+          return;
+        }
+        if (code === "RATE_LIMITED") {
+          setError("Trop de tentatives. Réessayez plus tard.");
+          setLoading(false);
+          return;
+        }
+        throw new Error(errJson?.error?.message || "Erreur serveur");
+      }
+
+      showToast("Votre compte a été supprimé.");
+      // Sign out and redirect to home
+      await signOut({ callbackUrl: "/" });
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Erreur, veuillez réessayer.");
+      setLoading(false);
+    }
+  }, [canSubmit, password, showToast]);
 
   const handleClose = useCallback(() => {
+    if (loading) return; // prevent closing during delete
     setConfirmText("");
     setPassword("");
     setPasswordVisible(false);
+    setError(null);
     onClose();
-  }, [onClose]);
+  }, [onClose, loading]);
 
   return (
     <Dialog open={open} onOpenChange={(v) => !v && handleClose()}>
@@ -63,7 +100,8 @@ export function DeleteAccountModal({
           <button
             type="button"
             onClick={handleClose}
-            className="w-8 h-8 flex items-center justify-center rounded-lg text-ink-secondary hover:bg-surface-muted transition-colors shrink-0 -mr-1 -mt-0.5"
+            disabled={loading}
+            className="w-8 h-8 flex items-center justify-center rounded-lg text-ink-secondary hover:bg-surface-muted transition-colors shrink-0 -mr-1 -mt-0.5 disabled:opacity-60"
             aria-label="Fermer"
           >
             <span className="material-symbols-outlined" style={{ fontSize: 20 }}>close</span>
@@ -86,6 +124,14 @@ export function DeleteAccountModal({
             </div>
           </div>
 
+          {/* Error message */}
+          {error && (
+            <div className="bg-[#FEF2F2] border border-[#FCA5A5] rounded p-3 flex items-center gap-2">
+              <span className="material-symbols-outlined text-[#DC2626] shrink-0" style={{ fontSize: 16 }}>error</span>
+              <span className="text-[12.5px] text-[#991B1B]">{error}</span>
+            </div>
+          )}
+
           {/* Confirm text input */}
           <div>
             <label htmlFor="del-confirm-text" className="field-label">
@@ -99,6 +145,7 @@ export function DeleteAccountModal({
               placeholder="SUPPRIMER"
               value={confirmText}
               onChange={(e) => setConfirmText(e.target.value)}
+              disabled={loading}
               className="field-input"
             />
           </div>
@@ -119,6 +166,7 @@ export function DeleteAccountModal({
                 placeholder="Votre mot de passe"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
+                disabled={loading}
                 className="field-input pl-9 pr-10"
               />
               <button
@@ -150,7 +198,8 @@ export function DeleteAccountModal({
           <button
             type="button"
             onClick={handleClose}
-            className="inline-flex items-center gap-1.5 px-4 py-[9px] text-[13px] font-semibold text-ink-primary bg-white border border-[#D1D1D1] rounded hover:bg-surface-muted transition-colors"
+            disabled={loading}
+            className="inline-flex items-center gap-1.5 px-4 py-[9px] text-[13px] font-semibold text-ink-primary bg-white border border-[#D1D1D1] rounded hover:bg-surface-muted transition-colors disabled:opacity-60"
           >
             Annuler
           </button>
@@ -160,8 +209,17 @@ export function DeleteAccountModal({
             onClick={handleSubmit}
             className="inline-flex items-center gap-1.5 px-4 py-[9px] text-[13px] font-semibold text-white bg-[#B91C1C] hover:bg-[#991B1B] rounded transition-colors disabled:bg-[#E0E0E0] disabled:text-[#A8A8A8] disabled:cursor-not-allowed"
           >
-            <span className="material-symbols-outlined" style={{ fontSize: 16 }}>delete_forever</span>
-            Supprimer définitivement
+            {loading ? (
+              <>
+                <span className="material-symbols-outlined animate-spin" style={{ fontSize: 16 }}>progress_activity</span>
+                Suppression...
+              </>
+            ) : (
+              <>
+                <span className="material-symbols-outlined" style={{ fontSize: 16 }}>delete_forever</span>
+                Supprimer définitivement
+              </>
+            )}
           </button>
         </div>
       </DialogContent>

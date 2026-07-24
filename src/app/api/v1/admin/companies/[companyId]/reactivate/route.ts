@@ -8,9 +8,9 @@ export async function POST(
   { params }: { params: Promise<{ companyId: string }> },
 ): Promise<Response> {
   try {
-    await requireAdmin();
+    const session = await requireAdmin();
     const { companyId } = await params;
-    await reactivateCompanyByAdmin(companyId);
+    await reactivateCompanyByAdmin(companyId, session.user.id);
     return jsonOk({ reactivated: true });
   } catch (err) {
     return handleApiError(err);

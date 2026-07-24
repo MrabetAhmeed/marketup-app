@@ -43,7 +43,8 @@ export async function ensureUniqueSlug(
     return filter;
   };
 
-  while (await (Company as any).exists(buildQuery(slug))) {
+  // withDeleted: true ensures deleted company slugs remain reserved forever
+  while (await (Company as any).exists(buildQuery(slug)).setOptions({ withDeleted: true })) {
     slug = `${base}-${suffix}`;
     suffix++;
   }

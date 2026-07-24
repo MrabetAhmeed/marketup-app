@@ -11,6 +11,9 @@ import { rseReceiptValidatedEmailTemplate } from "./templates/rse-receipt-valida
 import { rseReceiptRejectedEmailTemplate } from "./templates/rse-receipt-rejected";
 import { companyResubmittedEmailTemplate } from "./templates/company-resubmitted";
 import { passwordChangedEmailTemplate } from "./templates/password-changed";
+import { accountDeletedEmailTemplate } from "./templates/account-deleted";
+import { companySuspendedEmailTemplate } from "./templates/company-suspended";
+import { companyReactivatedEmailTemplate } from "./templates/company-reactivated";
 
 const FROM_ADDRESS = `MARKET-UP <${env.EMAIL_FROM}>`;
 
@@ -194,4 +197,38 @@ export async function sendPasswordChangedEmail(to: string): Promise<void> {
   const forgotUrl = `${env.NEXTAUTH_URL}/forgot`;
   const { subject, html } = passwordChangedEmailTemplate(forgotUrl);
   await sendEmail(to, subject, html);
+}
+
+/** Notify user that their account has been deleted (self-delete). */
+export async function sendAccountDeletedEmail(params: {
+  userEmail: string;
+  companyName: string;
+}): Promise<void> {
+  const { subject, html } = accountDeletedEmailTemplate(params.companyName);
+  await sendEmail(params.userEmail, subject, html);
+}
+
+/** Notify owner that their company has been suspended by admin. */
+export async function sendCompanySuspendedEmail(params: {
+  userEmail: string;
+  companyName: string;
+  reason: string;
+}): Promise<void> {
+  const { subject, html } = companySuspendedEmailTemplate({
+    companyName: params.companyName,
+    reason: params.reason,
+  });
+  await sendEmail(params.userEmail, subject, html);
+}
+
+/** Notify owner that their company has been reactivated by admin. */
+export async function sendCompanyReactivatedEmail(params: {
+  userEmail: string;
+  companyName: string;
+}): Promise<void> {
+  const { subject, html } = companyReactivatedEmailTemplate({
+    companyName: params.companyName,
+    dashboardUrl: `${env.NEXTAUTH_URL}/dashboard`,
+  });
+  await sendEmail(params.userEmail, subject, html);
 }

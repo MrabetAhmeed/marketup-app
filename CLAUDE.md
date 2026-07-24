@@ -548,6 +548,32 @@ The NextAuth jwt() callback checks session validity against the DB on every auth
 
 **UI:** sub-choice appears under the "Profil public" toggle when OFF — two radio buttons: "Masquer complètement" (hidden) / "Afficher « Bientôt disponible »" (coming_soon). Disabled conditions match the isPublic toggle per kind.
 
+### 6.16 Account deletion + Suspension lifecycle (PP-14, July 24 2026)
+
+**Owner self-delete** (`DELETE /api/v1/me`):
+- Body: `{ password }` — bcrypt verification required, rate-limited 3/hour per userId
+- Accessible from ANY company status (active, rejected, suspended)
+- Cascade soft-delete in a Mongoose transaction across 9 models: Company (status→"deleted"), User, Profile (×3), Transaction, Boost, Sponsoring, RseReceipt, Notification (by recipientId), File (by ownerUserId)
+- No hard delete. Physical file cleanup (Cloudinary/S3) deferred to V1.1 (RGPD J+30 purge)
+- Email "account-deleted" sent non-blocking after transaction
+- Session invalidation: handled by existing jwt() callback PP-13 (company.status === "deleted")
+- Slug + slugHistory of deleted company remain reserved forever (`ensureUniqueSlug` uses `withDeleted: true`)
+- Re-login impossible: soft-delete filter on User → findOne returns null → INVALID_CREDENTIALS
+
+**Admin suspend** (`POST /admin/companies/[id]/suspend`):
+- Body: `{ reason }` — Zod min 3 chars, max 500, required
+- Writes `suspendedReason`, `suspendedAt`, `$push auditTrail { action: "suspended", byRole: "SUPER_ADMIN", details: { reason } }`
+- Email "company-suspended" sent to owner with reason (non-blocking)
+- Session invalidation: handled by existing jwt() callback PP-13 (company.status === "suspended")
+- UI: modal with reason textarea required, warning about profile visibility and session impact
+
+**Admin reactivate** (`POST /admin/companies/[id]/reactivate`):
+- Clears `suspendedReason` and `suspendedAt`, `$push auditTrail { action: "reactivated" }`
+- Email "company-reactivated" sent to owner (non-blocking)
+- UI: simple confirmation modal
+
+**A8 constat:** admin entreprises page has no status filter/onglet → deleted companies are NOT visible in admin. Item backlog V1.1 "corbeille admin complète" for deleted company listing + potential restoration.
+
 ---
 
 ## 7. API Conventions
@@ -648,12 +674,12 @@ When asked to do specific work, **always look in `.claude/skills/`** first:
 | **PP-13** | Changement mot de passe + invalidation sessions (passwordChangedAt) + S8 (suspended/deleted) |
 | **PP-14.5** | Mode "Bientôt disponible" : placeholderMode (hidden/coming_soon) pour profils masqués |
 | **PP-14.6** | Câblage toggles visibilité dashboard (Vue d'ensemble) sur soft service PP-14.5 |
+| **PP-14** | Delete account (owner self-delete cascade) + Suspend hardening (raison, audit trail, emails, modals) |
 
 ### 🔵 Restant avant V1 prod
 
 | Sprint | Scope |
 |---|---|
-| **PP-14** | Delete account (owner self-delete) + suspend hardening |
 | **PP-17** | Seed prod (données de production initiales, sans TechnoFab demo) |
 | **DevOps** | Resend domain verification, security headers S5, env prod, deploy pipeline |
 
@@ -667,6 +693,8 @@ When asked to do specific work, **always look in `.claude/skills/`** first:
 | Tracking vues | Compteurs de vues profils (analytics) |
 | Facturation réelle | PDF invoices + Excel export admin |
 | Cache sessions | TTL ~30s sur jwt() pour réduire DB hits |
+| Purge RGPD J+30 | Suppression physique des fichiers Cloudinary/S3 après soft-delete (30 jours) |
+| Corbeille admin | Vue admin des comptes supprimés + restauration potentielle |
 | Backlog polish | `V1_1_POLISH_BACKLOG.md` (GPS re-geocode, badge StatusPill isPublic, nom gouvernorat diff admin, etc.) |
 
 ---

@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
 
-type StatusPillKind = "active" | "pending" | "rejected" | "disabled" | "incomplete" | "gold";
+type StatusPillKind = "active" | "pending" | "rejected" | "disabled" | "incomplete" | "gold" | "suspended";
 
 // Full static class strings so Tailwind JIT can detect them.
 // "incomplete" maps to the "draft" color tokens (gray-blue family).
@@ -11,6 +11,7 @@ const KIND_TO_CLASSES: Record<StatusPillKind, string> = {
   disabled: "bg-status-disabled-bg text-status-disabled-fg border-status-disabled-border",
   incomplete: "bg-status-draft-bg text-status-draft-fg border-status-draft-border",
   gold: "bg-status-gold-bg text-status-gold-fg border-status-gold-border",
+  suspended: "bg-[#F5F5F5] text-[#616161] border-[#E0E0E0]",
 };
 
 const KIND_TO_DOT: Record<StatusPillKind, string> = {
@@ -20,6 +21,7 @@ const KIND_TO_DOT: Record<StatusPillKind, string> = {
   disabled: "bg-status-disabled-dot",
   incomplete: "bg-status-draft-dot",
   gold: "bg-status-gold-dot",
+  suspended: "bg-[#616161]",
 };
 
 const KIND_TO_LABEL: Record<StatusPillKind, string> = {
@@ -29,6 +31,7 @@ const KIND_TO_LABEL: Record<StatusPillKind, string> = {
   disabled: "Désactivé",
   incomplete: "Incomplet",
   gold: "Attesté",
+  suspended: "Désactivé",
 };
 
 interface StatusPillProps {

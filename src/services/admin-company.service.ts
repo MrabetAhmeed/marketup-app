@@ -10,7 +10,12 @@ import { Profile } from "@/models/profile.model";
 import { User } from "@/models/user.model";
 import { Sector } from "@/models/sector.model";
 import { Gouvernorat } from "@/models/gouvernorat.model";
-import { sendCompanyValidatedEmail, sendCompanyRejectedEmail } from "@/lib/email/sender";
+import {
+  sendCompanyValidatedEmail,
+  sendCompanyRejectedEmail,
+  sendCompanySuspendedEmail,
+  sendCompanyReactivatedEmail,
+} from "@/lib/email/sender";
 import type { SupportedLang } from "@/lib/i18n";
 import type { ProfileKind } from "@/types";
 
@@ -271,6 +276,8 @@ export async function rejectCompanyByAdmin(
 
 export async function suspendCompanyByAdmin(
   companyId: string,
+  adminId: string,
+  reason: string,
 ): Promise<void> {
   if (!isValidObjectId(companyId)) {
     throw new BusinessRuleError("INVALID_ID", "Identifiant invalide.");
@@ -283,9 +290,34 @@ export async function suspendCompanyByAdmin(
     throw new BusinessRuleError("ALREADY_SUSPENDED", "Ce compte est déjà désactivé.");
   }
 
+  const now = new Date();
   await CompanyModel.findByIdAndUpdate(companyId, {
-    $set: { status: "suspended", suspendedAt: new Date() },
+    $set: { status: "suspended", suspendedAt: now, suspendedReason: reason },
+    $push: {
+      auditTrail: {
+        at: now,
+        by: new mongoose.Types.ObjectId(adminId),
+        byRole: "SUPER_ADMIN",
+        action: "suspended",
+        details: { reason },
+      },
+    },
   });
+
+  // Non-blocking email to owner
+  try {
+    const owner = await UserModel.findOne({ companyId: new mongoose.Types.ObjectId(companyId) }).lean();
+    if (owner?.email) {
+      const companyName = pickLocale(company.data?.displayName, "fr");
+      await sendCompanySuspendedEmail({
+        userEmail: owner.email,
+        companyName,
+        reason,
+      });
+    }
+  } catch (err) {
+    console.warn("[suspendCompany] Email failed (non-blocking):", err);
+  }
 }
 
 // ---------------------------------------------------------------------------
@@ -294,6 +326,7 @@ export async function suspendCompanyByAdmin(
 
 export async function reactivateCompanyByAdmin(
   companyId: string,
+  adminId: string,
 ): Promise<void> {
   if (!isValidObjectId(companyId)) {
     throw new BusinessRuleError("INVALID_ID", "Identifiant invalide.");
@@ -306,9 +339,32 @@ export async function reactivateCompanyByAdmin(
     throw new BusinessRuleError("NOT_SUSPENDED", "Ce compte n'est pas désactivé.");
   }
 
+  const now = new Date();
   await CompanyModel.findByIdAndUpdate(companyId, {
     $set: { status: "active", suspendedAt: null, suspendedReason: null },
+    $push: {
+      auditTrail: {
+        at: now,
+        by: new mongoose.Types.ObjectId(adminId),
+        byRole: "SUPER_ADMIN",
+        action: "reactivated",
+      },
+    },
   });
+
+  // Non-blocking email to owner
+  try {
+    const owner = await UserModel.findOne({ companyId: new mongoose.Types.ObjectId(companyId) }).lean();
+    if (owner?.email) {
+      const companyName = pickLocale(company.data?.displayName, "fr");
+      await sendCompanyReactivatedEmail({
+        userEmail: owner.email,
+        companyName,
+      });
+    }
+  } catch (err) {
+    console.warn("[reactivateCompany] Email failed (non-blocking):", err);
+  }
 }
 
 // ---------------------------------------------------------------------------
@@ -474,6 +530,8 @@ export async function listAllCompanies(
     sector: sectorMap.get(c.liveData?.sectorId) ?? c.liveData?.sectorId ?? "",
     ville: c.liveData?.ville ?? "",
     registeredAt: new Date(c.registeredAt).toISOString(),
+    suspendedReason: c.suspendedReason ?? null,
+    suspendedAt: c.suspendedAt ? new Date(c.suspendedAt).toISOString() : null,
   }));
 }
 
