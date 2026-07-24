@@ -21,6 +21,7 @@ export interface ProfileSummary {
   status: ProfileStatus;
   visible: boolean;
   isPublic: boolean;
+  placeholderMode: "hidden" | "coming_soon";
   rejectionReason: string | null;
   rejectedAt: string | null;
   submittedAt: string | null;

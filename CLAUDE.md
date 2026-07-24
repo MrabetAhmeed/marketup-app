@@ -621,24 +621,53 @@ When asked to do specific work, **always look in `.claude/skills/`** first:
 
 ---
 
-## 9. Build Order (suggested phasing)
+## 9. Build Status & Roadmap
 
-This is a suggested ordering; the human may override.
+### ✅ Livré (PP-1 → PP-14.6)
 
-| Phase | Scope | Approx |
-|---|---|---|
-| **0 — Setup** | repo init, env vars, eslint, prettier, tsconfig, `lib/db.ts`, `lib/env.ts`, NextAuth scaffold, `middleware.ts` | 1 day |
-| **1 — Models** | Mongoose models for all entities, seed script, `npm run db:seed` working | 2 days |
-| **2 — Auth flow** | `/api/v1/auth/*`, `/(auth)/*` pages, email OTP via Resend | 3 days |
-| **3 — Owner dashboard skeleton** | `/(dashboard)/*` layout + sidebar + topbar + `/me` endpoint | 1 day |
-| **4 — Profile editing** | three profiles CRUD endpoints + dashboard pages | 5 days |
-| **5 — Public search & profiles** | `/(public)/*` + search APIs | 4 days |
-| **6 — Admin workspace** | `/(admin)/*` + validation endpoints | 4 days |
-| **7 — Boost & Sponsoring** | endpoints + checkout flow + payment gateway integration | 3 days |
-| **8 — RSE** | submission + admin validation + badge logic | 2 days |
-| **9 — Notifications + real-time** | Pusher channels + bell dropdown | 2 days |
-| **10 — Invoices + exports** | PDF generation + Excel export for admin | 2 days |
-| **11 — Polish + E2E tests** | Playwright happy paths, accessibility check, perf budget | 3 days |
+| Sprint | Scope |
+|---|---|
+| **PP-0** | Setup: Next.js 14, Mongoose, NextAuth, Tailwind, shadcn, middleware, env validation |
+| **PP-1** | Models (16 Mongoose), seed script `npm run db:seed` |
+| **PP-2** | Auth flow: signup (company+user+OTP), login, forgot/reset password, email validation |
+| **PP-3** | Dashboard skeleton: layout, sidebar, topbar, `/me` endpoint |
+| **PP-4** | Profile editing: 3 kinds CRUD, soft/hard patterns, gallery, videos |
+| **PP-5** | Public search engines (3) + profile pages (3 × `[slug]`) |
+| **PP-6** | Admin workspace: validation queues (inscriptions, profils, RSE), company detail, suspend/reactivate |
+| **PP-6b** | Géocodage Nominatim au signup (remplacé par PP-12.6) |
+| **PP-7** | Hard change `displayName` + `pendingUpdates` pattern générique |
+| **PP-8** | Hard change `gouvernorat` (bloc unifié multi-fields) |
+| **PP-9** | Hard change LinkUP socials (pattern 3-tier profile) |
+| **PP-10** | Hard change logo + banner (upload Cloudinary → pendingUpdates) |
+| **PP-11** | Hard change TraceUP vidéos (hybride hard add / soft delete) |
+| **PP-11.5** | Visibilité : profil validé reste visible pendant pending/rejected (matrice 4 cas) |
+| **PP-12** | Hub admin unifié (4 onglets) + slug lifecycle (regeneration + 301 redirect) |
+| **PP-12.5** | Cluster localisation : gouvernorat/ville/adresse en hard change Company |
+| **PP-12.6** | GPS par pin Leaflet dans éditeur LinkUP, retrait complet Nominatim |
+| **SEC-1** | Escape regex recherche (ReDoS + crash) + cleanup UI morts |
+| **PP-13** | Changement mot de passe + invalidation sessions (passwordChangedAt) + S8 (suspended/deleted) |
+| **PP-14.5** | Mode "Bientôt disponible" : placeholderMode (hidden/coming_soon) pour profils masqués |
+| **PP-14.6** | Câblage toggles visibilité dashboard (Vue d'ensemble) sur soft service PP-14.5 |
+
+### 🔵 Restant avant V1 prod
+
+| Sprint | Scope |
+|---|---|
+| **PP-14** | Delete account (owner self-delete) + suspend hardening |
+| **PP-17** | Seed prod (données de production initiales, sans TechnoFab demo) |
+| **DevOps** | Resend domain verification, security headers S5, env prod, deploy pipeline |
+
+### 📦 V1.1 post-prod (backlog)
+
+| Item | Scope |
+|---|---|
+| PP-15 | Notifications utilisateur (Pusher real-time + bell dropdown) |
+| PP-16 | Langues (AR/EN) — i18n frontend |
+| Boost/Sponsoring dynamiques | Checkout flow, paiement réel, campagnes |
+| Tracking vues | Compteurs de vues profils (analytics) |
+| Facturation réelle | PDF invoices + Excel export admin |
+| Cache sessions | TTL ~30s sur jwt() pour réduire DB hits |
+| Backlog polish | `V1_1_POLISH_BACKLOG.md` (GPS re-geocode, badge StatusPill isPublic, nom gouvernorat diff admin, etc.) |
 
 ---
 

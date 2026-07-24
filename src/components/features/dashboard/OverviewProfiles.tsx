@@ -1,8 +1,10 @@
 "use client";
 
+import { useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { StatusPill } from "@/components/shared/StatusPill";
-import { useFeatureSoonToast } from "@/hooks/useFeatureSoonToast";
+import { useToast } from "@/components/shared/Toast";
 import type { ProfileSummary, MeResponse } from "@/types/dashboard";
 import type { ProfileKind, ProfileStatus } from "@/types";
 
@@ -41,6 +43,38 @@ const PROFILE_CONFIGS: ProfileCardConfig[] = [
     description: "Votre carte de contact numérique\u00A0: QR code, liens réseaux sociaux, partage rapide.",
   },
 ];
+
+// ---------------------------------------------------------------------------
+// Toggle disabled logic (matches editor conditions from PP-14.5)
+// ---------------------------------------------------------------------------
+
+function isToggleDisabled(kind: ProfileKind, status: ProfileStatus): boolean {
+  switch (kind) {
+    case "brandup":
+      // BrandUP: only active can toggle
+      return status !== "active";
+    case "traceup":
+    case "linkup":
+      // TraceUP/LinkUP: pending and disabled → grisé ; actif en rejected
+      return status === "pending" || status === "disabled" || status === "incomplete";
+  }
+}
+
+function getToggleTooltip(kind: ProfileKind, status: ProfileStatus): string | undefined {
+  if (!isToggleDisabled(kind, status)) return undefined;
+  switch (status) {
+    case "incomplete":
+      return "Complétez et soumettez votre profil d'abord";
+    case "pending":
+      return "Profil en attente de validation";
+    case "disabled":
+      return "Profil désactivé";
+    case "rejected":
+      return kind === "brandup" ? "Corrigez le profil et resoumettez" : undefined;
+    default:
+      return undefined;
+  }
+}
 
 // ---------------------------------------------------------------------------
 // Status-driven CTA logic
@@ -159,11 +193,18 @@ function ProfileCard({
   config: ProfileCardConfig;
   profile: ProfileSummary | null;
 }): JSX.Element {
-  const toast = useFeatureSoonToast();
+  const router = useRouter();
+  const { showToast } = useToast();
   const status = profile?.status ?? "incomplete";
-  const isActive = status === "active";
-  const switchDisabled = !isActive;
-  const switchChecked = isActive && (profile?.isPublic ?? false);
+
+  // Local optimistic state
+  const [localIsPublic, setLocalIsPublic] = useState(profile?.isPublic ?? false);
+  const [localPlaceholderMode, setLocalPlaceholderMode] = useState(profile?.placeholderMode ?? "hidden");
+  const [toggling, setToggling] = useState(false);
+
+  const disabled = isToggleDisabled(config.kind, status);
+  const tooltip = getToggleTooltip(config.kind, status);
+  const switchChecked = localIsPublic;
 
   const ctas = getCtaButtons(config, profile);
   const suffix = getStatusSuffix(profile);
@@ -174,6 +215,53 @@ function ProfileCard({
   // amber elsewhere in the same mockup (internal inconsistency). We
   // use the canonical amber pending pill consistently.
   const pillKind = status as ProfileStatus;
+
+  // Coming soon indicator: visible when OFF + coming_soon
+  const showComingSoonHint = !localIsPublic && localPlaceholderMode === "coming_soon";
+
+  async function handleToggle(): Promise<void> {
+    if (!profile || disabled || toggling) return;
+
+    const newIsPublic = !localIsPublic;
+
+    // Optimistic update
+    setLocalIsPublic(newIsPublic);
+    if (!newIsPublic) {
+      // OFF → always set coming_soon (dashboard = bienveillant default)
+      setLocalPlaceholderMode("coming_soon");
+    }
+    setToggling(true);
+
+    try {
+      const patch: Record<string, unknown> = { isPublic: newIsPublic };
+      if (!newIsPublic) {
+        patch.placeholderMode = "coming_soon";
+      }
+
+      const res = await fetch(`/api/v1/profiles/${profile.id}/soft`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(patch),
+      });
+
+      if (!res.ok) {
+        const errJson = await res.json().catch(() => null);
+        throw new Error(errJson?.error?.message || "Erreur serveur");
+      }
+
+      showToast(newIsPublic ? "Profil rendu public" : "Profil masqué");
+      router.refresh();
+    } catch (err) {
+      // Rollback optimistic state
+      setLocalIsPublic(!newIsPublic);
+      if (!newIsPublic) {
+        setLocalPlaceholderMode(profile.placeholderMode ?? "hidden");
+      }
+      showToast(err instanceof Error ? err.message : "Erreur, veuillez réessayer");
+    } finally {
+      setToggling(false);
+    }
+  }
 
   return (
     <div className="card card--hover p-5 flex flex-col">
@@ -203,13 +291,17 @@ function ProfileCard({
           </div>
         </div>
         {/* Visibility switch */}
-        <label className="relative inline-block w-9 h-5 shrink-0" aria-label={`Activer le profil ${config.label}`}>
+        <label
+          className="relative inline-block w-9 h-5 shrink-0"
+          aria-label={`Activer le profil ${config.label}`}
+          title={tooltip}
+        >
           <input
             type="checkbox"
             className="sr-only peer"
             checked={switchChecked}
-            disabled={switchDisabled}
-            onChange={() => toast()}
+            disabled={disabled || toggling}
+            onChange={handleToggle}
           />
           <span className="absolute inset-0 cursor-pointer rounded-[10px] bg-[#C8C6C4] transition-colors peer-checked:bg-primary peer-disabled:opacity-60 peer-disabled:cursor-not-allowed" />
           <span className="absolute left-[3px] top-[3px] h-3.5 w-3.5 rounded-full bg-white shadow-sm transition-transform peer-checked:translate-x-4" />
@@ -221,6 +313,14 @@ function ProfileCard({
         {config.description}
         {suffix && <> {suffix}.</>}
       </p>
+
+      {/* Coming soon indicator */}
+      {showComingSoonHint && (
+        <p className="text-[11px] text-ink-tertiary italic mb-3 flex items-center gap-1">
+          <span className="material-symbols-outlined" style={{ fontSize: 13 }}>visibility</span>
+          Bientôt disponible affiché aux visiteurs
+        </p>
+      )}
 
       {/* CTAs */}
       {ctas.length > 0 && (

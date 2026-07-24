@@ -290,3 +290,96 @@ describe("PP-14.5 — soft mutation placeholderMode", () => {
     expect(mockBrandUpUpdate).not.toHaveBeenCalled();
   });
 });
+
+// =====================================================================
+// PP-14.6 — Dashboard toggle OFF: isPublic false + placeholderMode coming_soon
+// =====================================================================
+
+describe("PP-14.6 — dashboard toggle OFF sets isPublic false + placeholderMode coming_soon", () => {
+  beforeEach(() => {
+    mockUserFindById.mockResolvedValue({ _id: "user1", companyId: COMPANY_ID });
+    mockBrandUpUpdate.mockResolvedValue({});
+    mockTraceUpUpdate.mockResolvedValue({});
+    mockLinkUpUpdate.mockResolvedValue({});
+  });
+
+  it("brandup — toggle OFF sets both fields", async () => {
+    mockProfileFindById.mockResolvedValue({
+      _id: PROFILE_ID, companyId: COMPANY_ID, kind: "brandup",
+      status: "active", isPublic: true, placeholderMode: "hidden",
+    });
+    await updateProfileSoft(PROFILE_ID, "user1", { isPublic: false, placeholderMode: "coming_soon" });
+    expect(mockBrandUpUpdate).toHaveBeenCalledWith(PROFILE_ID, {
+      $set: { isPublic: false, placeholderMode: "coming_soon" },
+    });
+  });
+
+  it("traceup — toggle OFF sets both fields", async () => {
+    mockProfileFindById.mockResolvedValue({
+      _id: PROFILE_ID, companyId: COMPANY_ID, kind: "traceup",
+      status: "active", isPublic: true, placeholderMode: "hidden",
+    });
+    await updateProfileSoft(PROFILE_ID, "user1", { isPublic: false, placeholderMode: "coming_soon" });
+    expect(mockTraceUpUpdate).toHaveBeenCalledWith(PROFILE_ID, {
+      $set: { isPublic: false, placeholderMode: "coming_soon" },
+    });
+  });
+
+  it("linkup — toggle OFF sets both fields", async () => {
+    mockProfileFindById.mockResolvedValue({
+      _id: PROFILE_ID, companyId: COMPANY_ID, kind: "linkup",
+      status: "active", isPublic: true, placeholderMode: "hidden",
+    });
+    await updateProfileSoft(PROFILE_ID, "user1", { isPublic: false, placeholderMode: "coming_soon" });
+    expect(mockLinkUpUpdate).toHaveBeenCalledWith(PROFILE_ID, {
+      $set: { isPublic: false, placeholderMode: "coming_soon" },
+    });
+  });
+});
+
+// =====================================================================
+// PP-14.6 — Dashboard toggle ON: isPublic true, placeholderMode INCHANGÉ
+// =====================================================================
+
+describe("PP-14.6 — dashboard toggle ON sets isPublic true only", () => {
+  beforeEach(() => {
+    mockUserFindById.mockResolvedValue({ _id: "user1", companyId: COMPANY_ID });
+    mockBrandUpUpdate.mockResolvedValue({});
+  });
+
+  it("toggle ON sends only isPublic true, placeholderMode untouched", async () => {
+    mockProfileFindById.mockResolvedValue({
+      _id: PROFILE_ID, companyId: COMPANY_ID, kind: "brandup",
+      status: "active", isPublic: false, placeholderMode: "coming_soon",
+    });
+    await updateProfileSoft(PROFILE_ID, "user1", { isPublic: true });
+    expect(mockBrandUpUpdate).toHaveBeenCalledWith(PROFILE_ID, {
+      $set: { isPublic: true },
+    });
+    // placeholderMode NOT in $set
+    const setArg = mockBrandUpUpdate.mock.calls[0][1].$set;
+    expect(setArg).not.toHaveProperty("placeholderMode");
+  });
+});
+
+// =====================================================================
+// PP-14.6 — Dashboard toggle OFF overwrites hidden → coming_soon
+// =====================================================================
+
+describe("PP-14.6 — toggle OFF overwrites existing hidden → coming_soon", () => {
+  beforeEach(() => {
+    mockUserFindById.mockResolvedValue({ _id: "user1", companyId: COMPANY_ID });
+    mockLinkUpUpdate.mockResolvedValue({});
+  });
+
+  it("profile with placeholderMode=hidden → OFF sets coming_soon", async () => {
+    mockProfileFindById.mockResolvedValue({
+      _id: PROFILE_ID, companyId: COMPANY_ID, kind: "linkup",
+      status: "active", isPublic: true, placeholderMode: "hidden",
+    });
+    await updateProfileSoft(PROFILE_ID, "user1", { isPublic: false, placeholderMode: "coming_soon" });
+    const setArg = mockLinkUpUpdate.mock.calls[0][1].$set;
+    expect(setArg.isPublic).toBe(false);
+    expect(setArg.placeholderMode).toBe("coming_soon");
+  });
+});

@@ -135,6 +135,7 @@ export async function getMe(
         { status: company.status },
       ),
       isPublic: p.isPublic ?? true,
+      placeholderMode: p.placeholderMode ?? "hidden",
       rejectionReason: p.rejectionReason ?? null,
       rejectedAt: toISOOrNull(p.rejectedAt),
       submittedAt: toISOOrNull(p.submittedAt),
