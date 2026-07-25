@@ -59,6 +59,7 @@ interface PublicRseReceipt {
 }
 
 export interface PublicBrandUpProfile {
+  profileId: string;
   company: PublicCompanyBase;
   kind: "brandup";
   pitch: string;
@@ -73,6 +74,7 @@ export interface PublicBrandUpProfile {
 }
 
 export interface PublicTraceUpProfile {
+  profileId: string;
   company: PublicCompanyBase;
   kind: "traceup";
   videos: {
@@ -90,6 +92,7 @@ export interface PublicTraceUpProfile {
 }
 
 export interface PublicLinkUpProfile {
+  profileId: string;
   company: PublicCompanyBase;
   kind: "linkup";
   socials: { platform: string; url: string | null }[];
@@ -248,6 +251,7 @@ export async function getPublicProfileBySlug(
 
   if (type === "brandup") {
     return {
+      profileId: String(profileAny._id),
       company: companyBase,
       kind: "brandup",
       pitch: pickLocale(data.pitch as { fr: string; ar?: string; en?: string } | undefined, lang),
@@ -299,6 +303,7 @@ export async function getPublicProfileBySlug(
       });
 
     return {
+      profileId: String(profileAny._id),
       company: companyBase,
       kind: "traceup",
       videos: videos.map((v) => ({
@@ -336,6 +341,7 @@ export async function getPublicProfileBySlug(
   }
 
   return {
+    profileId: String(profileAny._id),
     company: companyBase,
     kind: "linkup",
     socials: socials.map((s) => ({

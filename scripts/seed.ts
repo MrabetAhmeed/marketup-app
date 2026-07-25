@@ -22,6 +22,7 @@ import { Notification } from "../src/models/notification.model";
 import { Association } from "../src/models/association.model";
 import { Sector } from "../src/models/sector.model";
 import { Gouvernorat } from "../src/models/gouvernorat.model";
+import { ProfileStatsMonthlyModel } from "../src/models/profile-stats-monthly.model";
 
 // Helpers to bypass Mongoose 9 strict types in seed context
 const insert = (m: Model<any>, data: Record<string, unknown>) => m.create(data as any);
@@ -104,6 +105,7 @@ const counts = {
   rseValidated: 0,
   rsePending: 0,
   notifications: 0,
+  profileStatsMonthly: 0,
 };
 
 // ═══════════════════════════════════════════════════
@@ -161,6 +163,9 @@ async function main(): Promise<void> {
 
   // 8. Notifications
   await seedNotifications(adminId);
+
+  // 9. ProfileStatsMonthly (tracking seed data)
+  await seedProfileStatsMonthly();
 
   // Verify TechnoFab canon
   const canonOk = await verifyTechnoFabCanon();
@@ -960,6 +965,49 @@ async function seedCompanies(
       if (r.status === "pending") counts.rsePending++;
     }
   }
+}
+
+// ═══════════════════════════════════════════════════
+// PROFILE STATS MONTHLY (tracking seed data)
+// ═══════════════════════════════════════════════════
+
+async function seedProfileStatsMonthly(): Promise<void> {
+  const now = new Date();
+  const currentMonth = `${now.getUTCFullYear()}-${String(now.getUTCMonth() + 1).padStart(2, "0")}`;
+  const prevDate = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth() - 1, 1));
+  const prevMonth = `${prevDate.getUTCFullYear()}-${String(prevDate.getUTCMonth() + 1).padStart(2, "0")}`;
+
+  // Find all profiles with non-zero stats
+  const profiles = await (Profile as any).find({
+    $or: [
+      { "stats.viewsTotal": { $gt: 0 } },
+      { "stats.clicksTotal": { $gt: 0 } },
+    ],
+  }).select("_id stats").lean();
+
+  const docs: Record<string, unknown>[] = [];
+  for (const p of profiles as any[]) {
+    const viewsTotal = p.stats?.viewsTotal ?? 0;
+    const clicksTotal = p.stats?.clicksTotal ?? 0;
+
+    // Split roughly: 60% current month, 40% previous month
+    const viewsCur = Math.round(viewsTotal * 0.6);
+    const viewsPrev = viewsTotal - viewsCur;
+    const clicksCur = Math.round(clicksTotal * 0.6);
+    const clicksPrev = clicksTotal - clicksCur;
+
+    if (viewsCur > 0 || clicksCur > 0) {
+      docs.push({ profileId: p._id, month: currentMonth, views: viewsCur, clicks: clicksCur });
+    }
+    if (viewsPrev > 0 || clicksPrev > 0) {
+      docs.push({ profileId: p._id, month: prevMonth, views: viewsPrev, clicks: clicksPrev });
+    }
+  }
+
+  if (docs.length > 0) {
+    await insertBulk(ProfileStatsMonthlyModel as any, docs);
+  }
+  counts.profileStatsMonthly = docs.length;
 }
 
 // ═══════════════════════════════════════════════════

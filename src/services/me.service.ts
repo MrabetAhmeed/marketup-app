@@ -16,6 +16,7 @@ import { RseReceipt } from "@/models/rse-receipt.model";
 import { Association } from "@/models/association.model";
 import type { MeResponse, ProfileSummary, RseSummary, NotificationPreview } from "@/types/dashboard";
 import type { ProfileKind } from "@/types";
+import { getProfileMonthlyStats, getCurrentMonth, getPreviousMonth, computeTrend } from "@/services/track.service";
 
 // Mongoose 9 strict types require casts for dynamic queries
 const CompanyModel = Company as any;
@@ -145,7 +146,9 @@ export async function getMe(
       hasPendingData: p.pendingData != null,
       stats: {
         viewsTotal: p.stats?.viewsTotal ?? 0,
-        views30d: p.stats?.views30d ?? 0,
+        clicksTotal: p.stats?.clicksTotal ?? 0,
+        viewsThisMonth: 0, // populated below
+        trend: null, // populated below
       },
       boosted: boostedKinds.has(kind),
       sponsoring: sponsoringKinds.has(kind),
@@ -158,16 +161,48 @@ export async function getMe(
     linkup: buildProfileSummary("linkup"),
   };
 
-  // Aggregate view stats
+  // Aggregate stats — fetch monthly data from ProfileStatsMonthly
+  const currentMonth = getCurrentMonth();
+  const prevMonth = getPreviousMonth(currentMonth);
+
+  let totalPrevViews = 0;
+  let hasPrevData = false;
+
+  for (const kind of ["brandup", "traceup", "linkup"] as const) {
+    const summary = profileSummaries[kind];
+    if (!summary) continue;
+    const profileObj = profilesByKind[kind];
+    if (!profileObj) continue;
+    const pid = (profileObj as any)._id.toString();
+    const [curStats, prevStats] = await Promise.all([
+      getProfileMonthlyStats(pid, currentMonth),
+      getProfileMonthlyStats(pid, prevMonth),
+    ]);
+    summary.stats.viewsThisMonth = curStats.views;
+    const prevHasData = prevStats.views > 0 || prevStats.clicks > 0;
+    summary.stats.trend = computeTrend(curStats.views, prevHasData ? prevStats.views : null);
+    if (prevHasData) {
+      hasPrevData = true;
+      totalPrevViews += prevStats.views;
+    }
+  }
+
   const viewsTotal =
     (profileSummaries.brandup?.stats.viewsTotal ?? 0) +
     (profileSummaries.traceup?.stats.viewsTotal ?? 0) +
     (profileSummaries.linkup?.stats.viewsTotal ?? 0);
 
-  const views30d =
-    (profileSummaries.brandup?.stats.views30d ?? 0) +
-    (profileSummaries.traceup?.stats.views30d ?? 0) +
-    (profileSummaries.linkup?.stats.views30d ?? 0);
+  const clicksTotal =
+    (profileSummaries.brandup?.stats.clicksTotal ?? 0) +
+    (profileSummaries.traceup?.stats.clicksTotal ?? 0) +
+    (profileSummaries.linkup?.stats.clicksTotal ?? 0);
+
+  const viewsThisMonth =
+    (profileSummaries.brandup?.stats.viewsThisMonth ?? 0) +
+    (profileSummaries.traceup?.stats.viewsThisMonth ?? 0) +
+    (profileSummaries.linkup?.stats.viewsThisMonth ?? 0);
+
+  const aggregateTrend = computeTrend(viewsThisMonth, hasPrevData ? totalPrevViews : null);
 
   // Build RSE summary
   const totalDonationsYear = (yearlyDonationAgg as any[])[0]?.total ?? 0;
@@ -240,7 +275,9 @@ export async function getMe(
     rse: rseSummary,
     stats: {
       viewsTotal,
-      views30d,
+      clicksTotal,
+      viewsThisMonth,
+      trend: aggregateTrend,
       activeBoosts: (activeBoosts as any[]).length,
       activeSponsorings: (activeSponsorings as any[]).length,
       unreadNotifications,

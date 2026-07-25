@@ -28,6 +28,7 @@
 | **PP-14.5** | Mode "Bientot disponible" : placeholderMode (hidden/coming_soon) pour profils masques |
 | **PP-14.6** | Cablage toggles visibilite dashboard (Vue d'ensemble) sur soft service PP-14.5 |
 | **PP-14** | Delete account (owner self-delete cascade) + Suspend hardening (raison, audit trail, emails, modals) |
+| **PP-15a** | Tracking statistiques reel : vues (beacon client) + clics sortants (sendBeacon), collection ProfileStatsMonthly, endpoint POST /track, dashboard tendance mois courant vs mois-1 |
 
 ## V1.1 post-prod (backlog)
 

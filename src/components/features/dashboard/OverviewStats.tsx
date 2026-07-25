@@ -50,20 +50,22 @@ function TotalViewsCard({ stats }: { stats: MeResponse["stats"] }): JSX.Element 
             visibility
           </span>
         </div>
-        {stats.views30d > 0 && (
-          <span className="inline-flex items-center gap-0.5 text-[11px] font-semibold text-status-active-fg">
-            <span className="material-symbols-outlined" style={{ fontSize: 14 }}>trending_up</span>
-            +{stats.views30d}
+        {stats.trend ? (
+          <span className={`inline-flex items-center gap-0.5 text-[11px] font-semibold ${stats.trend.value >= 0 ? "text-status-active-fg" : "text-[#B91C1C]"}`}>
+            <span className="material-symbols-outlined" style={{ fontSize: 14 }}>
+              {stats.trend.value >= 0 ? "trending_up" : "trending_down"}
+            </span>
+            {stats.trend.label}
           </span>
-        )}
+        ) : null}
       </div>
       <div className="text-[11px] text-ink-secondary font-medium uppercase tracking-wider mb-1">
-        Vues totales
+        Vues ce mois
       </div>
       <div className="font-heading font-bold text-ink-primary text-[26px] leading-none">
-        {stats.viewsTotal}
+        {stats.viewsThisMonth}
       </div>
-      <div className="text-[11px] text-ink-secondary mt-1">Tout les profils · ce mois</div>
+      <div className="text-[11px] text-ink-secondary mt-1">Tous les profils</div>
     </div>
   );
 }
@@ -94,10 +96,12 @@ function ProfileStatCard({
             {config.icon}
           </span>
         </div>
-        {isActive && profile && profile.stats.views30d > 0 ? (
-          <span className="inline-flex items-center gap-0.5 text-[11px] font-semibold text-status-active-fg">
-            <span className="material-symbols-outlined" style={{ fontSize: 14 }}>trending_up</span>
-            +{profile.stats.views30d}
+        {isActive && profile?.stats.trend ? (
+          <span className={`inline-flex items-center gap-0.5 text-[11px] font-semibold ${profile.stats.trend.value >= 0 ? "text-status-active-fg" : "text-[#B91C1C]"}`}>
+            <span className="material-symbols-outlined" style={{ fontSize: 14 }}>
+              {profile.stats.trend.value >= 0 ? "trending_up" : "trending_down"}
+            </span>
+            {profile.stats.trend.label}
           </span>
         ) : badge ? (
           <span className={`inline-flex items-center gap-1 text-[10px] font-semibold ${badge.textColor}`}>
@@ -112,7 +116,7 @@ function ProfileStatCard({
       {isActive && profile ? (
         <>
           <div className="font-heading font-bold text-ink-primary text-[26px] leading-none">
-            {profile.stats.viewsTotal}
+            {profile.stats.viewsThisMonth}
           </div>
           {profile.boosted && (
             <div className="text-[11px] text-primary font-semibold mt-1">

@@ -10,6 +10,7 @@ interface Social {
 
 interface ServicesGridProps {
   slug: string;
+  profileId: string;
   socials: Social[];
   siblingProfiles: { brandup: boolean; traceup: boolean };
   companyWhatsapp?: string | null;
@@ -52,7 +53,21 @@ function getMapsLink(
   return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(parts)}`;
 }
 
-export default function ServicesGrid({ slug, socials, siblingProfiles, companyWhatsapp, companyPhone, companyAddress, companyVille, companyGouvernoratName, companyGpsPosition }: ServicesGridProps): JSX.Element {
+function trackClick(profileId: string): void {
+  const body = JSON.stringify({ profileId, event: "click" });
+  if (navigator.sendBeacon) {
+    navigator.sendBeacon("/api/v1/public/track", new Blob([body], { type: "application/json" }));
+  } else {
+    fetch("/api/v1/public/track", {
+      method: "POST",
+      body,
+      headers: { "Content-Type": "application/json" },
+      keepalive: true,
+    }).catch(() => {});
+  }
+}
+
+export default function ServicesGrid({ slug, profileId, socials, siblingProfiles, companyWhatsapp, companyPhone, companyAddress, companyVille, companyGouvernoratName, companyGpsPosition }: ServicesGridProps): JSX.Element {
   const socialUrl = (platform: string): string | null => {
     const s = socials.find((x) => x.platform === platform);
     return s?.url ?? null;
@@ -89,6 +104,7 @@ export default function ServicesGrid({ slug, socials, siblingProfiles, companyWh
               key={s.key}
               href={s.href!}
               {...extraProps}
+              onClick={s.external ? () => trackClick(profileId) : undefined}
               className="aspect-square bg-white flex flex-col items-center justify-center text-center group p-2 cursor-pointer transition-all duration-200"
               style={{
                 border: "1px solid #E0E0E0",

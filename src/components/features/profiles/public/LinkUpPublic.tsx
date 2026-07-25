@@ -37,6 +37,7 @@ export default function LinkUpPublic({ data, embedded }: LinkUpPublicProps): JSX
 
         <ServicesGrid
           slug={c.slug}
+          profileId={data.profileId}
           socials={data.socials}
           siblingProfiles={data.siblingProfiles}
           companyWhatsapp={c.whatsapp}

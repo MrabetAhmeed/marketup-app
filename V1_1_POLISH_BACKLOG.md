@@ -497,3 +497,40 @@ TraceUpEditor : toggle disabled en `isPending || isDisabled` (actif en rejected)
 LinkUpEditor : toggle disabled en `isReadOnly` (actif en rejected).
 Trois comportements différents. Harmoniser si friction terrain constatée.
 Estimé : 15 min.
+
+## Tracking & Analytics
+
+### ✅ LIVRÉ PP-15a — Tracking vues + clics sortants
+Collection ProfileStatsMonthly, beacon client, endpoint POST /api/v1/public/track.
+200 tests green. Voir CLAUDE.md §6.17.
+
+### PRIORITÉ HAUTE — ProfileHero : tel/whatsapp/email cliquables + tracking clics
+Les coordonnées dans ProfileHero (phone, whatsapp, email) sont des `<div>` non
+cliquables. Sur mobile, un produit "carte de contact" avec des coordonnées non
+cliquables est un défaut UX critique. Rendre cliquables (`<a href="tel:">`,
+`<a href="mailto:">`, etc.) et ajouter le tracking clics. Vague 1 post-prod.
+Fichiers : ProfileHero.tsx + wiring sendBeacon.
+Estimé : 1h.
+
+### Breakdown clics par type (whatsapp/tel/socials/maps)
+Actuellement : compteur agrégé clicks. V1.1 : stocker le type de clic
+(whatsapp, phone, facebook, etc.) pour analytics granulaires dashboard.
+Champ optionnel `target` dans le payload track + stockage par type.
+Estimé : 2h.
+
+### Cleanup champ views30d déprécié
+Profile.stats.views30d conservé au schéma en PP-15a pour zéro migration.
+Retirer du schéma Mongoose + cleanup seed data.
+Estimé : 15 min.
+
+### Tracking → lecture par boost/sponsoring dynamiques
+Boost.viewsAdded / clicksAdded (boost.model.ts:13-14) existent mais ne
+sont jamais incrémentés. Quand le checkout boost sera implémenté, lire
+ProfileStatsMonthly pour calculer les vues/clics pendant la période boost.
+Estimé : 2h (dépend du sprint boost dynamique).
+
+### Tracker clic PDF reçu RSE (optionnel)
+RseSection.tsx:69 a un `<a href={receiptDocumentUrl} target="_blank">`.
+Actuellement exclu du tracking (téléchargement de reçu ≠ intention de contact).
+Si utile pour analytics RSE, ajouter sendBeacon onClick.
+Estimé : 15 min.

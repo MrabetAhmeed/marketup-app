@@ -6,6 +6,7 @@ import PublicProfileHeader from "@/components/shared/PublicProfileHeader";
 import PublicFooter from "@/components/shared/PublicFooter";
 import TraceUpPublic from "@/components/features/profiles/public/TraceUpPublic";
 import ComingSoonPage from "@/components/shared/ComingSoonPage";
+import TrackView from "@/components/shared/TrackView";
 import type { PublicTraceUpProfile, PublicProfileOrPlaceholder } from "@/services/public-profile.service";
 
 export const dynamic = "force-dynamic";
@@ -66,6 +67,7 @@ export default async function TraceUpProfilePage({ params }: PageProps): Promise
   return (
     <div className="min-h-screen bg-[#fbf9f8]">
       <PublicProfileHeader product="traceup" />
+      <TrackView profileId={(data! as PublicTraceUpProfile).profileId} />
       <TraceUpPublic data={data! as PublicTraceUpProfile} />
       <PublicFooter />
     </div>

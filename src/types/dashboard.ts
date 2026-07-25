@@ -29,7 +29,7 @@ export interface ProfileSummary {
   lastValidatedAt: string | null;
   disabledAt: string | null;
   hasPendingData: boolean;
-  stats: { viewsTotal: number; views30d: number };
+  stats: { viewsTotal: number; clicksTotal: number; viewsThisMonth: number; trend: { value: number; label: string } | null };
   boosted: boolean;
   sponsoring: boolean;
 }
@@ -78,7 +78,9 @@ export interface MeResponse {
   rse: RseSummary;
   stats: {
     viewsTotal: number;
-    views30d: number;
+    clicksTotal: number;
+    viewsThisMonth: number;
+    trend: { value: number; label: string } | null;
     activeBoosts: number;
     activeSponsorings: number;
     unreadNotifications: number;

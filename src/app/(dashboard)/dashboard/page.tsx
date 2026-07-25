@@ -22,15 +22,7 @@ export default async function DashboardPage(): Promise<JSX.Element> {
       <section>
         <SectionHeader
           title="Performances du mois"
-          subtitle="Vues cumulées sur vos 3 vitrines publiques"
-          right={
-            <span className="hidden sm:inline-flex items-center gap-1 text-[11px] text-ink-tertiary">
-              <span className="material-symbols-outlined" style={{ fontSize: 14 }}>
-                schedule
-              </span>
-              Actualisé il y a 5 min
-            </span>
-          }
+          subtitle="Vues et clics sur vos 3 vitrines publiques"
         />
         <OverviewStats me={me} />
       </section>
