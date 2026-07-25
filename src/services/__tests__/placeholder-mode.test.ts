@@ -357,7 +357,7 @@ describe("PP-14.6 — dashboard toggle ON sets isPublic true only", () => {
       $set: { isPublic: true },
     });
     // placeholderMode NOT in $set
-    const setArg = mockBrandUpUpdate.mock.calls[0][1].$set;
+    const setArg = mockBrandUpUpdate.mock.calls[0]![1].$set;
     expect(setArg).not.toHaveProperty("placeholderMode");
   });
 });
@@ -378,7 +378,7 @@ describe("PP-14.6 — toggle OFF overwrites existing hidden → coming_soon", ()
       status: "active", isPublic: true, placeholderMode: "hidden",
     });
     await updateProfileSoft(PROFILE_ID, "user1", { isPublic: false, placeholderMode: "coming_soon" });
-    const setArg = mockLinkUpUpdate.mock.calls[0][1].$set;
+    const setArg = mockLinkUpUpdate.mock.calls[0]![1].$set;
     expect(setArg.isPublic).toBe(false);
     expect(setArg.placeholderMode).toBe("coming_soon");
   });
