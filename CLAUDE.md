@@ -405,6 +405,23 @@ When asked to do specific work, **always look in `.claude/skills/`** first:
 
 ---
 
+## 9-bis. Déploiement (Infomaniak / serveur RAM-limité)
+
+Le conteneur de production dispose de **~1.5 Go RAM**. Sans les garde-fous ci-dessous, `next build` SIGABRT (OOM) lors de la phase "Generating static pages".
+
+| Paramètre | Valeur | Où |
+|---|---|---|
+| `experimental.cpus` | `1` | `next.config.mjs` — limite les workers de static generation à 1 thread |
+| `NODE_OPTIONS` | `--max-old-space-size=1536` | variable d'environnement serveur (build + start) |
+
+**Rationale :** Next.js lance par défaut autant de workers que de CPU logiques. Sur un conteneur mutualisé avec peu de RAM, chaque worker consomme ~300-500 Mo → OOM. `cpus: 1` force un seul worker. `--max-old-space-size=1536` plafonne le heap V8 sous la limite conteneur.
+
+**Impact local :** le build est légèrement plus lent (~+30 %) car mono-worker. Le runtime (`next start`, `next dev`) est **inchangé**.
+
+**Règle de déploiement :** `git pull → npm run build → restart service`. Pas de CI/CD automatisé en V1 — déploiement manuel via SSH.
+
+---
+
 ## 10. Commands
 
 ```bash
