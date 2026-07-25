@@ -9,7 +9,9 @@ declare global {
 export async function connectDb(): Promise<typeof mongoose> {
   if (!global._mongoosePromise) {
     global._mongoosePromise = mongoose.connect(env.MONGODB_URI, {
-      serverSelectionTimeoutMS: 10_000,
+      family: 4, // force IPv4 — élimine les tentatives IPv6/NAT64 cassées en dev local
+      serverSelectionTimeoutMS: 15_000, // laisse le temps de retrouver un primary sur liaison lente
+      maxIdleTimeMS: 60_000, // libère les connexions idle après 60s
     });
   }
   return global._mongoosePromise;

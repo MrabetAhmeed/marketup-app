@@ -35,7 +35,7 @@ When implementing **any feature**, read these files **in this order** before wri
 
 > **If a mockup and the spec disagree, the mockup wins.** Surface the inconsistency to the human, do not silently resolve it.
 
-The narrative demo entity across all mockups is **TechnoFab Industries** (B2B · Mécanique · Sousse · owner Ahmed Mrabet). Its three profiles are canonically:
+The narrative demo entity across all mockups is **TechnoFab Industries** (B2B · Mecanique · Sousse · owner Ahmed Mrabet). Its three profiles are canonically:
 - **BrandUP: rejected** (with a rejection reason)
 - **TraceUP: pending** (first submission awaiting admin review)
 - **LinkUP: active + boosted + active sponsoring campaign**
@@ -44,69 +44,13 @@ Honour this canon when seeding dev databases.
 
 ---
 
-## 2-bis. Mockup filenames ≠ Next.js routes (critical)
+## 2-bis. Mockup filenames ≠ Next.js routes
 
-**The HTML filenames in `reference/mockups/` are documentation references, NOT routes to be recreated literally in the Next.js codebase.**
+Mockup HTML filenames are documentation references, NOT literal Next.js routes. The Next.js implementation uses dynamic routes (`[slug]`). All routes are implemented.
 
-Several mockup files include a company slug in their filename (e.g. `public_brandup_technofab-industries.html`) — these are **rendered examples** showing what the page produces for that specific company. The Next.js implementation uses **dynamic routes** (`[slug]`) and renders the same template for any company at runtime.
+> **Full mapping table and rules:** see `reference/ROUTE_MAPPING.md`
 
-### Filename → Next.js route mapping
-
-| Mockup file | Purpose | Next.js route |
-|---|---|---|
-| `onboarding_onboarding.html` | Product picker | `app/(public)/onboarding/page.tsx` |
-| `auth_inscription-entreprise.html` | Signup step 1 | `app/(auth)/signup/company/page.tsx` |
-| `auth_inscription-utilisateur.html` | Signup step 2 | `app/(auth)/signup/user/page.tsx` |
-| `auth_inscription-otp.html` | Signup step 3 | `app/(auth)/signup/verify/page.tsx` |
-| `auth_validation-email.html` | Resend OTP | `app/(auth)/validation-email/page.tsx` |
-| `auth_validation-success.html` | Post-OTP success | `app/(auth)/signup/success/page.tsx` |
-| `auth_connexion.html` | Login | `app/(auth)/login/page.tsx` |
-| `auth_mot-de-passe-oublie.html` | Forgot password | `app/(auth)/forgot/page.tsx` |
-| `auth_modifier-mot-de-passe.html` | Reset password | `app/(auth)/reset/page.tsx` |
-| `public_brandup.html` | **BrandUP search engine** | `app/(public)/brandup/page.tsx` |
-| `public_traceup.html` | **TraceUP search engine** | `app/(public)/traceup/page.tsx` |
-| `public_linkup.html` | **LinkUP search engine** | `app/(public)/linkup/page.tsx` |
-| `public_brandup_technofab-industries.html` | Example of a BrandUP **profile page** (any company) | `app/(public)/brandup/[slug]/page.tsx` |
-| `public_brandup_popup_technofab-industries.html` | Example of a BrandUP **popup quick-preview** (any company) | `<BrandUpPopup>` component used by `/brandup` search results |
-| `public_traceup_technofab-industries.html` | Example of a TraceUP profile page | `app/(public)/traceup/[slug]/page.tsx` |
-| `public_traceup_popup_technofab-industries.html` | Example of a TraceUP popup | `<TraceUpPopup>` component |
-| `public_linkup_technofab-industries.html` | Example of a LinkUP card | `app/(public)/linkup/[slug]/page.tsx` |
-| `public_linkup_popup_technofab-industries.html` | Example of a LinkUP popup | `<LinkUpPopup>` component |
-| `dashboard_index.html` | Owner overview | `app/(dashboard)/dashboard/page.tsx` |
-| `dashboard_account.html` | Owner account | `app/(dashboard)/dashboard/account/page.tsx` |
-| `dashboard_settings.html` | Owner settings | `app/(dashboard)/dashboard/settings/page.tsx` |
-| `dashboard_brandup.html` | Owner BrandUP editor | `app/(dashboard)/dashboard/brandup/page.tsx` |
-| `dashboard_traceup.html` | Owner TraceUP editor | `app/(dashboard)/dashboard/traceup/page.tsx` |
-| `dashboard_linkup.html` | Owner LinkUP editor | `app/(dashboard)/dashboard/linkup/page.tsx` |
-| `dashboard_boost.html` | Owner boost overview | `app/(dashboard)/dashboard/boost/page.tsx` |
-| `dashboard_sponsoring.html` | Owner sponsoring | `app/(dashboard)/dashboard/sponsoring/page.tsx` |
-| `dashboard_rse.html` | Owner RSE | `app/(dashboard)/dashboard/rse/page.tsx` |
-| `dashboard_billing.html` | Owner billing | `app/(dashboard)/dashboard/billing/page.tsx` |
-| `dashboard_notifications.html` | Owner notifications | `app/(dashboard)/dashboard/notifications/page.tsx` |
-| `admin_dashboard.html` | Admin overview | `app/(admin)/admin/page.tsx` |
-| `admin_entreprises.html` | Admin company directory | `app/(admin)/admin/companies/page.tsx` |
-| `admin_entreprise-detail.html` | Admin single-company view | `app/(admin)/admin/companies/[id]/page.tsx` |
-| `admin_validation-comptes.html` | Account validation queue | `app/(admin)/admin/validation/accounts/page.tsx` |
-| `admin_validation-profils.html` | Profile validation queue | `app/(admin)/admin/validation/profiles/page.tsx` |
-| `admin_validation-rse.html` | RSE validation queue | `app/(admin)/admin/validation/rse/page.tsx` |
-| `admin_brandup-detail.html` | Single BrandUP review | `app/(admin)/admin/profiles/[id]/page.tsx` (kind=brandup) |
-| `admin_traceup-detail.html` | Single TraceUP review | `app/(admin)/admin/profiles/[id]/page.tsx` (kind=traceup) |
-| `admin_linkup-detail.html` | Single LinkUP review | `app/(admin)/admin/profiles/[id]/page.tsx` (kind=linkup) |
-| `admin_transactions.html` | All transactions | `app/(admin)/admin/transactions/page.tsx` |
-
-### Three rules that follow from this mapping
-
-1. **Never create a file named after a company slug** in the Next.js code. There is no `app/(public)/brandup/technofab-industries/page.tsx`. The route is `app/(public)/brandup/[slug]/page.tsx`, and `technofab-industries` is one of many possible slug values (resolved from the seed at runtime).
-2. **The 6 TechnoFab mockup files** (`public_<type>(_popup)?_technofab-industries.html`) demonstrate **only one** narrative — they exist so you can see "what BrandUP looks like when status=rejected", "what TraceUP looks like when status=pending", "what LinkUP looks like when active+boosted". Reproduce the **template logic** (how to render any status), not the **specific content** (the TechnoFab pitch text).
-3. **For the three admin profile-detail pages** (`admin_brandup-detail.html`, `admin_traceup-detail.html`, `admin_linkup-detail.html`), the Next.js implementation has **one** dynamic route (`admin/profiles/[id]/page.tsx`) that branches on `profile.kind` and renders the appropriate template — not three separate routes.
-
-### Data sources for slug-based routes
-
-When implementing `app/(public)/brandup/[slug]/page.tsx`:
-- The slug comes from `params.slug` (e.g. `technofab-industries`).
-- The service `getPublicProfileBySlug(slug, "brandup")` does `Company.findOne({ slug })` → `Profile.findOne({ companyId, kind: "brandup" })`.
-- If `!isProfileVisible(profile, company)` → return `notFound()` (Next.js 404).
-- Otherwise render the same template that the TechnoFab mockup demonstrates, with the dynamic data.
+Key rules: never create a file named after a company slug; TechnoFab mockups demonstrate template logic, not specific content; admin profile-detail uses one dynamic route branching on `profile.kind`.
 
 ---
 
@@ -213,97 +157,7 @@ reference/                         # READ-ONLY — never modify these
 .claude/skills/                    # custom skills available to Claude Code
 ```
 
----
-
-## 4-bis. Static Assets — single source, mirrored to `public/`
-
-**The single source of truth for shared static assets (logos, onboarding illustrations) lives in `reference/mockups/shared/`.** This folder mirrors the relative path used inside the HTML mockups so they remain visually functional when opened directly in a browser.
-
-```
-reference/mockups/
-├── shared/                                         ← SOURCE — single editable location
-│   ├── logos/
-│   │   ├── logos-brandup.png
-│   │   ├── logos-traceup.png
-│   │   └── logos-linkup.png
-│   └── onboarding-images/
-│       ├── onboarding-images-b2b_img.jpg
-│       └── onboarding-images-b2c_img.jpg
-├── auth_*.html, dashboard_*.html, admin_*.html, public_*.html  ← reference paths like src="shared/logos/..."
-└── README.md
-```
-
-**For Next.js to serve these at runtime, the same folder MUST also exist under `public/shared/`** — Next.js only serves files from `public/`, not from `reference/`.
-
-### Mandatory setup step (Phase 0)
-
-When initializing the project, copy the shared folder from the reference into `public/`:
-
-```bash
-mkdir -p public
-cp -r reference/mockups/shared public/shared
-```
-
-This step is part of Phase 0 (see §9) and must be performed before the dev server runs. **If any logo or illustration is missing at runtime, this is almost always the cause** — re-run the cp command.
-
-### Optional npm script to automate sync
-
-If shared assets ever change (new logo, new onboarding image), keep `reference/mockups/shared/` as the single editable copy and re-sync:
-
-```json
-// package.json
-{
-  "scripts": {
-    "sync-shared": "rm -rf public/shared && cp -r reference/mockups/shared public/shared",
-    "prebuild": "npm run sync-shared",
-    "predev": "npm run sync-shared"
-  }
-}
-```
-
-With this, `npm run dev` and `npm run build` auto-resync. Edit only `reference/mockups/shared/`; never edit `public/shared/` directly (it will be overwritten).
-
-### Reference paths — HTML vs Next.js
-
-The HTML mockups use **relative** paths (because they sit beside `shared/`):
-```html
-<!-- in reference/mockups/dashboard_index.html -->
-<img src="shared/logos/logos-brandup.png" alt="BrandUP" />
-```
-
-The Next.js code uses **absolute** paths (because Next.js serves `public/` at `/`):
-```tsx
-// in src/components/...
-<img src="/shared/logos/logos-brandup.png" alt="BrandUP" />
-```
-
-The only difference is the leading `/`. When porting a mockup, just prefix the path with `/`.
-
-### External image domains
-
-Avatars (`api.dicebear.com`) and placeholder banners (`picsum.photos`) and TraceUP thumbnails (`img.youtube.com`) are loaded from external CDNs. These must be whitelisted in `next.config.js` if you want to use `next/image`:
-
-```ts
-// next.config.js
-module.exports = {
-  images: {
-    remotePatterns: [
-      { protocol: "https", hostname: "api.dicebear.com" },
-      { protocol: "https", hostname: "picsum.photos" },
-      { protocol: "https", hostname: "img.youtube.com" },
-      { protocol: "https", hostname: "i.vimeocdn.com" },
-      { protocol: "https", hostname: "s1.dmcdn.net" },              // Dailymotion thumbnails
-      { protocol: "https", hostname: "cdn.vivasky.media" },         // future production CDN
-    ],
-  },
-};
-```
-
-If you stick to plain `<img>` tags during Phase 0–4 (port phase), you don't need this whitelist — the browser loads any URL. Add it before migrating to `next/image` (Phase 11 polish).
-
-### What about uploaded company assets?
-
-Logos, gallery images, RSE receipts, profile photos — these are user-uploaded files stored on object storage (S3 / R2). They live at `https://cdn.vivasky.media/uploads/...` and are referenced by URL in the DB. **Do not put them in `public/`** — they are dynamic, owner-scoped, and managed via `POST /api/v1/uploads` (see API_REFERENCE §11).
+> **Static assets setup (logos, images):** see `reference/STATIC_ASSETS.md`. Key rule: source in `reference/mockups/shared/`, mirrored to `public/shared/` via `npm run sync-shared`.
 
 ---
 
@@ -362,7 +216,7 @@ For company-level edits to validation-gated fields, write to `company.pendingUpd
 |---|---|
 | Nom d'entreprise | `data.displayName` |
 | Logo | `data.logoUrl` |
-| Bannière | `data.bannerUrl` |
+| Banniere | `data.bannerUrl` |
 | Gouvernorat | `liveData.gouvernorat` |
 | Ville | `liveData.ville` |
 | Adresse | `liveData.address` |
@@ -392,11 +246,7 @@ function isProfileVisible(
 }
 ```
 
-A profile already validated at least once (`publishedAt` set) remains publicly visible with its **validated `data`** even while `pendingData` awaits admin review. This ensures QR codes, shared links, and SEO rankings are not disrupted by minor edits.
-
-Never persist a `visible` column. Compute on every read. This makes suspension/reactivation reversible without dirty writes.
-
-**Important:** `pendingData` is **never** exposed to the public. Public pages always read from `profile.data`.
+Never persist a `visible` column. Compute on every read. **`pendingData` is never exposed to the public.** Public pages always read from `profile.data`.
 
 ### 6.3 Money is **HT in storage, TTC at read**
 
@@ -411,7 +261,6 @@ Never persist a `visible` column. Compute on every read. This makes suspension/r
 The DB stores text as `{ fr, ar, en }`. **API responses always return a single string.**
 
 ```ts
-// lib/i18n.ts
 export function pickLocale(value: I18nString | string | null | undefined, lang: "fr" | "ar" | "en" = "fr"): string {
   if (value == null) return "";
   if (typeof value === "string") return value;
@@ -439,11 +288,8 @@ API route handlers read `?lang=` query param (default `fr`) and pass it to `pick
 Use typed error classes. Catch at the API route boundary and map to standard responses.
 
 ```ts
-// lib/api-error.ts
 export class AppError extends Error {
-  constructor(public code: string, message: string, public status = 400, public details?: unknown) {
-    super(message);
-  }
+  constructor(public code: string, message: string, public status = 400, public details?: unknown) { super(message); }
 }
 export class NotFoundError extends AppError { /* status 404 */ }
 export class AuthError extends AppError { /* 401 / 403 */ }
@@ -460,119 +306,16 @@ export class BusinessRuleError extends AppError { /* 422 */ }
 
 `POST /me/boost/checkout` and `POST /me/sponsoring/checkout` accept an `Idempotency-Key` header. Cache responses 24h keyed by `(userId, idempotencyKey)`. Return the cached response on retry.
 
-### 6.10 TraceUP videos — hybrid hard/soft (updated PP-11, June 30 2026)
+### 6.10–6.16 Implemented business rules (PP-11 → PP-14)
 
-Per client feedback (demo May 22, decision Ahmed June 29): TraceUP video **additions** require admin review (hard change via `pendingData`). Video **deletions** remain instant (soft) when profile is active. Deletions are blocked during pending status.
+These rules are fully implemented and tested. **Summaries below; full details in `reference/BUSINESS_RULES_DETAILED.md`.**
 
-- `createVideo()` writes to `pendingData.fields[key="videos"]` with a full snapshot (not to `data.videos`)
-- Profile transitions to `pending` on first add (hidden publicly until admin validates)
-- `deleteVideo()` is soft instant (active/rejected), blocked during pending
-- `removeVideoFromPending()` lets the owner retract pending videos before admin review
-- Auto-recovery: if pending snapshot matches `data.videos` → clear pending, restore previous status
-
-### 6.11 Slug lifecycle — regeneration + 301 redirect (PP-12, July 6 2026)
-
-When admin approves a `data.displayName` change via `approvePendingUpdates()`:
-1. `generateSlug(newDisplayName)` produces a candidate slug
-2. If candidate === current slug (no-op): skip — no slug change, no slugHistory entry
-3. `ensureUniqueSlug(candidate, companyId)` checks uniqueness against all slugs **and** all `slugHistory` entries (excluding the company itself via `excludeCompanyId`)
-4. Old slug → `company.slugHistory[]` ($addToSet); new slug → `company.slug`
-5. "Retour interne" (reclaim own old slug): allowed, removed from slugHistory
-
-**Anti-collision:** `ensureUniqueSlug()` checks `{ $or: [{ slug }, { slugHistory }] }`. An old slug is reserved forever for redirect. A new company signup that collides with another company's slugHistory gets a `-2` suffix.
-
-**Redirect:** `getPublicProfileBySlug()` falls back to `Company.findOne({ slugHistory: slug })` when primary lookup fails. If found → throws `SlugRedirectError(kind, newSlug)`. Consumers:
-- 3 SSR pages: catch → `permanentRedirect()` (308 Permanent Redirect)
-- 3 API routes: catch → `NextResponse.redirect(newUrl, 301)`
-- `generateMetadata()`: catch → return `{}` (empty metadata, page redirect handles it)
-
-`SlugRedirectError` extends `Error` (NOT `AppError`) to avoid being caught by `handleApiError`.
-
-### 6.12 Admin validation hub (PP-12, July 6 2026)
-
-Single page `/admin/validation` with 4 tabs: Inscriptions · Modifications comptes · Profils · RSE. Tab active controlled by `?tab=` query param (deep-linkable).
-
-- `listCompaniesWithPendingUpdates()`: active companies with `pendingUpdates !== null`
-- 4th counter `companyUpdates` in `getPendingCountsForAdmin()`
-- Old validation list pages (`/comptes`, `/profiles`, `/rse`) redirect to the hub
-- Detail page "Retour" link infers tab from company status (pending → inscriptions, active → modifications)
-
-### 6.13 Session invalidation — passwordChangedAt + S8 (PP-13, July 23 2026)
-
-The NextAuth jwt() callback checks session validity against the DB on every authenticated request (Owner role only, SUPER_ADMIN skipped):
-
-**Two parallel queries** per invocation (`.select().lean()`, minimal cost):
-1. `User.findById(token.id).select("passwordChangedAt")`
-2. `Company.findById(token.companyId).select("status")`
-
-**Invalidation triggers:**
-- `Math.floor(passwordChangedAt.getTime() / 1000) > token.iat` → password changed after token was issued (strict `>`, same-second sessions survive so the device that changed the password keeps its fresh JWT via signIn silencieux)
-- `company.status ∈ ["suspended", "deleted"]` → S8 fix: suspended/deleted companies lose all active sessions
-
-**Fail-open:** if the DB is unreachable, the request proceeds (avoid logging out all users on a transient DB blip).
-
-**Cost:** 2 queries per page load on protected routes (middleware + getServerSession each trigger jwt()). Acceptable for V1 single-instance. V1.1 item: add a short TTL cache (~30s) to reduce DB hits.
-
-**Password change flow:**
-- `PUT /api/v1/me/settings/password` — no company.status guard (accessible to rejected owners)
-- After success, client calls `signIn("credentials", { email, newPassword, redirect: false })` for a fresh JWT
-- Non-blocking confirmation email sent to owner (template: password-changed)
-- Rate limited: 5/hour per userId
-
-**Settings page:** exempt from `guardActiveCompany()` (like `/account/edit`) — rejected owners can change their password. Layout exemption added for `/dashboard/settings`.
-
-### 6.15 Placeholder mode — "Bientôt disponible" (PP-14.5, July 23 2026)
-
-`Profile.placeholderMode` is an enum `"hidden" | "coming_soon"` (default `"hidden"`). It controls what visitors see when the owner voluntarily hides a profile (`isPublic: false`).
-
-**Public page decision matrix** (evaluated in `getPublicProfileBySlug`, in this order):
-
-| company.status | profile.status | isPublic | placeholderMode | publishedAt | Result |
-|---|---|---|---|---|---|
-| not active | any | any | any | any | **404** |
-| active | disabled/incomplete | any | any | any | **404** |
-| active | any | any | any | null + not active | **404** |
-| active | any | false | coming_soon | renseigné | **Placeholder DTO** |
-| active | any | false | hidden | any | **404** |
-| active | active/pending/rejected | true | any | any | **Full profile** |
-
-**Placeholder DTO** — minimal, strict whitelist: `{ kind, placeholder: true, company: { displayName, logoUrl, slug } }`. No data, socials, coordinates, pendingData, or contact info. Prevents information leakage.
-
-**Guard: publishedAt required** — a profile never validated by admin (`publishedAt null`) cannot show a placeholder. This prevents leaking company name/logo before admin validation.
-
-**Pages:** the 3 `[slug]/page.tsx` detect `placeholder: true` in the DTO and render `<ComingSoonPage>` with the engine accent colour. `generateMetadata` returns `robots: { index: false }` for placeholders. HTTP status is 200 with noindex (App Router limitation — no custom status on SSR pages).
-
-**Search engines:** a profile with `isPublic: false` remains **absent** from search results regardless of `placeholderMode`. The placeholder is only accessible via direct URL/QR.
-
-**Mutation:** `placeholderMode` is a soft field (instant, no admin review) mutated via `PUT /profiles/[id]/soft` alongside `isPublic`. Zod enum strict.
-
-**UI:** sub-choice appears under the "Profil public" toggle when OFF — two radio buttons: "Masquer complètement" (hidden) / "Afficher « Bientôt disponible »" (coming_soon). Disabled conditions match the isPublic toggle per kind.
-
-### 6.16 Account deletion + Suspension lifecycle (PP-14, July 24 2026)
-
-**Owner self-delete** (`DELETE /api/v1/me`):
-- Body: `{ password }` — bcrypt verification required, rate-limited 3/hour per userId
-- Accessible from ANY company status (active, rejected, suspended)
-- Cascade soft-delete in a Mongoose transaction across 9 models: Company (status→"deleted"), User, Profile (×3), Transaction, Boost, Sponsoring, RseReceipt, Notification (by recipientId), File (by ownerUserId)
-- No hard delete. Physical file cleanup (Cloudinary/S3) deferred to V1.1 (RGPD J+30 purge)
-- Email "account-deleted" sent non-blocking after transaction
-- Session invalidation: handled by existing jwt() callback PP-13 (company.status === "deleted")
-- Slug + slugHistory of deleted company remain reserved forever (`ensureUniqueSlug` uses `withDeleted: true`)
-- Re-login impossible: soft-delete filter on User → findOne returns null → INVALID_CREDENTIALS
-
-**Admin suspend** (`POST /admin/companies/[id]/suspend`):
-- Body: `{ reason }` — Zod min 3 chars, max 500, required
-- Writes `suspendedReason`, `suspendedAt`, `$push auditTrail { action: "suspended", byRole: "SUPER_ADMIN", details: { reason } }`
-- Email "company-suspended" sent to owner with reason (non-blocking)
-- Session invalidation: handled by existing jwt() callback PP-13 (company.status === "suspended")
-- UI: modal with reason textarea required, warning about profile visibility and session impact
-
-**Admin reactivate** (`POST /admin/companies/[id]/reactivate`):
-- Clears `suspendedReason` and `suspendedAt`, `$push auditTrail { action: "reactivated" }`
-- Email "company-reactivated" sent to owner (non-blocking)
-- UI: simple confirmation modal
-
-**A8 constat:** admin entreprises page has no status filter/onglet → deleted companies are NOT visible in admin. Item backlog V1.1 "corbeille admin complète" for deleted company listing + potential restoration.
+- **6.10 TraceUP videos:** hybrid hard/soft — additions require admin review (`pendingData`), deletions are instant (soft). Deletions blocked during pending.
+- **6.11 Slug lifecycle:** regeneration on displayName change + 301 redirect via `slugHistory`. `SlugRedirectError` extends `Error` (not `AppError`).
+- **6.12 Admin validation hub:** single page `/admin/validation` with 4 tabs (Inscriptions · Modifications comptes · Profils · RSE), `?tab=` deep-linkable.
+- **6.13 Session invalidation:** `passwordChangedAt` check in jwt() callback + S8 fix (suspended/deleted companies lose sessions). Fail-open on DB unreachable.
+- **6.15 Placeholder mode:** `placeholderMode` enum `"hidden" | "coming_soon"` for `isPublic: false` profiles. Requires `publishedAt` set. Placeholder DTO is a strict whitelist (no data leak).
+- **6.16 Account deletion + suspension:** owner self-delete cascades across 9 models (soft-delete). Admin suspend requires reason. Slugs remain reserved forever.
 
 ---
 
@@ -603,7 +346,7 @@ export async function PUT(req: NextRequest, { params }: { params: { type: string
   try {
     const session = await requireOwner();
     const body = await req.json();
-    const parsed = ProfileEditSchema.parse(body); // throws ZodError → caught below
+    const parsed = ProfileEditSchema.parse(body);
     const result = await updateProfile(session.user.companyId, params.type, parsed);
     return jsonOk(result);
   } catch (err) {
@@ -649,53 +392,14 @@ When asked to do specific work, **always look in `.claude/skills/`** first:
 
 ## 9. Build Status & Roadmap
 
-### ✅ Livré (PP-1 → PP-14.6)
+**PP-0 → PP-14.6 + SEC-1 delivered** (20 sprints, 183 tests green). Full sprint list: `reference/CHANGELOG.md`.
+
+### Restant avant V1 prod
 
 | Sprint | Scope |
 |---|---|
-| **PP-0** | Setup: Next.js 14, Mongoose, NextAuth, Tailwind, shadcn, middleware, env validation |
-| **PP-1** | Models (16 Mongoose), seed script `npm run db:seed` |
-| **PP-2** | Auth flow: signup (company+user+OTP), login, forgot/reset password, email validation |
-| **PP-3** | Dashboard skeleton: layout, sidebar, topbar, `/me` endpoint |
-| **PP-4** | Profile editing: 3 kinds CRUD, soft/hard patterns, gallery, videos |
-| **PP-5** | Public search engines (3) + profile pages (3 × `[slug]`) |
-| **PP-6** | Admin workspace: validation queues (inscriptions, profils, RSE), company detail, suspend/reactivate |
-| **PP-6b** | Géocodage Nominatim au signup (remplacé par PP-12.6) |
-| **PP-7** | Hard change `displayName` + `pendingUpdates` pattern générique |
-| **PP-8** | Hard change `gouvernorat` (bloc unifié multi-fields) |
-| **PP-9** | Hard change LinkUP socials (pattern 3-tier profile) |
-| **PP-10** | Hard change logo + banner (upload Cloudinary → pendingUpdates) |
-| **PP-11** | Hard change TraceUP vidéos (hybride hard add / soft delete) |
-| **PP-11.5** | Visibilité : profil validé reste visible pendant pending/rejected (matrice 4 cas) |
-| **PP-12** | Hub admin unifié (4 onglets) + slug lifecycle (regeneration + 301 redirect) |
-| **PP-12.5** | Cluster localisation : gouvernorat/ville/adresse en hard change Company |
-| **PP-12.6** | GPS par pin Leaflet dans éditeur LinkUP, retrait complet Nominatim |
-| **SEC-1** | Escape regex recherche (ReDoS + crash) + cleanup UI morts |
-| **PP-13** | Changement mot de passe + invalidation sessions (passwordChangedAt) + S8 (suspended/deleted) |
-| **PP-14.5** | Mode "Bientôt disponible" : placeholderMode (hidden/coming_soon) pour profils masqués |
-| **PP-14.6** | Câblage toggles visibilité dashboard (Vue d'ensemble) sur soft service PP-14.5 |
-| **PP-14** | Delete account (owner self-delete cascade) + Suspend hardening (raison, audit trail, emails, modals) |
-
-### 🔵 Restant avant V1 prod
-
-| Sprint | Scope |
-|---|---|
-| **PP-17** | Seed prod (données de production initiales, sans TechnoFab demo) |
+| **PP-17** | Seed prod (donnees de production initiales, sans TechnoFab demo) |
 | **DevOps** | Resend domain verification, security headers S5, env prod, deploy pipeline |
-
-### 📦 V1.1 post-prod (backlog)
-
-| Item | Scope |
-|---|---|
-| PP-15 | Notifications utilisateur (Pusher real-time + bell dropdown) |
-| PP-16 | Langues (AR/EN) — i18n frontend |
-| Boost/Sponsoring dynamiques | Checkout flow, paiement réel, campagnes |
-| Tracking vues | Compteurs de vues profils (analytics) |
-| Facturation réelle | PDF invoices + Excel export admin |
-| Cache sessions | TTL ~30s sur jwt() pour réduire DB hits |
-| Purge RGPD J+30 | Suppression physique des fichiers Cloudinary/S3 après soft-delete (30 jours) |
-| Corbeille admin | Vue admin des comptes supprimés + restauration potentielle |
-| Backlog polish | `V1_1_POLISH_BACKLOG.md` (GPS re-geocode, badge StatusPill isPublic, nom gouvernorat diff admin, etc.) |
 
 ---
 
@@ -740,11 +444,10 @@ If any gate fails, fix before committing.
 - **i18n leak:** returning a `{fr, ar, en}` object instead of a string from an API endpoint. Always pass through `pickLocale`.
 - **Visibility drift:** writing `profile.visible` to the DB. Always compute.
 - **VAT rounding:** computing TTC from a stored TTC instead of `priceHT * (1 + vatRate)`. Recompute every read.
-- **Currency in EUR (€):** the platform is DT-only. There is no euro anywhere.
+- **Currency in EUR:** the platform is DT-only. There is no euro anywhere.
 - **CSS in JS:** Tailwind classes only. No styled-components, no Emotion, no CSS Modules.
-- **PendingData merge bugs:** when admin approves modifs, `data = { ...data, ...pendingData.fields-mapped }` is wrong. Use the explicit field map from `pendingData.fields[].newValue` keyed by `.key`.
+- **PendingData merge bugs:** when admin approves modifs, use the explicit field map from `pendingData.fields[].newValue` keyed by `.key`. Never spread directly.
 - **TechnoFab canon drift:** the demo data must always show BrandUP rejected · TraceUP pending · LinkUP active+boosted. If your seed produces different states, the demo breaks.
-- **TraceUP videos:** they don't go through `pendingData`. Direct CRUD only.
 
 ---
 
@@ -767,5 +470,5 @@ If any gate fails, fix before committing.
 
 ---
 
-*Last updated: May 12, 2026.*
+*Last updated: July 25, 2026.*
 *Maintained by: AGGREGAX SUARL — Ahmed Mrabet.*
