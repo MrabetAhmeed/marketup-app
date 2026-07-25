@@ -9,7 +9,7 @@ interface PageProps {
 
 export default async function ProfileReviewPage({ params }: PageProps): Promise<JSX.Element> {
   const { profileId } = await params;
-  const profile = await getProfileForAdminReview(profileId, "fr");
+  const profile = await getProfileForAdminReview(profileId, "fr", { withDeleted: true });
 
   const kindLabel = profile.kind === "brandup" ? "BrandUP" : profile.kind === "traceup" ? "TraceUP" : "LinkUP";
   const kindIcon = profile.kind === "brandup" ? "storefront" : profile.kind === "traceup" ? "play_circle" : "qr_code_2";
@@ -45,8 +45,20 @@ export default async function ProfileReviewPage({ params }: PageProps): Promise<
             </div>
           </div>
         </div>
-        {profile.status === "pending" && <ProfileReviewActions profileId={profileId} />}
+        {profile.status === "pending" && profile.companyStatus !== "deleted" && <ProfileReviewActions profileId={profileId} />}
       </div>
+
+      {/* Deleted company banner */}
+      {profile.companyStatus === "deleted" && (
+        <section className="bg-[#FEF2F2] border border-[#FCA5A5] rounded-lg px-5 py-4">
+          <div className="flex items-start gap-2">
+            <span className="material-symbols-outlined text-[#B91C1C] shrink-0 mt-0.5" style={{ fontSize: 18 }}>delete</span>
+            <div className="text-[13px] text-[#991B1B] font-medium">
+              Entreprise supprimée — consultation en lecture seule.
+            </div>
+          </div>
+        </section>
+      )}
 
       {/* Status banners */}
       <AdminProfileStatusBanner status={profile.status} rejectionReason={profile.rejectionReason} />

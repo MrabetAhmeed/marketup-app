@@ -2,7 +2,7 @@
 import mongoose from "mongoose";
 import { connectDb } from "@/lib/db";
 import { env } from "@/lib/env";
-import { NotFoundError, BusinessRuleError } from "@/lib/api-error";
+import { NotFoundError, BusinessRuleError, ConflictError } from "@/lib/api-error";
 import { generateSlug, ensureUniqueSlug } from "@/lib/slug";
 import { pickLocale } from "@/lib/i18n";
 import { Company } from "@/models/company.model";
@@ -10,11 +10,18 @@ import { Profile } from "@/models/profile.model";
 import { User } from "@/models/user.model";
 import { Sector } from "@/models/sector.model";
 import { Gouvernorat } from "@/models/gouvernorat.model";
+import { Transaction } from "@/models/transaction.model";
+import { Boost } from "@/models/boost.model";
+import { Sponsoring } from "@/models/sponsoring.model";
+import { RseReceipt } from "@/models/rse-receipt.model";
+import { Notification } from "@/models/notification.model";
+import { File } from "@/models/file.model";
 import {
   sendCompanyValidatedEmail,
   sendCompanyRejectedEmail,
   sendCompanySuspendedEmail,
   sendCompanyReactivatedEmail,
+  sendCompanyRestoredEmail,
 } from "@/lib/email/sender";
 import type { SupportedLang } from "@/lib/i18n";
 import type { ProfileKind } from "@/types";
@@ -24,6 +31,12 @@ const ProfileModel = Profile as any;
 const UserModel = User as any;
 const SectorModel = Sector as any;
 const GouvernoratModel = Gouvernorat as any;
+const TransactionModel = Transaction as any;
+const BoostModel = Boost as any;
+const SponsoringModel = Sponsoring as any;
+const RseReceiptModel = RseReceipt as any;
+const NotificationModel = Notification as any;
+const FileModel = File as any;
 
 function isValidObjectId(id: string): boolean {
   return mongoose.Types.ObjectId.isValid(id);
@@ -127,20 +140,33 @@ export interface CompanyForAdminReview {
 export async function getCompanyForAdminReview(
   companyId: string,
   lang: SupportedLang = "fr",
-): Promise<CompanyForAdminReview & { status: string }> {
+  options?: { withDeleted?: boolean },
+): Promise<CompanyForAdminReview & { status: string; deletedAt?: string | null }> {
   if (!isValidObjectId(companyId)) {
     throw new BusinessRuleError("INVALID_ID", "Identifiant invalide.");
   }
   await connectDb();
 
-  const company = await CompanyModel.findById(companyId).lean();
+  const includeDeleted = options?.withDeleted === true;
+  let companyQuery = CompanyModel.findById(companyId);
+  if (includeDeleted) companyQuery = companyQuery.setOptions({ withDeleted: true });
+  const company = await companyQuery.lean();
   if (!company) throw new NotFoundError("Company");
 
+  let profileQuery = ProfileModel.find({ companyId: company._id });
+  if (includeDeleted) {
+    profileQuery = profileQuery.setOptions({ withDeleted: true });
+  } else {
+    profileQuery = profileQuery.where({ deletedAt: null });
+  }
+
   const [user, sector, gouvernorat, profiles] = await Promise.all([
-    UserModel.findOne({ companyId: company._id }).lean(),
+    includeDeleted
+      ? UserModel.findOne({ companyId: company._id }).setOptions({ withDeleted: true }).lean()
+      : UserModel.findOne({ companyId: company._id }).lean(),
     SectorModel.findOne({ slug: company.liveData?.sectorId }).lean(),
     GouvernoratModel.findOne({ slug: company.liveData?.gouvernorat }).lean(),
-    ProfileModel.find({ companyId: company._id, deletedAt: null }).lean(),
+    profileQuery.lean(),
   ]);
 
   const linkedProfiles: LinkedProfile[] = (profiles as any[]).map((p) => ({
@@ -180,6 +206,7 @@ export async function getCompanyForAdminReview(
           })),
         }
       : null,
+    deletedAt: company.deletedAt ? new Date(company.deletedAt).toISOString() : null,
   };
 }
 
@@ -566,5 +593,176 @@ export async function listCompaniesWithPendingUpdates(
     submittedAt: c.pendingUpdates?.submittedAt
       ? new Date(c.pendingUpdates.submittedAt).toISOString()
       : "",
+  }));
+}
+
+// ---------------------------------------------------------------------------
+// Restore deleted company (admin action — symmetric cascade inverse of PP-14)
+// ---------------------------------------------------------------------------
+
+export async function restoreCompanyByAdmin(
+  companyId: string,
+  adminId: string,
+): Promise<void> {
+  if (!isValidObjectId(companyId)) {
+    throw new BusinessRuleError("INVALID_ID", "Identifiant invalide.");
+  }
+  await connectDb();
+
+  // Must use withDeleted to find the deleted company
+  const company = await CompanyModel.findById(companyId).setOptions({ withDeleted: true }).lean();
+  if (!company) throw new NotFoundError("Company");
+  if (company.status !== "deleted") {
+    throw new ConflictError("NOT_DELETED", "Ce compte n'est pas supprimé.");
+  }
+
+  const cascadeTimestamp = company.deletedAt as Date;
+
+  // Find user (also deleted — use withDeleted)
+  const user = await UserModel.findOne({
+    companyId: new mongoose.Types.ObjectId(companyId),
+  }).setOptions({ withDeleted: true }).lean();
+
+  // E1: company never validated by admin → restore to "pending"
+  const restoredStatus = company.validatedAt != null ? "active" : "pending";
+
+  const now = new Date();
+  const session = await mongoose.startSession();
+  try {
+    session.startTransaction();
+
+    // 1. Company → restore (use updateOne to bypass pre-find soft-delete filter)
+    await CompanyModel.updateOne(
+      { _id: new mongoose.Types.ObjectId(companyId) },
+      {
+        $set: { status: restoredStatus, deletedAt: null },
+        $push: {
+          auditTrail: {
+            at: now,
+            by: new mongoose.Types.ObjectId(adminId),
+            byRole: "SUPER_ADMIN",
+            action: "restored",
+          },
+        },
+      },
+      { session },
+    );
+
+    // 2. User — match exact cascade timestamp
+    if (user) {
+      await UserModel.updateMany(
+        { _id: user._id, deletedAt: cascadeTimestamp },
+        { $set: { deletedAt: null } },
+        { session },
+      );
+    }
+
+    const companyOid = new mongoose.Types.ObjectId(companyId);
+
+    // 3. Profiles — match exact cascade timestamp (status untouched)
+    await ProfileModel.updateMany(
+      { companyId: companyOid, deletedAt: cascadeTimestamp },
+      { $set: { deletedAt: null } },
+      { session },
+    );
+
+    // 4. Transactions
+    await TransactionModel.updateMany(
+      { companyId: companyOid, deletedAt: cascadeTimestamp },
+      { $set: { deletedAt: null } },
+      { session },
+    );
+
+    // 5. Boosts
+    await BoostModel.updateMany(
+      { companyId: companyOid, deletedAt: cascadeTimestamp },
+      { $set: { deletedAt: null } },
+      { session },
+    );
+
+    // 6. Sponsorings
+    await SponsoringModel.updateMany(
+      { companyId: companyOid, deletedAt: cascadeTimestamp },
+      { $set: { deletedAt: null } },
+      { session },
+    );
+
+    // 7. RSE Receipts
+    await RseReceiptModel.updateMany(
+      { companyId: companyOid, deletedAt: cascadeTimestamp },
+      { $set: { deletedAt: null } },
+      { session },
+    );
+
+    // 8. Notifications (by recipientId = userId)
+    if (user) {
+      await NotificationModel.updateMany(
+        { recipientId: user._id, deletedAt: cascadeTimestamp },
+        { $set: { deletedAt: null } },
+        { session },
+      );
+    }
+
+    // 9. Files (by ownerUserId = userId)
+    if (user) {
+      await FileModel.updateMany(
+        { ownerUserId: user._id, deletedAt: cascadeTimestamp },
+        { $set: { deletedAt: null } },
+        { session },
+      );
+    }
+
+    await session.commitTransaction();
+  } catch (err) {
+    await session.abortTransaction();
+    throw err;
+  } finally {
+    session.endSession();
+  }
+
+  // Non-blocking email to owner
+  try {
+    if (user?.email) {
+      const companyName = pickLocale(company.data?.displayName, "fr");
+      await sendCompanyRestoredEmail({
+        userEmail: user.email,
+        companyName,
+      });
+    }
+  } catch (err) {
+    console.warn("[restoreCompany] Email failed (non-blocking):", err);
+  }
+}
+
+// ---------------------------------------------------------------------------
+// List deleted companies (admin corbeille)
+// ---------------------------------------------------------------------------
+
+export interface DeletedCompanyItem {
+  id: string;
+  displayName: string;
+  slug: string;
+  type: string;
+  deletedAt: string;
+  registeredAt: string;
+}
+
+export async function listDeletedCompanies(
+  lang: SupportedLang = "fr",
+): Promise<DeletedCompanyItem[]> {
+  await connectDb();
+
+  const companies = await CompanyModel.find({ status: "deleted" })
+    .setOptions({ withDeleted: true })
+    .sort({ deletedAt: -1 })
+    .lean();
+
+  return (companies as any[]).map((c) => ({
+    id: c._id.toString(),
+    displayName: pickLocale(c.data?.displayName, lang),
+    slug: c.slug,
+    type: c.type,
+    deletedAt: c.deletedAt ? new Date(c.deletedAt).toISOString() : "",
+    registeredAt: new Date(c.registeredAt).toISOString(),
   }));
 }

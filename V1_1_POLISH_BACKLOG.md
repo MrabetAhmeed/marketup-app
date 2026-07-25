@@ -534,3 +534,22 @@ RseSection.tsx:69 a un `<a href={receiptDocumentUrl} target="_blank">`.
 Actuellement exclu du tracking (téléchargement de reçu ≠ intention de contact).
 Si utile pour analytics RSE, ajouter sendBeacon onClick.
 Estimé : 15 min.
+
+## Corbeille admin
+
+### ✅ LIVRÉ PP-15b — Vue Supprimés + fiche consultable + restauration
+Onglet "Supprimées" dans /admin/entreprises, fiche detail read-only,
+restoreCompanyByAdmin cascade inverse 9 models, match exact timestamp,
+E1 pending guard, StatusPill deleted. 210 tests green.
+
+### Purge RGPD J+30 → guard restauration impossible post-purge
+Quand la purge physique Cloudinary/S3 sera implémentée (item existant),
+ajouter un guard dans restoreCompanyByAdmin : si deletedAt + 30j < now,
+refuser la restauration (les fichiers physiques n'existent plus).
+Estimé : 15 min.
+
+### Delete par admin (hard flow admin-initiated)
+Actuellement seul l'owner peut supprimer son compte. L'admin ne peut que
+suspendre. Si besoin : ajouter un endpoint admin DELETE company avec la
+même cascade PP-14 mais byRole SUPER_ADMIN + raison obligatoire.
+Estimé : 1h.

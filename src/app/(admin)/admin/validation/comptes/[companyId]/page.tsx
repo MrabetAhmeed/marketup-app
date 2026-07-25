@@ -4,6 +4,8 @@ import { getCompanyForAdminReview } from "@/services/admin-company.service";
 import { ensurePdfExtension } from "@/lib/upload";
 import { CompanyReviewActions } from "@/components/features/admin/CompanyReviewActions";
 import { PendingUpdatesActions } from "@/components/features/admin/PendingUpdatesActions";
+import { CompanyRestoreAction } from "@/components/features/admin/CompanyRestoreAction";
+import { StatusPill } from "@/components/shared/StatusPill";
 import type { LinkedProfile } from "@/services/admin-company.service";
 
 interface PageProps {
@@ -12,7 +14,7 @@ interface PageProps {
 
 export default async function CompanyReviewPage({ params }: PageProps): Promise<JSX.Element> {
   const { companyId } = await params;
-  const company = await getCompanyForAdminReview(companyId, "fr");
+  const company = await getCompanyForAdminReview(companyId, "fr", { withDeleted: true });
 
   const fields = [
     { label: "Nom de l'entreprise", value: company.displayName },
@@ -31,27 +33,39 @@ export default async function CompanyReviewPage({ params }: PageProps): Promise<
 
   return (
     <div className="max-w-[800px] mx-auto space-y-6">
-      <Link href={`/admin/validation?tab=${company.status === "pending" ? "inscriptions" : "modifications"}`} className="inline-flex items-center gap-1 text-[13px] text-ink-secondary hover:text-ink-primary transition-colors">
+      <Link
+        href={company.status === "deleted" ? "/admin/entreprises" : `/admin/validation?tab=${company.status === "pending" ? "inscriptions" : "modifications"}`}
+        className="inline-flex items-center gap-1 text-[13px] text-ink-secondary hover:text-ink-primary transition-colors"
+      >
         <span className="material-symbols-outlined" style={{ fontSize: 16 }}>arrow_back</span>
         Retour à la liste
       </Link>
 
+      {/* Deleted banner */}
+      {company.status === "deleted" && company.deletedAt && (
+        <div className="bg-red-50 border border-red-200 rounded-lg p-4 flex items-start gap-3">
+          <span className="material-symbols-outlined text-red-600 shrink-0 mt-0.5" style={{ fontSize: 20 }}>delete_forever</span>
+          <div className="flex-1">
+            <p className="text-[13px] font-semibold text-red-800">
+              Compte supprimé le {new Date(company.deletedAt).toLocaleDateString("fr-FR", { day: "numeric", month: "long", year: "numeric" })}
+            </p>
+            <p className="text-[12px] text-red-700 mt-0.5">
+              Ce compte a été supprimé par son propriétaire. Vous pouvez le restaurer.
+            </p>
+          </div>
+          <CompanyRestoreAction companyId={companyId} companyName={company.displayName} />
+        </div>
+      )}
+
       <div className="flex items-start justify-between gap-4 flex-wrap">
         <div className="flex items-start gap-3">
-          <div className="w-11 h-11 rounded-lg bg-[#D97706]/10 flex items-center justify-center shrink-0">
-            <span className="material-symbols-outlined text-[#D97706]" style={{ fontSize: 24 }}>business</span>
+          <div className={`w-11 h-11 rounded-lg flex items-center justify-center shrink-0 ${company.status === "deleted" ? "bg-red-100" : "bg-[#D97706]/10"}`}>
+            <span className={`material-symbols-outlined ${company.status === "deleted" ? "text-red-600" : "text-[#D97706]"}`} style={{ fontSize: 24 }}>business</span>
           </div>
           <div>
             <h1 className="font-heading font-bold text-[20px] text-ink-primary leading-tight">{company.displayName}</h1>
             <div className="flex items-center gap-2 mt-1 text-[12px] text-ink-secondary">
-              <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-bold ${
-                company.status === "pending" ? "bg-[#FEF3C7] text-[#92400E]"
-                  : company.status === "active" ? "bg-[#F0FDF4] text-[#16A34A]"
-                    : company.status === "rejected" ? "bg-[#FEF2F2] text-[#B91C1C]"
-                      : "bg-surface-muted text-ink-secondary"
-              }`}>
-                {company.status === "pending" ? "En attente" : company.status === "active" ? "Actif" : company.status === "rejected" ? "Refusé" : company.status}
-              </span>
+              <StatusPill kind={company.status === "deleted" ? "deleted" : company.status === "pending" ? "pending" : company.status === "active" ? "active" : company.status === "rejected" ? "rejected" : company.status === "suspended" ? "suspended" : "disabled"} />
               <span>Inscrit le {new Date(company.registeredAt).toLocaleDateString("fr-FR", { day: "numeric", month: "long", year: "numeric" })}</span>
             </div>
           </div>

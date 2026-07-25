@@ -1,7 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { describe, it, expect, beforeAll, afterAll, beforeEach, vi } from "vitest";
 import mongoose from "mongoose";
-
 vi.mock("@/lib/db", () => ({
   connectDb: vi.fn().mockResolvedValue(undefined),
 }));

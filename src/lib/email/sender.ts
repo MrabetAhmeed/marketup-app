@@ -14,6 +14,7 @@ import { passwordChangedEmailTemplate } from "./templates/password-changed";
 import { accountDeletedEmailTemplate } from "./templates/account-deleted";
 import { companySuspendedEmailTemplate } from "./templates/company-suspended";
 import { companyReactivatedEmailTemplate } from "./templates/company-reactivated";
+import { companyRestoredEmailTemplate } from "./templates/company-restored";
 
 const FROM_ADDRESS = `MARKET-UP <${env.EMAIL_FROM}>`;
 
@@ -227,6 +228,18 @@ export async function sendCompanyReactivatedEmail(params: {
   companyName: string;
 }): Promise<void> {
   const { subject, html } = companyReactivatedEmailTemplate({
+    companyName: params.companyName,
+    dashboardUrl: `${env.NEXTAUTH_URL}/dashboard`,
+  });
+  await sendEmail(params.userEmail, subject, html);
+}
+
+/** Notify owner that their deleted account has been restored by admin. */
+export async function sendCompanyRestoredEmail(params: {
+  userEmail: string;
+  companyName: string;
+}): Promise<void> {
+  const { subject, html } = companyRestoredEmailTemplate({
     companyName: params.companyName,
     dashboardUrl: `${env.NEXTAUTH_URL}/dashboard`,
   });

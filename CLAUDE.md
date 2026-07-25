@@ -317,6 +317,7 @@ These rules are fully implemented and tested. **Summaries below; full details in
 - **6.15 Placeholder mode:** `placeholderMode` enum `"hidden" | "coming_soon"` for `isPublic: false` profiles. Requires `publishedAt` set. Placeholder DTO is a strict whitelist (no data leak).
 - **6.16 Account deletion + suspension:** owner self-delete cascades across 9 models (soft-delete). Admin suspend requires reason. Slugs remain reserved forever.
 - **6.17 Tracking stats (PP-15a):** collection `ProfileStatsMonthly` (profileId + month YYYY-MM, unique index). Vues comptees par beacon client `<TrackView>` au mount reel (dedup sessionStorage, guard StrictMode). Clics sortants via `sendBeacon` sur ServicesGrid (s.external only). Endpoint `POST /api/v1/public/track` public, 204 always, bot filter UA, rate limit 60/min. `Profile.stats.viewsTotal/clicksTotal` incrementes en $inc parallele. `views30d` deprecie (conserve au schema, retire des DTO). Dashboard lit `ProfileStatsMonthly` mois courant + mois-1 pour tendance.
+- **6.18 Corbeille admin (PP-15b):** onglet "Supprimees" dans `/admin/entreprises`, fiche detail consultable read-only pour les companies deleted (`withDeleted: true`). `restoreCompanyByAdmin()` = cascade inverse symetrique (9 models, match exact `deletedAt: cascadeTimestamp`, transaction Mongoose). E1: company jamais validee (`validatedAt null`) restauree en "pending". Profils retrouvent leur status exact d'avant (la cascade PP-14 n'ecrit que `deletedAt`, jamais `status`). Endpoint `POST /admin/companies/[id]/restore`. Email dedie "company-restored". StatusPill kind "deleted".
 
 ---
 
@@ -393,7 +394,7 @@ When asked to do specific work, **always look in `.claude/skills/`** first:
 
 ## 9. Build Status & Roadmap
 
-**PP-0 → PP-15a + SEC-1 delivered** (21 sprints, 200 tests green). Full sprint list: `reference/CHANGELOG.md`.
+**PP-0 → PP-15b + SEC-1 delivered** (22 sprints, 210 tests green). Full sprint list: `reference/CHANGELOG.md`.
 
 ### Restant avant V1 prod
 

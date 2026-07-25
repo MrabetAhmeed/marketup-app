@@ -110,6 +110,7 @@ export interface ProfileForAdminReview {
   isPublic: boolean;
   companyName: string;
   companySlug: string;
+  companyStatus: string;
   companyLogoUrl: string | null;
   companyBannerUrl: string | null;
   ownerEmail: string;
@@ -135,16 +136,25 @@ export interface ProfileForAdminReview {
 export async function getProfileForAdminReview(
   profileId: string,
   lang: SupportedLang = "fr",
+  options?: { withDeleted?: boolean },
 ): Promise<ProfileForAdminReview> {
   await connectDb();
 
-  const profile = await ProfileModel.findById(profileId).lean();
+  const includeDeleted = options?.withDeleted === true;
+
+  let profileQuery = ProfileModel.findById(profileId);
+  if (includeDeleted) profileQuery = profileQuery.setOptions({ withDeleted: true });
+  const profile = await profileQuery.lean();
   if (!profile) throw new NotFoundError("Profile");
 
-  const company = await CompanyModel.findById(profile.companyId).lean();
+  let companyQuery = CompanyModel.findById(profile.companyId);
+  if (includeDeleted) companyQuery = companyQuery.setOptions({ withDeleted: true });
+  const company = await companyQuery.lean();
   if (!company) throw new NotFoundError("Company");
 
-  const user = await UserModel.findOne({ companyId: profile.companyId }).lean();
+  const user = includeDeleted
+    ? await UserModel.findOne({ companyId: profile.companyId }).setOptions({ withDeleted: true }).lean()
+    : await UserModel.findOne({ companyId: profile.companyId }).lean();
 
   const pendingFields: PendingField[] = (profile.pendingData?.fields ?? []).map((f: any) => ({
     key: f.key,
@@ -221,6 +231,7 @@ export async function getProfileForAdminReview(
     isPublic: profile.isPublic ?? true,
     companyName: pickLocale(company.data?.displayName, lang),
     companySlug: company.slug,
+    companyStatus: company.status,
     companyLogoUrl: company.data?.logoUrl ?? null,
     companyBannerUrl: company.data?.bannerUrl ?? null,
     ownerEmail: user?.email ?? company.accountEmail,

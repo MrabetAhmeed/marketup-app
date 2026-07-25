@@ -29,6 +29,7 @@
 | **PP-14.6** | Cablage toggles visibilite dashboard (Vue d'ensemble) sur soft service PP-14.5 |
 | **PP-14** | Delete account (owner self-delete cascade) + Suspend hardening (raison, audit trail, emails, modals) |
 | **PP-15a** | Tracking statistiques reel : vues (beacon client) + clics sortants (sendBeacon), collection ProfileStatsMonthly, endpoint POST /track, dashboard tendance mois courant vs mois-1 |
+| **PP-15b** | Corbeille admin : onglet Supprimees, fiche detail read-only, restauration cascade inverse symetrique (9 models, match exact timestamp, E1 pending guard), StatusPill deleted |
 
 ## V1.1 post-prod (backlog)
 

@@ -23,6 +23,17 @@ interface CompanyItem {
   suspendedAt?: string | null;
 }
 
+interface DeletedCompanyItem {
+  id: string;
+  displayName: string;
+  slug: string;
+  type: string;
+  deletedAt: string;
+  registeredAt: string;
+}
+
+type TabKey = "active" | "deleted";
+
 // ---------------------------------------------------------------------------
 // Suspend Modal
 // ---------------------------------------------------------------------------
@@ -233,8 +244,12 @@ function ReactivateModal({
 export default function EntreprisesPage(): JSX.Element {
   const router = useRouter();
   const { showToast } = useToast();
+  const [tab, setTab] = useState<TabKey>("active");
   const [companies, setCompanies] = useState<CompanyItem[]>([]);
+  const [deletedCompanies, setDeletedCompanies] = useState<DeletedCompanyItem[]>([]);
   const [loading, setLoading] = useState(true);
+  const [deletedLoading, setDeletedLoading] = useState(false);
+  const [deletedLoaded, setDeletedLoaded] = useState(false);
   const [actionLoading, setActionLoading] = useState(false);
 
   // Modal state
@@ -247,6 +262,27 @@ export default function EntreprisesPage(): JSX.Element {
       .then((data) => { setCompanies(Array.isArray(data) ? data : []); setLoading(false); })
       .catch(() => setLoading(false));
   }, []);
+
+  const loadDeleted = useCallback(() => {
+    setDeletedLoading(true);
+    fetch("/api/v1/admin/companies?deleted=true")
+      .then((r) => r.json())
+      .then((data) => {
+        setDeletedCompanies(Array.isArray(data) ? data : []);
+        setDeletedLoaded(true);
+        setDeletedLoading(false);
+      })
+      .catch(() => {
+        setDeletedLoaded(true);
+        setDeletedLoading(false);
+      });
+  }, []);
+
+  useEffect(() => {
+    if (tab === "deleted" && !deletedLoaded && !deletedLoading) {
+      loadDeleted();
+    }
+  }, [tab, deletedLoaded, deletedLoading, loadDeleted]);
 
   async function handleSuspendConfirm(reason: string): Promise<void> {
     if (!suspendTarget) return;
@@ -291,6 +327,7 @@ export default function EntreprisesPage(): JSX.Element {
   const pillKind = (status: string) => {
     if (status === "active") return "active" as const;
     if (status === "suspended") return "suspended" as const;
+    if (status === "deleted") return "deleted" as const;
     return "disabled" as const;
   };
 
@@ -298,10 +335,31 @@ export default function EntreprisesPage(): JSX.Element {
     <div className="max-w-[1120px] mx-auto space-y-6">
       <div>
         <h1 className="font-heading font-bold text-[22px] text-ink-primary">Entreprises</h1>
-        <p className="text-[13px] text-ink-secondary mt-1">Liste des entreprises actives et désactivées</p>
+        <p className="text-[13px] text-ink-secondary mt-1">Gestion des entreprises inscrites</p>
       </div>
 
-      {loading ? (
+      {/* Tabs */}
+      <div className="flex gap-1 border-b border-surface-border">
+        <button
+          type="button"
+          onClick={() => setTab("active")}
+          className={`px-4 py-2.5 text-[13px] font-semibold border-b-2 transition-colors ${tab === "active" ? "border-primary text-primary" : "border-transparent text-ink-secondary hover:text-ink-primary"}`}
+        >
+          Actives & Désactivées
+          {companies.length > 0 && <span className="ml-1.5 text-[11px] text-ink-tertiary">({companies.length})</span>}
+        </button>
+        <button
+          type="button"
+          onClick={() => setTab("deleted")}
+          className={`px-4 py-2.5 text-[13px] font-semibold border-b-2 transition-colors ${tab === "deleted" ? "border-red-600 text-red-700" : "border-transparent text-ink-secondary hover:text-ink-primary"}`}
+        >
+          Supprimées
+          {deletedCompanies.length > 0 && <span className="ml-1.5 text-[11px] text-red-500">({deletedCompanies.length})</span>}
+        </button>
+      </div>
+
+      {/* Tab: Active/Suspended */}
+      {tab === "active" && (loading ? (
         <div className="text-center py-16 text-ink-secondary">Chargement…</div>
       ) : companies.length === 0 ? (
         <div className="bg-white border border-surface-border rounded-lg py-16 text-center">
@@ -373,7 +431,45 @@ export default function EntreprisesPage(): JSX.Element {
             </div>
           ))}
         </div>
-      )}
+      ))}
+
+      {/* Tab: Deleted */}
+      {tab === "deleted" && (deletedLoading ? (
+        <div className="text-center py-16 text-ink-secondary">Chargement…</div>
+      ) : deletedCompanies.length === 0 ? (
+        <div className="bg-white border border-surface-border rounded-lg py-16 text-center">
+          <span className="material-symbols-outlined text-ink-tertiary mb-2" style={{ fontSize: 32 }}>delete_sweep</span>
+          <p className="text-[13px] text-ink-secondary">Aucune entreprise supprimée.</p>
+        </div>
+      ) : (
+        <div className="space-y-3">
+          {deletedCompanies.map((c) => (
+            <div key={c.id} className="bg-white border border-red-100 rounded-lg p-4">
+              <div className="flex items-center gap-4">
+                <div className="w-10 h-10 rounded-lg bg-red-50 flex items-center justify-center shrink-0">
+                  <span className="material-symbols-outlined text-red-400" style={{ fontSize: 22 }}>business</span>
+                </div>
+                <div className="min-w-0 flex-1">
+                  <div className="font-heading font-semibold text-[14px] text-ink-primary leading-tight">{c.displayName}</div>
+                  <div className="flex items-center gap-2 mt-1 text-[12px] text-ink-secondary flex-wrap">
+                    <StatusPill kind="deleted" />
+                    <span>{c.type}</span>
+                    <span>·</span>
+                    <span>Supprimé le {new Date(c.deletedAt).toLocaleDateString("fr-FR", { day: "numeric", month: "short", year: "numeric" })}</span>
+                  </div>
+                </div>
+                <Link
+                  href={`/admin/validation/comptes/${c.id}`}
+                  className="inline-flex items-center gap-1.5 px-4 py-[9px] text-[13px] font-semibold text-ink-primary bg-white border border-[#D1D1D1] rounded hover:bg-surface-muted transition-colors shrink-0"
+                >
+                  <span className="material-symbols-outlined" style={{ fontSize: 16 }}>info</span>
+                  Voir détails
+                </Link>
+              </div>
+            </div>
+          ))}
+        </div>
+      ))}
 
       {/* Modals */}
       <SuspendModal
