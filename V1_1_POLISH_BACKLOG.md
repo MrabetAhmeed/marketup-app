@@ -1,555 +1,428 @@
 # V1.1 Polish Backlog
 
-Items deferred from V1 implementation. Each entry includes context,
-implementation notes, and estimated effort.
+Purgé le 26 juillet 2026 — audit read-only complet (18 items livrés/obsolètes retirés).
+Items restants reformulés avec preuve verbatim et priorité.
 
 ---
 
-## Reset password page — pre-validate token on load
+## Priorité haute
 
-Currently /reset?token=xxx shows the password form even with an invalid
-or expired token. The user enters a new password, submits, and only then
-sees RESET_TOKEN_INVALID / RESET_TOKEN_EXPIRED. Better UX: validate the
-token on page load and show the error immediately.
+### R1 — ProfileHero : coordonnées non cliquables
+
+Tel, WhatsApp, email sont des `<div>` non cliquables dans `ProfileHero.tsx:82-98`.
+Sur mobile, un produit "carte de contact" avec des coordonnées non cliquables est un
+défaut UX critique.
 
 Implementation:
-- Add GET /api/v1/auth/password/validate-token?token=xxx
-- Returns 200 if valid, 410 if expired, 400 if invalid
-- /reset page does a useEffect fetch on mount, shows loading state
-- If invalid → show error state immediately (don't render form)
+- `<a href="tel:...">` pour phone
+- `<a href="https://wa.me/...">` pour whatsapp
+- `<a href="mailto:...">` pour email
+- Ajouter tracking sendBeacon onClick (comme ServicesGrid)
 
-Estimated effort: 1 hour (new endpoint + Zod + page state update).
-
-Discovered during Phase 2 browser testing (Test 6).
-
----
-
-## Phase 3 dependency — /dashboard route
-
-During Phase 2 browser testing (Test 1), logging in with an active
-company (seed user ahmed@technofab.tn) redirects to /dashboard which
-returns 404. This is expected — /dashboard is in Phase 3 scope.
-
-When Phase 3 starts, the dashboard skeleton will resolve this. Until
-then, users with status="active" companies will see a 404 after login.
-
-Not a bug, just a phase dependency to track.
+Fichiers: `ProfileHero.tsx`
+Effort: 1h
 
 ---
 
-## CGU hardening — z.literal(true) instead of HTML-only required
+### R2 — Admin vidéo TraceUP : lien cliquable vers la source
 
-Currently CGU acceptance is enforced via HTML `required` attribute on
-the checkbox. Can be bypassed by:
-- Disabling JS in browser dev tools
-- Submitting directly to the API
+L'admin voit la miniature des vidéos pending/publiées mais ne peut pas visionner
+la vidéo source (pas de `<a href>` vers YouTube/Vimeo/Dailymotion).
+Confirmé: `admin/validation/profiles/[profileId]/page.tsx:266-320` — uniquement
+`<img>` + texte, aucun lien sortant.
 
-For V1.1, harden with Zod:
-  cguAccepted: z.literal(true, {
-    errorMap: () => ({ message: "Vous devez accepter les CGU." })
-  })
+Implementation:
+- Ajouter `<a href={v.url} target="_blank">` sur les cartes vidéo (pending + publiées)
+- Icon "open_in_new" sur la miniature
 
-And update signupUser service to generate acceptedTermsAt = new Date()
-only when cguAccepted === true.
-
-Estimated effort: 15 minutes.
+Fichier: `admin/validation/profiles/[profileId]/page.tsx`
+Effort: 15 min
 
 ---
 
-## jsonError refactor for login route 429 response
+### R3 — StatusPill : kind "Masqué" pour active + !isPublic
 
-login/route.ts currently uses:
-  return jsonOk({ error: { code: "RATE_LIMITED", ... } }, 429);
+`StatusPill.tsx` n'a pas de prop `isPublic`. Quand l'owner désactive son profil
+(toggle isPublic=false), le badge reste "Actif" vert alors que le profil est invisible.
 
-Functionally correct (returns 429 with error body) but stylistically
-inconsistent. Refactor to:
-  return jsonError("RATE_LIMITED", "Trop de tentatives...", 429);
+Implementation:
+- Ajouter kind "hidden" ou prop `isPublic` à StatusPill
+- Hiérarchie : disabled > incomplete > pending > rejected > active+!isPublic ("Masqué") > active
+- Appliquer aux 3 pages dashboard profile + OverviewProfiles
 
-Estimated effort: 5 minutes.
-
----
-
-## Forgot route — swallow Zod errors in outer catch
-
-forgot/route.ts outer catch uses handleApiError which leaks Zod
-validation errors as 400 ("email is required", etc). Not an
-email-enumeration leak (result doesn't depend on account existence)
-but exposes the API contract.
-
-For V1.1 zero-info-leak compliance:
-  } catch (err) {
-    console.error("[forgot] outer error swallowed:", err);
-    return jsonOk({ message: STANDARD_MESSAGE });
-  }
-
-Estimated effort: 10 minutes.
+Fichier: `StatusPill.tsx` + 3 editors + `OverviewProfiles.tsx`
+Effort: 30 min
 
 ---
 
-## Mobile bottom sheets — 3 items deferred from C4
+## Priorité moyenne
 
-Onboarding page mobile dropdowns currently use standard dropdown
-behavior instead of slide-up bottom sheet pattern shown in mockup.
+### R4 — Banner rejected adapté par kind (TraceUP)
 
-Items:
-- Country dropdown mobile header ("Choisir un pays" + close button)
-- App launcher mobile header ("Produits MARKET-UP" + close button)
-- Mobile backdrop overlay (#mobileBackdrop) for both dropdowns
+`ProfileStatusBlock.tsx:100` dit "cliquez sur Enregistrer et resoumettre" pour tous
+les kinds. TraceUP n'a pas ce bouton (re-soumission = ajout vidéo auto-transition).
 
-Estimated effort: 2-3 hours (CSS animations + state management).
+Implementation:
+- Ajouter prop `kind` à ProfileStatusBlock
+- TraceUP: "Ajoutez une nouvelle vidéo conforme — la soumission sera automatique."
 
-Discovered during C4 audit. Page remains functional on mobile but
-without the canonical UX polish.
-
----
-
-## Cleanup orphan signups — dev tooling script
-
-During development, testing signup creates "stuck" Users
-(emailVerifiedAt=null, < 7 days old). Currently only fixable via manual
-MongoDB Compass deletion.
-
-For dev experience, add:
-  scripts/cleanup-orphan-signups.ts
-
-A script that:
-- Connects to MongoDB
-- Finds all Users where emailVerifiedAt=null
-- Lists them with createdAt + accountEmail
-- Asks for confirmation
-- Cascade-deletes the User + their Company
-
-Usage: npm run cleanup:orphans
-
-Estimated effort: 30 minutes.
-
-Note: production cleanup (cron for >7d orphans) tracked separately
-for Phase 10.
+Fichier: `ProfileStatusBlock.tsx` + 3 editors (passer kind)
+Effort: 15 min
 
 ---
 
-## Storage — Path traversal defense in depth
+### R5 — Compteur HARD numérique
 
-Origin: Audit b2975ff finding B8.
+`ProfileActionBar.tsx:185` affiche "Modifications à resoumettre" sans compteur.
+Le compteur SOFT affiche déjà le nombre. Incohérence.
 
-Current state: LocalStorageAdapter uses options.companyId directly in
-key construction. If a malicious companyId like "../../etc" reaches
-the adapter, the resolved path would escape the uploads directory.
-
-Risk: LOW. Real protection happens at the API route layer — companyId
-is always read from session.user.companyId (verified ObjectId from
-JWT), never from request body.
-
-V1.1 hardening (~10 min):
-- Add a guard in LocalStorageAdapter.upload() (and other methods
-  consuming key):
-    if (!/^[a-f0-9]{24}$/.test(options.companyId)) {
-      throw new StorageError("Invalid companyId format");
-    }
-- This is belt-and-suspenders. The API route layer is the primary
-  defense, but this prevents any future caller mistake from leaking
-  paths.
-
-Commit when implemented:
-  fix(storage): defense-in-depth ObjectId validation in LocalAdapter
+Cible: "X modifications à resoumettre · revalidation admin requise"
+Fichier: `ProfileActionBar.tsx`
+Effort: 15 min
 
 ---
 
-## Storage — Random suffix for collision-resistant keys
+### R6 — Forgot route : catch extérieur leake ZodError
 
-Origin: Audit b2975ff finding B3a.
+`forgot/route.ts:26-29` swallow interne OK. Mais le catch extérieur L35-37 utilise
+`handleApiError(err)` qui retourne 400 sur ZodError (body invalide). Pas un leak
+d'enumeration mais expose le contrat API.
 
-Current state: Keys use YYYY-MM-DD date format. Two uploads of the
-same filename on the same day would generate identical keys,
-overwriting the first.
-
-Risk: LOW for logo/banner (1 per company), MODERATE for gallery
-uploads where users may upload multiple images per session.
-
-V1.1 fix (~5 min):
-- Switch from YYYY-MM-DD to a more granular timestamp:
-    const ts = Date.now().toString(36); // base36 for shorter string
-    const key = `companies/${id}/${cat}/${ts}-${slug}.${ext}`;
-- Or use nanoid(8) for 8-char random suffix.
-
-Phase 4 dependency: Implement BEFORE building gallery upload (gallery
-needs collision resistance more than single-image fields).
-
-Commit when implemented:
-  fix(storage): time-precision + random suffix for collision resistance
+Fix: remplacer L35-37 par swallow + retour 200 standard.
+Fichier: `auth/password/forgot/route.ts`
+Effort: 10 min
 
 ---
 
-## Remove unused shadcn deps
+### R7 — Login route jsonError refactor
 
-shadcn/ui installed deps not used in our app:
-- lucide-react (we use Material Symbols)
-- next-themes (no dark mode toggle yet)
-- @base-ui/react (replaced by our custom components)
-- sonner (replaced by our custom Toast)
+`login/route.ts:14` utilise `jsonOk({ error: ... }, 429)` au lieu de `jsonError(...)`.
+Fonctionnellement correct mais stylistiquement incohérent.
 
-Run: npm uninstall lucide-react next-themes @base-ui/react sonner
-Verify: npm run lint + typecheck stay clean
-
-Estimated effort: 5 minutes (but verify carefully).
-
-
-### Compteur HARD message
-- Actuellement : "Modifications à resoumettre · revalidation admin requise"
-- Cible : "X modifications à resoumettre · revalidation admin requise"
-- Cohérence avec compteur SOFT qui affiche déjà le nombre
-- Fichier : ProfileActionBar.tsx (branches active + rejected + incomplete)
-
-### Tests Vitest manquants Sprint 2
-- profile-soft.service: dispatch by kind
-- profile-soft.service: cross-tenant guard
-- profile-soft.service: gallery reorder with markModified
-- profile-soft.schema: strict mode + nested socials validation
-
-
-### Logo/Banner/Gallery validation-gated cascade
-- Currently V1 démo: upload direct (Sprint 4 Option C decision)
-- Target V1.1: switch to HARD validation-gated
-- Logo/Banner: store in company.pendingUpdates, admin approval required
-- Gallery: store new items + deletes in profile.pendingData, admin approval
-- Requires Phase 6 admin validation UI (already in scope)
-- Files impacted: account/logo route, account/banner route, profiles/gallery routes
-- Canon §6.1 to be updated accordingly
-
+Fix: `return jsonError("RATE_LIMITED", "Trop de tentatives...", 429);`
+Fichier: `auth/login/route.ts`
+Effort: 5 min
 
 ---
 
-## Sprint 2 — Profile SOFT mutations
+### R8 — CGU hardening z.literal(true)
 
-### Tests Vitest manquants
-- profile-soft.service: dispatch by kind
-- profile-soft.service: cross-tenant guard
-- profile-soft.service: gallery reorder with markModified
-- profile-soft.schema: strict mode + nested socials validation
+Acceptation CGU = HTML required + `acceptedTermsAt` envoyé programmatiquement
+(`signup/user/page.tsx:66`). Aucune validation server-side Zod.
 
-Estimated effort: 1-2 hours.
-
-(Note: already mentioned but moving here under proper sprint heading)
-
-### Socials field counter granularity
-- Currently: any modification to socials array counts as 1 in dirty counter
-  (Option α from C.3 test)
-- Discussed alternative β: count each modified URL individually
-- Decision V1: Option α (validated by Ahmed)
-- V1.1 reconsider if user feedback requests it
+Fix: ajouter `cguAccepted: z.literal(true)` dans `auth.schema.ts` SignupUserSchema.
+Fichier: `schemas/auth.schema.ts` + `signup/user/page.tsx`
+Effort: 15 min
 
 ---
 
-## Sprint 3 — Profile HARD submit
+### R9 — Reset password : pre-validate token on load
 
-### Compteur HARD message
-- Actuellement : "Modifications à resoumettre · revalidation admin requise"
-- Cible : "X modifications à resoumettre · revalidation admin requise"
-- Cohérence avec compteur SOFT qui affiche déjà le nombre
-- Fichier : ProfileActionBar.tsx (branches active + rejected + incomplete)
+/reset?token=xxx affiche le formulaire meme avec token invalide/expiré. L'erreur
+n'apparait qu'au submit.
 
-Estimated effort: 15 minutes.
+Implementation:
+- Endpoint GET /api/v1/auth/password/validate-token?token=xxx (200/410/400)
+- Page /reset: useEffect fetch on mount, loading state, error state si invalide
 
-### Tests Vitest manquants
-- profile-hard.service: submit dispatch + cross-tenant guard
-- profile-hard.service: 422 ALREADY_PENDING / PROFILE_DISABLED
-- profile-hard.service: pendingData.fields[] structure
-- profile-hard.service: rejection cleared on re-submit
-- email.service: sendProfileSubmittedEmail (mock Resend)
-
-Estimated effort: 2 hours.
-
-### Email user notifications post-validation
-- Currently: only admin gets email when profile submitted
-- Phase 6 will add: admin validates/rejects → email user
-- "Votre profil X a été validé et est maintenant public"
-- "Votre profil X a été refusé. Raison : ..."
-
-Estimated effort: 1 hour (template + send wiring in admin validation flow).
+Effort: 1h
 
 ---
 
-## Sprint 4 — Media uploads
+### R10 — Harmoniser conditions disabled toggle isPublic
 
-### Logo/Banner/Gallery validation-gated cascade
-- Currently V1 démo: upload direct (Sprint 4 Option C decision)
-- Target V1.1: switch to HARD validation-gated
-- Logo/Banner: store in company.pendingUpdates, admin approval required
-- Gallery: store new items + deletes in profile.pendingData, admin approval
-- Requires Phase 6 admin validation UI (already in scope)
-- Files impacted: account/logo route, account/banner route, profiles/gallery routes
-- Canon §6.1 to be updated accordingly
+3 comportements differents (audit PP-14.5, 23 juillet 2026):
+- BrandUpEditor: `isReadOnly || profile.status !== "active"` (bloqué en pending+rejected)
+- TraceUpEditor: `isPending || isDisabled` (actif en rejected)
+- LinkUpEditor: `isReadOnly` (actif en rejected)
 
-Estimated effort: 3-4 hours (across endpoints + admin UI extension).
+Effort: 15 min
 
-### Cloudinary orphan cleanup cron
-- Currently: when user adds gallery image then cancels, image stays on Cloudinary
-- Same risk on logo/banner if user uploads then changes mind
-- Solution: daily cron that lists Cloudinary public_ids in marketup/ folder
-  and compares with referenced URLs in DB (companies + profiles)
-- Delete unreferenced public_ids
-- Estimated saving: ~5-10% storage post-démo if users experiment with uploads
+---
 
-Estimated effort: 2 hours (script + cron setup).
+### R11 — Remove unused shadcn deps
 
-### Signup company PDF document upload
-- Currently stubbed in signup-entreprise page with {/* DISABLED for V1 */} comment
-- Wire to Cloudinary preset marketup_documents
-- Endpoint: POST /api/v1/auth/upload-document (or integrate in signup flow)
-- Field stored: company.legalDocumentUrl
-- Admin reviews PDF during company validation (Phase 6)
+`package.json` contient 4 deps inutilisées:
+- lucide-react (L29) — on utilise Material Symbols
+- next-themes (L33) — pas de dark mode
+- @base-ui/react (L21) — remplacé par composants custom
+- sonner (L41) — remplacé par Toast custom
 
-Estimated effort: 30-45 minutes.
+Fix: `npm uninstall lucide-react next-themes @base-ui/react sonner` + verify build
+Effort: 5 min
 
-### Video moderation a posteriori
-- Currently: video add = CRUD direct (no admin validation, canon §6.10)
-- Risk: user adds inappropriate YouTube/Vimeo/Dailymotion video
-- V1.1 solution: admin can DELETE user videos from admin panel
-- Notification user: "Cette vidéo a été retirée pour non-conformité"
-- Reason field required for admin (audit trail)
+---
 
-Estimated effort: 2 hours (admin UI + delete with reason flow + email).
+### R12 — Email rejet : mention visibilité continue
 
-### oEmbed title auto-fill (optional)
-- Currently: user types title manually, oEmbed only fetches thumbnail
-- V1.1 option: pre-fill title with oEmbed response, user can edit
-- Adds polish but not blocking
+`sendProfileRejectedEmail` (`sender.ts:106-111`) ne reçoit pas `publishedAt`.
+Le template ne mentionne pas que le profil reste visible avec les données validées.
+Le dashboard (`ProfileStatusBlock.tsx:102-106`) le fait, mais l'email non.
 
-Estimated effort: 30 minutes.
+Fix: passer `publishedAt` aux params, conditionner dans template.
+Fichiers: `admin-profile.service.ts` + `sender.ts` + `templates/profile-rejected.ts`
+Effort: 30 min
 
-### Storage migration to R2 (future)
-- Currently Cloudinary (25 GB free, 25 credits/month)
-- When approaching limits: migrate to Cloudflare R2
-- Both behind StorageAdapter interface (already abstracted)
-- Migration = rewrite adapter + bulk transfer existing files
-- One-time effort
+---
 
-Estimated effort: 4-6 hours (adapter + migration script + cutover).
+### R13 — oEmbed title auto-fill
 
+`oembed.ts:43` lit `thumbnail_url` mais ignore `title` de la réponse oEmbed.
+L'owner doit taper le titre manuellement.
 
-### V1.1 — Resend domain verification
-- Vérifier un domaine (vivasky.media ou autre) sur resend.com/domains
-- Mettre à jour FROM_EMAIL dans .env (passe de onboarding@resend.dev à no-reply@vivasky.media)
-- Les emails passent à tous les destinataires
-- Effort : 10 min config + 10-30 min propagation DNS
+Fix: retourner `{ thumbnailUrl, title }` depuis fetchVideoMetadata, pre-fill dans le formulaire.
+Fichier: `lib/video/oembed.ts` + formulaire vidéo TraceUpEditor
+Effort: 30 min
 
-## ✅ RÉSOLU PP-12.6 — Picker carte LinkUP
+---
 
-Nominatim entièrement retiré. Position GPS posée par l'owner via marker
-Leaflet draggable dans le dashboard LinkUP (édition live instantanée).
-GPS obligatoire pour soumettre un profil LinkUP (guard MISSING_GPS 422).
+### R14 — Cleanup champ views30d déprécié
 
-### Items V1.1 restants (issus de ce bloc) :
-- Reverse geocoding au drop du pin (afficher l'adresse trouvée — optionnel UX)
-- Bouton Maps sur BrandUP/TraceUP (donnée déjà exposée dans PublicCompanyBase)
+`profile.model.ts:75` : views30d conservé pour zero migration PP-15a.
+8 usages dans tests + `auth.service.ts:325,420`.
 
-## V1.1 — UX
+Fix: retirer du schema + nettoyer seed data + tests.
+Effort: 15 min
 
-### ✅ RÉSOLU en V1 par PP-11.5 — Exception visibilité pendant pending/rejected
-Étendu aux 3 profils (pas seulement LinkUP). Un profil avec publishedAt
-renseigné (déjà validé au moins 1 fois) reste visible publiquement avec
-ses données validées (data) même pendant status pending ou rejected.
-Voir CLAUDE.md §6.2 (matrice 4 cas avec publishedAt).
+---
 
-## V1.1 — Polish UI/UX
+### R15 — Mongoose { new: true } warning
 
-### Visibilité & status
-- ~~Exception visibilité LinkUP pendant pending~~ → ✅ RÉSOLU PP-11.5 (tous profils)
-- Badge StatusPill prend isPublic en compte ("Masqué" si active + !isPublic)
+`account.service.ts:165` utilise `{ new: true }` au lieu de `returnDocument: "after"`.
+1 occurrence.
 
-### Admin
-- ~~Hub admin unifié /admin/validation/comptes avec onglets~~ ✅ RÉSOLU PP-12 (July 6 2026)
-  Page hub /admin/validation avec 4 onglets, 4e compteur companyUpdates, sidebar simplifiée
-- Anomalie seed : BuildTech (c-004) et ArchStudio (c-006) ont status "pending" + pendingUpdates — incohérent avec le design PP-7 (pendingUpdates réservé aux actives). Sans impact fonctionnel (filtre active les exclut du hub). À corriger dans un nettoyage seed V1.1.
+Effort: 5 min
 
-### SEO & URLs
-- ~~Slug management γ : regénération auto + redirect 301 quand displayName change~~ ✅ RÉSOLU PP-12 (July 6 2026)
-  Slug régénéré dans approvePendingUpdates, slugHistory[] sur Company, redirect 308/301,
-  anti-collision via ensureUniqueSlug $or, retour interne supporté
-- ~~Conservation historique slugs (table companySlugHistory)~~ ✅ RÉSOLU PP-12
-  Implémenté comme Company.slugHistory[] (array) + index multikey, pas collection séparée
+---
 
-### Localisation
-- ~~Cluster localisation en hard change (gouvernorat + ville + adresse)~~ ✅ RÉSOLU PP-12.5 (July 12 2026)
-  Ville et adresse rejoignent gouvernorat dans pendingUpdates. Pattern granulaire 3 fields séparés.
-  Account.service.ts + schema + AccountForm + 7 nouveaux tests (120/120 green) + audit 19/19.
-  Seed MediaCom étendu à 3 fields déménagement complet.
-- **Option V1.1 — groupement conditionnel cluster localisation** : afficher les 3 champs
-  (gouvernorat + ville + adresse) comme un seul "bloc localisation" dans la diff admin et
-  dans le formulaire owner (soumission/approbation groupée). À évaluer si friction terrain
-  après pré-prod (owners modifiant souvent les 3 en même temps).
-- ~~Picker carte Leaflet~~ → ✅ RÉSOLU PP-12.6
-- ~~Retry pattern Nominatim~~ → ❌ OBSOLÈTE (Nominatim retiré PP-12.6)
-- ~~Cache résultats Nominatim~~ → ❌ OBSOLÈTE (Nominatim retiré PP-12.6)
+## Priorité basse / design decisions
 
-### Email rejet — mention visibilité continue
-Ajouter une ligne conditionnelle dans le template email de rejet profil
-(si publishedAt renseigné) : "votre profil reste visible avec les données
-validées précédemment". Chaîne à modifier : admin-profile.service.ts
-(passer publishedAt aux params) → sender.ts (signature
-sendProfileRejectedEmail) → templates/profile-rejected.ts (paramètre
-+ ligne conditionnelle HTML). Reporté de PP-11.5 — cosmétique. Vérifier
-profile-validated.ts au passage.
+### R16 — Badge AJOUT socials diff admin LinkUP
 
-### Code quality
-- Warning Mongoose { new: true } → returnDocument: "after" (1 occurrence)
-- ~~3 lints pré-existants (profile-editor, public-search unused vars)~~ → ✅ RÉSOLU PP-11.5 (5 lints fixés : 3 documentés + 2 découverts dans profile-hard.service.test.ts)
-- Retry pattern TransientTransactionError MongoDB Atlas
+Admin validation LinkUP: tout ecart social = "MODIFIÉ" meme si (vide) -> URL.
+Devrait etre "AJOUT" comme gallery et vidéos.
 
-### Sécurité sessions
-- ~~S8 : owner suspendu garde ses accès API via JWT stateless~~ → ✅ RÉSOLU PP-13 (July 23 2026)
-  jwt() callback vérifie company.status sur chaque requête authentifiée. suspended/deleted → session tuée.
-- ~~S2 : messages login distinguent email inconnu vs mauvais mdp~~ → ✅ FAUX POSITIF (confirmé audit PP-13)
-  Les 3 branches retournent "Email ou mot de passe incorrect." — anti-enumeration conforme.
-- Cache TTL court sur le check session jwt() — 2 queries par page load protégée.
-  Option V1.1 : cache in-memory TTL 30s sur { passwordChangedAt, company.status } par userId.
-  Réduirait les hits DB de ~90% sur les navigations rapides. Non implémenté en V1.
+Fichier: `admin/validation/profiles/[profileId]/page.tsx` (LinkUpContent)
+Effort: 30 min
 
-### Recherche & rendu
-- Requêtes "à proximité" via index 2dsphere
+---
 
-## V1.1 — UI badges StatusPill cohérence
+### R17 — previousStatus perdu au reject TraceUP
 
-### Problème détecté
-**Source** : smoke PP-9 (28 juin), bug pré-existant depuis Phase 5.
-**Pages affectées** : /dashboard/brandup, /dashboard/traceup, /dashboard/linkup
+Retirer toutes les vidéos pending après un cycle reject restaure "rejected" pas "active".
+Si l'owner abandonne, il reste bloqué en rejected. Design decision: préserver le
+previousStatus original à travers le cycle reject.
 
-Le badge StatusPill en haut de chaque page profile affiche le `status` 
-(Actif/En attente/Refusé/etc.) MAIS ne reflète PAS l'état `isPublic`.
+Complexité: M. A évaluer après feedback pré-prod.
 
-### Conséquence UX
-Quand l'owner désactive son profile (toggle isPublic=false) :
-- Badge reste "Actif" (vert)
-- Mais le profile est invisible publiquement (404)
-- Confusion : "Pourquoi mon profile est-il caché alors qu'il est Actif ?"
+---
 
-### Spec V1.1
-Hiérarchie des badges (par priorité) :
+### R18 — Perte pendingData au reject
 
-| status | isPublic | Badge affiché |
-|--------|----------|---------------|
-| draft | (any) | "Brouillon" (gris) |
-| pending | (any) | "En attente" (jaune) |
-| rejected | (any) | "Refusé" (rouge) |
-| active | true | "Actif" (vert) |
-| **active** | **false** | **"Masqué" (gris ou orange clair)** ← NOUVEAU |
+rejectProfileByAdmin() efface pendingData. Si l'owner avait soumis 5 vidéos et qu'une
+seule posait problème, il perd les 5 (URLs à re-saisir). Concerne aussi BrandUP/LinkUP.
 
-### Implémentation
-- Composant : StatusPill (chercher le bon nom dans le code)
-- Props à ajouter : `isPublic?: boolean`
-- Appliquer aux 3 pages dashboard profile
-- Aucune modification backend nécessaire (juste UI)
+Option: conserver rejectedData pour correction sans re-saisie.
+Complexité: M. A évaluer après feedback pré-prod.
 
-### Effort estimé
-- CC : 30-45 min
-- Smoke : 5 min (vérifier sur 3 profils)
-- Tests Vitest : optionnels (visuel pur)
+---
 
-### PP-11.5 audit UX — Cycle rejected TraceUP (5 juillet)
+### R19 — Groupement conditionnel cluster localisation
 
-1. **Banner rejected adapté par kind** — ProfileStatusBlock dit "cliquez
-   sur Enregistrer et resoumettre" mais TraceUP n'a pas ce bouton (la
-   re-soumission passe par l'ajout de vidéo, auto-transition fix α).
-   Ajouter prop `kind` + texte conditionnel TraceUP : "Ajoutez une
-   nouvelle vidéo conforme — la soumission sera automatique."
-   Fichier : ProfileStatusBlock.tsx.
+Afficher gouvernorat + ville + adresse comme un seul "bloc localisation" dans la diff
+admin et le formulaire owner (soumission/approbation groupée).
+A évaluer si friction terrain (owners modifiant souvent les 3 en meme temps).
 
-2. **Badge AJOUT socials (diff admin LinkUP)** — actuellement tout écart
-   = MODIFIÉ, même (vide) → URL. Aligner sur gallery (NOUVEAU) et vidéos
-   (AJOUT) : si current vide/absent et pending renseigné → AJOUT.
-   Fichier : admin/validation/profiles/[profileId]/page.tsx,
-   LinkUpContent() condition :355.
+Effort: 30 min
 
-3. **previousStatus perdu au reject** — retirer toutes les vidéos pending
-   après un cycle reject restaure "rejected" (pas "active"). Si le cas
-   d'usage "abandon pur" est demandé : préserver le previousStatus
-   original à travers le cycle reject. Complexité M. À évaluer après
-   feedback pré-prod. Note : le retour à active via validation admin
-   uniquement est un choix défendable (anti-contournement).
+---
 
-4. **Perte du contenu au reject** — rejectProfileByAdmin() efface
-   pendingData : si l'owner avait soumis 5 vidéos et qu'une seule posait
-   problème, il perd les 5 (URLs à re-saisir). À évaluer : conserver une
-   copie du pendingData refusé (champ rejectedData ou historique) pour
-   permettre la correction sans re-saisie. Concerne aussi BrandUP/LinkUP
-   (même service reject). À croiser avec feedback client pré-prod.
-   
-   
-   ### ✅ RÉSOLU PP-12.6 — GPS position — cycle de vie complet
-Nominatim retiré. L'owner pose un pin Leaflet dans le dashboard LinkUP
-(édition live instantanée). Le déménagement est résolu : l'owner
-déplace son pin quand il veut, sans dépendre de l'approbation admin.
+### R20 — Storage collision resistance
 
-### ✅ RÉSOLU PP-14.5 — Mode "Bientôt disponible" (placeholder public)
-Profile.placeholderMode (hidden | coming_soon, default hidden). Quand
-isPublic=false + coming_soon + publishedAt renseigné → page minimale
-(logo, nom, "Bientôt disponible") au lieu de 404. DTO strict whitelist
-(aucune fuite data/socials/coordonnées). Guard publishedAt obligatoire
-(pas de placeholder avant validation admin). 3 pages publiques +
-3 editors (sous-choix radio sous le toggle). 20 tests, build OK.
-Voir CLAUDE.md §6.15.
+`cloudinary.ts:93-100` : key = `YYYY-MM-DD-slug` sans random suffix. Deux uploads
+du meme fichier le meme jour ecrasent le premier.
 
-### Harmoniser conditions disabled toggle isPublic entre les 3 editors
-**Source** : audit PP-14.5 (23 juillet 2026).
-BrandUpEditor : toggle disabled en `isReadOnly || profile.status !== "active"`
-(bloqué en pending + rejected + disabled).
-TraceUpEditor : toggle disabled en `isPending || isDisabled` (actif en rejected).
-LinkUpEditor : toggle disabled en `isReadOnly` (actif en rejected).
-Trois comportements différents. Harmoniser si friction terrain constatée.
-Estimé : 15 min.
+Fix: ajouter `Date.now().toString(36)` ou `nanoid(8)` dans le key.
+Effort: 5 min
 
-## Tracking & Analytics
+---
 
-### ✅ LIVRÉ PP-15a — Tracking vues + clics sortants
-Collection ProfileStatsMonthly, beacon client, endpoint POST /api/v1/public/track.
-200 tests green. Voir CLAUDE.md §6.17.
+### R21 — Storage path traversal defense-in-depth
 
-### PRIORITÉ HAUTE — ProfileHero : tel/whatsapp/email cliquables + tracking clics
-Les coordonnées dans ProfileHero (phone, whatsapp, email) sont des `<div>` non
-cliquables. Sur mobile, un produit "carte de contact" avec des coordonnées non
-cliquables est un défaut UX critique. Rendre cliquables (`<a href="tel:">`,
-`<a href="mailto:">`, etc.) et ajouter le tracking clics. Vague 1 post-prod.
-Fichiers : ProfileHero.tsx + wiring sendBeacon.
-Estimé : 1h.
+Aucun guard ObjectId dans `src/lib/storage/`. Si un companyId malformé atteint
+l'adapter, le path pourrait s'échapper. Risque LOW (companyId vient de la session).
 
-### Breakdown clics par type (whatsapp/tel/socials/maps)
-Actuellement : compteur agrégé clicks. V1.1 : stocker le type de clic
-(whatsapp, phone, facebook, etc.) pour analytics granulaires dashboard.
-Champ optionnel `target` dans le payload track + stockage par type.
-Estimé : 2h.
+Fix: `if (!/^[a-f0-9]{24}$/.test(options.companyId)) throw`
+Effort: 10 min
 
-### Cleanup champ views30d déprécié
-Profile.stats.views30d conservé au schéma en PP-15a pour zéro migration.
-Retirer du schéma Mongoose + cleanup seed data.
-Estimé : 15 min.
+---
 
-### Tracking → lecture par boost/sponsoring dynamiques
-Boost.viewsAdded / clicksAdded (boost.model.ts:13-14) existent mais ne
-sont jamais incrémentés. Quand le checkout boost sera implémenté, lire
-ProfileStatsMonthly pour calculer les vues/clics pendant la période boost.
-Estimé : 2h (dépend du sprint boost dynamique).
+### R22 — Reverse geocoding au drop du pin
 
-### Tracker clic PDF reçu RSE (optionnel)
-RseSection.tsx:69 a un `<a href={receiptDocumentUrl} target="_blank">`.
-Actuellement exclu du tracking (téléchargement de reçu ≠ intention de contact).
-Si utile pour analytics RSE, ajouter sendBeacon onClick.
-Estimé : 15 min.
+`MapPicker.tsx` pose le pin mais n'affiche pas l'adresse trouvée. Optionnel UX.
+Effort: 1h
 
-## Corbeille admin
+---
 
-### ✅ LIVRÉ PP-15b — Vue Supprimés + fiche consultable + restauration
-Onglet "Supprimées" dans /admin/entreprises, fiche detail read-only,
-restoreCompanyByAdmin cascade inverse 9 models, match exact timestamp,
-E1 pending guard, StatusPill deleted. 210 tests green.
+### R23 — Bouton Maps sur BrandUP/TraceUP public
 
-### Purge RGPD J+30 → guard restauration impossible post-purge
-Quand la purge physique Cloudinary/S3 sera implémentée (item existant),
-ajouter un guard dans restoreCompanyByAdmin : si deletedAt + 30j < now,
-refuser la restauration (les fichiers physiques n'existent plus).
-Estimé : 15 min.
+`ServicesGrid` est uniquement dans `LinkUpPublic.tsx`. BrandUpPublic et TraceUpPublic
+n'exposent pas les liens sociaux ni le lien Maps.
 
-### Delete par admin (hard flow admin-initiated)
-Actuellement seul l'owner peut supprimer son compte. L'admin ne peut que
-suspendre. Si besoin : ajouter un endpoint admin DELETE company avec la
-même cascade PP-14 mais byRole SUPER_ADMIN + raison obligatoire.
-Estimé : 1h.
+Effort: 30 min
+
+---
+
+### R24 — Mobile bottom sheets onboarding
+
+Dropdowns onboarding = standard dropdown. Mockup montre slide-up bottom sheet pattern
+sur mobile (country + app launcher).
+
+Effort: 2-3h
+
+---
+
+### R25 — Cleanup orphan signups script
+
+Dev tooling: `scripts/cleanup-orphan-signups.ts` pour supprimer les Users
+emailVerifiedAt=null créés pendant les tests.
+
+Effort: 30 min
+
+---
+
+### R26 — Breakdown clics par type
+
+Compteur clicks agrégé. V1.1: stocker le type de clic (whatsapp, phone, facebook, etc.)
+pour analytics granulaires dashboard. Champ `target` dans le payload track.
+
+Effort: 2h
+
+---
+
+### R27 — Cache TTL court check session jwt()
+
+2 queries DB par page load protégée (passwordChangedAt + company.status).
+Cache in-memory TTL 30s par userId réduirait ~90% des hits.
+
+Effort: 1h
+
+---
+
+### R28 — Retry TransientTransactionError MongoDB Atlas
+
+Pas de retry pattern sur les transactions Mongoose. Atlas peut retourner
+TransientTransactionError en cas de conflit.
+
+Effort: 1h
+
+---
+
+### R29 — Requetes "a proximite" geo-search
+
+Index 2dsphere existe (`company.model.ts:139`) mais aucune query `$geoNear` dans le
+code. Recherche = regex in-memory (`public-search.service.ts`). A cabler si search geo V1.1.
+
+Effort: 2h
+
+---
+
+### R30 — Tests Vitest profile-soft Sprint 2
+
+4 cas manquants: dispatch by kind, cross-tenant guard, gallery reorder markModified,
+strict mode + nested socials validation. Aucun fichier `profile-soft.service.test.ts`.
+
+Effort: 1-2h
+
+---
+
+### R31 — Delete par admin (hard flow admin-initiated)
+
+Actuellement seul l'owner peut supprimer. L'admin ne peut que suspendre.
+Ajouter endpoint admin DELETE company (cascade PP-14 + raison obligatoire).
+
+Effort: 1h
+
+---
+
+### R32 — Purge RGPD J+30 guard restauration
+
+`restoreCompanyByAdmin` n'a pas de guard temporel. Quand la purge physique
+Cloudinary/S3 sera implementée, refuser la restauration si deletedAt + 30j < now.
+
+Effort: 15 min
+
+---
+
+### R33 — Cloudinary orphan cleanup cron
+
+Upload puis annulation = image orpheline sur Cloudinary. Script daily qui compare
+les public_ids avec les URLs en DB.
+
+Effort: 2h
+
+---
+
+### R34 — Anomalie seed BuildTech/ArchStudio
+
+c-004 et c-006 ont status "pending" + pendingUpdates — incohérent (pendingUpdates
+réservé aux actives). Sans impact fonctionnel mais confus pour le debug.
+
+Effort: 15 min
+
+---
+
+### R35 — Tracker clic PDF recu RSE (optionnel)
+
+`RseSection.tsx:69` a un `<a>` vers le PDF sans tracking. Ajouter sendBeacon si
+analytics RSE utile.
+
+Effort: 15 min
+
+---
+
+### R36 — Boost viewsAdded/clicksAdded cablage
+
+`boost.model.ts:13-14` : champs existent mais jamais incrementés. Depend du sprint
+boost dynamique (checkout + lecture ProfileStatsMonthly pendant période boost).
+
+Effort: 2h
+
+---
+
+### R37 — Storage migration R2
+
+Cloudinary actif (25 GB free). `r2-adapter.ts` existe non cable. Migration quand
+limites approchent. StorageAdapter interface deja abstraite.
+
+Effort: 4-6h
+
+---
+
+### R38 — Resend domain verification
+
+Config DevOps: vérifier domaine sur resend.com/domains, mettre a jour FROM_EMAIL
+(.env), propagation DNS.
+
+Effort: 10 min config + 30 min DNS
+
+---
+
+## Constat supplementaire (decouvert pendant l'audit)
+
+### C1 — ServicesGrid ternaire mort
+
+`ServicesGrid.tsx:99` : `const Tag = s.external ? "a" : "a"` — ternaire qui retourne
+toujours "a". Cleanup trivial.
+
+Effort: 1 min
+
+---
+
+### C2 — Recherche in-memory ne scale pas
+
+`public-search.service.ts` charge toutes les companies puis filtre en JS avec
+`buildAndRegex()`. Pas de `$regex` ni `$text` MongoDB. Fonctionne en V1 (<1000
+companies). A migrer vers `$text` index ou `$regex` MongoDB si croissance.
+
+Effort: 2-3h
