@@ -69,13 +69,36 @@ Do **not** introduce alternatives without explicit human approval.
 | Forms | **React Hook Form** + Zod resolver |
 | Validation | **Zod** everywhere (client RHF + server route handlers) |
 | Real-time | **Pusher Channels** (alternative: Ably) |
-| Email | **Resend** (alternative: SendGrid) |
+| Email | **Nodemailer** over client SMTP (see §3-bis) |
 | File storage | **AWS S3** or **Cloudflare R2** behind a CDN |
 | PDF generation | **@react-pdf/renderer** (lazy, server-side) |
 | Tests | **Vitest** + **Playwright** for E2E |
 | Lint | **ESLint** + **Prettier** (config provided) |
 
 **Forbidden:** Material UI, MUI, Chakra, Mantine, Ant Design, Bootstrap, styled-components, Emotion, CSS Modules, raw CSS files (use Tailwind classes only).
+
+---
+
+## 3-bis. Email — SMTP client via Nodemailer
+
+Resend a été remplacé par **Nodemailer** connecté au SMTP du client (PHPMailer credentials existants).
+
+| Var | Description | Default |
+|---|---|---|
+| `SMTP_HOST` | Hostname du serveur SMTP | `""` (emails skippés si vide) |
+| `SMTP_PORT` | Port SMTP (465 = SSL, 587 = STARTTLS) | `465` |
+| `SMTP_SECURE` | Force TLS (`true`/`false`). Si absent : inféré (`true` si port 465) | *(auto)* |
+| `SMTP_USER` | Login SMTP | `""` (emails skippés si vide) |
+| `SMTP_PASS` | Mot de passe SMTP | `""` |
+| `EMAIL_FROM` | Adresse expéditeur (doit correspondre au domaine/boite authentifiée — SPF/relay) | `onboarding@resend.dev` |
+
+**Comportement dev :** si `SMTP_HOST` ou `SMTP_USER` est vide, `sendEmail()` log un `console.warn` et return sans erreur. Aucun email n'est envoyé.
+
+**Vérification connectivité :** `npx tsx scripts/check-smtp.ts` — appelle `transporter.verify()`, ne send rien.
+
+**Architecture :** `src/lib/email/sender.ts` expose 16 fonctions `send*`. Toutes passent par `sendEmail()` privé qui gère le transporter singleton. Les templates HTML sont dans `src/lib/email/templates/`. Chaque email est envoyé en multipart (HTML + text/plain auto-généré) pour la délivrabilité.
+
+**Emails en dev local :** les templates contenant des liens construisent les URLs via `env.NEXTAUTH_URL` (`http://localhost:3000` en dev). Le filtre sortant SMTP (Infomaniak) rejette les emails avec des liens `localhost` — c'est attendu. L'OTP (sans lien) passe. Pour tester les emails à liens, utiliser le serveur avec une URL https réelle.
 
 ---
 

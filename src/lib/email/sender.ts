@@ -1,4 +1,4 @@
-import { Resend } from "resend";
+import nodemailer from "nodemailer";
 import { env } from "@/lib/env";
 import { otpEmailTemplate } from "./templates/otp";
 import { passwordResetEmailTemplate } from "./templates/password-reset";
@@ -16,38 +16,68 @@ import { companySuspendedEmailTemplate } from "./templates/company-suspended";
 import { companyReactivatedEmailTemplate } from "./templates/company-reactivated";
 import { companyRestoredEmailTemplate } from "./templates/company-restored";
 
+import type { Transporter } from "nodemailer";
+
 const FROM_ADDRESS = `MARKET-UP <${env.EMAIL_FROM}>`;
 
-let resendClient: Resend | null = null;
+/** Strip HTML tags to produce a text/plain alternative (anti-spam multipart). */
+function htmlToText(html: string): string {
+  return html
+    .replace(/<br\s*\/?>/gi, "\n")
+    .replace(/<\/p>/gi, "\n\n")
+    .replace(/<\/tr>/gi, "\n")
+    .replace(/<\/h[1-6]>/gi, "\n\n")
+    .replace(/<hr[^>]*>/gi, "\n---\n")
+    .replace(/<[^>]+>/g, "")
+    .replace(/&nbsp;/gi, " ")
+    .replace(/&amp;/gi, "&")
+    .replace(/&lt;/gi, "<")
+    .replace(/&gt;/gi, ">")
+    .replace(/&quot;/gi, '"')
+    .replace(/&#39;/gi, "'")
+    .replace(/&eacute;/gi, "e")
+    .replace(/&middot;/gi, "·")
+    .replace(/\n{3,}/g, "\n\n")
+    .trim();
+}
 
-function getClient(): Resend | null {
-  if (!env.RESEND_API_KEY) {
+let transporter: Transporter | null = null;
+
+function getTransporter(): Transporter | null {
+  if (!env.SMTP_HOST || !env.SMTP_USER) {
     return null;
   }
-  if (!resendClient) {
-    resendClient = new Resend(env.RESEND_API_KEY);
+  if (!transporter) {
+    const secure = env.SMTP_SECURE ?? (env.SMTP_PORT === 465);
+    transporter = nodemailer.createTransport({
+      host: env.SMTP_HOST,
+      port: env.SMTP_PORT,
+      secure,
+      auth: { user: env.SMTP_USER, pass: env.SMTP_PASS },
+      connectionTimeout: 10_000,
+      greetingTimeout: 10_000,
+      socketTimeout: 30_000,
+    });
   }
-  return resendClient;
+  return transporter;
 }
 
 async function sendEmail(to: string, subject: string, html: string): Promise<void> {
-  const client = getClient();
-  if (!client) {
-    console.warn(`[email] RESEND_API_KEY not set — skipping email to ${to} (subject: "${subject}")`);
+  const transport = getTransporter();
+  if (!transport) {
+    console.warn(`[email] SMTP not configured — skipping email to ${to} (subject: "${subject}")`);
     return;
   }
 
-  const { error } = await client.emails.send({
+  const info = await transport.sendMail({
     from: FROM_ADDRESS,
     to,
     subject,
     html,
+    text: htmlToText(html),
   });
 
-  if (error) {
-    console.error("[email] Failed to send:", error);
-    throw new Error(`Email send failed: ${error.message}`);
-  }
+  console.info(`[email] Sent to ${to} — messageId: ${info.messageId}`);
 }
 
 /** Send a 6-digit OTP verification code. */

@@ -399,15 +399,6 @@ Effort: 4-6h
 
 ---
 
-### R38 — Resend domain verification
-
-Config DevOps: vérifier domaine sur resend.com/domains, mettre a jour FROM_EMAIL
-(.env), propagation DNS.
-
-Effort: 10 min config + 30 min DNS
-
----
-
 ## Constat supplementaire (decouvert pendant l'audit)
 
 ### C1 — ServicesGrid ternaire mort

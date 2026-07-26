@@ -8,8 +8,15 @@ const envSchema = z.object({
   NEXTAUTH_URL: z.string().url().default("http://localhost:3000"),
   NEXTAUTH_SECRET: z.string().min(1, "NEXTAUTH_SECRET is required"),
 
-  // Resend
-  RESEND_API_KEY: z.string().default(""),
+  // SMTP (transactional email via Nodemailer)
+  SMTP_HOST: z.string().default(""),
+  SMTP_PORT: z.coerce.number().int().default(465),
+  SMTP_SECURE: z.preprocess(
+    (v) => (v === "" || v === undefined ? undefined : v === "true" || v === "1"),
+    z.boolean().optional(),
+  ),
+  SMTP_USER: z.string().default(""),
+  SMTP_PASS: z.string().default(""),
   EMAIL_FROM: z.string().min(1).default("onboarding@resend.dev"),
 
   // Pusher
