@@ -68,7 +68,7 @@ const ECOSYSTEM_CARDS: readonly EcosystemCard[] = [
     icon: "videocam",
     imageUrl:
       "https://images.unsplash.com/photo-1601506521937-0121a7fc2a6b?q=80&w=800&auto=format&fit=crop",
-    href: "/traceup",
+    href: "/onboarding?product=traceup",
     layoutClass: "min-h-[240px] lg:row-span-2 lg:min-h-[500px]",
     breatheDelay: "2s",
   },
@@ -78,7 +78,7 @@ const ECOSYSTEM_CARDS: readonly EcosystemCard[] = [
     icon: "account_tree",
     imageUrl:
       "https://plus.unsplash.com/premium_photo-1764691489695-56c848f680dd?q=80&w=1460&auto=format&fit=crop",
-    href: "/linkup",
+    href: "/onboarding?product=linkup",
     layoutClass: "min-h-[240px]",
     breatheDelay: "6s",
   },
@@ -88,7 +88,7 @@ const ECOSYSTEM_CARDS: readonly EcosystemCard[] = [
     icon: "storefront",
     imageUrl:
       "https://images.unsplash.com/photo-1542838132-92c53300491e?q=80&w=800&auto=format&fit=crop",
-    href: "/brandup",
+    href: "/onboarding?product=brandup",
     layoutClass: "min-h-[240px]",
     breatheDelay: "4s",
   },
