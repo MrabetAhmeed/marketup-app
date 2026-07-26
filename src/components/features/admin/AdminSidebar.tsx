@@ -7,7 +7,7 @@ const NAV_ITEMS = [
   { href: "/admin", label: "Vue d'ensemble", icon: "dashboard" },
   { href: "/admin/validation", label: "Validation", icon: "verified" },
   { href: "/admin/entreprises", label: "Entreprises", icon: "business" },
-  { href: "#", label: "Transactions", icon: "receipt_long", disabled: true },
+  { href: "/admin/transactions", label: "Transactions", icon: "receipt_long" },
 ];
 
 export function AdminSidebar(): JSX.Element {
@@ -33,28 +33,22 @@ export function AdminSidebar(): JSX.Element {
         {NAV_ITEMS.map((item) => {
           const active = item.href === "/admin"
             ? pathname === "/admin"
-            : pathname.startsWith(item.href) && item.href !== "#";
+            : pathname.startsWith(item.href);
 
           return (
             <Link
               key={item.label}
-              href={item.disabled ? "#" : item.href}
+              href={item.href}
               className={`flex items-center gap-2.5 px-3 py-2 rounded-lg text-[13px] font-medium transition-colors ${
-                item.disabled
-                  ? "text-ink-tertiary cursor-not-allowed opacity-50"
-                  : active
-                    ? "bg-[#5C2D91]/10 text-[#5C2D91]"
-                    : "text-ink-secondary hover:bg-surface-muted hover:text-ink-primary"
+                active
+                  ? "bg-[#5C2D91]/10 text-[#5C2D91]"
+                  : "text-ink-secondary hover:bg-surface-muted hover:text-ink-primary"
               }`}
-              onClick={(e) => item.disabled && e.preventDefault()}
             >
               <span className={`material-symbols-outlined ${active ? "icon-fill" : ""}`} style={{ fontSize: 20 }}>
                 {item.icon}
               </span>
               {item.label}
-              {item.disabled && (
-                <span className="ml-auto text-[9px] font-bold text-ink-tertiary bg-surface-muted px-1.5 py-0.5 rounded">V1.1</span>
-              )}
             </Link>
           );
         })}

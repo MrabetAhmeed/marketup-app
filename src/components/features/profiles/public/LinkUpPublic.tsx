@@ -1,8 +1,8 @@
+import type { PublicLinkUpProfile } from "@/services/public-profile.service";
 import ProfileHero from "./ProfileHero";
 import ServicesGrid from "./ServicesGrid";
 import RseSection from "./RseSection";
 import CrossLinks from "./CrossLinks";
-import type { PublicLinkUpProfile } from "@/services/public-profile.service";
 
 interface LinkUpPublicProps {
   data: PublicLinkUpProfile;

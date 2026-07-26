@@ -3,11 +3,11 @@
 import { usePathname } from "next/navigation";
 import { signOut } from "next-auth/react";
 import Link from "next/link";
+import { useState } from "react";
 import { Sheet, SheetContent } from "@/components/ui/sheet";
 import { StatusDot } from "@/components/shared/StatusDot";
 import type { MeResponse } from "@/types/dashboard";
 import type { ProfileStatus } from "@/types";
-import { useState } from "react";
 
 interface DashboardSidebarProps {
   me: MeResponse;

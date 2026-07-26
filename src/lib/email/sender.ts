@@ -15,7 +15,6 @@ import { accountDeletedEmailTemplate } from "./templates/account-deleted";
 import { companySuspendedEmailTemplate } from "./templates/company-suspended";
 import { companyReactivatedEmailTemplate } from "./templates/company-reactivated";
 import { companyRestoredEmailTemplate } from "./templates/company-restored";
-
 import type { Transporter } from "nodemailer";
 
 const FROM_ADDRESS = `MARKET-UP <${env.EMAIL_FROM}>`;

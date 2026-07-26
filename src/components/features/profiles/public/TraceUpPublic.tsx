@@ -1,8 +1,8 @@
+import type { PublicTraceUpProfile } from "@/services/public-profile.service";
 import ProfileHero from "./ProfileHero";
 import VideoLibrary from "./VideoLibrary";
 import RseSection from "./RseSection";
 import CrossLinks from "./CrossLinks";
-import type { PublicTraceUpProfile } from "@/services/public-profile.service";
 
 interface TraceUpPublicProps {
   data: PublicTraceUpProfile;

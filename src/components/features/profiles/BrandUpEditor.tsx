@@ -7,11 +7,11 @@ import { useForm } from "react-hook-form";
 import { StatusPill } from "@/components/shared/StatusPill";
 import { ProfileStatusBlock } from "@/components/shared/ProfileStatusBlock";
 import { useToast } from "@/components/shared/Toast";
+import type { BrandUpEditorData, GalleryItem } from "@/types/profile-editor";
+import type { MeResponse } from "@/types/dashboard";
 import { ProfileActionBar } from "./ProfileActionBar";
 import { AddGalleryImageModal } from "./AddGalleryImageModal";
 import { GalleryDeleteConfirm } from "./GalleryDeleteConfirm";
-import type { BrandUpEditorData, GalleryItem } from "@/types/profile-editor";
-import type { MeResponse } from "@/types/dashboard";
 
 // SCOPE_DECISION: 9 gallery slots max (mockup shows 10 — reduced per owner directive)
 const MAX_GALLERY = 9;

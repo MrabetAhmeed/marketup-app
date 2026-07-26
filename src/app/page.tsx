@@ -1,5 +1,4 @@
 import { VivaskyLanding } from "@/components/features/landing/VivaskyLanding";
-
 import type { Metadata, Viewport } from "next";
 
 const TITLE = "vivasky.media — E-motion of Life";

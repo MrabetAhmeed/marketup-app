@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
 
-type StatusPillKind = "active" | "pending" | "rejected" | "disabled" | "incomplete" | "gold" | "suspended" | "deleted";
+type StatusPillKind = "active" | "pending" | "rejected" | "disabled" | "incomplete" | "gold" | "suspended" | "deleted" | "paid" | "failed" | "refunded";
 
 // Full static class strings so Tailwind JIT can detect them.
 // "incomplete" maps to the "draft" color tokens (gray-blue family).
@@ -13,6 +13,9 @@ const KIND_TO_CLASSES: Record<StatusPillKind, string> = {
   gold: "bg-status-gold-bg text-status-gold-fg border-status-gold-border",
   suspended: "bg-[#F5F5F5] text-[#616161] border-[#E0E0E0]",
   deleted: "bg-red-50 text-red-700 border-red-200",
+  paid: "bg-status-active-bg text-status-active-fg border-status-active-border",
+  failed: "bg-status-rejected-bg text-status-rejected-fg border-status-rejected-border",
+  refunded: "bg-[#F5F5F5] text-[#616161] border-[#E0E0E0]",
 };
 
 const KIND_TO_DOT: Record<StatusPillKind, string> = {
@@ -24,6 +27,9 @@ const KIND_TO_DOT: Record<StatusPillKind, string> = {
   gold: "bg-status-gold-dot",
   suspended: "bg-[#616161]",
   deleted: "bg-red-700",
+  paid: "bg-status-active-dot",
+  failed: "bg-status-rejected-dot",
+  refunded: "bg-[#616161]",
 };
 
 const KIND_TO_LABEL: Record<StatusPillKind, string> = {
@@ -35,6 +41,9 @@ const KIND_TO_LABEL: Record<StatusPillKind, string> = {
   gold: "Attesté",
   suspended: "Désactivé",
   deleted: "Supprimé",
+  paid: "Payé",
+  failed: "Échoué",
+  refunded: "Remboursé",
 };
 
 interface StatusPillProps {

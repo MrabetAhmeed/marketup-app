@@ -1,8 +1,8 @@
+import type { PublicBrandUpProfile } from "@/services/public-profile.service";
 import ProfileHero from "./ProfileHero";
 import ProjectGallery from "./ProjectGallery";
 import RseSection from "./RseSection";
 import CrossLinks from "./CrossLinks";
-import type { PublicBrandUpProfile } from "@/services/public-profile.service";
 
 interface BrandUpPublicProps {
   data: PublicBrandUpProfile;

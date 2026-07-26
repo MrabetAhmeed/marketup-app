@@ -3,11 +3,11 @@
 import { useState, useCallback, useRef, useEffect } from "react";
 import PublicSearchHeader from "@/components/shared/PublicSearchHeader";
 import PublicFooter from "@/components/shared/PublicFooter";
+import type { SearchResultCard as CardType } from "@/services/public-search.service";
 import SponsorBanner from "./SponsorBanner";
 import SearchResultCard from "./SearchResultCard";
 import SearchEmptyState from "./SearchEmptyState";
 import ProfilePopup from "./ProfilePopup";
-import type { SearchResultCard as CardType } from "@/services/public-search.service";
 
 type ProductKey = "brandup" | "traceup" | "linkup";
 

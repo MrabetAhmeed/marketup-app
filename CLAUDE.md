@@ -423,8 +423,9 @@ When asked to do specific work, **always look in `.claude/skills/`** first:
 
 | Sprint | Scope |
 |---|---|
-| **C0** | Socle monetisation (flag, guard, adapter, helper boost) — **livre** |
-| **C3 → C1 → C2** | Facturation → Boost → Sponsoring (voir §9-ter) |
+| **C0** | Socle monetisation (flag, guard, adapter, helper boost) — **livré** |
+| **C3** | Facturation (billing owner, admin transactions, invoice numbering) — **livré** |
+| **C1 → C2** | Boost → Sponsoring (voir §9-ter) |
 | **PP-17** | Seed prod (donnees de production initiales, sans TechnoFab demo) |
 | **DevOps** | Security headers S5, env prod, deploy pipeline |
 
@@ -484,8 +485,8 @@ Le conteneur de production dispose de **~1.5 Go RAM**. Sans les garde-fous ci-de
 
 | Sprint | Scope | Depend |
 |---|---|---|
-| **C0** | Flag + guard + PaymentAdapter + helper boost + pricing constants | — |
-| **C3** | Facturation : page billing, endpoint transactions, admin transactions | C0 |
+| **C0** | Flag + guard + PaymentAdapter + helper boost + pricing constants | — | **livré** |
+| **C3** | Facturation : page billing, endpoint transactions, admin transactions, `generateInvoiceNumber` (MU-YYYY-NNNNN, Counter atomique). Admin voit toujours (pas de requireMonetization). D12 : owner voit "paid" pour paid_simulated, admin voit "Payé (test)". | C0 | **livré** |
 | **C1** | Boost : page, checkout simule, activation, expiration, shuffle search | C0+C3 |
 | **C2** | Sponsoring : page, checkout, SponsorBanner dynamique, ciblage | C0+C3 |
 

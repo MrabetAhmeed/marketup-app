@@ -9,6 +9,7 @@ export default defineConfig({
     hookTimeout: 120_000,
     testTimeout: 30_000,
     fileParallelism: false,
+    pool: "forks",
   },
   resolve: {
     alias: {

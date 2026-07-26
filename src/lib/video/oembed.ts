@@ -1,5 +1,5 @@
-import type { VideoPlatform } from "./parsers";
 import { buildFallbackThumbnail } from "./parsers";
+import type { VideoPlatform } from "./parsers";
 
 // ---------------------------------------------------------------------------
 // oEmbed metadata fetch — thumbnail only, never throws

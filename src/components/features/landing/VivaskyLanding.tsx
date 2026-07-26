@@ -15,7 +15,6 @@
 
 import { useRef } from "react";
 import Link from "next/link";
-
 import type { MouseEvent } from "react";
 
 type EcosystemCard = {

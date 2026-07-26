@@ -6,10 +6,10 @@ import { useRouter } from "next/navigation";
 import { StatusPill } from "@/components/shared/StatusPill";
 import { ProfileStatusBlock } from "@/components/shared/ProfileStatusBlock";
 import { useToast } from "@/components/shared/Toast";
-import { AddVideoModal } from "./AddVideoModal";
-import { VideoDeleteConfirm } from "./VideoDeleteConfirm";
 import type { TraceUpEditorData, VideoItem } from "@/types/profile-editor";
 import type { MeResponse } from "@/types/dashboard";
+import { AddVideoModal } from "./AddVideoModal";
+import { VideoDeleteConfirm } from "./VideoDeleteConfirm";
 
 type VideoCategory = "actualite" | "offres" | "astuces" | "emplois";
 

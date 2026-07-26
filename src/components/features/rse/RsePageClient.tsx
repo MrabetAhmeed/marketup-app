@@ -1,11 +1,11 @@
 "use client";
 
 import { useState } from "react";
+import type { RsePageData } from "@/types/rse";
 import { RseBadgeHero } from "./RseBadgeHero";
 import { RseStats } from "./RseStats";
 import { RseReceiptsList } from "./RseReceiptsList";
 import { RseDonationModal } from "./RseDonationModal";
-import type { RsePageData } from "@/types/rse";
 
 interface RsePageClientProps {
   data: RsePageData;

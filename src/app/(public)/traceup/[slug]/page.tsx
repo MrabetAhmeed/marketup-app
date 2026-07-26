@@ -1,5 +1,4 @@
 import { notFound, permanentRedirect } from "next/navigation";
-import type { Metadata } from "next";
 import { getPublicProfileBySlug } from "@/services/public-profile.service";
 import { SlugRedirectError } from "@/lib/api-error";
 import PublicProfileHeader from "@/components/shared/PublicProfileHeader";
@@ -8,6 +7,7 @@ import TraceUpPublic from "@/components/features/profiles/public/TraceUpPublic";
 import ComingSoonPage from "@/components/shared/ComingSoonPage";
 import TrackView from "@/components/shared/TrackView";
 import type { PublicTraceUpProfile, PublicProfileOrPlaceholder } from "@/services/public-profile.service";
+import type { Metadata } from "next";
 
 export const dynamic = "force-dynamic";
 

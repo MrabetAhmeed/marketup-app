@@ -1,8 +1,8 @@
 import { NextRequest } from "next/server";
+import { z } from "zod";
 import { requireAdmin } from "@/lib/auth-guards";
 import { jsonOk, jsonError, handleApiError } from "@/lib/api-response";
 import { suspendCompanyByAdmin } from "@/services/admin-company.service";
-import { z } from "zod";
 
 const SuspendBodySchema = z.object({
   reason: z.string().min(3, "La raison doit comporter au moins 3 caractères.").max(500),
