@@ -19,6 +19,13 @@ const envSchema = z.object({
   SMTP_PASS: z.string().default(""),
   EMAIL_FROM: z.string().min(1).default("onboarding@resend.dev"),
 
+  // Monetization
+  MONETIZATION_ENABLED: z.preprocess(
+    (v) => v === "true" || v === "1",
+    z.boolean().default(false),
+  ),
+  PAYMENT_ADAPTER: z.enum(["simulated"]).default("simulated"),
+
   // Pusher
   PUSHER_APP_ID: z.string().default(""),
   PUSHER_KEY: z.string().default(""),

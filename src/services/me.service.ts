@@ -6,7 +6,7 @@ import { isProfileVisible } from "@/lib/visibility";
 import { Company } from "@/models/company.model";
 import { User } from "@/models/user.model";
 import { Profile } from "@/models/profile.model";
-import { Boost } from "@/models/boost.model";
+import { findActiveBoosts } from "@/models/boost.model";
 import { Sponsoring } from "@/models/sponsoring.model";
 import { Notification } from "@/models/notification.model";
 import { Sector } from "@/models/sector.model";
@@ -17,12 +17,12 @@ import { Association } from "@/models/association.model";
 import type { MeResponse, ProfileSummary, RseSummary, NotificationPreview } from "@/types/dashboard";
 import type { ProfileKind } from "@/types";
 import { getProfileMonthlyStats, getCurrentMonth, getPreviousMonth, computeTrend } from "@/services/track.service";
+import { env } from "@/lib/env";
 
 // Mongoose 9 strict types require casts for dynamic queries
 const CompanyModel = Company as any;
 const UserModel = User as any;
 const ProfileModel = Profile as any;
-const BoostModel = Boost as any;
 const SponsoringModel = Sponsoring as any;
 const NotificationModel = Notification as any;
 const RseReceiptModel = RseReceipt as any;
@@ -71,7 +71,7 @@ export async function getMe(
     CompanyModel.findById(companyId).lean(),
     UserModel.findById(userId).lean(),
     ProfileModel.find({ companyId }).lean(),
-    BoostModel.find({ companyId, status: "active", to: { $gte: now } }).lean(),
+    findActiveBoosts({ companyId }, now),
     SponsoringModel.find({ companyId, status: "active", to: { $gte: now } }).lean(),
     NotificationModel.countDocuments({
       recipientType: "owner",
@@ -281,6 +281,9 @@ export async function getMe(
       activeBoosts: (activeBoosts as any[]).length,
       activeSponsorings: (activeSponsorings as any[]).length,
       unreadNotifications,
+    },
+    features: {
+      monetization: env.MONETIZATION_ENABLED,
     },
   };
 }

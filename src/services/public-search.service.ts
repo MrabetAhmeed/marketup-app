@@ -5,7 +5,7 @@ import { Profile } from "@/models/profile.model";
 import "@/models/profile-brandup.model";
 import "@/models/profile-traceup.model";
 import "@/models/profile-linkup.model";
-import { Boost } from "@/models/boost.model";
+import { findActiveBoosts } from "@/models/boost.model";
 import { Sector } from "@/models/sector.model";
 import { Gouvernorat } from "@/models/gouvernorat.model";
 import { pickLocale } from "@/lib/i18n";
@@ -14,7 +14,6 @@ import type { SupportedLang } from "@/lib/i18n";
 // Mongoose 9 strict types require casts for dynamic queries
 const CompanyModel = Company as any;
 const ProfileModel = Profile as any;
-const BoostModel = Boost as any;
 const SectorModel = Sector as any;
 const GouvernoratModel = Gouvernorat as any;
 
@@ -214,17 +213,9 @@ export async function searchBrandUp(
   }
 
   // Sort: boosted first, then by registeredAt desc
-  const now = new Date();
-  const boostedCompanyIds = new Set<string>();
-  const boosts = await BoostModel.find({
-    companyId: { $in: filtered.map((p) => (p.company as Record<string, unknown>)._id) },
-    profileKind: "brandup",
-    status: "active",
-    to: { $gte: now },
-  }).lean();
-  for (const b of boosts) {
-    boostedCompanyIds.add(String((b as Record<string, unknown>).companyId));
-  }
+  const companyIds = filtered.map((p) => (p.company as Record<string, unknown>)._id);
+  const boosts = await findActiveBoosts({ companyId: companyIds, profileKind: "brandup" });
+  const boostedCompanyIds = new Set(boosts.map((b) => String(b.companyId)));
 
   filtered.sort((a, b) => {
     const aBoosted = boostedCompanyIds.has(String((a.company as Record<string, unknown>)._id)) ? 1 : 0;
@@ -305,17 +296,9 @@ export async function searchTraceUp(
   }
 
   // Sort: boosted first, then registeredAt desc
-  const now = new Date();
-  const boostedCompanyIds = new Set<string>();
-  const boosts = await BoostModel.find({
-    companyId: { $in: filtered.map((p) => (p.company as Record<string, unknown>)._id) },
-    profileKind: "traceup",
-    status: "active",
-    to: { $gte: now },
-  }).lean();
-  for (const b of boosts) {
-    boostedCompanyIds.add(String((b as Record<string, unknown>).companyId));
-  }
+  const companyIdsT = filtered.map((p) => (p.company as Record<string, unknown>)._id);
+  const boostsT = await findActiveBoosts({ companyId: companyIdsT, profileKind: "traceup" });
+  const boostedCompanyIds = new Set(boostsT.map((b) => String(b.companyId)));
 
   filtered.sort((a, b) => {
     const aBoosted = boostedCompanyIds.has(String((a.company as Record<string, unknown>)._id)) ? 1 : 0;
@@ -396,17 +379,9 @@ export async function searchLinkUp(
   }
 
   // Sort
-  const now = new Date();
-  const boostedCompanyIds = new Set<string>();
-  const boosts = await BoostModel.find({
-    companyId: { $in: filtered.map((p) => (p.company as Record<string, unknown>)._id) },
-    profileKind: "linkup",
-    status: "active",
-    to: { $gte: now },
-  }).lean();
-  for (const b of boosts) {
-    boostedCompanyIds.add(String((b as Record<string, unknown>).companyId));
-  }
+  const companyIdsL = filtered.map((p) => (p.company as Record<string, unknown>)._id);
+  const boostsL = await findActiveBoosts({ companyId: companyIdsL, profileKind: "linkup" });
+  const boostedCompanyIds = new Set(boostsL.map((b) => String(b.companyId)));
 
   filtered.sort((a, b) => {
     const aBoosted = boostedCompanyIds.has(String((a.company as Record<string, unknown>)._id)) ? 1 : 0;

@@ -423,8 +423,10 @@ When asked to do specific work, **always look in `.claude/skills/`** first:
 
 | Sprint | Scope |
 |---|---|
+| **C0** | Socle monetisation (flag, guard, adapter, helper boost) — **livre** |
+| **C3 → C1 → C2** | Facturation → Boost → Sponsoring (voir §9-ter) |
 | **PP-17** | Seed prod (donnees de production initiales, sans TechnoFab demo) |
-| **DevOps** | Resend domain verification, security headers S5, env prod, deploy pipeline |
+| **DevOps** | Security headers S5, env prod, deploy pipeline |
 
 ---
 
@@ -442,6 +444,55 @@ Le conteneur de production dispose de **~1.5 Go RAM**. Sans les garde-fous ci-de
 **Impact local :** le build est légèrement plus lent (~+30 %) car mono-worker. Le runtime (`next start`, `next dev`) est **inchangé**.
 
 **Règle de déploiement :** `git pull → npm run build → restart service`. Pas de CI/CD automatisé en V1 — déploiement manuel via SSH.
+
+---
+
+## 9-ter. Monetisation (C0 socle — sprint courant)
+
+**Flag runtime** : `MONETIZATION_ENABLED` dans `env.ts`. Absent ou invalide = **OFF** (fail-safe). Pas de `NEXT_PUBLIC_*` — lu au runtime uniquement. Un seul code/build, plusieurs deploiements (`.env` different par environnement).
+
+**Comportement OFF** : pages boost/sponsoring/billing = `FeatureComingSoonPage` (identique a avant). Endpoints monetisation futurs = `requireMonetization()` → 403 `MONETIZATION_DISABLED`.
+
+**Comportement ON** : flux complet avec paiement **simule** (pas de PSP reel en V1).
+
+### Adapter pattern (payment)
+
+`src/lib/payment/` — meme pattern que `src/lib/storage/` :
+- `types.ts` : `PaymentAdapter` interface (`createCheckout`, `verifyPayment`)
+- `simulated.ts` : adapter simule (paiement instantane, reference `SIM-...`)
+- `index.ts` : singleton `payment`, switch sur `PAYMENT_ADAPTER` env var (default `"simulated"`)
+- Point de branchement PSP futur = nouvel adapter, zero refonte
+
+### Decisions produit (D1-D12)
+
+| # | Decision |
+|---|---|
+| D1 | Boost = **50 DT HT / 30 jours** (`lib/pricing.ts` constants) |
+| D2 | Boost par **profileKind** (pas par company) |
+| D3 | Multi-profils simultanes OK, mais **jamais 2 actifs/pending sur le meme (companyId, profileKind)** |
+| D4 | Renouvellement **manuel** |
+| D5 | Sponsoring = **100 DT HT / 7 jours** |
+| D6 | Banniere sponsoring = **search uniquement** (pas sur pages profil public) |
+| D7 | Rotation = **aleatoire par affichage** |
+| D8 | Ciblage = **par moteur seul** (brandup/traceup/linkup) |
+| D9 | Facture = **numero + page detail, PAS de PDF V1** |
+| D10 | Admin transactions = **inclus en C3** |
+| D11 | Notif paiement admin = **in-app + email** |
+| D12 | `paid_simulated` = label owner **"Paye"**, mention "(test)" **admin only** |
+
+### Roadmap monetisation
+
+| Sprint | Scope | Depend |
+|---|---|---|
+| **C0** | Flag + guard + PaymentAdapter + helper boost + pricing constants | — |
+| **C3** | Facturation : page billing, endpoint transactions, admin transactions | C0 |
+| **C1** | Boost : page, checkout simule, activation, expiration, shuffle search | C0+C3 |
+| **C2** | Sponsoring : page, checkout, SponsorBanner dynamique, ciblage | C0+C3 |
+
+### Transaction model enums
+
+`status` : `"pending"` | `"paid"` | `"paid_simulated"` | `"refunded"` | `"failed"`
+`paymentMethod` : `"card"` | `"bank_transfer"` | `"manual"` | `"simulated"`
 
 ---
 

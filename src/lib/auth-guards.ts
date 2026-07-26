@@ -2,7 +2,8 @@ import { redirect } from "next/navigation";
 import { getServerSession } from "next-auth";
 import type { CompanyStatus } from "@/types";
 import { authOptions } from "./auth";
-import { AuthError } from "./api-error";
+import { AuthError, AppError } from "./api-error";
+import { env } from "./env";
 
 export async function requireSession() {
   const session = await getServerSession(authOptions);
@@ -29,6 +30,16 @@ export async function requireAdmin() {
     throw new AuthError("FORBIDDEN", "Admin role required", 403);
   }
   return session;
+}
+
+/**
+ * Guard for monetization endpoints — throws 403 if flag is OFF.
+ * Synchronous (reads env, no DB/session).
+ */
+export function requireMonetization(): void {
+  if (!env.MONETIZATION_ENABLED) {
+    throw new AppError("MONETIZATION_DISABLED", "Cette fonctionnalité n'est pas encore disponible.", 403);
+  }
 }
 
 /**

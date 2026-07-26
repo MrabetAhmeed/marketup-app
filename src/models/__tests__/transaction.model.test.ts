@@ -30,7 +30,7 @@ describe("Transaction model", () => {
       paymentMethod: "card",
     });
 
-    const reloaded = await (Transaction as any).findById(doc._id).lean();
+    const reloaded = await (Transaction as any).findById(doc!._id).lean();
     expect(reloaded!.priceHT).toBe(50);
     expect(reloaded!.vatRate).toBe(0.19);
     expect(reloaded!.currency).toBe("DT");

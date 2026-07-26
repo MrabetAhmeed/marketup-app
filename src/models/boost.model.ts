@@ -30,3 +30,44 @@ BoostSchema.pre(/^find/, function (this: { getOptions(): { withDeleted?: boolean
 });
 
 export const Boost = models.Boost || model("Boost", BoostSchema);
+
+// ---------------------------------------------------------------------------
+// Helper: find active boosts (centralizes the inline query used ×4)
+// ---------------------------------------------------------------------------
+
+export interface ActiveBoostFilter {
+  companyId?: string | string[] | unknown[];
+  profileKind?: "brandup" | "traceup" | "linkup";
+}
+
+/**
+ * Find boosts that are currently active (status "active" + to >= now).
+ * Returns lean documents. Used by search (×3) and me.service.
+ */
+export async function findActiveBoosts(
+  filter: ActiveBoostFilter = {},
+  now: Date = new Date(),
+): Promise<Record<string, unknown>[]> {
+  const query: Record<string, unknown> = {
+    status: "active",
+    to: { $gte: now },
+  };
+  if (filter.companyId) {
+    query.companyId = Array.isArray(filter.companyId) ? { $in: filter.companyId } : filter.companyId;
+  }
+  if (filter.profileKind) {
+    query.profileKind = filter.profileKind;
+  }
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  return (Boost as any).find(query).lean();
+}
+
+/**
+ * Check if a single boost document is currently active.
+ */
+export function isBoostActive(
+  boost: { status: string; to: Date | string },
+  now: Date = new Date(),
+): boolean {
+  return boost.status === "active" && new Date(boost.to) >= now;
+}

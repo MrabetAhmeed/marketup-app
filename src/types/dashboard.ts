@@ -85,6 +85,9 @@ export interface MeResponse {
     activeSponsorings: number;
     unreadNotifications: number;
   };
+  features: {
+    monetization: boolean;
+  };
 }
 
 // ---------------------------------------------------------------------------

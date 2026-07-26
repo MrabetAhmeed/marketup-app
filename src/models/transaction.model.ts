@@ -14,12 +14,12 @@ const TransactionSchema = new Schema(
 
     status: {
       type: String,
-      enum: ["pending", "paid", "refunded", "failed"],
+      enum: ["pending", "paid", "paid_simulated", "refunded", "failed"],
       default: "pending",
     },
     paymentMethod: {
       type: String,
-      enum: ["card", "bank_transfer", "manual"],
+      enum: ["card", "bank_transfer", "manual", "simulated"],
       default: null,
     },
     paymentReference: { type: String, default: null },

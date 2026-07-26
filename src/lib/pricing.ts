@@ -31,4 +31,17 @@ export function computeTTC(priceHT: number, vatRate: number): { vatAmount: numbe
   return { vatAmount, priceTTC };
 }
 
-// TODO (Phase 7): formatMoneyHT, formatMoneyTTC for invoice display
+// ---------------------------------------------------------------------------
+// Product pricing constants (single source of truth — change here only)
+// ---------------------------------------------------------------------------
+
+/** Boost: 50 DT HT for 30 days, per profileKind */
+export const BOOST_PRICE_HT = 50;
+export const BOOST_DURATION_DAYS = 30;
+
+/** Sponsoring: 100 DT HT for 7 days, per profileKind */
+export const SPONSORING_PRICE_HT = 100;
+export const SPONSORING_DURATION_DAYS = 7;
+
+/** Standard VAT rate (19%) */
+export const DEFAULT_VAT_RATE = 0.19;
