@@ -263,29 +263,43 @@ function TraceUpContent({
           </div>
           <div className="p-5">
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
-              {newPendingVideos.map((v) => (
-                <div key={v.id} className="border border-[#FDE68A] rounded-lg overflow-hidden">
-                  <div className="aspect-video bg-surface-muted relative">
-                    {v.thumbnailUrl ? (
-                      /* eslint-disable-next-line @next/next/no-img-element */
-                      <img src={v.thumbnailUrl} alt={v.title} className="w-full h-full object-cover" />
-                    ) : (
-                      <div className="w-full h-full flex items-center justify-center">
-                        <span className="material-symbols-outlined text-ink-tertiary" style={{ fontSize: 32 }}>play_circle</span>
-                      </div>
-                    )}
-                    <span className="absolute top-1.5 left-1.5 text-[9px] font-bold px-1.5 py-0.5 rounded bg-white/90 text-ink-secondary border border-surface-border">
-                      {v.source}
-                    </span>
-                    <span className="absolute top-1.5 right-1.5 text-[8px] font-bold px-1.5 py-0.5 rounded bg-[#D97706] text-white">
-                      AJOUT
-                    </span>
+              {newPendingVideos.map((v) => {
+                const card = (
+                  <div className="border border-[#FDE68A] rounded-lg overflow-hidden">
+                    <div className="aspect-video bg-surface-muted relative">
+                      {v.thumbnailUrl ? (
+                        /* eslint-disable-next-line @next/next/no-img-element */
+                        <img src={v.thumbnailUrl} alt={v.title} className="w-full h-full object-cover" />
+                      ) : (
+                        <div className="w-full h-full flex items-center justify-center">
+                          <span className="material-symbols-outlined text-ink-tertiary" style={{ fontSize: 32 }}>play_circle</span>
+                        </div>
+                      )}
+                      <span className="absolute top-1.5 left-1.5 text-[9px] font-bold px-1.5 py-0.5 rounded bg-white/90 text-ink-secondary border border-surface-border">
+                        {v.source}
+                      </span>
+                      <span className="absolute top-1.5 right-1.5 text-[8px] font-bold px-1.5 py-0.5 rounded bg-[#D97706] text-white">
+                        AJOUT
+                      </span>
+                      {v.videoUrl && (
+                        <span className="absolute bottom-1.5 right-1.5 bg-black/60 text-white rounded p-0.5 flex items-center justify-center">
+                          <span className="material-symbols-outlined" style={{ fontSize: 14 }}>open_in_new</span>
+                        </span>
+                      )}
+                    </div>
+                    <div className="p-2 border-t border-[#FDE68A] bg-[#FFFBEB]">
+                      <p className="text-[11px] font-medium text-ink-primary truncate">{v.title || "Sans titre"}</p>
+                    </div>
                   </div>
-                  <div className="p-2 border-t border-[#FDE68A] bg-[#FFFBEB]">
-                    <p className="text-[11px] font-medium text-ink-primary truncate">{v.title || "Sans titre"}</p>
-                  </div>
-                </div>
-              ))}
+                );
+                return v.videoUrl ? (
+                  <a key={v.id} href={v.videoUrl} target="_blank" rel="noopener noreferrer" className="block">
+                    {card}
+                  </a>
+                ) : (
+                  <div key={v.id}>{card}</div>
+                );
+              })}
             </div>
           </div>
         </section>
@@ -302,29 +316,43 @@ function TraceUpContent({
           </div>
           <div className="p-5">
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
-              {videos.map((v) => (
-                <div key={v.id} className="border border-surface-border rounded-lg overflow-hidden">
-                  <div className="aspect-video bg-surface-muted relative">
-                    {v.thumbnailUrl ? (
-                      /* eslint-disable-next-line @next/next/no-img-element */
-                      <img src={v.thumbnailUrl} alt={v.title} className="w-full h-full object-cover" />
-                    ) : (
-                      <div className="w-full h-full flex items-center justify-center">
-                        <span className="material-symbols-outlined text-ink-tertiary" style={{ fontSize: 32 }}>play_circle</span>
-                      </div>
-                    )}
-                    <span className="absolute top-1.5 left-1.5 text-[9px] font-bold px-1.5 py-0.5 rounded bg-white/90 text-ink-secondary border border-surface-border">
-                      {v.source}
-                    </span>
-                    <span className="absolute top-1.5 right-1.5 text-[9px] font-bold px-1.5 py-0.5 rounded bg-[#7C3AED] text-white">
-                      {v.category}
-                    </span>
+              {videos.map((v) => {
+                const card = (
+                  <div className="border border-surface-border rounded-lg overflow-hidden">
+                    <div className="aspect-video bg-surface-muted relative">
+                      {v.thumbnailUrl ? (
+                        /* eslint-disable-next-line @next/next/no-img-element */
+                        <img src={v.thumbnailUrl} alt={v.title} className="w-full h-full object-cover" />
+                      ) : (
+                        <div className="w-full h-full flex items-center justify-center">
+                          <span className="material-symbols-outlined text-ink-tertiary" style={{ fontSize: 32 }}>play_circle</span>
+                        </div>
+                      )}
+                      <span className="absolute top-1.5 left-1.5 text-[9px] font-bold px-1.5 py-0.5 rounded bg-white/90 text-ink-secondary border border-surface-border">
+                        {v.source}
+                      </span>
+                      <span className="absolute top-1.5 right-1.5 text-[9px] font-bold px-1.5 py-0.5 rounded bg-[#7C3AED] text-white">
+                        {v.category}
+                      </span>
+                      {v.videoUrl && (
+                        <span className="absolute bottom-1.5 right-1.5 bg-black/60 text-white rounded p-0.5 flex items-center justify-center">
+                          <span className="material-symbols-outlined" style={{ fontSize: 14 }}>open_in_new</span>
+                        </span>
+                      )}
+                    </div>
+                    <div className="p-2 border-t border-surface-border bg-surface-subtle">
+                      <p className="text-[11px] font-medium text-ink-primary truncate">{v.title || "Sans titre"}</p>
+                    </div>
                   </div>
-                  <div className="p-2 border-t border-surface-border bg-surface-subtle">
-                    <p className="text-[11px] font-medium text-ink-primary truncate">{v.title || "Sans titre"}</p>
-                  </div>
-                </div>
-              ))}
+                );
+                return v.videoUrl ? (
+                  <a key={v.id} href={v.videoUrl} target="_blank" rel="noopener noreferrer" className="block">
+                    {card}
+                  </a>
+                ) : (
+                  <div key={v.id}>{card}</div>
+                );
+              })}
             </div>
           </div>
         </section>
