@@ -11,6 +11,20 @@ import { Gouvernorat } from "@/models/gouvernorat.model";
 import { pickLocale } from "@/lib/i18n";
 import type { SupportedLang } from "@/lib/i18n";
 
+/**
+ * Fisher-Yates shuffle (in-place, O(n)).
+ * Used to randomize boosted entries order per request.
+ */
+function shuffleInPlace<T>(arr: T[]): T[] {
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    const tmp = arr[i] as T;
+    arr[i] = arr[j] as T;
+    arr[j] = tmp;
+  }
+  return arr;
+}
+
 // Mongoose 9 strict types require casts for dynamic queries
 const CompanyModel = Company as any;
 const ProfileModel = Profile as any;
@@ -212,19 +226,20 @@ export async function searchBrandUp(
     });
   }
 
-  // Sort: boosted first, then by registeredAt desc
+  // Sort: boosted first (shuffled among themselves), then non-boosted by registeredAt desc
   const companyIds = filtered.map((p) => (p.company as Record<string, unknown>)._id);
   const boosts = await findActiveBoosts({ companyId: companyIds, profileKind: "brandup" });
   const boostedCompanyIds = new Set(boosts.map((b) => String(b.companyId)));
 
-  filtered.sort((a, b) => {
-    const aBoosted = boostedCompanyIds.has(String((a.company as Record<string, unknown>)._id)) ? 1 : 0;
-    const bBoosted = boostedCompanyIds.has(String((b.company as Record<string, unknown>)._id)) ? 1 : 0;
-    if (aBoosted !== bBoosted) return bBoosted - aBoosted;
+  const boostedItems = filtered.filter((p) => boostedCompanyIds.has(String((p.company as Record<string, unknown>)._id)));
+  const nonBoostedItems = filtered.filter((p) => !boostedCompanyIds.has(String((p.company as Record<string, unknown>)._id)));
+  shuffleInPlace(boostedItems);
+  nonBoostedItems.sort((a, b) => {
     const aDate = new Date(((a.company as Record<string, unknown>).registeredAt as string) ?? 0).getTime();
     const bDate = new Date(((b.company as Record<string, unknown>).registeredAt as string) ?? 0).getTime();
     return bDate - aDate;
   });
+  filtered = [...boostedItems, ...nonBoostedItems];
 
   const total = filtered.length;
   const totalPages = Math.ceil(total / limit);
@@ -295,19 +310,20 @@ export async function searchTraceUp(
     });
   }
 
-  // Sort: boosted first, then registeredAt desc
+  // Sort: boosted first (shuffled), then non-boosted by registeredAt desc
   const companyIdsT = filtered.map((p) => (p.company as Record<string, unknown>)._id);
   const boostsT = await findActiveBoosts({ companyId: companyIdsT, profileKind: "traceup" });
   const boostedCompanyIds = new Set(boostsT.map((b) => String(b.companyId)));
 
-  filtered.sort((a, b) => {
-    const aBoosted = boostedCompanyIds.has(String((a.company as Record<string, unknown>)._id)) ? 1 : 0;
-    const bBoosted = boostedCompanyIds.has(String((b.company as Record<string, unknown>)._id)) ? 1 : 0;
-    if (aBoosted !== bBoosted) return bBoosted - aBoosted;
+  const boostedItems = filtered.filter((p) => boostedCompanyIds.has(String((p.company as Record<string, unknown>)._id)));
+  const nonBoostedItems = filtered.filter((p) => !boostedCompanyIds.has(String((p.company as Record<string, unknown>)._id)));
+  shuffleInPlace(boostedItems);
+  nonBoostedItems.sort((a, b) => {
     const aDate = new Date(((a.company as Record<string, unknown>).registeredAt as string) ?? 0).getTime();
     const bDate = new Date(((b.company as Record<string, unknown>).registeredAt as string) ?? 0).getTime();
     return bDate - aDate;
   });
+  filtered = [...boostedItems, ...nonBoostedItems];
 
   const total = filtered.length;
   const totalPages = Math.ceil(total / limit);
@@ -378,19 +394,20 @@ export async function searchLinkUp(
     });
   }
 
-  // Sort
+  // Sort: boosted first (shuffled), then non-boosted by registeredAt desc
   const companyIdsL = filtered.map((p) => (p.company as Record<string, unknown>)._id);
   const boostsL = await findActiveBoosts({ companyId: companyIdsL, profileKind: "linkup" });
   const boostedCompanyIds = new Set(boostsL.map((b) => String(b.companyId)));
 
-  filtered.sort((a, b) => {
-    const aBoosted = boostedCompanyIds.has(String((a.company as Record<string, unknown>)._id)) ? 1 : 0;
-    const bBoosted = boostedCompanyIds.has(String((b.company as Record<string, unknown>)._id)) ? 1 : 0;
-    if (aBoosted !== bBoosted) return bBoosted - aBoosted;
+  const boostedItems = filtered.filter((p) => boostedCompanyIds.has(String((p.company as Record<string, unknown>)._id)));
+  const nonBoostedItems = filtered.filter((p) => !boostedCompanyIds.has(String((p.company as Record<string, unknown>)._id)));
+  shuffleInPlace(boostedItems);
+  nonBoostedItems.sort((a, b) => {
     const aDate = new Date(((a.company as Record<string, unknown>).registeredAt as string) ?? 0).getTime();
     const bDate = new Date(((b.company as Record<string, unknown>).registeredAt as string) ?? 0).getTime();
     return bDate - aDate;
   });
+  filtered = [...boostedItems, ...nonBoostedItems];
 
   const total = filtered.length;
   const totalPages = Math.ceil(total / limit);

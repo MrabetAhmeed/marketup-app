@@ -2,6 +2,7 @@ import { connectDb } from "@/lib/db";
 import { ProfileStatsMonthlyModel } from "@/models/profile-stats-monthly.model";
 import { Profile } from "@/models/profile.model";
 import { Company } from "@/models/company.model";
+import { Boost } from "@/models/boost.model";
 import type { TrackEventInput } from "@/schemas/track.schema";
 
 // ---------------------------------------------------------------------------
@@ -50,7 +51,7 @@ export async function recordTrackEvent(
     _id: input.profileId,
     deletedAt: null,
   })
-    .select("companyId")
+    .select("companyId kind")
     .lean();
 
   if (!profile) return;
@@ -82,6 +83,27 @@ export async function recordTrackEvent(
   );
 
   await ProfileModel.updateOne({ _id: input.profileId }, { $inc: incProfile });
+
+  // 5. Boost viewsAdded/clicksAdded — fail-silent, no find prerequisite
+  const boostInc: Record<string, number> =
+    input.event === "view" ? { viewsAdded: 1 } : { clicksAdded: 1 };
+  const profileData = profile as Record<string, unknown>;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const BoostModel = Boost as any;
+  try {
+    await BoostModel.updateOne(
+      {
+        companyId: profileData.companyId,
+        profileKind: profileData.kind,
+        status: "active",
+        to: { $gte: new Date() },
+        deletedAt: null,
+      },
+      { $inc: boostInc },
+    );
+  } catch {
+    // fail-silent: never break the beacon if boost update fails
+  }
 }
 
 // ---------------------------------------------------------------------------

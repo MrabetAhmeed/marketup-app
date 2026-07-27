@@ -263,6 +263,24 @@ export async function sendCompanyReactivatedEmail(params: {
   await sendEmail(params.userEmail, subject, html);
 }
 
+/** Notify admin of a new transaction (boost or sponsoring) — generic for C1/C2. */
+export async function sendTransactionAdminEmail(params: {
+  adminEmail: string;
+  companyName: string;
+  type: "boost" | "sponsoring";
+  amountTTC: string;
+  invoiceNumber: string;
+}): Promise<void> {
+  const { transactionAdminEmailTemplate } = await import("./templates/transaction-admin");
+  const { subject, html } = transactionAdminEmailTemplate({
+    companyName: params.companyName,
+    type: params.type,
+    amountTTC: params.amountTTC,
+    invoiceNumber: params.invoiceNumber,
+  });
+  await sendEmail(params.adminEmail, subject, html);
+}
+
 /** Notify owner that their deleted account has been restored by admin. */
 export async function sendCompanyRestoredEmail(params: {
   userEmail: string;

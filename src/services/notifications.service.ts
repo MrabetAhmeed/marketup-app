@@ -101,3 +101,37 @@ export async function getNotificationsForUser(
     totalPages: Math.ceil(total / pageSize),
   };
 }
+
+// ---------------------------------------------------------------------------
+// createNotification — generic helper for owner + admin notifs (C1/C2)
+// ---------------------------------------------------------------------------
+
+export interface CreateNotificationParams {
+  recipientType: "owner" | "admin";
+  recipientId: string;
+  kind: string;
+  icon?: string;
+  color?: string;
+  title: { fr: string; ar?: string; en?: string };
+  body: { fr: string; ar?: string; en?: string };
+  actionUrl?: string;
+  actionLabel?: { fr: string; ar?: string; en?: string };
+}
+
+export async function createNotification(params: CreateNotificationParams): Promise<void> {
+  await connectDb();
+  await NotificationModel.create({
+    recipientType: params.recipientType,
+    recipientId: params.recipientId,
+    kind: params.kind,
+    icon: params.icon ?? "notifications",
+    color: params.color ?? "primary",
+    title: { fr: params.title.fr, ar: params.title.ar ?? "", en: params.title.en ?? "" },
+    body: { fr: params.body.fr, ar: params.body.ar ?? "", en: params.body.en ?? "" },
+    actionUrl: params.actionUrl ?? null,
+    actionLabel: params.actionLabel
+      ? { fr: params.actionLabel.fr, ar: params.actionLabel.ar ?? "", en: params.actionLabel.en ?? "" }
+      : { fr: "", ar: "", en: "" },
+    read: false,
+  });
+}

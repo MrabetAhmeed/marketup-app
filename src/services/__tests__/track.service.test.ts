@@ -213,6 +213,79 @@ describe("recordTrackEvent", () => {
 });
 
 // =====================================================================
+// B3: viewsAdded/clicksAdded on active boost
+// =====================================================================
+
+describe("boost viewsAdded/clicksAdded (B3)", () => {
+  it("increments viewsAdded on active boost when view event fires", async () => {
+    const { companyId, profileId } = await createCompanyAndProfile();
+    const { Boost } = await import("@/models/boost.model");
+    await (Boost as any).create({
+      companyId,
+      profileKind: "brandup",
+      from: new Date(Date.now() - 5 * 86_400_000),
+      to: new Date(Date.now() + 25 * 86_400_000),
+      status: "active",
+      viewsAdded: 0,
+      clicksAdded: 0,
+    });
+
+    await recordTrackEvent({ profileId, event: "view" }, "Chrome/120");
+
+    const boost = await (Boost as any).findOne({ companyId, profileKind: "brandup" }).lean();
+    expect(boost.viewsAdded).toBe(1);
+    expect(boost.clicksAdded).toBe(0);
+  });
+
+  it("increments clicksAdded on active boost when click event fires", async () => {
+    const { companyId, profileId } = await createCompanyAndProfile();
+    const { Boost } = await import("@/models/boost.model");
+    await (Boost as any).create({
+      companyId,
+      profileKind: "brandup",
+      from: new Date(Date.now() - 5 * 86_400_000),
+      to: new Date(Date.now() + 25 * 86_400_000),
+      status: "active",
+      viewsAdded: 0,
+      clicksAdded: 0,
+    });
+
+    await recordTrackEvent({ profileId, event: "click" }, "Chrome/120");
+
+    const boost = await (Boost as any).findOne({ companyId, profileKind: "brandup" }).lean();
+    expect(boost.clicksAdded).toBe(1);
+    expect(boost.viewsAdded).toBe(0);
+  });
+
+  it("does not increment if no active boost exists", async () => {
+    const { profileId } = await createCompanyAndProfile();
+    await recordTrackEvent({ profileId, event: "view" }, "Chrome/120");
+    // No boost to check — just verify no crash and profile stats still work
+    const profile = await (Profile as any).findById(profileId).lean();
+    expect(profile.stats.viewsTotal).toBe(1);
+  });
+
+  it("does not increment expired boost", async () => {
+    const { companyId, profileId } = await createCompanyAndProfile();
+    const { Boost } = await import("@/models/boost.model");
+    await (Boost as any).create({
+      companyId,
+      profileKind: "brandup",
+      from: new Date(Date.now() - 35 * 86_400_000),
+      to: new Date(Date.now() - 5 * 86_400_000),
+      status: "expired",
+      viewsAdded: 10,
+      clicksAdded: 3,
+    });
+
+    await recordTrackEvent({ profileId, event: "view" }, "Chrome/120");
+
+    const boost = await (Boost as any).findOne({ companyId, profileKind: "brandup" }).lean();
+    expect(boost.viewsAdded).toBe(10); // unchanged
+  });
+});
+
+// =====================================================================
 // getProfileMonthlyStats
 // =====================================================================
 

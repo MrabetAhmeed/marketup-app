@@ -8,6 +8,7 @@ interface SearchResultCardProps {
   gouvernoratName: string;
   rseBadgeStatus: string;
   accentColor: string;
+  boosted?: boolean;
   onClick: () => void;
 }
 
@@ -27,6 +28,7 @@ export default function SearchResultCard({
   gouvernoratName,
   rseBadgeStatus,
   accentColor,
+  boosted,
   onClick,
 }: SearchResultCardProps): JSX.Element {
   const initials = getInitials(displayName);
@@ -40,6 +42,12 @@ export default function SearchResultCard({
     >
       {/* Visual area */}
       <div className="h-[107px] bg-[#F5F5F5] p-2 relative flex-shrink-0">
+        {boosted && (
+          <div className="absolute top-2 right-2 z-10 flex items-center gap-0.5 bg-[#FEFCE8] border border-[#E8C96A] px-1.5 py-0.5 rounded">
+            <span className="material-symbols-outlined text-[#C5A059] text-[11px]" style={{ fontVariationSettings: "'FILL' 1" }}>bolt</span>
+            <span className="text-[10px] font-bold text-[#854D0E]">Boosté</span>
+          </div>
+        )}
         {bannerUrl ? (
           <img
             alt={displayName}

@@ -425,7 +425,8 @@ When asked to do specific work, **always look in `.claude/skills/`** first:
 |---|---|
 | **C0** | Socle monetisation (flag, guard, adapter, helper boost) — **livré** |
 | **C3** | Facturation (billing owner, admin transactions, invoice numbering) — **livré** |
-| **C1 → C2** | Boost → Sponsoring (voir §9-ter) |
+| **C1** | Boost dynamique (checkout, activation, expiration, shuffle search) — **livré** |
+| **C2** | Sponsoring (voir §9-ter) |
 | **PP-17** | Seed prod (donnees de production initiales, sans TechnoFab demo) |
 | **DevOps** | Security headers S5, env prod, deploy pipeline |
 
@@ -487,7 +488,7 @@ Le conteneur de production dispose de **~1.5 Go RAM**. Sans les garde-fous ci-de
 |---|---|---|
 | **C0** | Flag + guard + PaymentAdapter + helper boost + pricing constants | — | **livré** |
 | **C3** | Facturation : page billing, endpoint transactions, admin transactions, `generateInvoiceNumber` (MU-YYYY-NNNNN, Counter atomique). Admin voit toujours (pas de requireMonetization). D12 : owner voit "paid" pour paid_simulated, admin voit "Payé (test)". | C0 | **livré** |
-| **C1** | Boost : page, checkout simule, activation, expiration, shuffle search | C0+C3 |
+| **C1** | Boost : `checkoutBoost` (Mongoose session atomique Transaction+Boost), `expireStaleBoosts` lazy dans getMe, shuffle Fisher-Yates boosted x3 search, page dashboard 3 cards + modal checkout, notifs owner+admin in-app, email admin generique `sendTransactionAdminEmail`, `createNotification` generique. Guard anti-doublon `findActiveBoosts` (pas de status pending sur Boost). Renouvellement apres expiration seulement (D4). **Guard R1** : checkout exige `profile.status === "active" && isPublic === true` (422 BOOST_PROFILE_NOT_PUBLIC). **R1.4** : un boost deja actif n'est PAS coupe si le profil change d'etat ensuite (pas de pause/remboursement V1, expire naturellement). | C0+C3 | **livré** |
 | **C2** | Sponsoring : page, checkout, SponsorBanner dynamique, ciblage | C0+C3 |
 
 ### Transaction model enums

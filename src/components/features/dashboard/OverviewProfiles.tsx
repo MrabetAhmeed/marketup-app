@@ -112,12 +112,6 @@ function getCtaButtons(
         { label: "Corriger", href: config.editorHref, variant: "danger", icon: "error" },
       ];
     case "active":
-      if (profile?.boosted) {
-        return [
-          { label: "Modifier", href: config.editorHref, variant: "outline" },
-          { label: "Renouveler", href: "/dashboard/boost", variant: "primary", icon: "bolt" },
-        ];
-      }
       return [
         { label: "Modifier", href: config.editorHref, variant: "outline" },
       ];

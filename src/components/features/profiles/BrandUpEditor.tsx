@@ -495,8 +495,6 @@ export function BrandUpEditor({ profile, company }: BrandUpEditorProps): JSX.Ele
         </div>
       </section>
 
-      {/* ═══ SECTION: RACCOURCIS VISIBILITÉ ═══ */}
-      <BoostSponsoringCards status={profile.status} boosted={profile.boosted} sponsoring={profile.sponsoring} />
 
       {/* ═══ RESUBMISSION WARNING (rejected state) ═══ */}
       {profile.status === "rejected" && isDirty && (
@@ -529,10 +527,6 @@ export function BrandUpEditor({ profile, company }: BrandUpEditorProps): JSX.Ele
     </div>
   );
 }
-
-// ---------------------------------------------------------------------------
-// Boost & Sponsoring cards (state-driven)
-// ---------------------------------------------------------------------------
 
 // ---------------------------------------------------------------------------
 // Gallery Grid sub-component
@@ -679,140 +673,6 @@ function GalleryGrid({
         onConfirm={() => { if (deleteTarget) { onDelete(deleteTarget.id); setDeleteTarget(null); } }}
       />
     </>
-  );
-}
-
-// ---------------------------------------------------------------------------
-// Boost & Sponsoring cards (state-driven)
-// ---------------------------------------------------------------------------
-
-function BoostSponsoringCards({
-  status,
-  boosted,
-  sponsoring,
-}: {
-  status: string;
-  boosted: boolean;
-  sponsoring: boolean;
-}): JSX.Element {
-  const isBlocked = status !== "active";
-
-  const blockMessage = status === "rejected"
-    ? "Un profil refusé ne peut pas être mis en avant. Corrigez les points signalés et resoumettez-le."
-    : status === "pending"
-      ? "Un profil en attente de validation ne peut pas être mis en avant."
-      : "Un profil désactivé ne peut pas être mis en avant.";
-
-  const blockBorder = status === "rejected" ? "border-[#FCA5A5]" : status === "pending" ? "border-[#FDE68A]" : "border-surface-border";
-  const blockBg = status === "rejected" ? "bg-[#FEF2F2]" : status === "pending" ? "bg-[#FFFBEB]" : "bg-surface-muted";
-  const blockTextColor = status === "rejected" ? "text-[#7F1D1D]" : status === "pending" ? "text-[#92400E]" : "text-ink-secondary";
-  const blockIconColor = status === "rejected" ? "text-[#B91C1C]" : status === "pending" ? "text-[#D97706]" : "text-ink-tertiary";
-
-  return (
-    <section>
-      <div className="flex items-end justify-between mb-4">
-        <div>
-          <h2 className="font-heading font-semibold text-[13px] text-ink-primary uppercase tracking-wider">
-            Raccourcis visibilité
-          </h2>
-          <p className="text-[12px] text-ink-secondary mt-0.5">
-            Accédez rapidement aux outils de mise en avant de votre profil BrandUP
-          </p>
-        </div>
-      </div>
-
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        {/* Boost card */}
-        <div className="card p-5 flex flex-col">
-          <div className="flex items-start justify-between mb-4">
-            <div className="flex items-center gap-3 min-w-0">
-              <div className={`w-10 h-10 rounded-lg flex items-center justify-center shrink-0 ${boosted ? "bg-primary-light" : "bg-surface-muted"}`}>
-                <span className={`material-symbols-outlined icon-fill ${boosted ? "text-primary" : "text-ink-secondary"}`} style={{ fontSize: 22 }}>bolt</span>
-              </div>
-              <div className="min-w-0">
-                <h3 className="font-heading font-bold text-[14px] text-ink-primary leading-tight">Boost</h3>
-                {boosted && <StatusPill kind="active">Actif</StatusPill>}
-                {!boosted && !isBlocked && (
-                  <span className="inline-flex items-center gap-1 text-[10px] font-semibold text-ink-secondary bg-surface-muted border border-surface-border px-1.5 py-0.5 rounded mt-1">
-                    <span className="w-1.5 h-1.5 bg-ink-tertiary rounded-full" />Inactif
-                  </span>
-                )}
-              </div>
-            </div>
-          </div>
-
-          {isBlocked ? (
-            <div className={`${blockBg} border ${blockBorder} rounded p-3 mb-4 flex-1`}>
-              <div className="flex items-start gap-2">
-                <span className={`material-symbols-outlined icon-fill ${blockIconColor} shrink-0 mt-[1px]`} style={{ fontSize: 16 }}>info</span>
-                <div className={`text-[12px] ${blockTextColor} leading-relaxed`}>
-                  {blockMessage}
-                </div>
-              </div>
-            </div>
-          ) : (
-            <p className="text-[12px] text-ink-secondary leading-relaxed mb-4 flex-1">
-              Mettez en avant votre profil BrandUP pendant 30 jours.
-            </p>
-          )}
-
-          <div className="flex items-center gap-2 pt-3 border-t border-[#F0F0F0] mt-auto">
-            <Link href="/dashboard/boost" className="inline-flex items-center gap-1.5 px-4 py-[9px] text-[13px] font-semibold text-ink-primary bg-white border border-[#D1D1D1] rounded hover:bg-surface-muted transition-colors">
-              {isBlocked ? "Voir" : "Voir détails"}
-            </Link>
-            {!isBlocked && (
-              <Link href="/dashboard/boost" className="inline-flex items-center gap-1.5 px-4 py-[9px] text-[13px] font-semibold text-white bg-primary hover:bg-primary-hover rounded transition-colors">
-                <span className="material-symbols-outlined icon-fill" style={{ fontSize: 14 }}>bolt</span>
-                {boosted ? "Renouveler" : "Booster"}
-              </Link>
-            )}
-          </div>
-        </div>
-
-        {/* Sponsoring card */}
-        <div className="card p-5 flex flex-col">
-          <div className="flex items-start justify-between mb-4">
-            <div className="flex items-center gap-3 min-w-0">
-              <div className={`w-10 h-10 rounded-lg flex items-center justify-center shrink-0 ${sponsoring ? "bg-primary-light" : "bg-surface-muted"}`}>
-                <span className={`material-symbols-outlined ${sponsoring ? "text-primary" : "text-ink-secondary"}`} style={{ fontSize: 22 }}>campaign</span>
-              </div>
-              <div className="min-w-0">
-                <h3 className="font-heading font-bold text-[14px] text-ink-primary leading-tight">Sponsoring</h3>
-                {sponsoring && <StatusPill kind="active">Actif</StatusPill>}
-                {!sponsoring && (
-                  <span className="inline-flex items-center gap-1 text-[10px] font-semibold text-ink-secondary bg-surface-muted border border-surface-border px-1.5 py-0.5 rounded mt-1">
-                    <span className="w-1.5 h-1.5 bg-ink-tertiary rounded-full" />
-                    {isBlocked ? "Indisponible" : "Inactif"}
-                  </span>
-                )}
-              </div>
-            </div>
-          </div>
-
-          {isBlocked ? (
-            <div className={`${blockBg} border ${blockBorder} rounded p-3 mb-4 flex-1`}>
-              <div className="flex items-start gap-2">
-                <span className={`material-symbols-outlined icon-fill ${blockIconColor} shrink-0 mt-[1px]`} style={{ fontSize: 16 }}>info</span>
-                <div className={`text-[12px] ${blockTextColor} leading-relaxed`}>
-                  {blockMessage}
-                </div>
-              </div>
-            </div>
-          ) : (
-            <p className="text-[12px] text-ink-secondary leading-relaxed mb-4 flex-1">
-              Bannière sponsorisée dans les résultats du moteur BrandUP.
-            </p>
-          )}
-
-          <div className="flex items-center gap-2 pt-3 border-t border-[#F0F0F0] mt-auto">
-            <Link href="/dashboard/sponsoring" className="inline-flex items-center gap-1.5 px-4 py-[9px] text-[13px] font-semibold text-ink-primary bg-white border border-[#D1D1D1] rounded hover:bg-surface-muted transition-colors">
-              <span className="material-symbols-outlined" style={{ fontSize: 14 }}>visibility</span>
-              Voir
-            </Link>
-          </div>
-        </div>
-      </div>
-    </section>
   );
 }
 

@@ -229,6 +229,7 @@ export default function SearchPageClient({ product, sectors, categories, gouvern
                   gouvernoratName={r.gouvernoratName}
                   rseBadgeStatus={r.rseBadgeStatus}
                   accentColor={accent}
+                  boosted={r.boosted}
                   onClick={() => setPopupSlug(r.slug)}
                 />
               ))}

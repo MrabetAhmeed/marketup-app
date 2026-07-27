@@ -58,6 +58,10 @@ export async function getMe(
 ): Promise<MeResponse | null> {
   await connectDb();
 
+  // Lazy expiration: flip stale boosts to "expired" before querying
+  const { expireStaleBoosts } = await import("@/services/boost.service");
+  await expireStaleBoosts();
+
   const now = new Date();
 
   // RSE year boundaries (current civil year)
