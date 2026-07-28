@@ -3,6 +3,7 @@ import { ProfileStatsMonthlyModel } from "@/models/profile-stats-monthly.model";
 import { Profile } from "@/models/profile.model";
 import { Company } from "@/models/company.model";
 import { Boost } from "@/models/boost.model";
+import { incSponsoringClicks, incSponsoringImpressions } from "@/services/sponsoring.service";
 import type { TrackEventInput } from "@/schemas/track.schema";
 
 // ---------------------------------------------------------------------------
@@ -40,6 +41,16 @@ export async function recordTrackEvent(
   if (isBot(userAgent)) return;
 
   await connectDb();
+
+  // Handle sponsor events separately
+  if (input.event === "sponsor_click") {
+    await incSponsoringClicks(input.sponsoringId);
+    return;
+  }
+  if (input.event === "sponsor_impression") {
+    await incSponsoringImpressions(input.sponsoringId);
+    return;
+  }
 
   // 2. Silent validation: profile exists + not deleted + company active
   // eslint-disable-next-line @typescript-eslint/no-explicit-any

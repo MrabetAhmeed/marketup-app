@@ -124,7 +124,7 @@ async function seedFullCompany(password = "TestPass123!"): Promise<void> {
   });
   await SponsoringModel.create({
     companyId, profileKind: "linkup", from: new Date(), to: new Date(),
-    status: "active",
+    status: "active", bannerUrl: "https://cdn/banner.jpg", linkUrl: "https://example.com",
   });
   await RseReceiptModel.create({
     companyId, associationId: new mongoose.Types.ObjectId(),

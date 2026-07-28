@@ -342,6 +342,8 @@ These rules are fully implemented and tested. **Summaries below; full details in
 - **6.17 Tracking stats (PP-15a):** collection `ProfileStatsMonthly` (profileId + month YYYY-MM, unique index). Vues comptees par beacon client `<TrackView>` au mount reel (dedup sessionStorage, guard StrictMode). Clics sortants via `sendBeacon` sur ServicesGrid (s.external only). Endpoint `POST /api/v1/public/track` public, 204 always, bot filter UA, rate limit 60/min. `Profile.stats.viewsTotal/clicksTotal` incrementes en $inc parallele. `views30d` deprecie (conserve au schema, retire des DTO). Dashboard lit `ProfileStatsMonthly` mois courant + mois-1 pour tendance.
 - **6.18 Corbeille admin (PP-15b):** onglet "Supprimees" dans `/admin/entreprises`, fiche detail consultable read-only pour les companies deleted (`withDeleted: true`). `restoreCompanyByAdmin()` = cascade inverse symetrique (9 models, match exact `deletedAt: cascadeTimestamp`, transaction Mongoose). E1: company jamais validee (`validatedAt null`) restauree en "pending". Profils retrouvent leur status exact d'avant (la cascade PP-14 n'ecrit que `deletedAt`, jamais `status`). Endpoint `POST /admin/companies/[id]/restore`. Email dedie "company-restored". StatusPill kind "deleted".
 
+- **6.19 Sponsoring dynamique (C2):** workflow a etats : `pending` (demande owner) → `confirmed` (admin valide) → `active` (owner paie, from=paidAt, to=+7j) → `expired` (lazy). Terminaux : `rejected` (admin, raison obligatoire), `cancelled` (owner, pending/confirmed seulement — aucune annulation apres paiement V1). Guard anti-doublon : 1 seul sponsoring en pending|confirmed|active par (companyId, profileKind) → 409. rejected/cancelled/expired liberent le slot. Eligibilite demande : company active + profil du kind active+isPublic → sinon 422. Banniere publique : rotation aleatoire serveur parmi actifs du kind, mention "Sponsorise". Banniere defaut HTML/CSS quand aucun actif. Stats : impressions ($inc serveur au rendu SSR, fail-silent) + clics (sendBeacon sponsor_click → track endpoint, $inc fail-silent). Hub admin : onglet Sponsorings dans validation (5e tab), apercu banniere, lien cliquable, actions valider/refuser. Notifs : sponsoring_request_submitted (admin), sponsoring_validated (owner), sponsoring_rejected (owner), sponsoring_paid (admin+owner). 3 emails dedies + sendTransactionAdminEmail generique au paiement. Flag OFF : endpoints owner 403, admin accessible (lecture + valider/refuser).
+
 ---
 
 ## 7. API Conventions
@@ -426,7 +428,7 @@ When asked to do specific work, **always look in `.claude/skills/`** first:
 | **C0** | Socle monetisation (flag, guard, adapter, helper boost) — **livré** |
 | **C3** | Facturation (billing owner, admin transactions, invoice numbering) — **livré** |
 | **C1** | Boost dynamique (checkout, activation, expiration, shuffle search) — **livré** |
-| **C2** | Sponsoring (voir §9-ter) |
+| **C2** | Sponsoring (voir §9-ter) — **livré** |
 | **PP-17** | Seed prod (donnees de production initiales, sans TechnoFab demo) |
 | **DevOps** | Security headers S5, env prod, deploy pipeline |
 
@@ -489,7 +491,7 @@ Le conteneur de production dispose de **~1.5 Go RAM**. Sans les garde-fous ci-de
 | **C0** | Flag + guard + PaymentAdapter + helper boost + pricing constants | — | **livré** |
 | **C3** | Facturation : page billing, endpoint transactions, admin transactions, `generateInvoiceNumber` (MU-YYYY-NNNNN, Counter atomique). Admin voit toujours (pas de requireMonetization). D12 : owner voit "paid" pour paid_simulated, admin voit "Payé (test)". | C0 | **livré** |
 | **C1** | Boost : `checkoutBoost` (Mongoose session atomique Transaction+Boost), `expireStaleBoosts` lazy dans getMe, shuffle Fisher-Yates boosted x3 search, page dashboard 3 cards + modal checkout, notifs owner+admin in-app, email admin generique `sendTransactionAdminEmail`, `createNotification` generique. Guard anti-doublon `findActiveBoosts` (pas de status pending sur Boost). Renouvellement apres expiration seulement (D4). **Guard R1** : checkout exige `profile.status === "active" && isPublic === true` (422 BOOST_PROFILE_NOT_PUBLIC). **R1.4** : un boost deja actif n'est PAS coupe si le profil change d'etat ensuite (pas de pause/remboursement V1, expire naturellement). | C0+C3 | **livré** |
-| **C2** | Sponsoring : page, checkout, SponsorBanner dynamique, ciblage | C0+C3 |
+| **C2** | Sponsoring : machine a etats (pending/confirmed/active/expired/rejected/cancelled), workflow demande→validation admin→paiement→banniere. SponsorBanner dynamique + defaut HTML/CSS. Stats impressions/clics. Hub admin onglet Sponsorings. | C0+C3 | **livré** |
 
 ### Transaction model enums
 

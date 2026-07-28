@@ -4,6 +4,7 @@ import { useState, useCallback, useRef, useEffect } from "react";
 import PublicSearchHeader from "@/components/shared/PublicSearchHeader";
 import PublicFooter from "@/components/shared/PublicFooter";
 import type { SearchResultCard as CardType } from "@/services/public-search.service";
+import type { SponsorBannerData } from "@/services/sponsoring.service";
 import SponsorBanner from "./SponsorBanner";
 import SearchResultCard from "./SearchResultCard";
 import SearchEmptyState from "./SearchEmptyState";
@@ -37,9 +38,10 @@ interface SearchPageClientProps {
   sectors: Sector[];
   categories: Sector[];
   gouvernorats: Gouvernorat[];
+  sponsors?: SponsorBannerData[];
 }
 
-export default function SearchPageClient({ product, sectors, categories, gouvernorats }: SearchPageClientProps): JSX.Element {
+export default function SearchPageClient({ product, sectors, categories, gouvernorats, sponsors }: SearchPageClientProps): JSX.Element {
   const accent = PRODUCT_ACCENT[product];
   const [activeType, setActiveType] = useState<"B2B" | "B2C">("B2B");
   const [query, setQuery] = useState("");
@@ -191,7 +193,7 @@ export default function SearchPageClient({ product, sectors, categories, gouvern
         </section>
 
         {/* Sponsor banner */}
-        <SponsorBanner />
+        <SponsorBanner sponsors={sponsors ?? []} accent={accent} />
 
         {/* Sticky filters bar */}
         <div className="sticky top-[64px] md:top-[72px] z-40 bg-[#F5F5F5] border-y border-[#E0E0E0] px-6 py-3">

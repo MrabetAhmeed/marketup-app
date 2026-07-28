@@ -2,13 +2,15 @@ import Link from "next/link";
 import { listPendingCompanies, listCompaniesWithPendingUpdates } from "@/services/admin-company.service";
 import { listPendingProfiles } from "@/services/admin-profile.service";
 import { listPendingRseReceipts } from "@/services/admin-rse.service";
+import { listPendingSponsorings } from "@/services/sponsoring.service";
 import { ValidationHubTabs } from "@/components/features/admin/ValidationHubTabs";
+import { SponsoringValidationList } from "@/components/features/admin/SponsoringValidationList";
 import type { PendingCompanyItem, PendingUpdateCompanyItem } from "@/services/admin-company.service";
 import type { PendingProfileItem } from "@/services/admin-profile.service";
 
 export const dynamic = "force-dynamic";
 
-type TabKey = "inscriptions" | "modifications" | "profils" | "rse";
+type TabKey = "inscriptions" | "modifications" | "profils" | "rse" | "sponsorings";
 
 interface PageProps {
   searchParams: Promise<{ tab?: string }>;
@@ -16,15 +18,16 @@ interface PageProps {
 
 export default async function ValidationHubPage({ searchParams }: PageProps): Promise<JSX.Element> {
   const { tab } = await searchParams;
-  const activeTab: TabKey = (["inscriptions", "modifications", "profils", "rse"] as const).includes(tab as TabKey)
+  const activeTab: TabKey = (["inscriptions", "modifications", "profils", "rse", "sponsorings"] as const).includes(tab as TabKey)
     ? (tab as TabKey)
     : "inscriptions";
 
-  const [inscriptions, modifications, profiles, rseReceipts] = await Promise.all([
+  const [inscriptions, modifications, profiles, rseReceipts, pendingSponsorings] = await Promise.all([
     listPendingCompanies("fr"),
     listCompaniesWithPendingUpdates("fr"),
     listPendingProfiles("fr"),
     listPendingRseReceipts("fr"),
+    listPendingSponsorings(),
   ]);
 
   return (
@@ -41,6 +44,7 @@ export default async function ValidationHubPage({ searchParams }: PageProps): Pr
           modifications: modifications.length,
           profils: profiles.length,
           rse: rseReceipts.length,
+          sponsorings: pendingSponsorings.length,
         }}
       />
 
@@ -55,6 +59,9 @@ export default async function ValidationHubPage({ searchParams }: PageProps): Pr
       )}
       {activeTab === "rse" && (
         <RseList receipts={rseReceipts} />
+      )}
+      {activeTab === "sponsorings" && (
+        <SponsoringValidationList sponsorings={pendingSponsorings} />
       )}
     </div>
   );

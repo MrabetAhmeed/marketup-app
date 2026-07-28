@@ -2,7 +2,7 @@
 
 import { useRouter } from "next/navigation";
 
-type TabKey = "inscriptions" | "modifications" | "profils" | "rse";
+type TabKey = "inscriptions" | "modifications" | "profils" | "rse" | "sponsorings";
 
 interface Tab {
   key: TabKey;
@@ -15,6 +15,7 @@ const TABS: Tab[] = [
   { key: "modifications", label: "Modifications comptes", icon: "edit_note" },
   { key: "profils", label: "Profils", icon: "verified" },
   { key: "rse", label: "RSE", icon: "volunteer_activism" },
+  { key: "sponsorings", label: "Sponsorings", icon: "campaign" },
 ];
 
 interface ValidationHubTabsProps {
@@ -26,7 +27,7 @@ export function ValidationHubTabs({ activeTab, counts }: ValidationHubTabsProps)
   const router = useRouter();
 
   return (
-    <div className="flex items-center gap-1 bg-white border border-surface-border rounded-lg p-1">
+    <div className="flex items-center gap-1 bg-white border border-surface-border rounded-lg p-1 overflow-x-auto">
       {TABS.map((tab) => {
         const active = tab.key === activeTab;
         const count = counts[tab.key];
@@ -35,7 +36,7 @@ export function ValidationHubTabs({ activeTab, counts }: ValidationHubTabsProps)
             key={tab.key}
             type="button"
             onClick={() => router.push(`/admin/validation?tab=${tab.key}`)}
-            className={`flex items-center gap-2 px-3 py-2 rounded-lg text-[13px] font-medium transition-colors ${
+            className={`flex items-center gap-2 px-3 py-2 rounded-lg text-[13px] font-medium transition-colors whitespace-nowrap ${
               active
                 ? "bg-[#5C2D91]/10 text-[#5C2D91]"
                 : "text-ink-secondary hover:bg-surface-muted hover:text-ink-primary"

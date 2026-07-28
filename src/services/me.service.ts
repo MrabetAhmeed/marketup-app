@@ -58,9 +58,10 @@ export async function getMe(
 ): Promise<MeResponse | null> {
   await connectDb();
 
-  // Lazy expiration: flip stale boosts to "expired" before querying
+  // Lazy expiration: flip stale boosts + sponsorings to "expired" before querying
   const { expireStaleBoosts } = await import("@/services/boost.service");
-  await expireStaleBoosts();
+  const { expireStaleSponsorings } = await import("@/services/sponsoring.service");
+  await Promise.all([expireStaleBoosts(), expireStaleSponsorings()]);
 
   const now = new Date();
 

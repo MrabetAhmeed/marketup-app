@@ -1015,20 +1015,49 @@ Initiates a boost purchase for a given profile.
 ---
 
 ### `GET /me/sponsoring`
-**Auth:** Required (OWNER).
-Returns the 3 profile cards similar to `/me/boost`, plus active campaigns and their stats.
+**Auth:** Required (OWNER). **Guard:** `requireMonetization()`.
+Returns 3 profile cards (one per kind) with current sponsoring state + paginated history.
 
-**Response Body:** Same structure as `/me/boost`, with `activeCampaign` instead of `activeBoost` and:
+**Response Body:**
 ```json
 {
-  "activeCampaign": {
-    "id": "s-001",
-    "from": "...", "to": "...",
-    "targetCategory": "mecanique",
-    "impressions": 1250,
-    "clicks": 45,
-    "ctr": 3.6
-  }
+  "cards": [
+    {
+      "profileKind": "brandup",
+      "profileExists": true,
+      "profileStatus": "active",
+      "isPublic": true,
+      "current": {
+        "id": "...",
+        "status": "pending|confirmed|active",
+        "bannerUrl": "https://...",
+        "linkUrl": "https://...",
+        "from": null,
+        "to": null,
+        "paidAt": null,
+        "confirmedAt": null,
+        "rejectionReason": null,
+        "impressions": 0,
+        "clicks": 0,
+        "createdAt": "..."
+      }
+    }
+  ],
+  "history": [
+    {
+      "id": "...",
+      "profileKind": "brandup",
+      "status": "expired|rejected|cancelled",
+      "bannerUrl": "https://...",
+      "from": "...",
+      "to": "...",
+      "priceTTC": 119,
+      "currency": "DT",
+      "impressions": 1250,
+      "clicks": 45,
+      "createdAt": "..."
+    }
+  ]
 }
 ```
 
@@ -1036,36 +1065,85 @@ Returns the 3 profile cards similar to `/me/boost`, plus active campaigns and th
 
 ---
 
-### `POST /me/sponsoring/checkout`
-**Auth:** Required (OWNER).
+### `POST /me/sponsoring/request`
+**Auth:** Required (OWNER). **Guard:** `requireMonetization()`.
+Creates a sponsoring demand (status: `pending`). Requires admin validation before payment.
 
 **Request Body:**
 ```json
 {
-  "profileType": "linkup",
-  "targetCategory": "mecanique",
-  "paymentMethod": "card"
+  "profileKind": "brandup|traceup|linkup",
+  "bannerUrl": "https://cdn.example.com/banner.jpg",
+  "linkUrl": "https://www.example.com"
 }
 ```
 
-**Response Body (`201`):** Same shape as boost checkout, with `campaign` instead of `boost`.
+**Guards:** company active, profile active+isPublic, no existing pending/confirmed/active on same (companyId, profileKind).
+
+**Response Body (`201`):**
+```json
+{
+  "id": "...",
+  "profileKind": "brandup",
+  "status": "pending",
+  "bannerUrl": "https://...",
+  "linkUrl": "https://...",
+  "createdAt": "..."
+}
+```
 
 ---
 
-### `GET /me/sponsoring/:id/stats`
-**Auth:** Required (OWNER).
-Detailed daily breakdown of impressions/clicks for a campaign.
+### `POST /me/sponsoring/[id]/cancel`
+**Auth:** Required (OWNER). **Guard:** `requireMonetization()`.
+Cancels a sponsoring from `pending` or `confirmed` status only. Active sponsorings cannot be cancelled in V1.
 
-**Response Body:**
+---
+
+### `POST /me/sponsoring/checkout`
+**Auth:** Required (OWNER). **Guard:** `requireMonetization()`.
+Pays for a `confirmed` sponsoring (after admin validation). Creates Transaction atomically.
+
+**Request Body:**
 ```json
 {
-  "campaign": { "id": "s-001", "from": "...", "to": "...", "status": "active" },
-  "totals": { "impressions": 1250, "clicks": 45, "ctr": 3.6 },
-  "daily": [
-    { "date": "2026-04-15", "impressions": 180, "clicks": 6 }
-  ]
+  "sponsoringId": "ObjectId",
+  "idempotencyKey": "unique-key"
 }
 ```
+
+**Response Body (`201`):** Same shape as boost checkout, with `sponsoring` instead of `boost`.
+
+---
+
+### `POST /admin/sponsorings/[id]/validate`
+**Auth:** Required (SUPER_ADMIN). No `requireMonetization()`.
+Validates a pending sponsoring → `confirmed`. Owner is notified (in-app + email).
+
+---
+
+### `POST /admin/sponsorings/[id]/reject`
+**Auth:** Required (SUPER_ADMIN). No `requireMonetization()`.
+Rejects a pending sponsoring → `rejected`. Reason is required.
+
+**Request Body:**
+```json
+{
+  "reason": "Bannière inappropriée"
+}
+```
+
+---
+
+### Track extension: `sponsor_click`
+`POST /api/v1/public/track` now accepts:
+```json
+{
+  "sponsoringId": "ObjectId",
+  "event": "sponsor_click"
+}
+```
+Returns 204 always. $inc `Sponsoring.clicks` + daily breakdown. Fail-silent.
 
 ---
 

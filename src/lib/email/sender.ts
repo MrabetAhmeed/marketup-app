@@ -15,6 +15,9 @@ import { accountDeletedEmailTemplate } from "./templates/account-deleted";
 import { companySuspendedEmailTemplate } from "./templates/company-suspended";
 import { companyReactivatedEmailTemplate } from "./templates/company-reactivated";
 import { companyRestoredEmailTemplate } from "./templates/company-restored";
+import { sponsoringSubmittedEmailTemplate } from "./templates/sponsoring-submitted";
+import { sponsoringValidatedEmailTemplate } from "./templates/sponsoring-validated";
+import { sponsoringRejectedEmailTemplate } from "./templates/sponsoring-rejected";
 import type { Transporter } from "nodemailer";
 
 const FROM_ADDRESS = `MARKET-UP <${env.EMAIL_FROM}>`;
@@ -289,6 +292,50 @@ export async function sendCompanyRestoredEmail(params: {
   const { subject, html } = companyRestoredEmailTemplate({
     companyName: params.companyName,
     dashboardUrl: `${env.NEXTAUTH_URL}/dashboard`,
+  });
+  await sendEmail(params.userEmail, subject, html);
+}
+
+/** Notify admin that an owner submitted a sponsoring request. */
+export async function sendSponsoringSubmittedEmail(params: {
+  adminEmail: string;
+  companyName: string;
+  profileKind: string;
+}): Promise<void> {
+  const { subject, html } = sponsoringSubmittedEmailTemplate({
+    companyName: params.companyName,
+    profileKind: params.profileKind,
+    adminUrl: `${env.NEXTAUTH_URL}/admin/validation?tab=sponsorings`,
+  });
+  await sendEmail(params.adminEmail, subject, html);
+}
+
+/** Notify owner that their sponsoring request was validated by admin. */
+export async function sendSponsoringValidatedEmail(params: {
+  userEmail: string;
+  companyName: string;
+  profileKind: string;
+}): Promise<void> {
+  const { subject, html } = sponsoringValidatedEmailTemplate({
+    companyName: params.companyName,
+    profileKind: params.profileKind,
+    dashboardUrl: `${env.NEXTAUTH_URL}/dashboard/sponsoring`,
+  });
+  await sendEmail(params.userEmail, subject, html);
+}
+
+/** Notify owner that their sponsoring request was rejected by admin. */
+export async function sendSponsoringRejectedEmail(params: {
+  userEmail: string;
+  companyName: string;
+  profileKind: string;
+  rejectionReason: string;
+}): Promise<void> {
+  const { subject, html } = sponsoringRejectedEmailTemplate({
+    companyName: params.companyName,
+    profileKind: params.profileKind,
+    rejectionReason: params.rejectionReason,
+    dashboardUrl: `${env.NEXTAUTH_URL}/dashboard/sponsoring`,
   });
   await sendEmail(params.userEmail, subject, html);
 }

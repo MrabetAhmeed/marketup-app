@@ -54,7 +54,7 @@ beforeAll(async () => {
   await (Profile as any).create({ companyId: cid, kind: "brandup", status: "incomplete", isPublic: false, stats: { viewsTotal: 0, views30d: 0, clicksTotal: 0 }, data: {} });
   await (Transaction as any).create({ companyId: cid, type: "boost", priceHT: 1, vatRate: 0.19, status: "pending" });
   await (Boost as any).create({ companyId: cid, profileKind: "brandup", status: "active", from: new Date(), to: new Date() });
-  await (Sponsoring as any).create({ companyId: cid, profileKind: "brandup", status: "active", from: new Date(), to: new Date() });
+  await (Sponsoring as any).create({ companyId: cid, profileKind: "brandup", status: "active", from: new Date(), to: new Date(), bannerUrl: "https://cdn/banner.jpg", linkUrl: "https://example.com" });
   await (RseReceipt as any).create({ companyId: cid, associationId: new mongoose.Types.ObjectId(), amount: 1, donationDate: new Date(), status: "pending" });
   await (Notification as any).create({ recipientType: "owner", recipientId: uid, kind: "info", title: { fr: "i" }, body: { fr: "i" } });
   await (FileModel as any).create({ ownerUserId: uid, key: "i.png", url: "u", mimeType: "image/png", size: 1, purpose: "logo" });
@@ -113,7 +113,7 @@ async function createDeletedCompany(opts?: { validatedAt?: Date | null; profileS
   // Create related docs with same cascadeTimestamp
   await (Transaction as any).create({ companyId: company._id, type: "boost", priceHT: 100, vatRate: 0.19, status: "paid", deletedAt: now });
   await (Boost as any).create({ companyId: company._id, profileKind: "brandup", status: "expired", from: new Date("2026-01-01"), to: new Date("2026-02-01"), deletedAt: now });
-  await (Sponsoring as any).create({ companyId: company._id, profileKind: "brandup", status: "completed", from: new Date("2026-01-01"), to: new Date("2026-02-01"), deletedAt: now });
+  await (Sponsoring as any).create({ companyId: company._id, profileKind: "brandup", status: "expired", from: new Date("2026-01-01"), to: new Date("2026-02-01"), bannerUrl: "https://cdn/banner.jpg", linkUrl: "https://example.com", deletedAt: now });
   await (RseReceipt as any).create({ companyId: company._id, associationId: new mongoose.Types.ObjectId(), amount: 50, donationDate: new Date(), status: "validated", deletedAt: now });
   await (Notification as any).create({ recipientType: "owner", recipientId: uid, kind: "info", title: { fr: "test" }, body: { fr: "test" }, deletedAt: now });
   await (FileModel as any).create({ ownerUserId: uid, key: "test.png", url: "https://cdn/test.png", mimeType: "image/png", size: 1000, purpose: "logo", deletedAt: now });

@@ -18,28 +18,45 @@ const SponsoringSchema = new Schema(
       required: true,
     },
     targetCategory: { type: String, default: null },
-    from: { type: Date, required: true },
-    to: { type: Date, required: true },
+
+    // Banner & link — provided at request time
+    bannerUrl: { type: String, required: true },
+    linkUrl: { type: String, required: true },
+
+    // Date range — set at checkout (confirmed → active), null while pending/confirmed
+    from: { type: Date, default: null },
+    to: { type: Date, default: null },
+
+    // Payment
     transactionId: { type: Types.ObjectId, ref: "Transaction", default: null },
-    // Status persisted for query efficiency; compute from `to >= now` on read.
-    // Cron to flip completed is Phase 9 work.
+    paidAt: { type: Date, default: null },
+
+    // Workflow: pending → confirmed (admin) → active (paid) → expired (lazy)
+    // Terminal: rejected (admin), cancelled (owner from pending/confirmed)
     status: {
       type: String,
-      enum: ["active", "completed", "cancelled"],
-      default: "active",
+      enum: ["pending", "confirmed", "active", "expired", "rejected", "cancelled"],
+      default: "pending",
     },
+
+    // Admin validation
+    confirmedAt: { type: Date, default: null },
+    rejectionReason: { type: String, default: null },
+    cancelledAt: { type: Date, default: null },
+
+    // Stats
     impressions: { type: Number, default: 0 },
     clicks: { type: Number, default: 0 },
     daily: { type: [DailyBreakdownSchema], default: [] },
 
-    // Soft delete (no audit trail — immutable post-creation)
+    // Soft delete
     deletedAt: { type: Date, default: null, index: true },
   },
   { timestamps: true, versionKey: false },
 );
 
 // Index for "find active sponsoring for this company+profile"
-SponsoringSchema.index({ companyId: 1, profileKind: 1, to: -1 });
+SponsoringSchema.index({ companyId: 1, profileKind: 1, status: 1 });
 
 // Soft-delete filter
 SponsoringSchema.pre(/^find/, function (this: { getOptions(): { withDeleted?: boolean }; where(condition: Record<string, unknown>): void }) {

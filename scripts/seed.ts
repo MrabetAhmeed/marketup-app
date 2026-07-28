@@ -402,11 +402,14 @@ interface BoostSeedData {
 
 interface SponsoringSeedData {
   seedId: string;
-  from: Date;
-  to: Date;
+  from: Date | null;
+  to: Date | null;
   priceHT: number;
-  transactionSeedId: string;
-  targetCategory: string;
+  transactionSeedId: string | null;
+  targetCategory: string | null;
+  bannerUrl: string;
+  linkUrl: string;
+  paidAt: Date | null;
   impressions: number;
   clicks: number;
   status: string;
@@ -557,7 +560,7 @@ function buildCompanies(): CompanySeedData[] {
             { seedId: "b-c-001-0", from: daysAgo(71), to: daysAgo(41), priceHT: 50, transactionSeedId: "t-c-001-9", viewsAdded: 48, clicksAdded: 6, status: "expired" },
           ],
           sponsorings: [
-            { seedId: "s-c-001-1", from: daysAgo(2), to: daysFromNow(5), priceHT: 100, transactionSeedId: "t-c-001-1", targetCategory: "mecanique", impressions: 1250, clicks: 45, status: "active" },
+            { seedId: "s-c-001-1", from: daysAgo(2), to: daysFromNow(5), priceHT: 100, transactionSeedId: "t-c-001-1", targetCategory: "mecanique", bannerUrl: "https://picsum.photos/seed/spo-c001/1200/200", linkUrl: "https://www.technofab.tn", paidAt: daysAgo(2), impressions: 1250, clicks: 45, status: "active" },
           ],
         },
       },
@@ -626,7 +629,7 @@ function buildCompanies(): CompanySeedData[] {
       status: "active", registeredAt: daysAgo(173), validatedAt: daysAgo(172), rseBadgeStatus: "validated",
       pendingUpdates: { submittedAt: daysAgo(2), fields: [{ key: "data.displayName", label: "Nom de l'entreprise", currentValue: i18n("GreenLife — Bio & Naturel"), newValue: i18n("GreenLife Marché Bio") }] },
       profiles: {
-        brandup: { kind: "brandup", status: "active", data: { pitch: i18n("Épicerie bio et naturelle à Sousse. Plus de 800 références."), about: i18n("GreenLife est née d'une conviction simple : manger bon, sain et juste."), color: "#10B981", links: [{ label: i18n("Site web"), url: "https://greenlife.tn", icon: "language" }], gallery: [], projects: [{ id: "proj-c-003-1", name: i18n("Huile d'olive bio extra vierge"), image: "https://picsum.photos/seed/c-003-proj-1/600/400", description: i18n("Notre huile premium issue de petits producteurs du Cap Bon."), order: 1 }], certifications: [{ id: "cert-c-003-1", name: "AB Tunisie", label: i18n("Agriculture biologique tunisienne"), icon: "eco", image: "https://picsum.photos/seed/c-003-cert-ab/200/200", issuedAt: new Date("2023-01-01"), expiresAt: new Date("2026-01-01") }], services: [{ name: i18n("Vente en boutique") }, { name: i18n("Livraison Sousse") }] }, publishedAt: daysAgo(153), lastValidatedAt: daysAgo(153), stats: { viewsTotal: 1543, views30d: 421, clicksTotal: 89 }, boosts: [{ seedId: "b-c-003-1", from: daysAgo(21), to: daysFromNow(9), priceHT: 50, transactionSeedId: "t-c-003-1", viewsAdded: 312, clicksAdded: 24, status: "active" }], sponsorings: [] },
+        brandup: { kind: "brandup", status: "active", data: { pitch: i18n("Épicerie bio et naturelle à Sousse. Plus de 800 références."), about: i18n("GreenLife est née d'une conviction simple : manger bon, sain et juste."), color: "#10B981", links: [{ label: i18n("Site web"), url: "https://greenlife.tn", icon: "language" }], gallery: [], projects: [{ id: "proj-c-003-1", name: i18n("Huile d'olive bio extra vierge"), image: "https://picsum.photos/seed/c-003-proj-1/600/400", description: i18n("Notre huile premium issue de petits producteurs du Cap Bon."), order: 1 }], certifications: [{ id: "cert-c-003-1", name: "AB Tunisie", label: i18n("Agriculture biologique tunisienne"), icon: "eco", image: "https://picsum.photos/seed/c-003-cert-ab/200/200", issuedAt: new Date("2023-01-01"), expiresAt: new Date("2026-01-01") }], services: [{ name: i18n("Vente en boutique") }, { name: i18n("Livraison Sousse") }] }, publishedAt: daysAgo(153), lastValidatedAt: daysAgo(153), stats: { viewsTotal: 1543, views30d: 421, clicksTotal: 89 }, boosts: [{ seedId: "b-c-003-1", from: daysAgo(21), to: daysFromNow(9), priceHT: 50, transactionSeedId: "t-c-003-1", viewsAdded: 312, clicksAdded: 24, status: "active" }], sponsorings: [{ seedId: "s-c-003-1", from: null, to: null, priceHT: 100, transactionSeedId: null, targetCategory: null, bannerUrl: "https://picsum.photos/seed/spo-c003/1200/200", linkUrl: "https://www.greenlife.tn/promo", paidAt: null, impressions: 0, clicks: 0, status: "pending" }] },
         traceup: { kind: "traceup", status: "incomplete", data: { channelName: i18n(""), channelDescription: i18n(""), videos: [] }, stats: { viewsTotal: 0, views30d: 0, clicksTotal: 0 }, boosts: [], sponsorings: [] },
         linkup: { kind: "linkup", status: "active", data: { qrConfig: { style: "square", colorForeground: "#10B981", colorBackground: "#FFFFFF", logoOverlay: true }, socials: [{ platform: "instagram", url: "https://instagram.com/greenlife.tn" }, { platform: "facebook", url: "https://facebook.com/greenlife.tn" }] }, publishedAt: daysAgo(153), lastValidatedAt: daysAgo(153), stats: { viewsTotal: 245, views30d: 67, clicksTotal: 18 }, boosts: [], sponsorings: [] },
       },
@@ -730,7 +733,7 @@ function buildCompanies(): CompanySeedData[] {
       data: { displayName: i18n("EduPro Formation"), logoUrl: logoUrl("EduPro", "7C3AED"), bannerUrl: bannerUrl("c-009") },
       status: "active", registeredAt: daysAgo(260), validatedAt: daysAgo(259), rseBadgeStatus: "validated",
       profiles: {
-        brandup: { kind: "brandup", status: "active", data: { pitch: i18n("Centre de formation professionnelle à Tunis. Certifications IT, management, langues."), about: i18n("EduPro est un centre de formation agréé par le CNFCPP."), color: "#7C3AED", links: [{ label: i18n("Site web"), url: "https://edupro.tn", icon: "language" }], gallery: [], projects: [{ id: "proj-c-009-1", name: i18n("Formation Scrum Master"), image: "https://picsum.photos/seed/c-009-proj-1/600/400", description: i18n("Certification Scrum Master en 5 jours."), order: 1 }], certifications: [{ id: "cert-c-009-1", name: "CNFCPP Agréé", label: i18n("Centre agréé formation continue"), icon: "school", image: null, issuedAt: new Date("2020-01-01"), expiresAt: null }], services: [{ name: i18n("Formation IT") }, { name: i18n("Formation management") }] }, publishedAt: daysAgo(245), lastValidatedAt: daysAgo(245), stats: { viewsTotal: 987, views30d: 178, clicksTotal: 56 }, boosts: [{ seedId: "b-c-009-1", from: daysAgo(10), to: daysFromNow(20), priceHT: 50, transactionSeedId: "t-c-009-1", viewsAdded: 178, clicksAdded: 12, status: "active" }], sponsorings: [{ seedId: "s-c-009-1", from: daysAgo(5), to: daysFromNow(2), priceHT: 100, transactionSeedId: "t-c-009-2", targetCategory: "formation-pro", impressions: 890, clicks: 34, status: "active" }] },
+        brandup: { kind: "brandup", status: "active", data: { pitch: i18n("Centre de formation professionnelle à Tunis. Certifications IT, management, langues."), about: i18n("EduPro est un centre de formation agréé par le CNFCPP."), color: "#7C3AED", links: [{ label: i18n("Site web"), url: "https://edupro.tn", icon: "language" }], gallery: [], projects: [{ id: "proj-c-009-1", name: i18n("Formation Scrum Master"), image: "https://picsum.photos/seed/c-009-proj-1/600/400", description: i18n("Certification Scrum Master en 5 jours."), order: 1 }], certifications: [{ id: "cert-c-009-1", name: "CNFCPP Agréé", label: i18n("Centre agréé formation continue"), icon: "school", image: null, issuedAt: new Date("2020-01-01"), expiresAt: null }], services: [{ name: i18n("Formation IT") }, { name: i18n("Formation management") }] }, publishedAt: daysAgo(245), lastValidatedAt: daysAgo(245), stats: { viewsTotal: 987, views30d: 178, clicksTotal: 56 }, boosts: [{ seedId: "b-c-009-1", from: daysAgo(10), to: daysFromNow(20), priceHT: 50, transactionSeedId: "t-c-009-1", viewsAdded: 178, clicksAdded: 12, status: "active" }], sponsorings: [{ seedId: "s-c-009-1", from: daysAgo(5), to: daysFromNow(2), priceHT: 100, transactionSeedId: "t-c-009-2", targetCategory: "formation-pro", bannerUrl: "https://picsum.photos/seed/spo-c009/1200/200", linkUrl: "https://www.edupro.tn", paidAt: daysAgo(5), impressions: 890, clicks: 34, status: "active" }] },
         traceup: { kind: "traceup", status: "active", data: { channelName: i18n("EduPro Webinars"), channelDescription: i18n(""), videos: [{ id: "v-c-009-1", source: "youtube", videoId: "PkZNo7MFNFg", videoUrl: "https://www.youtube.com/watch?v=PkZNo7MFNFg", thumbnailUrl: ytThumb("PkZNo7MFNFg"), category: "astuces", title: i18n("Les 5 certifications IT les plus demandées en 2026"), description: i18n("Quelles certifications pour booster votre carrière IT."), status: "active", publishedAt: daysAgo(30), order: 1 }] }, publishedAt: daysAgo(230), lastValidatedAt: daysAgo(230), stats: { viewsTotal: 2345, views30d: 456, clicksTotal: 123 }, boosts: [], sponsorings: [] },
         linkup: { kind: "linkup", status: "disabled", data: { qrConfig: { style: "rounded", colorForeground: "#7C3AED", colorBackground: "#FFFFFF", logoOverlay: true }, socials: [{ platform: "linkedin", url: "https://linkedin.com/in/hatemgharbi" }] }, publishedAt: daysAgo(245), lastValidatedAt: daysAgo(245), disabledAt: daysAgo(15), stats: { viewsTotal: 89, views30d: 0, clicksTotal: 5 }, boosts: [], sponsorings: [] },
       },
@@ -894,8 +897,11 @@ async function seedCompanies(
           companyId,
           profileKind: p.kind,
           targetCategory: s.targetCategory,
+          bannerUrl: s.bannerUrl,
+          linkUrl: s.linkUrl,
           from: s.from,
           to: s.to,
+          paidAt: s.paidAt,
           status: s.status,
           impressions: s.impressions,
           clicks: s.clicks,
