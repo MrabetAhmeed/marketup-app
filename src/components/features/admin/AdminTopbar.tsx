@@ -10,10 +10,10 @@ interface AdminTopbarProps {
 
 export function AdminTopbar({ initials, pendingCounts }: AdminTopbarProps): JSX.Element {
   return (
-    <header className="h-14 bg-white border-b border-surface-border flex items-center justify-between px-6 shrink-0">
-      <div className="flex items-center gap-2 text-[13px] text-ink-secondary">
+    <header className="h-14 bg-white border-b border-surface-border flex items-center justify-between px-4 md:px-6 shrink-0">
+      <div className="flex items-center gap-2 text-[13px] text-ink-secondary pl-14 md:pl-0">
         <span className="material-symbols-outlined" style={{ fontSize: 18 }}>shield_person</span>
-        <span>Espace administration</span>
+        <span className="hidden sm:inline">Espace administration</span>
       </div>
       <div className="flex items-center gap-3">
         <AdminNotificationBell counts={pendingCounts} />

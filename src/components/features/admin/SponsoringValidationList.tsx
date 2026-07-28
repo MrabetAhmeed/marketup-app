@@ -305,7 +305,7 @@ export function SponsoringValidationList({ sponsorings }: SponsoringValidationLi
                 <img
                   src={s.bannerUrl}
                   alt="Bannière sponsoring"
-                  className="w-full h-auto"
+                  className="w-full h-auto min-h-[60px]"
                   style={{ aspectRatio: "6/1", objectFit: "cover" }}
                 />
               </div>
@@ -324,7 +324,7 @@ export function SponsoringValidationList({ sponsorings }: SponsoringValidationLi
               </div>
 
               {/* Actions */}
-              <div className="flex gap-2">
+              <div className="flex flex-wrap gap-2">
                 <button
                   onClick={() => setValidateTarget({ id: s.id, companyName: s.companyName, profileKind: s.profileKind })}
                   className="inline-flex items-center gap-1.5 px-4 py-[9px] text-[13px] font-semibold text-white bg-[#16A34A] hover:bg-[#15803D] rounded transition-colors"

@@ -369,22 +369,24 @@ export default function EntreprisesPage(): JSX.Element {
         <div className="space-y-3">
           {companies.map((c) => (
             <div key={c.id} className="bg-white border border-surface-border rounded-lg p-4">
-              <div className="flex items-center gap-4">
-                <div className={`w-10 h-10 rounded-lg flex items-center justify-center shrink-0 ${c.status === "active" ? "bg-[#16A34A]/10" : "bg-surface-muted"}`}>
-                  <span className={`material-symbols-outlined ${c.status === "active" ? "text-[#16A34A]" : "text-ink-tertiary"}`} style={{ fontSize: 22 }}>business</span>
-                </div>
-                <div className="min-w-0 flex-1">
-                  <div className="font-heading font-semibold text-[14px] text-ink-primary leading-tight">{c.displayName}</div>
-                  <div className="flex items-center gap-2 mt-1 text-[12px] text-ink-secondary flex-wrap">
-                    <StatusPill kind={pillKind(c.status)} />
-                    <span>{c.type}</span>
-                    <span>·</span>
-                    <span>{c.sector}</span>
-                    <span>·</span>
-                    <span>{c.ville}</span>
+              <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4">
+                <div className="flex items-center gap-4 min-w-0 flex-1">
+                  <div className={`w-10 h-10 rounded-lg flex items-center justify-center shrink-0 ${c.status === "active" ? "bg-[#16A34A]/10" : "bg-surface-muted"}`}>
+                    <span className={`material-symbols-outlined ${c.status === "active" ? "text-[#16A34A]" : "text-ink-tertiary"}`} style={{ fontSize: 22 }}>business</span>
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <div className="font-heading font-semibold text-[14px] text-ink-primary leading-tight">{c.displayName}</div>
+                    <div className="flex items-center gap-2 mt-1 text-[12px] text-ink-secondary flex-wrap">
+                      <StatusPill kind={pillKind(c.status)} />
+                      <span>{c.type}</span>
+                      <span>·</span>
+                      <span>{c.sector}</span>
+                      <span>·</span>
+                      <span>{c.ville}</span>
+                    </div>
                   </div>
                 </div>
-                <div className="flex items-center gap-2 shrink-0">
+                <div className="flex items-center gap-2 shrink-0 sm:ml-auto">
                   <Link
                     href={`/admin/validation/comptes/${c.id}`}
                     className="inline-flex items-center gap-1.5 px-4 py-[9px] text-[13px] font-semibold text-ink-primary bg-white border border-[#D1D1D1] rounded hover:bg-surface-muted transition-colors"
@@ -416,7 +418,7 @@ export default function EntreprisesPage(): JSX.Element {
 
               {/* Suspended reason display */}
               {c.status === "suspended" && c.suspendedReason && (
-                <div className="mt-3 ml-14 bg-[#FEF2F2] border border-[#FCA5A5] rounded p-3 flex items-start gap-2">
+                <div className="mt-3 ml-0 sm:ml-14 bg-[#FEF2F2] border border-[#FCA5A5] rounded p-3 flex items-start gap-2">
                   <span className="material-symbols-outlined text-[#DC2626] shrink-0 mt-[1px]" style={{ fontSize: 14 }}>block</span>
                   <div className="text-[12px] text-[#991B1B] leading-snug">
                     <strong>Motif :</strong> {c.suspendedReason}

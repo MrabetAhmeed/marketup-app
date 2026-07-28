@@ -38,7 +38,7 @@ export function AdminNotificationBell({ counts }: AdminNotificationBellProps): J
       </button>
 
       {open && (
-        <div className="absolute right-0 top-full mt-1 w-[300px] bg-white border border-surface-border rounded-lg shadow-lg z-50 overflow-hidden">
+        <div className="absolute right-0 top-full mt-1 w-[calc(100vw-2rem)] max-w-[300px] bg-white border border-surface-border rounded-lg shadow-lg z-50 overflow-hidden">
           <div className="px-4 py-3 border-b border-surface-border">
             <h3 className="font-heading font-bold text-[13px] text-ink-primary">En attente de validation</h3>
           </div>

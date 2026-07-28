@@ -80,34 +80,36 @@ function InscriptionsList({ companies }: { companies: PendingCompanyItem[] }): J
   return (
     <div className="space-y-3">
       {companies.map((c) => (
-        <div key={c.id} className="bg-white border border-surface-border rounded-lg p-4 flex items-center gap-4">
-          <div className="w-10 h-10 rounded-lg bg-[#D97706]/10 flex items-center justify-center shrink-0">
-            <span className="material-symbols-outlined text-[#D97706]" style={{ fontSize: 22 }}>business</span>
-          </div>
-          <div className="min-w-0 flex-1">
-            <div className="font-heading font-semibold text-[14px] text-ink-primary leading-tight">{c.displayName}</div>
-            <div className="flex items-center gap-2 mt-1 text-[12px] text-ink-secondary flex-wrap">
-              <span>{c.type}</span>
-              <span>·</span>
-              <span>{c.sector}</span>
-              <span>·</span>
-              <span>{c.gouvernorat}, {c.ville}</span>
-              <span>·</span>
-              <span>Inscrit le {new Date(c.registeredAt).toLocaleDateString("fr-FR", { day: "numeric", month: "short", year: "numeric" })}</span>
-              {c.hasLegalDoc && (
-                <>
-                  <span>·</span>
-                  <span className="inline-flex items-center gap-0.5 text-[#16A34A]">
-                    <span className="material-symbols-outlined" style={{ fontSize: 12 }}>description</span>
-                    PDF
-                  </span>
-                </>
-              )}
+        <div key={c.id} className="bg-white border border-surface-border rounded-lg p-4 flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4">
+          <div className="flex items-center gap-4 min-w-0 flex-1">
+            <div className="w-10 h-10 rounded-lg bg-[#D97706]/10 flex items-center justify-center shrink-0">
+              <span className="material-symbols-outlined text-[#D97706]" style={{ fontSize: 22 }}>business</span>
+            </div>
+            <div className="min-w-0 flex-1">
+              <div className="font-heading font-semibold text-[14px] text-ink-primary leading-tight">{c.displayName}</div>
+              <div className="flex items-center gap-2 mt-1 text-[12px] text-ink-secondary flex-wrap">
+                <span>{c.type}</span>
+                <span>·</span>
+                <span>{c.sector}</span>
+                <span>·</span>
+                <span>{c.gouvernorat}, {c.ville}</span>
+                <span>·</span>
+                <span>Inscrit le {new Date(c.registeredAt).toLocaleDateString("fr-FR", { day: "numeric", month: "short", year: "numeric" })}</span>
+                {c.hasLegalDoc && (
+                  <>
+                    <span>·</span>
+                    <span className="inline-flex items-center gap-0.5 text-[#16A34A]">
+                      <span className="material-symbols-outlined" style={{ fontSize: 12 }}>description</span>
+                      PDF
+                    </span>
+                  </>
+                )}
+              </div>
             </div>
           </div>
           <Link
             href={`/admin/validation/comptes/${c.id}`}
-            className="inline-flex items-center gap-1.5 px-4 py-[9px] text-[13px] font-semibold text-white bg-[#5C2D91] hover:bg-[#4A2377] rounded transition-colors shrink-0"
+            className="inline-flex items-center justify-center gap-1.5 px-4 py-[9px] text-[13px] font-semibold text-white bg-[#5C2D91] hover:bg-[#4A2377] rounded transition-colors shrink-0"
           >
             <span className="material-symbols-outlined" style={{ fontSize: 16 }}>visibility</span>
             Examiner
@@ -127,21 +129,23 @@ function ModificationsList({ companies }: { companies: PendingUpdateCompanyItem[
   return (
     <div className="space-y-3">
       {companies.map((c) => (
-        <div key={c.id} className="bg-white border border-surface-border rounded-lg p-4 flex items-center gap-4">
-          <div className="w-10 h-10 rounded-lg bg-[#D97706]/10 flex items-center justify-center shrink-0">
-            <span className="material-symbols-outlined text-[#D97706]" style={{ fontSize: 22 }}>edit_note</span>
-          </div>
-          <div className="min-w-0 flex-1">
-            <div className="font-heading font-semibold text-[14px] text-ink-primary leading-tight">{c.displayName}</div>
-            <div className="flex items-center gap-2 mt-1 text-[12px] text-ink-secondary">
-              <span>{c.fieldsCount} champ{c.fieldsCount !== 1 ? "s" : ""} modifié{c.fieldsCount !== 1 ? "s" : ""}</span>
-              <span>·</span>
-              <span>Soumis le {new Date(c.submittedAt).toLocaleDateString("fr-FR", { day: "numeric", month: "short", year: "numeric" })}</span>
+        <div key={c.id} className="bg-white border border-surface-border rounded-lg p-4 flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4">
+          <div className="flex items-center gap-4 min-w-0 flex-1">
+            <div className="w-10 h-10 rounded-lg bg-[#D97706]/10 flex items-center justify-center shrink-0">
+              <span className="material-symbols-outlined text-[#D97706]" style={{ fontSize: 22 }}>edit_note</span>
+            </div>
+            <div className="min-w-0 flex-1">
+              <div className="font-heading font-semibold text-[14px] text-ink-primary leading-tight">{c.displayName}</div>
+              <div className="flex items-center gap-2 mt-1 text-[12px] text-ink-secondary">
+                <span>{c.fieldsCount} champ{c.fieldsCount !== 1 ? "s" : ""} modifié{c.fieldsCount !== 1 ? "s" : ""}</span>
+                <span>·</span>
+                <span>Soumis le {new Date(c.submittedAt).toLocaleDateString("fr-FR", { day: "numeric", month: "short", year: "numeric" })}</span>
+              </div>
             </div>
           </div>
           <Link
             href={`/admin/validation/comptes/${c.id}`}
-            className="inline-flex items-center gap-1.5 px-4 py-[9px] text-[13px] font-semibold text-white bg-[#5C2D91] hover:bg-[#4A2377] rounded transition-colors shrink-0"
+            className="inline-flex items-center justify-center gap-1.5 px-4 py-[9px] text-[13px] font-semibold text-white bg-[#5C2D91] hover:bg-[#4A2377] rounded transition-colors shrink-0"
           >
             <span className="material-symbols-outlined" style={{ fontSize: 16 }}>visibility</span>
             Examiner
@@ -166,24 +170,26 @@ function ProfilesList({ profiles }: { profiles: PendingProfileItem[] }): JSX.Ele
   return (
     <div className="space-y-3">
       {profiles.map((p) => (
-        <div key={p.id} className="bg-white border border-surface-border rounded-lg p-4 flex items-center gap-4">
-          <div className="w-10 h-10 rounded-lg flex items-center justify-center shrink-0" style={{ backgroundColor: `${kindColor(p.kind)}15` }}>
-            <span className="material-symbols-outlined" style={{ fontSize: 22, color: kindColor(p.kind) }}>
-              {p.kind === "brandup" ? "storefront" : p.kind === "traceup" ? "play_circle" : "qr_code_2"}
-            </span>
-          </div>
-          <div className="min-w-0 flex-1">
-            <div className="font-heading font-semibold text-[14px] text-ink-primary leading-tight">{p.companyName}</div>
-            <div className="flex items-center gap-2 mt-1 text-[12px] text-ink-secondary">
-              <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-bold" style={{ backgroundColor: `${kindColor(p.kind)}15`, color: kindColor(p.kind) }}>
-                {kindLabel(p.kind)}
+        <div key={p.id} className="bg-white border border-surface-border rounded-lg p-4 flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4">
+          <div className="flex items-center gap-4 min-w-0 flex-1">
+            <div className="w-10 h-10 rounded-lg flex items-center justify-center shrink-0" style={{ backgroundColor: `${kindColor(p.kind)}15` }}>
+              <span className="material-symbols-outlined" style={{ fontSize: 22, color: kindColor(p.kind) }}>
+                {p.kind === "brandup" ? "storefront" : p.kind === "traceup" ? "play_circle" : "qr_code_2"}
               </span>
-              <span>Soumis le {new Date(p.submittedAt).toLocaleDateString("fr-FR", { day: "numeric", month: "long", year: "numeric" })}</span>
+            </div>
+            <div className="min-w-0 flex-1">
+              <div className="font-heading font-semibold text-[14px] text-ink-primary leading-tight">{p.companyName}</div>
+              <div className="flex items-center gap-2 mt-1 text-[12px] text-ink-secondary">
+                <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-bold" style={{ backgroundColor: `${kindColor(p.kind)}15`, color: kindColor(p.kind) }}>
+                  {kindLabel(p.kind)}
+                </span>
+                <span>Soumis le {new Date(p.submittedAt).toLocaleDateString("fr-FR", { day: "numeric", month: "long", year: "numeric" })}</span>
+              </div>
             </div>
           </div>
           <Link
             href={`/admin/validation/profiles/${p.id}`}
-            className="inline-flex items-center gap-1.5 px-4 py-[9px] text-[13px] font-semibold text-white bg-[#5C2D91] hover:bg-[#4A2377] rounded transition-colors shrink-0"
+            className="inline-flex items-center justify-center gap-1.5 px-4 py-[9px] text-[13px] font-semibold text-white bg-[#5C2D91] hover:bg-[#4A2377] rounded transition-colors shrink-0"
           >
             <span className="material-symbols-outlined" style={{ fontSize: 16 }}>visibility</span>
             Examiner
@@ -204,23 +210,25 @@ function RseList({ receipts }: { receipts: any[] }): JSX.Element {
   return (
     <div className="space-y-3">
       {receipts.map((r) => (
-        <div key={r.id} className="bg-white border border-surface-border rounded-lg p-4 flex items-center gap-4">
-          <div className="w-10 h-10 rounded-lg bg-[#C5A059]/10 flex items-center justify-center shrink-0">
-            <span className="material-symbols-outlined icon-fill text-[#C5A059]" style={{ fontSize: 22 }}>volunteer_activism</span>
-          </div>
-          <div className="min-w-0 flex-1">
-            <div className="font-heading font-semibold text-[14px] text-ink-primary leading-tight">{r.companyName}</div>
-            <div className="flex items-center gap-2 mt-1 text-[12px] text-ink-secondary flex-wrap">
-              <span>{r.associationName}</span>
-              <span>·</span>
-              <span className="font-semibold">{r.amount} DT</span>
-              <span>·</span>
-              <span>Don du {new Date(r.donationDate).toLocaleDateString("fr-FR", { day: "numeric", month: "short", year: "numeric" })}</span>
+        <div key={r.id} className="bg-white border border-surface-border rounded-lg p-4 flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4">
+          <div className="flex items-center gap-4 min-w-0 flex-1">
+            <div className="w-10 h-10 rounded-lg bg-[#C5A059]/10 flex items-center justify-center shrink-0">
+              <span className="material-symbols-outlined icon-fill text-[#C5A059]" style={{ fontSize: 22 }}>volunteer_activism</span>
+            </div>
+            <div className="min-w-0 flex-1">
+              <div className="font-heading font-semibold text-[14px] text-ink-primary leading-tight">{r.companyName}</div>
+              <div className="flex items-center gap-2 mt-1 text-[12px] text-ink-secondary flex-wrap">
+                <span>{r.associationName}</span>
+                <span>·</span>
+                <span className="font-semibold">{r.amount} DT</span>
+                <span>·</span>
+                <span>Don du {new Date(r.donationDate).toLocaleDateString("fr-FR", { day: "numeric", month: "short", year: "numeric" })}</span>
+              </div>
             </div>
           </div>
           <Link
             href={`/admin/validation/rse/${r.id}`}
-            className="inline-flex items-center gap-1.5 px-4 py-[9px] text-[13px] font-semibold text-white bg-[#5C2D91] hover:bg-[#4A2377] rounded transition-colors shrink-0"
+            className="inline-flex items-center justify-center gap-1.5 px-4 py-[9px] text-[13px] font-semibold text-white bg-[#5C2D91] hover:bg-[#4A2377] rounded transition-colors shrink-0"
           >
             <span className="material-symbols-outlined" style={{ fontSize: 16 }}>visibility</span>
             Examiner

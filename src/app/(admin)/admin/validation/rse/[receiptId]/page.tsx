@@ -55,8 +55,8 @@ export default async function RseReceiptReviewPage({ params }: PageProps): Promi
         </div>
         <div className="divide-y divide-surface-border">
           {fields.map((f) => (
-            <div key={f.label} className="px-5 py-3 flex items-start gap-4">
-              <span className="text-[12px] font-semibold text-ink-tertiary w-[160px] shrink-0 pt-0.5">{f.label}</span>
+            <div key={f.label} className="px-5 py-3 flex flex-col sm:flex-row sm:items-start gap-1 sm:gap-4">
+              <span className="text-[12px] font-semibold text-ink-tertiary w-full sm:w-[160px] sm:shrink-0 sm:pt-0.5">{f.label}</span>
               <span className="text-[13px] text-ink-primary">{f.value}</span>
             </div>
           ))}

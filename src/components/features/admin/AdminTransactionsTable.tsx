@@ -75,7 +75,7 @@ export function AdminTransactionsTable({ transactions }: AdminTransactionsTableP
   return (
     <div>
       {/* Filters */}
-      <div className="flex items-center gap-3 mb-4">
+      <div className="flex flex-wrap items-center gap-3 mb-4">
         <select
           value={filterStatus}
           onChange={(e) => setFilterStatus(e.target.value)}
