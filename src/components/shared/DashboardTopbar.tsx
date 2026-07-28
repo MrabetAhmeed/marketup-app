@@ -114,7 +114,7 @@ export function DashboardTopbar({ me, notifications, title, subtitle }: Dashboar
           </button>
 
           {bellOpen && (
-            <div className="absolute right-0 top-full mt-1 w-[340px] max-w-[calc(100vw-24px)] bg-white rounded-xl shadow-modal border border-surface-border overflow-hidden">
+            <div className="max-md:fixed max-md:left-4 max-md:right-4 max-md:top-[57px] max-md:w-auto md:absolute md:right-0 md:top-full md:mt-1 md:w-[340px] md:max-w-[calc(100vw-24px)] bg-white rounded-xl shadow-modal border border-surface-border overflow-hidden z-50">
               <div className="px-4 py-3 flex items-center justify-between">
                 <span className="font-heading font-semibold text-[13px] text-ink-primary">
                   Notifications
@@ -205,7 +205,7 @@ export function DashboardTopbar({ me, notifications, title, subtitle }: Dashboar
           </button>
 
           {avatarOpen && (
-            <div className="absolute right-0 top-full mt-1 w-[300px] max-w-[calc(100vw-24px)] bg-white rounded-xl shadow-modal border border-surface-border overflow-hidden">
+            <div className="max-md:fixed max-md:right-4 max-md:top-[57px] max-md:w-[calc(100vw-2rem)] max-md:max-w-[300px] md:absolute md:right-0 md:top-full md:mt-1 md:w-[300px] md:max-w-[calc(100vw-24px)] bg-white rounded-xl shadow-modal border border-surface-border overflow-hidden z-50">
               {/* Identity block */}
               <div className="px-4 py-3 flex items-center gap-3">
                 <div className="w-10 h-10 rounded-full bg-primary flex items-center justify-center shrink-0">

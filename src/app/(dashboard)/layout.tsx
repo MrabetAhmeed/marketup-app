@@ -46,7 +46,7 @@ export default async function DashboardLayout({
     <ToastProvider>
       <div className="flex min-h-screen bg-surface-muted">
         <DashboardSidebar me={me} />
-        <div className="flex-1 flex flex-col md:ml-60">
+        <div className="flex-1 flex flex-col md:ml-60 min-w-0">
           <DashboardTopbar me={me} notifications={notifications} />
           <main className="flex-1 p-4 md:p-8">
             <div className="max-w-[1280px] mx-auto">{children}</div>

@@ -187,23 +187,25 @@ export function TraceUpEditor({ profile, company }: TraceUpEditorProps): JSX.Ele
 
       {/* ═══ PENDING BANNER ═══ */}
       {isPending && (
-        <section className="bg-[#FEF3C7] border border-[#FDE68A] rounded-lg px-4 py-3 flex items-start md:items-center gap-3">
-          <span className="material-symbols-outlined text-[#D97706] shrink-0 mt-[1px] md:mt-0" style={{ fontSize: 20 }}>schedule</span>
-          <div className="min-w-0 flex-1 text-[12.5px] text-[#92400E] leading-snug">
-            <strong>Profil en cours de validation par l&apos;administrateur.</strong>{" "}
-            {profile.publishedAt
-              ? "Le profil reste visible avec vos vidéos publiées."
-              : "Le profil est temporairement masqué publiquement."
-            }{" "}Les suppressions de vidéos publiées sont bloquées.
+        <section className="bg-[#FEF3C7] border border-[#FDE68A] rounded-lg px-4 py-3 flex flex-col sm:flex-row items-start sm:items-center gap-3">
+          <div className="flex items-start gap-3 min-w-0 flex-1">
+            <span className="material-symbols-outlined text-[#D97706] shrink-0 mt-[1px] sm:mt-0" style={{ fontSize: 20 }}>schedule</span>
+            <div className="min-w-0 flex-1 text-[12.5px] text-[#92400E] leading-snug">
+              <strong>Profil en cours de validation par l&apos;administrateur.</strong>{" "}
+              {profile.publishedAt
+                ? "Le profil reste visible avec vos vidéos publiées."
+                : "Le profil est temporairement masqué publiquement."
+              }{" "}Les suppressions de vidéos publiées sont bloquées.
+            </div>
           </div>
           <button
             type="button"
             disabled={cancelling}
             onClick={handleCancelPending}
-            className="shrink-0 inline-flex items-center gap-1 px-3 py-1.5 text-[12px] font-semibold text-[#92400E] bg-white border border-[#FDE68A] rounded hover:bg-[#FFFBEB] transition-colors disabled:opacity-60"
+            className="shrink-0 inline-flex items-center gap-1 px-3 py-1.5 text-[12px] font-semibold text-[#92400E] bg-white border border-[#FDE68A] rounded hover:bg-[#FFFBEB] transition-colors disabled:opacity-60 self-end sm:self-center"
           >
             <span className="material-symbols-outlined" style={{ fontSize: 14 }}>undo</span>
-            {cancelling ? "Annulation…" : "Annuler la soumission"}
+            {cancelling ? "Annulation…" : "Annuler"}
           </button>
         </section>
       )}
