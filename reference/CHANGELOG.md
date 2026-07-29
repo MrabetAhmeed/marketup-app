@@ -43,4 +43,5 @@
 | Cache sessions | TTL ~30s sur jwt() pour reduire DB hits |
 | Purge RGPD J+30 | Suppression physique des fichiers Cloudinary/S3 apres soft-delete (30 jours) |
 | Corbeille admin | Vue admin des comptes supprimes + restauration potentielle |
+| URL courte LinkUP | Système maison code court + redirect 302 — attention : régénérer casse les QR déjà imprimés, design à réfléchir |
 | Backlog polish | `V1_1_POLISH_BACKLOG.md` (GPS re-geocode, badge StatusPill isPublic, nom gouvernorat diff admin, etc.) |

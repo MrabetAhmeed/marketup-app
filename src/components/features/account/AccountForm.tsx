@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
@@ -43,7 +43,8 @@ interface AccountFormProps {
 
 export function AccountForm({ me, gouvernorats }: AccountFormProps): JSX.Element {
   const { company } = me;
-  const baseUrl = "https://vivasky.media";
+  const [baseUrl, setBaseUrl] = useState("");
+  useEffect(() => { setBaseUrl(window.location.origin); }, []);
   const router = useRouter();
   const { showToast } = useToast();
   const [saving, setSaving] = useState(false);

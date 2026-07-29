@@ -1,6 +1,7 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useState, useCallback, useRef, useEffect } from "react";
+import QRCode from "qrcode";
 import Link from "next/link";
 import dynamic from "next/dynamic";
 import { useRouter } from "next/navigation";
@@ -33,7 +34,18 @@ export function LinkUpEditor({ profile, company }: LinkUpEditorProps): JSX.Eleme
   const router = useRouter();
   const { showToast } = useToast();
   const isReadOnly = profile.status === "pending" || profile.status === "disabled";
-  const baseUrl = "https://vivasky.media";
+  const [baseUrl, setBaseUrl] = useState("");
+  useEffect(() => { setBaseUrl(window.location.origin); }, []);
+
+  // QR canvas
+  const qrCanvasRef = useRef<HTMLCanvasElement>(null);
+  const linkupUrl = `${baseUrl}/linkup/${company.slug}`;
+  useEffect(() => {
+    if (!baseUrl || !qrCanvasRef.current) return;
+    QRCode.toCanvas(qrCanvasRef.current, linkupUrl, { width: 128, margin: 1 }, (err) => {
+      if (err) console.error("QR render error:", err);
+    });
+  }, [baseUrl, linkupUrl]);
 
   // Build default values from socials array
   const defaultSocials: FormValues = {};
@@ -455,20 +467,28 @@ export function LinkUpEditor({ profile, company }: LinkUpEditorProps): JSX.Eleme
           </p>
         </div>
         <div className="flex flex-col md:flex-row items-center md:items-start gap-6">
-          {/* QR placeholder — TODO Phase 4: real QR generation */}
           <div className="w-[160px] h-[160px] p-4 bg-white border border-surface-border rounded-lg shrink-0 flex items-center justify-center">
-            <span className="material-symbols-outlined text-ink-tertiary" style={{ fontSize: 64 }}>qr_code_2</span>
+            <canvas ref={qrCanvasRef} />
           </div>
           <div className="min-w-0 flex-1 w-full space-y-4">
-            <CopyGroup value={`${baseUrl}/linkup/${company.slug}`} />
+            <CopyGroup value={linkupUrl} />
             <div className="flex items-center gap-2 flex-wrap">
-              <button type="button" disabled className="inline-flex items-center gap-1.5 px-4 py-[9px] text-[13px] font-semibold text-ink-primary bg-white border border-[#D1D1D1] rounded opacity-60 cursor-not-allowed">
+              <button
+                type="button"
+                disabled={!baseUrl}
+                onClick={() => {
+                  const canvas = qrCanvasRef.current;
+                  if (!canvas) return;
+                  const dataUrl = canvas.toDataURL("image/png");
+                  const a = document.createElement("a");
+                  a.href = dataUrl;
+                  a.download = `linkup-${company.slug}-qr.png`;
+                  a.click();
+                }}
+                className="inline-flex items-center gap-1.5 px-4 py-[9px] text-[13px] font-semibold text-ink-primary bg-white border border-[#D1D1D1] rounded hover:bg-surface-muted transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
+              >
                 <span className="material-symbols-outlined" style={{ fontSize: 16 }}>download</span>
                 Télécharger QR (PNG)
-              </button>
-              <button type="button" disabled className="inline-flex items-center gap-1.5 px-4 py-[9px] text-[13px] font-semibold text-primary hover:bg-primary-light rounded transition-colors opacity-60 cursor-not-allowed">
-                <span className="material-symbols-outlined" style={{ fontSize: 16 }}>refresh</span>
-                Régénérer URL courte
               </button>
             </div>
           </div>
