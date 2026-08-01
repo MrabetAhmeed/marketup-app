@@ -112,6 +112,9 @@ function ReceiptCard({ receipt }: { receipt: RseReceiptForUser }): JSX.Element {
           </div>
           <div className="text-[12px] text-ink-secondary leading-snug">
             <strong className="text-[#424242]">{formatDate(receipt.donationDate)}</strong>
+            {receipt.receiptNumber && (
+              <span className="text-ink-tertiary ml-2">· Reçu n° {receipt.receiptNumber}</span>
+            )}
           </div>
           <div className="text-[11px] text-ink-tertiary mt-0.5">
             {isValidated

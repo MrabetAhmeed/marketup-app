@@ -308,7 +308,7 @@ async function seedAdminUser(passwordHash: string): Promise<Types.ObjectId> {
   const admin = await insert(AdminUser, {
     firstName: "Bassem",
     lastName: "Admin",
-    email: "bassem@vivasky.media",
+    email: "manager@vivasky.media",
     passwordHash,
     role: "SUPER_ADMIN",
     avatar: { initials: "BA", backgroundColor: "#5C2D91" },
@@ -435,6 +435,7 @@ interface RseReceiptSeedData {
   associationSeedId: string;
   amount: number;
   donationDate: Date;
+  receiptNumber?: string | null;
   status: string;
   submittedAt: Date;
   validatedAt?: Date | null;
@@ -580,8 +581,8 @@ function buildCompanies(): CompanySeedData[] {
       ],
       rseReceipts: [
         { associationSeedId: "a-001", amount: 5200, donationDate: daysAgo(4), status: "pending", submittedAt: daysAgo(4) },
-        { associationSeedId: "a-002", amount: 4000, donationDate: daysAgo(100), status: "validated", submittedAt: daysAgo(100), validatedAt: daysAgo(99) },
-        { associationSeedId: "a-003", amount: 3200, donationDate: daysAgo(138), status: "validated", submittedAt: daysAgo(138), validatedAt: daysAgo(137) },
+        { associationSeedId: "a-002", amount: 4000, donationDate: daysAgo(100), receiptNumber: "REC-2026-0042", status: "validated", submittedAt: daysAgo(100), validatedAt: daysAgo(99) },
+        { associationSeedId: "a-003", amount: 3200, donationDate: daysAgo(138), receiptNumber: "REC-2026-0018", status: "validated", submittedAt: daysAgo(138), validatedAt: daysAgo(137) },
       ],
     },
     // c-002 — MediaCom Communication
@@ -636,7 +637,7 @@ function buildCompanies(): CompanySeedData[] {
       transactions: [
         { seedId: "t-c-003-1", type: "boost", refSeedId: "b-c-003-1", profileKind: "brandup", priceHT: 50, vatRate: 0.19, status: "paid", paidAt: daysAgo(21), paymentMethod: "card", paymentReference: "MP-BST-GL-001", invoiceUrl: SAMPLE_INVOICE_DOC, invoiceNumber: "MU-2026-00036", createdAt: daysAgo(21) },
       ],
-      rseReceipts: [{ associationSeedId: "a-002", amount: 1500, donationDate: daysAgo(61), status: "validated", submittedAt: daysAgo(61), validatedAt: daysAgo(60) }],
+      rseReceipts: [{ associationSeedId: "a-002", amount: 1500, donationDate: daysAgo(61), receiptNumber: "DON-2026-107", status: "validated", submittedAt: daysAgo(61), validatedAt: daysAgo(60) }],
     },
     // c-004 — BuildTech Construction
     {
@@ -686,8 +687,8 @@ function buildCompanies(): CompanySeedData[] {
       },
       transactions: [],
       rseReceipts: [
-        { associationSeedId: "a-002", amount: 2500, donationDate: daysAgo(82), status: "validated", submittedAt: daysAgo(82), validatedAt: daysAgo(81) },
-        { associationSeedId: "a-005", amount: 1800, donationDate: daysAgo(123), status: "validated", submittedAt: daysAgo(123), validatedAt: daysAgo(122) },
+        { associationSeedId: "a-002", amount: 2500, donationDate: daysAgo(82), receiptNumber: "TV-2026-0033", status: "validated", submittedAt: daysAgo(82), validatedAt: daysAgo(81) },
+        { associationSeedId: "a-005", amount: 1800, donationDate: daysAgo(123), receiptNumber: "SOS-2026-0091", status: "validated", submittedAt: daysAgo(123), validatedAt: daysAgo(122) },
       ],
     },
     // c-007 — AutoPlus
@@ -741,7 +742,7 @@ function buildCompanies(): CompanySeedData[] {
         { seedId: "t-c-009-1", type: "boost", refSeedId: "b-c-009-1", profileKind: "brandup", priceHT: 50, vatRate: 0.19, status: "paid", paidAt: daysAgo(10), paymentMethod: "card", paymentReference: "MP-BST-EP-001", invoiceUrl: SAMPLE_INVOICE_DOC, invoiceNumber: "MU-2026-00044", createdAt: daysAgo(10) },
         { seedId: "t-c-009-2", type: "sponsoring", refSeedId: "s-c-009-1", profileKind: "brandup", priceHT: 100, vatRate: 0.19, status: "paid", paidAt: daysAgo(5), paymentMethod: "card", paymentReference: "MP-SPO-EP-001", invoiceUrl: SAMPLE_INVOICE_DOC, invoiceNumber: "MU-2026-00046", createdAt: daysAgo(5) },
       ],
-      rseReceipts: [{ associationSeedId: "a-004", amount: 3500, donationDate: daysAgo(50), status: "validated", submittedAt: daysAgo(50), validatedAt: daysAgo(49) }],
+      rseReceipts: [{ associationSeedId: "a-004", amount: 3500, donationDate: daysAgo(50), receiptNumber: "AAEF-2026-055", status: "validated", submittedAt: daysAgo(50), validatedAt: daysAgo(49) }],
     },
     // c-010 — TextilTunis
     {
@@ -964,6 +965,7 @@ async function seedCompanies(
         amount: r.amount,
         currency: "DT",
         donationDate: r.donationDate,
+        receiptNumber: r.receiptNumber ?? null,
         receiptDocumentUrl: SAMPLE_RSE_RECEIPT_DOC,
         status: r.status,
         submittedAt: r.submittedAt,

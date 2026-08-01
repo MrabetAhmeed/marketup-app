@@ -5,6 +5,7 @@ export interface RseReceiptForUser {
   amount: number;
   donationDate: string;
   submissionDate: string;
+  receiptNumber: string | null;
   status: "validated" | "pending" | "rejected";
   rejectionReason: string | null;
   attestationUrl: string | null;

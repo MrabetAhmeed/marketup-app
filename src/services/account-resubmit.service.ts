@@ -57,7 +57,7 @@ export async function resubmitCompany(
 
   // Send admin email (non-blocking)
   try {
-    const adminEmail = process.env.ADMIN_NOTIFICATION_EMAIL ?? "bassem@vivasky.media";
+    const adminEmail = env.ADMIN_NOTIFICATION_EMAIL;
     const companyName = payload.displayName;
     await sendCompanyResubmittedEmail({
       adminEmail,

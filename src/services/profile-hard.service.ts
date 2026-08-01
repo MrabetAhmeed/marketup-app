@@ -122,7 +122,7 @@ export async function submitProfile(
   try {
     const company = await CompanyModel.findById(profile.companyId).lean();
     const companyName = company ? pickLocale(company.data?.displayName, lang) : "Entreprise inconnue";
-    const adminEmail = process.env.ADMIN_NOTIFICATION_EMAIL ?? "mrabet.ahmeed@gmail.com";
+    const adminEmail = env.ADMIN_NOTIFICATION_EMAIL;
 
     await sendProfileSubmittedEmail({
       adminEmail,

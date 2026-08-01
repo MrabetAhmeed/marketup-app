@@ -33,7 +33,7 @@ const envSchema = z.object({
   PUSHER_CLUSTER: z.string().default("eu"),
 
   // Admin notifications
-  ADMIN_NOTIFICATION_EMAIL: z.string().default("bassem@vivasky.media"),
+  ADMIN_NOTIFICATION_EMAIL: z.string().default("manager@vivasky.media"),
 
   // Storage
   STORAGE_ADAPTER: z.enum(["local", "r2", "cloudinary"]).default("local"),

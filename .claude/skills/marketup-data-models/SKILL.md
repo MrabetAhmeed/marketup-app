@@ -573,7 +573,7 @@ When porting `reference/marketup_seed_data.js` to a real `npm run db:seed`:
    This keeps the "active boost" state correct regardless of when the seed is run.
 4. **Rejection reasons are demo canon** — copy verbatim from the source seed, don't paraphrase.
 5. Hash demo passwords with the same bcrypt rounds as production (e.g. 12). Default demo password: `Demo1234!`.
-6. Demo admin: **Bassem Admin** (`bassem@vivasky.media`, BA avatar, purple `#5C2D91`).
+6. Demo admin: **Bassem Admin** (`manager@vivasky.media`, BA avatar, purple `#5C2D91`).
 
 ## 10. Migration / breaking-change protocol
 

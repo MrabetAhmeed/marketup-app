@@ -26,6 +26,11 @@ export const CreateRseDonationSchema = z.object({
       },
       { message: "La date ne peut pas être dans le futur." },
     ),
+  receiptNumber: z
+    .string()
+    .max(50, "50 caractères maximum.")
+    .optional()
+    .default(""),
   notes: z
     .string()
     .max(280, "280 caractères maximum.")

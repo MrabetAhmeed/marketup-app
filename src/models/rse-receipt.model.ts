@@ -21,6 +21,8 @@ const RseReceiptSchema = new Schema(
     currency: { type: String, default: "DT" },
     donationDate: { type: Date, required: true },
     receiptDocumentUrl: { type: String, default: null },
+    // Optional receipt number from the paper document (entered by owner)
+    receiptNumber: { type: String, default: null },
 
     status: {
       type: String,
@@ -46,6 +48,12 @@ const RseReceiptSchema = new Schema(
 // Indexes (per skill data-models §8)
 RseReceiptSchema.index({ companyId: 1, status: 1 });
 RseReceiptSchema.index({ status: 1, submittedAt: 1 });
+// Partial unique: same company cannot have duplicate receiptNumber (when provided)
+// Uses $type "string" instead of $ne:null because MongoDB in-memory doesn't support $ne in partialFilterExpression
+RseReceiptSchema.index(
+  { companyId: 1, receiptNumber: 1 },
+  { unique: true, partialFilterExpression: { receiptNumber: { $type: "string" } } },
+);
 
 // Soft-delete filter
 RseReceiptSchema.pre(/^find/, function (this: { getOptions(): { withDeleted?: boolean }; where(condition: Record<string, unknown>): void }) {

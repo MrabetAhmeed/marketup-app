@@ -282,18 +282,18 @@ describe("Auth Service", () => {
     await AdminUserModel.create([{
       firstName: "Bassem",
       lastName: "Admin",
-      email: "bassem@vivasky.media",
+      email: "manager@vivasky.media",
       passwordHash,
       role: "SUPER_ADMIN",
       avatar: { initials: "BA", backgroundColor: "#5C2D91" },
       languages: ["fr"],
     }]);
 
-    const result = await login("bassem@vivasky.media", "Admin1234!");
+    const result = await login("manager@vivasky.media", "Admin1234!");
 
     expect(result.role).toBe("SUPER_ADMIN");
     expect(result.companyId).toBeNull();
-    expect(result.email).toBe("bassem@vivasky.media");
+    expect(result.email).toBe("manager@vivasky.media");
   });
 
   // === (l) Password reset happy path ===

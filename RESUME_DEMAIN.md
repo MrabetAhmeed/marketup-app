@@ -60,7 +60,7 @@ Lancer `npm run dev` puis tester ces scénarios :
 6. Après resubmit → redirect vers `/dashboard` (plus bloqué car status = pending)
 
 **B. Flow Admin Suspend/Reactivate**
-1. Login bassem@vivasky.media (admin)
+1. Login manager@vivasky.media (admin)
 2. `/admin/entreprises` → liste des companies visible
 3. Cliquer une company active → bouton "Suspendre" visible
 4. Suspendre → company.status = "suspended"

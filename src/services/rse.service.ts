@@ -45,6 +45,7 @@ export async function getRseDataForUser(
       amount: r.amount,
       donationDate: new Date(r.donationDate).toISOString(),
       submissionDate: new Date(r.submittedAt ?? r.createdAt).toISOString(),
+      receiptNumber: r.receiptNumber ?? null,
       status: r.status,
       rejectionReason: r.rejectedReason ?? null,
       attestationUrl: r.receiptDocumentUrl ?? null,

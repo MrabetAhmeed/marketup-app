@@ -80,6 +80,7 @@ export interface RseReceiptForAdminReview {
   amount: number;
   donationDate: string;
   submittedAt: string;
+  receiptNumber: string | null;
   receiptDocumentUrl: string | null;
   ownerEmail: string;
 }
@@ -113,6 +114,7 @@ export async function getRseReceiptForAdminReview(
     amount: receipt.amount,
     donationDate: new Date(receipt.donationDate).toISOString(),
     submittedAt: new Date(receipt.submittedAt ?? receipt.createdAt).toISOString(),
+    receiptNumber: receipt.receiptNumber ?? null,
     receiptDocumentUrl: receipt.receiptDocumentUrl ?? null,
     ownerEmail: user?.email ?? company?.accountEmail ?? "",
   };

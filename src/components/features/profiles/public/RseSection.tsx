@@ -2,7 +2,7 @@ interface RseReceipt {
   associationName: string;
   amount: number;
   donationDate: string;
-  receiptNumber: string;
+  receiptNumber: string | null;
   receiptDocumentUrl?: string | null;
 }
 
@@ -44,8 +44,8 @@ export default function RseSection({ receipts }: RseSectionProps): JSX.Element {
 
       {/* Receipt cards */}
       <div className="flex flex-col md:flex-row gap-6">
-        {receipts.map((r) => (
-          <div key={r.receiptNumber} className="flex-1 bg-white rounded-2xl overflow-hidden shadow-sm border border-outline-variant">
+        {receipts.map((r, idx) => (
+          <div key={r.receiptNumber ?? `rse-${idx}`} className="flex-1 bg-white rounded-2xl overflow-hidden shadow-sm border border-outline-variant">
             <div className="h-32 overflow-hidden bg-gradient-to-br from-primary/10 to-primary/30 flex items-center justify-center">
               <span className="material-symbols-outlined text-primary" style={{ fontSize: 48, fontVariationSettings: "'FILL' 1" }}>volunteer_activism</span>
             </div>
@@ -53,7 +53,7 @@ export default function RseSection({ receipts }: RseSectionProps): JSX.Element {
               <div className="flex justify-between items-start mb-4">
                 <div>
                   <h4 className="font-bold text-on-surface">{r.associationName}</h4>
-                  <p className="text-[11px] text-outline font-medium">Re&ccedil;u n&deg; {r.receiptNumber}</p>
+                  {r.receiptNumber && <p className="text-[11px] text-outline font-medium">Re&ccedil;u n&deg; {r.receiptNumber}</p>}
                 </div>
                 <div className="bg-primary/10 text-primary px-2 py-1 rounded text-[10px] font-bold flex items-center gap-1">
                   <span className="material-symbols-outlined text-xs" style={{ fontVariationSettings: "'FILL' 1" }}>verified</span>

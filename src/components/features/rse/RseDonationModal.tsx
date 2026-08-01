@@ -24,6 +24,7 @@ export function RseDonationModal({ open, onClose, associations }: RseDonationMod
   const [associationId, setAssociationId] = useState("");
   const [amount, setAmount] = useState("");
   const [donationDate, setDonationDate] = useState("");
+  const [receiptNumber, setReceiptNumber] = useState("");
   const [file, setFile] = useState<File | null>(null);
   const [notes, setNotes] = useState("");
   const [submitting, setSubmitting] = useState(false);
@@ -34,6 +35,7 @@ export function RseDonationModal({ open, onClose, associations }: RseDonationMod
     setAssociationId("");
     setAmount("");
     setDonationDate("");
+    setReceiptNumber("");
     setFile(null);
     setNotes("");
     if (fileRef.current) fileRef.current.value = "";
@@ -48,13 +50,18 @@ export function RseDonationModal({ open, onClose, associations }: RseDonationMod
       fd.append("associationId", associationId);
       fd.append("amount", amount);
       fd.append("donationDate", donationDate);
+      if (receiptNumber.trim()) fd.append("receiptNumber", receiptNumber.trim());
       fd.append("notes", notes);
       fd.append("receipt", file);
 
       const res = await fetch("/api/v1/me/rse/donations", { method: "POST", body: fd });
       const json = await res.json();
       if (!res.ok) {
-        showToast(json.error?.message || "Erreur lors de la soumission");
+        if (json.error?.code === "DUPLICATE_RECEIPT_NUMBER") {
+          showToast("Un reçu avec ce numéro existe déjà pour votre entreprise.");
+        } else {
+          showToast(json.error?.message || "Erreur lors de la soumission");
+        }
         return;
       }
       showToast("Reçu de don soumis pour validation");
@@ -94,7 +101,7 @@ export function RseDonationModal({ open, onClose, associations }: RseDonationMod
         </div>
 
         {/* Body */}
-        <div className="p-5 space-y-4">
+        <div className="p-5 space-y-4 overflow-y-auto min-h-0">
           {/* Association */}
           <div>
             <label htmlFor="rse-assoc" className="field-label">
@@ -150,6 +157,22 @@ export function RseDonationModal({ open, onClose, associations }: RseDonationMod
               max={today}
               value={donationDate}
               onChange={(e) => setDonationDate(e.target.value)}
+              className="field-input"
+            />
+          </div>
+
+          {/* Receipt number (optional) */}
+          <div>
+            <label htmlFor="rse-number" className="field-label">
+              Numéro du reçu <span className="text-ink-tertiary font-normal normal-case tracking-normal ml-1">(si présent sur le document)</span>
+            </label>
+            <input
+              id="rse-number"
+              type="text"
+              maxLength={50}
+              value={receiptNumber}
+              onChange={(e) => setReceiptNumber(e.target.value)}
+              placeholder="Ex : REC-2026-0042"
               className="field-input"
             />
           </div>

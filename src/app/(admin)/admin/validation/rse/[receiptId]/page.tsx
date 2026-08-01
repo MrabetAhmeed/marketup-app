@@ -16,6 +16,7 @@ export default async function RseReceiptReviewPage({ params }: PageProps): Promi
     { label: "Association", value: receipt.associationName },
     { label: "Montant", value: `${receipt.amount} DT` },
     { label: "Date du don", value: new Date(receipt.donationDate).toLocaleDateString("fr-FR", { day: "numeric", month: "long", year: "numeric" }) },
+    ...(receipt.receiptNumber ? [{ label: "N° du reçu", value: receipt.receiptNumber }] : []),
     { label: "Soumis le", value: new Date(receipt.submittedAt).toLocaleDateString("fr-FR", { day: "numeric", month: "long", year: "numeric" }) },
     { label: "Email propriétaire", value: receipt.ownerEmail },
   ];

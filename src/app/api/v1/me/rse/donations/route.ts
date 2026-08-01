@@ -39,6 +39,7 @@ export async function POST(req: NextRequest): Promise<Response> {
       associationId: formData.get("associationId") as string ?? "",
       amount: formData.get("amount") as string ?? "",
       donationDate: formData.get("donationDate") as string ?? "",
+      receiptNumber: formData.get("receiptNumber") as string ?? "",
       notes: formData.get("notes") as string ?? "",
     };
     const parsed = CreateRseDonationSchema.parse({
@@ -56,12 +57,23 @@ export async function POST(req: NextRequest): Promise<Response> {
     const uploadResult = await uploadReceiptFromFile(file, companyId);
 
     // Create RseReceipt
+    const receiptNumber = parsed.receiptNumber?.trim() || null;
+
+    // Check duplicate receiptNumber for same company
+    if (receiptNumber) {
+      const existing = await RseReceiptModel.findOne({ companyId, receiptNumber }).lean();
+      if (existing) {
+        throw new AppError("DUPLICATE_RECEIPT_NUMBER", "Un reçu avec ce numéro existe déjà pour votre entreprise.", 409);
+      }
+    }
+
     const receipt = await RseReceiptModel.create({
       companyId,
       associationId: parsed.associationId,
       amount: parsed.amount,
       donationDate: new Date(parsed.donationDate),
       receiptDocumentUrl: uploadResult.url,
+      receiptNumber,
       status: "pending",
       submittedAt: new Date(),
     });
@@ -72,6 +84,7 @@ export async function POST(req: NextRequest): Promise<Response> {
       amount: parsed.amount,
       associationId: parsed.associationId,
       donationDate: parsed.donationDate,
+      receiptNumber,
       receiptDocumentUrl: uploadResult.url,
     }, 201);
   } catch (err) {

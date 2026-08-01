@@ -136,7 +136,7 @@ export function AddVideoModal({ open, onClose, profileId, defaultCategory = "act
         </div>
 
         {/* Body */}
-        <div className="p-5 space-y-4">
+        <div className="p-5 space-y-4 overflow-y-auto min-h-0">
           {/* Platform select */}
           <div>
             <label className="field-label">Plateforme <span className="text-[#B91C1C] font-bold ml-0.5">*</span></label>

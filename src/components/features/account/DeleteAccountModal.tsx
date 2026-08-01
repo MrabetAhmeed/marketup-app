@@ -109,7 +109,7 @@ export function DeleteAccountModal({
         </div>
 
         {/* Body */}
-        <div className="p-5 space-y-4">
+        <div className="p-5 space-y-4 overflow-y-auto min-h-0">
           {/* Warning box */}
           <div className="bg-[#FEF2F2] border border-[#FCA5A5] rounded p-3.5">
             <div className="flex items-start gap-2">

@@ -54,7 +54,7 @@ interface PublicRseReceipt {
   associationName: string;
   amount: number;
   donationDate: string;
-  receiptNumber: string;
+  receiptNumber: string | null;
   receiptDocumentUrl: string | null;
 }
 
@@ -117,16 +117,19 @@ async function resolveCompanyBase(
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   company: any,
   lang: SupportedLang,
+  profileKind?: "brandup" | "traceup" | "linkup",
 ): Promise<PublicCompanyBase> {
   const sectorDoc = await SectorModel.findOne({ slug: company.liveData.sectorId }).lean();
   const gouvDoc = await GouvernoratModel.findOne({ slug: company.liveData.gouvernorat }).lean();
 
   const now = new Date();
-  const activeBoost = await BoostModel.findOne({
+  const boostQuery: Record<string, unknown> = {
     companyId: company._id,
     status: "active",
     to: { $gte: now },
-  }).lean();
+  };
+  if (profileKind) boostQuery.profileKind = profileKind;
+  const activeBoost = await BoostModel.findOne(boostQuery).lean();
 
   return {
     slug: company.slug,
@@ -168,7 +171,7 @@ async function getValidatedReceipts(
     associations.map((a: Record<string, unknown>) => [String(a._id), a]),
   );
 
-  return receipts.slice(0, 2).map((r: Record<string, unknown>, idx: number) => {
+  return receipts.slice(0, 2).map((r: Record<string, unknown>) => {
     const assoc = assocMap.get(String(r.associationId));
     return {
       associationName: assoc
@@ -176,7 +179,7 @@ async function getValidatedReceipts(
         : "—",
       amount: r.amount as number,
       donationDate: r.donationDate ? new Date(r.donationDate as string).toISOString() : "",
-      receiptNumber: `2024-${String(idx + 1).padStart(5, "0")}`,
+      receiptNumber: (r.receiptNumber as string) ?? null,
       receiptDocumentUrl: (r.receiptDocumentUrl as string) ?? null,
     };
   });
@@ -244,7 +247,7 @@ export async function getPublicProfileBySlug(
   // 5. isPublic true but never published + not active → 404 (Cas 4 from visibility)
   if (publishedAt == null && profileStatus !== "active") throw new NotFoundError("Profil");
 
-  const companyBase = await resolveCompanyBase(companyAny, lang);
+  const companyBase = await resolveCompanyBase(companyAny, lang, type);
   const rseReceipts = await getValidatedReceipts(companyAny._id, lang);
 
   const data = profileAny.data as Record<string, unknown>;

@@ -552,7 +552,7 @@ If any gate fails, fix before committing.
 
 - **Owner** = the business person registered to the platform. One owner per company. Account email is the login.
 - **Super Admin** = AGGREGAX / vivasky.media staff. Validates accounts, profiles, RSE receipts. Sees all transactions.
-- The demo super admin is **Bassem Admin** (`bassem@vivasky.media`, avatar `BA` on purple `#5C2D91`).
+- The demo super admin is **Bassem Admin** (`manager@vivasky.media`, avatar `BA` on purple `#5C2D91`).
 - The demo owner is **Ahmed Mrabet** (`ahmed@technofab.tn`, avatar `AM`).
 
 ---

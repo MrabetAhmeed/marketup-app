@@ -176,7 +176,7 @@ a2a5dc8 feat(phase-6-sprint-2c): user-driven correction + suspend/reactivate + 5
 
 ### Compte admin
 
-Un seul admin : **Bassem Admin** (`bassem@vivasky.media`), role `SUPER_ADMIN`.
+Un seul admin : **Bassem Admin** (`manager@vivasky.media`), role `SUPER_ADMIN`.
 
 ### Aggregax (compte test Sprint 7X)
 

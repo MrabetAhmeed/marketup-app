@@ -85,7 +85,7 @@ function SuspendModal({
           </button>
         </div>
 
-        <div className="p-5 space-y-4">
+        <div className="p-5 space-y-4 overflow-y-auto min-h-0">
           <div className="bg-[#FEF2F2] border border-[#FCA5A5] rounded p-3.5">
             <div className="text-[12.5px] text-[#991B1B] leading-snug space-y-1">
               <div className="flex items-center gap-1.5">
