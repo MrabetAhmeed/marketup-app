@@ -18,6 +18,7 @@ interface CompanyEditData {
   phone: string | null;
   whatsapp: string | null;
   sectorId: string;
+  sectorName: string;
   gouvernorat: string;
   ville: string;
   address: string | null;
@@ -178,7 +179,7 @@ export function CompanyEditForm({ company }: { company: CompanyEditData }): JSX.
         {/* Read-only fields */}
         <section className="bg-white border border-surface-border rounded-lg p-5 space-y-4">
           <h3 className="font-heading font-bold text-[15px] text-ink-primary">Informations non modifiables</h3>
-          <p className="text-[12px] text-ink-secondary">Ces champs sont définis à l&apos;inscription et ne peuvent pas être modifiés. Contactez support@vivasky.media si nécessaire.</p>
+          <p className="text-[12px] text-ink-secondary">Ces champs sont définis à l&apos;inscription et ne peuvent pas être modifiés. Contactez manager@vivasky.media si nécessaire.</p>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
@@ -196,6 +197,11 @@ export function CompanyEditForm({ company }: { company: CompanyEditData }): JSX.
             <div>
               <label className="field-label">Email de compte (connexion)</label>
               <input type="text" readOnly value={company.accountEmail} className="field-input bg-surface-muted" />
+            </div>
+            <div>
+              <label className="field-label">Secteur d&apos;activité</label>
+              <input type="text" readOnly value={company.sectorName || company.sectorId} className="field-input bg-surface-muted" />
+              <p className="text-[11px] text-ink-tertiary mt-1">Défini à l&apos;inscription — non modifiable</p>
             </div>
           </div>
         </section>

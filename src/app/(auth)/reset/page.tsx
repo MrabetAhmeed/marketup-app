@@ -55,6 +55,7 @@ function ResetPasswordContent(): JSX.Element {
   const [state, setState] = useState<"form" | "success">("form");
   const { showToast } = useToast();
   const [errorEntry, setErrorEntry] = useState<ErrorMapEntry | null>(null);
+  const [scrollKey, setScrollKey] = useState(0);
   const [submitting, setSubmitting] = useState(false);
   const [confirmVisible, setConfirmVisible] = useState(false);
 
@@ -95,6 +96,7 @@ function ResetPasswordContent(): JSX.Element {
             showToast(entry.message);
           } else {
             setErrorEntry(entry);
+            setScrollKey((k) => k + 1);
           }
           return;
         }
@@ -166,7 +168,7 @@ function ResetPasswordContent(): JSX.Element {
                   </p>
                 </header>
 
-                {errorEntry && <AuthErrorBanner entry={errorEntry} />}
+                {errorEntry && <AuthErrorBanner entry={errorEntry} scrollKey={scrollKey} />}
 
                 {/* eslint-disable-next-line @typescript-eslint/no-misused-promises */}
                 <form onSubmit={handleSubmit(

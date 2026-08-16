@@ -68,7 +68,7 @@ function ValidateSponsoringModal({
 
         <div className="p-5">
           <p className="text-[13px] text-ink-secondary leading-relaxed">
-            La demande de campagne sponsorisée sera validée. L&apos;owner recevra une notification
+            La demande de campagne sponsorisée sera validée. Le client recevra une notification
             et pourra procéder au paiement pour lancer sa bannière.
           </p>
         </div>
@@ -164,11 +164,11 @@ function RejectSponsoringModal({
             <div className="text-[12.5px] text-[#991B1B] leading-snug space-y-1">
               <div className="flex items-center gap-1.5">
                 <span className="material-symbols-outlined shrink-0" style={{ fontSize: 14 }}>cancel</span>
-                La demande sera refusée et l&apos;owner notifié
+                La demande sera refusée et le client notifié
               </div>
               <div className="flex items-center gap-1.5">
                 <span className="material-symbols-outlined shrink-0" style={{ fontSize: 14 }}>refresh</span>
-                L&apos;owner pourra soumettre une nouvelle demande
+                Le client pourra soumettre une nouvelle demande
               </div>
             </div>
           </div>

@@ -21,7 +21,7 @@ export function companySuspendedEmailTemplate(params: {
         </p>
         <p style="color: #424242; font-size: 14px; line-height: 1.6;">
           Pour toute question, contactez notre support à
-          <a href="mailto:support@vivasky.media" style="color: #0078D4;">support@vivasky.media</a>.
+          <a href="mailto:manager@vivasky.media" style="color: #0078D4;">manager@vivasky.media</a>.
         </p>
         <hr style="border: none; border-top: 1px solid #E0E0E0; margin: 24px 0;" />
         <p style="color: #9E9E9E; font-size: 12px;">MARKET-UP — vivasky.media</p>

@@ -17,8 +17,17 @@ export function LogoUploadZone({ initials, logoUrl, pendingLogoUrl }: LogoUpload
   const [uploading, setUploading] = useState(false);
   const [previewUrl, setPreviewUrl] = useState(logoUrl);
 
+  function validateFile(file: File): string | null {
+    const allowed = ["image/jpeg", "image/png", "image/webp"];
+    if (!allowed.includes(file.type)) return "Format non accepté (JPG, PNG, WebP uniquement).";
+    if (file.size > 3 * 1024 * 1024) return "Fichier trop volumineux (3 Mo maximum).";
+    return null;
+  }
+
   async function handleFileChange(file: File | undefined): Promise<void> {
     if (!file) return;
+    const err = validateFile(file);
+    if (err) { showToast(err); return; }
     setUploading(true);
     try {
       const fd = new FormData();
@@ -42,7 +51,12 @@ export function LogoUploadZone({ initials, logoUrl, pendingLogoUrl }: LogoUpload
 
   return (
     <>
-    <div className="flex items-center gap-[18px] p-4 bg-surface-muted border border-dashed border-[#D1D1D1] rounded-lg hover:border-primary hover:bg-primary-light transition-colors">
+    <div
+      className="flex items-center gap-[18px] p-4 bg-surface-muted border border-dashed border-[#D1D1D1] rounded-lg hover:border-primary hover:bg-primary-light transition-colors"
+      onDragOver={(e) => e.preventDefault()}
+      onDragLeave={(e) => e.preventDefault()}
+      onDrop={(e) => { e.preventDefault(); handleFileChange(e.dataTransfer.files[0]); }}
+    >
       <input
         ref={fileRef}
         type="file"
@@ -67,7 +81,7 @@ export function LogoUploadZone({ initials, logoUrl, pendingLogoUrl }: LogoUpload
           Changer le logo
         </div>
         <div className="text-[12px] text-ink-secondary leading-snug mb-3">
-          Glissez une image ici ou cliquez pour en sélectionner une · JPG/PNG · 5 Mo max · minimum 400 × 400 px
+          Glissez une image ici ou cliquez pour en sélectionner une · JPG/PNG · 3 Mo max · minimum 400 × 400 px
         </div>
         <div className="flex items-center gap-2 flex-wrap">
           <button

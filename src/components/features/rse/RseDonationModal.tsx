@@ -29,7 +29,7 @@ export function RseDonationModal({ open, onClose, associations }: RseDonationMod
   const [notes, setNotes] = useState("");
   const [submitting, setSubmitting] = useState(false);
 
-  const canSubmit = associationId.length > 0 && Number(amount) >= 50 && donationDate.length > 0 && file !== null && !submitting;
+  const canSubmit = associationId.length > 0 && Number(amount) > 0 && donationDate.length > 0 && file !== null && !submitting;
 
   const handleClose = useCallback(() => {
     setAssociationId("");
@@ -132,17 +132,17 @@ export function RseDonationModal({ open, onClose, associations }: RseDonationMod
               <input
                 id="rse-amount"
                 type="number"
-                min={50}
+                min={1}
                 step={1}
                 value={amount}
                 onChange={(e) => setAmount(e.target.value)}
-                placeholder="Minimum 50 DT"
+                placeholder="Montant en DT"
                 className="field-input pl-9"
               />
             </div>
             <div className="field-help">
               <span className="material-symbols-outlined" style={{ fontSize: 13 }}>info</span>
-              Montant minimum : 50 DT · hors champ TVA (associations exonérées)
+              Montant en dinars tunisiens (DT) · hors champ TVA (associations exonérées)
             </div>
           </div>
 

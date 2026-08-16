@@ -314,29 +314,25 @@ export function AccountForm({ me, gouvernorats }: AccountFormProps): JSX.Element
             <div className="field-help">
               <span className="material-symbols-outlined" style={{ fontSize: 13 }}>info</span>
               Pour changer de type, contactez le support à
-              <a href="mailto:support@vivasky.media" className="text-primary hover:underline font-medium ml-1">
-                support@vivasky.media
+              <a href="mailto:manager@vivasky.media" className="text-primary hover:underline font-medium ml-1">
+                manager@vivasky.media
               </a>
             </div>
           </div>
 
-          {/* Sector (live) */}
+          {/* Sector (locked at registration) */}
           <div>
             <label htmlFor="acc-sector" className="field-label flex items-center gap-2 flex-wrap">
-              Secteur d&apos;activité <span className="text-[#B91C1C] font-bold ml-0.5">*</span>
-              <FieldBadge kind="live" />
+              Secteur d&apos;activité
+              <FieldBadge kind="locked" label="Défini à l'inscription — non modifiable" />
             </label>
             <input
               id="acc-sector"
               type="text"
               readOnly
               value={company.sector.name}
-              className="field-input"
+              className="field-input bg-surface-muted"
             />
-            <div className="field-help">
-              <span className="material-symbols-outlined" style={{ fontSize: 13 }}>info</span>
-              Impacte votre classement dans les moteurs de recherche
-            </div>
           </div>
 
           {/* Legal ID + Document (locked) */}
@@ -492,8 +488,8 @@ export function AccountForm({ me, gouvernorats }: AccountFormProps): JSX.Element
             <div className="field-help">
               <span className="material-symbols-outlined" style={{ fontSize: 13 }}>info</span>
               Identifiant de connexion · non modifiable ·
-              <a href="mailto:support@vivasky.media" className="text-primary hover:underline font-medium mx-1">
-                support@vivasky.media
+              <a href="mailto:manager@vivasky.media" className="text-primary hover:underline font-medium mx-1">
+                manager@vivasky.media
               </a>
               si besoin
             </div>

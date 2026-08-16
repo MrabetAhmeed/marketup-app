@@ -102,7 +102,7 @@ export const AUTH_ERROR_MESSAGES: Record<string, ErrorMapEntry> = {
     presentation: "banner",
   },
   COMPANY_SUSPENDED: {
-    message: "Votre compte a été désactivé. Pour toute question, contactez support@vivasky.media.",
+    message: "Votre compte a été désactivé. Pour toute question, contactez manager@vivasky.media.",
     presentation: "banner",
   },
 
@@ -116,7 +116,7 @@ export const AUTH_ERROR_MESSAGES: Record<string, ErrorMapEntry> = {
     presentation: "banner",
   },
   "COMPANY_NOT_ACTIVE.suspended": {
-    message: "Votre compte a été désactivé. Contactez support@vivasky.media.",
+    message: "Votre compte a été désactivé. Contactez manager@vivasky.media.",
     presentation: "banner",
   },
   "COMPANY_NOT_ACTIVE.deleted": {

@@ -14,7 +14,7 @@ import { VideoDeleteConfirm } from "./VideoDeleteConfirm";
 type VideoCategory = "actualite" | "offres" | "astuces" | "emplois";
 
 const TABS: { id: VideoCategory; label: string }[] = [
-  { id: "actualite", label: "Actualité" },
+  { id: "actualite", label: "Actualités" },
   { id: "offres", label: "Offres" },
   { id: "astuces", label: "Astuces" },
   { id: "emplois", label: "Emplois" },

@@ -78,7 +78,7 @@ export function CompanyRestoreAction({ companyId, companyName }: CompanyRestoreA
 
           <div className="p-5">
             <p className="text-[13px] text-ink-secondary leading-relaxed">
-              Le compte <strong>{companyName}</strong> sera restauré. L&apos;owner pourra se reconnecter
+              Le compte <strong>{companyName}</strong> sera restauré. Le client pourra se reconnecter
               et ses profils retrouveront leur état d&apos;avant la suppression. Un email de notification sera envoyé.
             </p>
           </div>

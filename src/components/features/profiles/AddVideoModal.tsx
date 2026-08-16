@@ -15,7 +15,7 @@ const PLATFORMS: { id: Platform; label: string; color: string; icon: string }[] 
 ];
 
 const CATEGORIES: { id: VideoCategory; label: string }[] = [
-  { id: "actualite", label: "Actualité" },
+  { id: "actualite", label: "Actualités" },
   { id: "offres", label: "Offres" },
   { id: "astuces", label: "Astuces" },
   { id: "emplois", label: "Emplois" },

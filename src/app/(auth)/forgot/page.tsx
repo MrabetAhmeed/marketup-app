@@ -60,7 +60,7 @@ export default function ForgotPasswordPage(): JSX.Element {
                     Mot de passe oublié
                   </h1>
                   <p className="text-[#616161] text-base leading-relaxed">
-                    Saisissez votre adresse email et nous vous enverrons un lien sécurisé pour réinitialiser votre mot de passe.
+                    Saisissez votre adresse email d&apos;inscription et nous vous enverrons un lien sécurisé pour réinitialiser votre mot de passe.
                   </p>
                 </header>
 
@@ -137,7 +137,7 @@ export default function ForgotPasswordPage(): JSX.Element {
                     <div>
                       <p className="text-xs font-bold uppercase tracking-wider text-[#616161] mb-1">Vous ne recevez rien ?</p>
                       <p className="text-xs text-[#616161] leading-relaxed mb-2">
-                        Vérifiez votre dossier spam. Si le problème persiste, contactez <a href="mailto:support@marketup.tn" className="text-[#0078D4] font-semibold hover:underline">support@marketup.tn</a>.
+                        Vérifiez votre dossier spam. Si le problème persiste, contactez <a href="mailto:manager@vivasky.media" className="text-[#0078D4] font-semibold hover:underline">manager@vivasky.media</a>.
                       </p>
                       <button type="button" onClick={handleResend} className="text-xs font-semibold text-[#0078D4] hover:underline mt-1">
                         Renvoyer le lien

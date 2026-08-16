@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { formatMoney, BOOST_PRICE_HT, DEFAULT_VAT_RATE, computeTTC } from "@/lib/pricing";
+import { formatMoney, BOOST_PRICE_HT, BOOST_DURATION_DAYS, DEFAULT_VAT_RATE, computeTTC } from "@/lib/pricing";
 
 interface BoostInfo {
   id: string;
@@ -35,9 +35,10 @@ const STATUS_LABELS: Record<string, string> = {
   incomplete: "Incomplet",
 };
 
-function daysRemaining(to: string): number {
+function daysRemaining(to: string, durationDays: number): number {
   const diff = new Date(to).getTime() - Date.now();
-  return Math.max(0, Math.ceil(diff / 86_400_000));
+  if (diff <= 0) return 0;
+  return Math.min(Math.ceil(diff / 86_400_000), durationDays);
 }
 
 function boostProgress(from: string, to: string): number {
@@ -46,8 +47,11 @@ function boostProgress(from: string, to: string): number {
   return Math.min(100, Math.max(0, Math.round((elapsed / total) * 100)));
 }
 
-function formatDate(iso: string): string {
-  return new Date(iso).toLocaleDateString("fr-TN", { day: "2-digit", month: "long", year: "numeric" });
+function formatDateTime(iso: string): string {
+  const d = new Date(iso);
+  const date = d.toLocaleDateString("fr-TN", { day: "numeric", month: "long", year: "numeric" });
+  const time = d.toLocaleTimeString("fr-TN", { hour: "2-digit", minute: "2-digit" });
+  return `${date} à ${time}`;
 }
 
 function getBlockingReason(item: ProfileBoostData): { color: string; bgColor: string; borderColor: string; icon: string; message: string } | null {
@@ -206,10 +210,10 @@ export function BoostCards({ data }: BoostCardsProps): JSX.Element {
                   <div className="mb-4">
                     <div className="flex items-center justify-between mb-1.5">
                       <span className="text-[11px] text-ink-secondary">
-                        Expire le <strong className="text-ink-primary">{formatDate(boost.to)}</strong>
+                        Expire le <strong className="text-ink-primary">{formatDateTime(boost.to)}</strong>
                       </span>
-                      <span className={`text-[11px] font-semibold ${daysRemaining(boost.to) <= 5 ? "text-status-pending-fg" : "text-status-active-fg"}`}>
-                        {daysRemaining(boost.to)} j restant{daysRemaining(boost.to) !== 1 ? "s" : ""}
+                      <span className={`text-[11px] font-semibold ${daysRemaining(boost.to, BOOST_DURATION_DAYS) <= 5 ? "text-status-pending-fg" : "text-status-active-fg"}`}>
+                        {daysRemaining(boost.to, BOOST_DURATION_DAYS)} j restant{daysRemaining(boost.to, BOOST_DURATION_DAYS) !== 1 ? "s" : ""}
                       </span>
                     </div>
                     <div className="h-1.5 bg-surface-muted rounded-full overflow-hidden">

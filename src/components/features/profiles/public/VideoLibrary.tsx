@@ -19,7 +19,7 @@ interface VideoLibraryProps {
 }
 
 const CATEGORIES = [
-  { key: "actualite", label: "Actualit\u00e9" },
+  { key: "actualite", label: "Actualit\u00e9s" },
   { key: "offres", label: "Offres" },
   { key: "astuces", label: "Astuces" },
   { key: "emplois", label: "Emplois" },
@@ -46,9 +46,7 @@ function formatDateLong(iso: string | null): string {
 
 export default function VideoLibrary({ videos }: VideoLibraryProps): JSX.Element {
   const [activeCategory, setActiveCategory] = useState<string>(() => {
-    const counts: Record<string, number> = {};
-    videos.forEach((v) => { counts[v.category] = (counts[v.category] ?? 0) + 1; });
-    return CATEGORIES.find((c) => (counts[c.key] ?? 0) > 0)?.key ?? "actualite";
+    return videos[0]?.category ?? "actualite";
   });
   const [activeVideoId, setActiveVideoId] = useState<string | null>(videos[0]?.id ?? null);
   const [autoplay, setAutoplay] = useState(false);
@@ -73,7 +71,7 @@ export default function VideoLibrary({ videos }: VideoLibraryProps): JSX.Element
   }, [videos, activeCategory, searchQuery]);
 
   const displayedVideos = filteredVideos.slice(0, displayCount);
-  const activeVideo = videos.find((v) => v.id === activeVideoId) ?? videos[0];
+  const activeVideo = videos.find((v) => v.id === activeVideoId) ?? filteredVideos[0] ?? videos[0];
 
   const handleCardClick = useCallback((video: Video) => {
     setActiveVideoId(video.id);
@@ -132,7 +130,13 @@ export default function VideoLibrary({ videos }: VideoLibraryProps): JSX.Element
             <button
               key={cat.key}
               type="button"
-              onClick={() => { setActiveCategory(cat.key); setDisplayCount(6); setSearchQuery(""); }}
+              onClick={() => {
+                setActiveCategory(cat.key);
+                setDisplayCount(6);
+                setSearchQuery("");
+                const firstInCat = videos.find((v) => v.category === cat.key);
+                setActiveVideoId(firstInCat?.id ?? null);
+              }}
               className={`pb-3 text-sm font-medium whitespace-nowrap transition-colors ${
                 activeCategory === cat.key
                   ? "font-bold text-primary border-b-2 border-primary"

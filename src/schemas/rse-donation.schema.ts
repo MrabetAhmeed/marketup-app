@@ -14,7 +14,7 @@ export const CreateRseDonationSchema = z.object({
   amount: z
     .number({ coerce: true })
     .int("Le montant doit être un nombre entier.")
-    .min(50, "Le montant minimum est de 50 DT.")
+    .min(1, "Le montant doit être supérieur à 0 DT.")
     .max(1_000_000, "Le montant maximum est de 1 000 000 DT."),
   donationDate: z
     .string()

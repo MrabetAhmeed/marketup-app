@@ -54,11 +54,11 @@ export default function CrossLinks({ current }: CrossLinksProps): JSX.Element {
   const links = ALL_LINKS.filter((l) => l.key !== current);
 
   return (
-    <div className="bg-[#0b1120] rounded-3xl p-8 md:p-12 text-white relative overflow-hidden">
+    <div className="bg-[#0b1120] rounded-xl p-8 md:p-12 text-white relative overflow-hidden">
       <div className="absolute top-0 right-0 w-64 h-64 bg-primary/10 blur-[100px]" />
 
       <div className="relative z-10 mb-10">
-        <h2 className="text-3xl font-extrabold mb-2 tracking-tight">D&eacute;couvrez aussi</h2>
+        <h2 className="text-3xl font-bold mb-2 tracking-tight">D&eacute;couvrez aussi</h2>
         <p className="text-slate-400">Explorez l&apos;&eacute;cosyst&egrave;me complet des entreprises sur nos plateformes partenaires.</p>
       </div>
 
@@ -67,7 +67,7 @@ export default function CrossLinks({ current }: CrossLinksProps): JSX.Element {
           <Link
             key={l.key}
             href={`/${l.key}`}
-            className="bg-slate-800/60 border border-white/10 rounded-2xl p-6 hover:bg-slate-800 transition-colors cursor-pointer group block"
+            className="bg-slate-800/60 border border-white/10 rounded-lg p-6 hover:bg-slate-800 transition-colors cursor-pointer group block"
           >
             <div className="flex items-center gap-4 mb-6">
               <div className="w-12 h-12 rounded-lg flex items-center justify-center" style={{ backgroundColor: l.color }}>

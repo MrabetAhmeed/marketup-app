@@ -5,11 +5,13 @@ import { NotFoundError, BusinessRuleError } from "@/lib/api-error";
 import { pickLocale } from "@/lib/i18n";
 import { Company } from "@/models/company.model";
 import { User } from "@/models/user.model";
+import { Sector } from "@/models/sector.model";
 import { sendCompanyResubmittedEmail } from "@/lib/email/sender";
 import type { CompanyResubmitInput } from "@/schemas/account-resubmit.schema";
 
 const CompanyModel = Company as any;
 const UserModel = User as any;
+const SectorModel = Sector as any;
 
 export async function resubmitCompany(
   userId: string,
@@ -83,6 +85,7 @@ export async function getCompanyForEdit(
   phone: string | null;
   whatsapp: string | null;
   sectorId: string;
+  sectorName: string;
   gouvernorat: string;
   ville: string;
   address: string | null;
@@ -100,6 +103,10 @@ export async function getCompanyForEdit(
   const company = await CompanyModel.findById(companyId).lean();
   if (!company) throw new NotFoundError("Company");
 
+  const sectorSlug = company.liveData?.sectorId ?? "";
+  const sectorDoc = sectorSlug ? await SectorModel.findOne({ slug: sectorSlug }).lean() : null;
+  const sectorName = sectorDoc ? pickLocale(sectorDoc.name, "fr") : sectorSlug;
+
   return {
     id: company._id.toString(),
     status: company.status,
@@ -112,6 +119,7 @@ export async function getCompanyForEdit(
     phone: company.liveData?.phone ?? null,
     whatsapp: company.liveData?.whatsapp ?? null,
     sectorId: company.liveData?.sectorId ?? "",
+    sectorName,
     gouvernorat: company.liveData?.gouvernorat ?? "",
     ville: company.liveData?.ville ?? "",
     address: company.liveData?.address ?? null,

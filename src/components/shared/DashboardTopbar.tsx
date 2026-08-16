@@ -74,8 +74,9 @@ export function DashboardTopbar({ me, notifications, title, subtitle }: Dashboar
 
   return (
     <header className="sticky top-0 z-30 h-14 bg-white border-b border-surface-border flex items-center justify-between px-4 md:px-6 gap-4">
-      {/* Left: title area (hamburger space on mobile handled by sidebar's fixed button) */}
-      <div className="min-w-0 pl-10 md:pl-0">
+      {/* Left: title area */}
+      <div className="min-w-0 pl-10 md:pl-0 flex items-center gap-3">
+        <div className="min-w-0">
         <h1 className="font-heading text-[16px] font-bold text-ink-primary truncate">
           {title ?? "Tableau de bord"}
         </h1>
@@ -87,10 +88,19 @@ export function DashboardTopbar({ me, notifications, title, subtitle }: Dashboar
             Bienvenue, {me.company.displayName}
           </p>
         )}
+        </div>
       </div>
 
-      {/* Right: bell + avatar */}
+      {/* Right: home + bell + avatar */}
       <div className="flex items-center gap-1 shrink-0">
+        {/* Home link */}
+        <Link
+          href="/"
+          className="w-9 h-9 flex items-center justify-center rounded-lg hover:bg-surface-muted transition-colors"
+          title="Accueil"
+        >
+          <span className="material-symbols-outlined text-ink-secondary" style={{ fontSize: 20 }}>home</span>
+        </Link>
         {/* Notification bell — hidden for rejected users */}
         {!isRejected && (
         <div ref={bellRef} className="relative">

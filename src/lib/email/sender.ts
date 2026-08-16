@@ -173,7 +173,7 @@ export async function sendCompanyRejectedEmail(params: {
   const { subject, html } = companyRejectedEmailTemplate({
     companyName: params.companyName,
     rejectedReason: params.rejectedReason,
-    supportEmail: "support@vivasky.media",
+    supportEmail: "manager@vivasky.media",
   });
   await sendEmail(params.userEmail, subject, html);
 }

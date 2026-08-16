@@ -197,7 +197,7 @@ export async function getProfileForAdminReview(
   // LinkUP fields
   const socials = (data.socials ?? []).map((s: any) => ({
     platform: s.platform ?? "",
-    url: s.url ?? null,
+    url: s.url || null,
   }));
 
   // Extract pending gallery for diff rendering (both snapshot and proposed)
@@ -274,7 +274,7 @@ export async function getProfileForAdminReview(
       if (!socialField) return null;
       return ((socialField.newValue ?? []) as any[]).map((s: any) => ({
         platform: s.platform ?? "",
-        url: s.url ?? null,
+        url: s.url || null,
       }));
     })(),
   };

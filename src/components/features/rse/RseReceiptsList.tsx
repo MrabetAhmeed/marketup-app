@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { StatusPill } from "@/components/shared/StatusPill";
-import { useFeatureSoonToast } from "@/hooks/useFeatureSoonToast";
+
 import { formatMoney } from "@/lib/pricing";
 import type { RseReceiptForUser } from "@/types/rse";
 
@@ -94,7 +94,6 @@ export function RseReceiptsList({
 }
 
 function ReceiptCard({ receipt }: { receipt: RseReceiptForUser }): JSX.Element {
-  const toast = useFeatureSoonToast();
   const isValidated = receipt.status === "validated";
 
   return (
@@ -131,16 +130,17 @@ function ReceiptCard({ receipt }: { receipt: RseReceiptForUser }): JSX.Element {
             </div>
           </div>
           <div className="flex items-center gap-1">
-            {isValidated && (
-              <button
-                type="button"
-                onClick={() => toast("FEATURE_COMING_SOON_RECEIPT_DOWNLOAD")}
+            {isValidated && receipt.attestationUrl && (
+              <a
+                href={receipt.attestationUrl}
+                target="_blank"
+                rel="noopener noreferrer"
                 className="inline-flex items-center gap-1 px-2 py-1.5 text-[12px] font-semibold text-primary hover:bg-primary-light rounded transition-colors"
-                title="Télécharger le PDF"
+                title="Voir le reçu"
               >
-                <span className="material-symbols-outlined" style={{ fontSize: 16 }}>download</span>
-                PDF
-              </button>
+                <span className="material-symbols-outlined" style={{ fontSize: 16 }}>open_in_new</span>
+                Voir le reçu
+              </a>
             )}
           </div>
         </div>

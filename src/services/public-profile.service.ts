@@ -349,7 +349,7 @@ export async function getPublicProfileBySlug(
     kind: "linkup",
     socials: socials.map((s) => ({
       platform: s.platform as string,
-      url: (s.url as string) ?? null,
+      url: (s.url as string) || null,
     })),
     rseReceipts,
     siblingProfiles,

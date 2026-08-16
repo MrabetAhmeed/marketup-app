@@ -105,7 +105,7 @@ export default function ValidationEmailPage(): JSX.Element {
               <div>
                 <p className="text-xs font-bold uppercase tracking-wider text-[#616161] mb-1">Vous ne recevez pas l&apos;email ?</p>
                 <p className="text-xs text-[#616161] leading-relaxed">
-                  Vérifiez votre dossier spam. Si le problème persiste, contactez notre support à <a href="mailto:support@marketup.tn" className="text-[#0078D4] font-semibold hover:underline">support@marketup.tn</a>.
+                  Vérifiez votre dossier spam. Si le problème persiste, contactez notre support à <a href="mailto:manager@vivasky.media" className="text-[#0078D4] font-semibold hover:underline">manager@vivasky.media</a>.
                 </p>
               </div>
             </div>

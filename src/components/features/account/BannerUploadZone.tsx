@@ -18,8 +18,17 @@ export function BannerUploadZone({ bannerUrl, pendingBannerUrl }: BannerUploadZo
 
   const hasImage = !!previewUrl;
 
+  function validateFile(file: File): string | null {
+    const allowed = ["image/jpeg", "image/png", "image/webp"];
+    if (!allowed.includes(file.type)) return "Format non accepté (JPG, PNG, WebP uniquement).";
+    if (file.size > 5 * 1024 * 1024) return "Fichier trop volumineux (5 Mo maximum).";
+    return null;
+  }
+
   async function handleFileChange(file: File | undefined): Promise<void> {
     if (!file) return;
+    const err = validateFile(file);
+    if (err) { showToast(err); return; }
     setUploading(true);
     try {
       const fd = new FormData();
@@ -52,6 +61,9 @@ export function BannerUploadZone({ bannerUrl, pendingBannerUrl }: BannerUploadZo
       />
       <div
         onClick={() => !uploading && fileRef.current?.click()}
+        onDragOver={(e) => e.preventDefault()}
+        onDragLeave={(e) => e.preventDefault()}
+        onDrop={(e) => { e.preventDefault(); handleFileChange(e.dataTransfer.files[0]); }}
         className={`relative w-full aspect-[4/1] max-h-[180px] rounded-lg overflow-hidden transition-colors cursor-pointer ${
           hasImage
             ? "border border-solid border-surface-border"
@@ -95,7 +107,7 @@ export function BannerUploadZone({ bannerUrl, pendingBannerUrl }: BannerUploadZo
       ) : (
         <div className="flex items-center gap-1 text-[11px] text-ink-tertiary mt-1">
           <span className="material-symbols-outlined" style={{ fontSize: 13 }}>info</span>
-          Affichée en haut de votre profil BrandUP · format paysage 4:1 (ex : 1200×300) · JPG/PNG · 5 Mo max
+          Affichée sur votre carte dans les résultats de recherche · format paysage 4:1 (ex : 1200×300) · JPG/PNG · 5 Mo max
         </div>
       )}
     </div>

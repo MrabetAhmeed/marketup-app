@@ -94,7 +94,7 @@ function SuspendModal({
               </div>
               <div className="flex items-center gap-1.5">
                 <span className="material-symbols-outlined shrink-0" style={{ fontSize: 14 }}>logout</span>
-                L&apos;owner sera déconnecté immédiatement
+                Le client sera déconnecté immédiatement
               </div>
               <div className="flex items-center gap-1.5">
                 <span className="material-symbols-outlined shrink-0" style={{ fontSize: 14 }}>mail</span>
@@ -199,7 +199,7 @@ function ReactivateModal({
 
         <div className="p-5">
           <p className="text-[13px] text-ink-secondary leading-relaxed">
-            Le compte <strong>{companyName}</strong> sera réactivé. L&apos;owner pourra se reconnecter
+            Le compte <strong>{companyName}</strong> sera réactivé. Le client pourra se reconnecter
             et ses profils publics redeviendront visibles. Un email de notification sera envoyé.
           </p>
         </div>

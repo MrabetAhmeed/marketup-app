@@ -215,7 +215,7 @@ function buildLinkUp(
   const data = profile.data ?? {};
   const socials: SocialLink[] = (data.socials ?? []).map((s: any) => ({
     platform: s.platform,
-    url: s.url ?? null,
+    url: s.url || null,
   }));
 
   const gps = company?.liveData?.gpsPosition;

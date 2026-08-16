@@ -14,7 +14,7 @@ export function accountDeletedEmailTemplate(companyName: string): { subject: str
         </p>
         <p style="color: #424242; font-size: 14px; line-height: 1.6;">
           Si vous n'êtes pas à l'origine de cette action, contactez immédiatement notre support
-          à <a href="mailto:support@vivasky.media" style="color: #0078D4;">support@vivasky.media</a>.
+          à <a href="mailto:manager@vivasky.media" style="color: #0078D4;">manager@vivasky.media</a>.
         </p>
         <hr style="border: none; border-top: 1px solid #E0E0E0; margin: 24px 0;" />
         <p style="color: #9E9E9E; font-size: 12px;">MARKET-UP — vivasky.media</p>

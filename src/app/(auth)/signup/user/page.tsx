@@ -18,6 +18,7 @@ export default function SignupUserPage(): JSX.Element {
   const router = useRouter();
   const { showToast } = useToast();
   const [errorEntry, setErrorEntry] = useState<ErrorMapEntry | null>(null);
+  const [scrollKey, setScrollKey] = useState(0);
   const [submitting, setSubmitting] = useState(false);
   const [accountEmail, setAccountEmail] = useState("");
   const [userId, setUserId] = useState("");
@@ -74,6 +75,7 @@ export default function SignupUserPage(): JSX.Element {
           showToast(entry.message);
         } else {
           setErrorEntry(entry);
+          setScrollKey((k) => k + 1);
         }
         return;
       }
@@ -114,7 +116,7 @@ export default function SignupUserPage(): JSX.Element {
               <p className="text-[#616161] text-base">Configurez votre accès personnel à la plateforme.</p>
             </header>
 
-            {errorEntry && <AuthErrorBanner entry={errorEntry} />}
+            {errorEntry && <AuthErrorBanner entry={errorEntry} scrollKey={scrollKey} />}
 
             {/* eslint-disable-next-line @typescript-eslint/no-misused-promises */}
             <form onSubmit={handleSubmit(

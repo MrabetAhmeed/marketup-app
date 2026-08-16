@@ -19,7 +19,7 @@ const PRODUCT_ACCENT: Record<ProductKey, string> = {
 };
 
 const PRODUCT_PLACEHOLDER: Record<ProductKey, string> = {
-  brandup: "Entreprise, secteur, produit, ville\u2026",
+  brandup: "Rechercher une entreprise\u2026",
   traceup: "Mots-cl\u00e9s, secteur, ville, vid\u00e9o\u2026",
   linkup: "Nom, fonction, entreprise, ville\u2026",
 };

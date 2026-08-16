@@ -1,15 +1,25 @@
 "use client";
 
+import { useRef, useEffect } from "react";
 import Link from "next/link";
 import type { ErrorMapEntry } from "@/lib/auth-error-messages";
 
 interface AuthErrorBannerProps {
   entry: ErrorMapEntry;
+  /** Increment to force scroll on repeated identical errors */
+  scrollKey?: number;
 }
 
-export default function AuthErrorBanner({ entry }: AuthErrorBannerProps): JSX.Element {
+export default function AuthErrorBanner({ entry, scrollKey }: AuthErrorBannerProps): JSX.Element {
+  const ref = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    requestAnimationFrame(() => {
+      ref.current?.scrollIntoView({ behavior: "smooth", block: "center" });
+    });
+  }, [entry, scrollKey]);
+
   return (
-    <div className="mb-6 flex items-start gap-2.5 p-3 px-4 bg-[#FDE7E9] border border-[#D13438] rounded text-[13px] text-[#A4262C]" role="alert">
+    <div ref={ref} className="mb-6 flex items-start gap-2.5 p-3 px-4 bg-[#FDE7E9] border border-[#D13438] rounded text-[13px] text-[#A4262C]" role="alert">
       <span className="material-symbols-outlined text-xl shrink-0">error</span>
       <div>
         <p className="font-semibold">{entry.message}</p>

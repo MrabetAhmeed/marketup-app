@@ -34,6 +34,7 @@ function LoginContent(): JSX.Element {
   const [passwordVisible, setPasswordVisible] = useState(false);
   const [rememberMe, setRememberMe] = useState(false);
   const [errorEntry, setErrorEntry] = useState<ErrorMapEntry | null>(null);
+  const [scrollKey, setScrollKey] = useState(0);
   const [hasError, setHasError] = useState(false);
   const [submitting, setSubmitting] = useState(false);
 
@@ -43,6 +44,7 @@ function LoginContent(): JSX.Element {
     if (errorCode) {
       const entry = getAuthErrorMessage(errorCode);
       setErrorEntry(entry);
+      setScrollKey((k) => k + 1);
       setHasError(true);
     }
   }, [searchParams]);
@@ -93,11 +95,13 @@ function LoginContent(): JSX.Element {
               showToast(entry.message);
             } else {
               setErrorEntry(entry);
+              setScrollKey((k) => k + 1);
               setHasError(true);
             }
           } catch {
             const entry = getAuthErrorMessage("INVALID_CREDENTIALS");
             setErrorEntry(entry);
+            setScrollKey((k) => k + 1);
             setHasError(true);
           }
         } else if (result?.ok) {
@@ -145,7 +149,7 @@ function LoginContent(): JSX.Element {
 
             {/* Error banner */}
             {errorEntry && errorEntry.presentation === "banner" && (
-              <AuthErrorBanner entry={errorEntry} />
+              <AuthErrorBanner entry={errorEntry} scrollKey={scrollKey} />
             )}
 
             <form onSubmit={handleSubmit} className="space-y-5">
@@ -233,7 +237,7 @@ function LoginContent(): JSX.Element {
 
             {/* Help */}
             <p className="mt-8 text-center text-xs text-[#8A8886]">
-              Problème de connexion ? Contactez <a href="mailto:support@marketup.tn" className="text-[#0078D4] font-semibold hover:underline">support@marketup.tn</a>
+              Problème de connexion ? Contactez <a href="mailto:manager@vivasky.media" className="text-[#0078D4] font-semibold hover:underline">manager@vivasky.media</a>
             </p>
           </div>
         </div>

@@ -3,6 +3,7 @@
 import { useState, useRef, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
+import { SPONSORING_DURATION_DAYS } from "@/lib/pricing";
 import type { SponsoringCardData } from "@/services/sponsoring.service";
 
 interface SponsoringCardsProps {
@@ -21,9 +22,17 @@ const KIND_ACCENT: Record<string, string> = {
   linkup: "#C5A059",
 };
 
-function daysRemaining(to: string): number {
+function daysRemaining(to: string, durationDays: number): number {
   const diff = new Date(to).getTime() - Date.now();
-  return Math.max(0, Math.ceil(diff / 86_400_000));
+  if (diff <= 0) return 0;
+  return Math.min(Math.ceil(diff / 86_400_000), durationDays);
+}
+
+function formatDateTime(iso: string): string {
+  const d = new Date(iso);
+  const date = d.toLocaleDateString("fr-TN", { day: "numeric", month: "long", year: "numeric" });
+  const time = d.toLocaleTimeString("fr-TN", { hour: "2-digit", minute: "2-digit" });
+  return `${date} à ${time}`;
 }
 
 function ctr(impressions: number, clicks: number): string {
@@ -271,6 +280,9 @@ function BannerInput({
           <button
             type="button"
             onClick={() => fileRef.current?.click()}
+            onDragOver={(e) => e.preventDefault()}
+            onDragLeave={(e) => e.preventDefault()}
+            onDrop={(e) => { e.preventDefault(); const f = e.dataTransfer.files[0]; if (f) { const dt = new DataTransfer(); dt.items.add(f); if (fileRef.current) { fileRef.current.files = dt.files; fileRef.current.dispatchEvent(new Event("change", { bubbles: true })); } } }}
             disabled={uploading}
             className="w-full py-4 border-2 border-dashed border-[#C8C6C4] hover:border-primary hover:bg-primary-light/30 rounded-lg transition-colors flex flex-col items-center gap-1.5 text-ink-secondary hover:text-primary disabled:opacity-50"
           >
@@ -322,7 +334,7 @@ function BannerInput({
         </div>
       )}
 
-      <p className="text-[10px] text-ink-tertiary">Recommandé : 1200×200 px</p>
+      <p className="text-[10px] text-ink-tertiary">Recommandé : 1200×200 px · La bannière sur la plateforme sera identique à cet aperçu.</p>
     </div>
   );
 }
@@ -496,8 +508,11 @@ export function SponsoringCards({ data }: SponsoringCardsProps): JSX.Element {
                   <div className="space-y-2">
                     <span className="inline-flex items-center gap-1 text-[10px] font-semibold text-status-active-fg bg-status-active-bg border border-status-active-border px-2 py-0.5 rounded">
                       <span className="w-1.5 h-1.5 rounded-full bg-status-active-dot" />
-                      En cours — {daysRemaining(card.current.to)} j restants
+                      En cours — {daysRemaining(card.current.to, SPONSORING_DURATION_DAYS)} j restant{daysRemaining(card.current.to, SPONSORING_DURATION_DAYS) !== 1 ? "s" : ""}
                     </span>
+                    <p className="text-[11px] text-ink-secondary">
+                      Expire le <strong className="text-ink-primary">{formatDateTime(card.current.to)}</strong>
+                    </p>
                     <img src={card.current.bannerUrl} alt="Bannière" className="w-full h-16 object-cover rounded" />
                     <div className="grid grid-cols-3 gap-2 text-center">
                       <div>

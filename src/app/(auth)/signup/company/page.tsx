@@ -30,6 +30,7 @@ function SignupCompanyContent(): JSX.Element {
   const presetType = searchParams.get("type")?.toUpperCase();
   const { showToast } = useToast();
   const [errorEntry, setErrorEntry] = useState<ErrorMapEntry | null>(null);
+  const [scrollKey, setScrollKey] = useState(0);
   const [submitting, setSubmitting] = useState(false);
   const [docFile, setDocFile] = useState<File | null>(null);
   const [docUploading, setDocUploading] = useState(false);
@@ -102,6 +103,7 @@ function SignupCompanyContent(): JSX.Element {
           showToast(entry.message);
         } else {
           setErrorEntry(entry);
+          setScrollKey((k) => k + 1);
         }
         return;
       }
@@ -142,7 +144,7 @@ function SignupCompanyContent(): JSX.Element {
               <p className="text-[#616161] text-base">Renseignez les informations légales pour créer votre compte MARKET-UP.</p>
             </header>
 
-            {errorEntry && <AuthErrorBanner entry={errorEntry} />}
+            {errorEntry && <AuthErrorBanner entry={errorEntry} scrollKey={scrollKey} />}
 
             {/* eslint-disable-next-line @typescript-eslint/no-misused-promises */}
             <form onSubmit={handleSubmit(
