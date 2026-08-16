@@ -344,6 +344,14 @@ These rules are fully implemented and tested. **Summaries below; full details in
 
 - **6.19 Sponsoring dynamique (C2):** workflow a etats : `pending` (demande owner) → `confirmed` (admin valide) → `active` (owner paie, from=paidAt, to=+7j) → `expired` (lazy). Terminaux : `rejected` (admin, raison obligatoire), `cancelled` (owner, pending/confirmed seulement — aucune annulation apres paiement V1). Guard anti-doublon : 1 seul sponsoring en pending|confirmed|active par (companyId, profileKind) → 409. rejected/cancelled/expired liberent le slot. Eligibilite demande : company active + profil du kind active+isPublic → sinon 422. Banniere publique : rotation aleatoire serveur parmi actifs du kind, mention "Sponsorise". Banniere defaut HTML/CSS quand aucun actif. Stats : impressions ($inc serveur au rendu SSR, fail-silent) + clics (sendBeacon sponsor_click → track endpoint, $inc fail-silent). Hub admin : onglet Sponsorings dans validation (5e tab), apercu banniere, lien cliquable, actions valider/refuser. Notifs : sponsoring_request_submitted (admin), sponsoring_validated (owner), sponsoring_rejected (owner), sponsoring_paid (admin+owner). 3 emails dedies + sendTransactionAdminEmail generique au paiement. Flag OFF : endpoints owner 403, admin accessible (lecture + valider/refuser).
 
+- **6.20 Notification actions (FB-2):** 3 endpoints owner — `PATCH /me/notifications/read-all`, `PATCH /me/notifications/[id]/read`, `DELETE /me/notifications/[id]` (soft-delete). Tous requireOwner + cross-tenant guard strict (recipientId === session userId). UI optimiste (state local) sur la page + les cards. La cloche admin est un compteur de taches pending (pas de read/delete).
+
+- **6.21 Signup frontiere passwordHash (FB-2):** a l'inscription, un user existant non verifie est ecrase SI il n'a PAS de passwordHash (etape 1 seule — le compte n'appartient a personne). Un user AVEC passwordHash (etape 2 faite) est refuse ("Cet email est deja utilise. Connectez-vous."). Au login, un user sans passwordHash recoit INVALID_CREDENTIALS generique (anti-enumeration). Le code SIGNUP_IN_PROGRESS est supprime.
+
+- **6.22 Forgot-password non verifie (FB-2):** `forgotPassword` envoie le lien si le user a un passwordHash, MEME si emailVerifiedAt est null. `resetPassword` pose emailVerifiedAt + cree les 3 profils via `ensureProfilesForCompany` (idempotent, E11000-safe) si le user etait non verifie. `ensureProfilesForCompany` est la fonction partagee utilisee par verifyOtp, login (lazy filet) et resetPassword.
+
+- **6.23 Obfuscation email support (FB-2):** l'email de support (`manager@vivasky.media`) n'apparait JAMAIS en clair dans le HTML source des pages rendues. Composant `<ObfuscatedEmail />` (client, assemble user+domain au mount via JS). Constante dans `src/lib/constants/support-email.ts`. Les emails HTML (templates Nodemailer) conservent l'email en clair (pas d'obfuscation dans un email).
+
 ---
 
 ## 7. API Conventions

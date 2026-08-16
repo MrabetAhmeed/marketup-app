@@ -1,22 +1,21 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useFeatureSoonToast } from "@/hooks/useFeatureSoonToast";
 import type { NotificationItem } from "@/types/notification";
 
 interface NotificationItemCardProps {
   notification: NotificationItem;
+  onMarkRead: (id: string) => void;
+  onDelete: (id: string) => void;
 }
 
-export function NotificationItemCard({ notification }: NotificationItemCardProps): JSX.Element {
+export function NotificationItemCard({ notification, onMarkRead, onDelete }: NotificationItemCardProps): JSX.Element {
   const router = useRouter();
-  const toast = useFeatureSoonToast();
   const n = notification;
 
   const handleClick = () => {
-    if (n.link) {
-      router.push(n.link);
-    }
+    if (!n.isRead) onMarkRead(n.id);
+    if (n.link) router.push(n.link);
   };
 
   return (
@@ -61,7 +60,7 @@ export function NotificationItemCard({ notification }: NotificationItemCardProps
         {!n.isRead && (
           <button
             type="button"
-            onClick={(e) => { e.stopPropagation(); toast("FEATURE_COMING_SOON_MARK_READ"); }}
+            onClick={(e) => { e.stopPropagation(); onMarkRead(n.id); }}
             className="w-7 h-7 rounded flex items-center justify-center text-ink-tertiary hover:text-primary hover:bg-primary-light transition-colors"
             title="Marquer comme lu"
             aria-label="Marquer comme lu"
@@ -71,7 +70,7 @@ export function NotificationItemCard({ notification }: NotificationItemCardProps
         )}
         <button
           type="button"
-          onClick={(e) => { e.stopPropagation(); toast("FEATURE_COMING_SOON_DELETE_NOTIFICATION"); }}
+          onClick={(e) => { e.stopPropagation(); onDelete(n.id); }}
           className="w-7 h-7 rounded flex items-center justify-center text-ink-tertiary hover:text-[#B91C1C] hover:bg-[#FEF2F2] transition-colors"
           title="Supprimer"
           aria-label="Supprimer"

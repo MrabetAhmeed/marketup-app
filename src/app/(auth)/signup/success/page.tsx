@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { ObfuscatedEmail } from "@/components/shared/ObfuscatedEmail";
 
 export default function SignupSuccessPage(): JSX.Element {
   return (
@@ -135,7 +136,7 @@ export default function SignupSuccessPage(): JSX.Element {
 
             {/* Support */}
             <p className="mt-10 text-xs text-[#8A8886]">
-              Une question ? Contactez-nous à <a href="mailto:manager@vivasky.media" className="text-[#0078D4] font-semibold hover:underline">manager@vivasky.media</a>
+              Une question ? Contactez-nous à <ObfuscatedEmail className="text-[#0078D4] font-semibold hover:underline" />
             </p>
           </div>
         </div>

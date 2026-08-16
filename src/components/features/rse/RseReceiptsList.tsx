@@ -6,7 +6,7 @@ import { StatusPill } from "@/components/shared/StatusPill";
 import { formatMoney } from "@/lib/pricing";
 import type { RseReceiptForUser } from "@/types/rse";
 
-type Filter = "all" | "validated" | "pending";
+type Filter = "all" | "validated" | "pending" | "rejected";
 
 interface RseReceiptsListProps {
   receipts: RseReceiptForUser[];
@@ -45,27 +45,30 @@ export function RseReceiptsList({
       </div>
 
       {/* Filter pills */}
-      <div className="flex gap-2 mb-4">
-        {(["all", "validated", "pending"] as Filter[]).map((f) => (
-          <button
-            key={f}
-            type="button"
-            onClick={() => setFilter(f)}
-            className={`px-3 py-1.5 text-[12px] font-semibold rounded transition-colors ${
-              filter === f
-                ? "bg-primary text-white"
-                : "bg-surface-muted text-ink-secondary hover:bg-surface-strong"
-            }`}
-          >
-            {f === "all" ? "Tous" : f === "validated" ? "Validés" : "En attente"}
-          </button>
-        ))}
+      <div className="flex gap-2 mb-4 flex-wrap">
+        {(["all", "validated", "pending", "rejected"] as Filter[]).map((f) => {
+          const label = f === "all" ? "Tous" : f === "validated" ? "Validés" : f === "pending" ? "En attente" : "Refusés";
+          return (
+            <button
+              key={f}
+              type="button"
+              onClick={() => setFilter(f)}
+              className={`px-3 py-1.5 text-[12px] font-semibold rounded transition-colors ${
+                filter === f
+                  ? "bg-primary text-white"
+                  : "bg-surface-muted text-ink-secondary hover:bg-surface-strong"
+              }`}
+            >
+              {label}
+            </button>
+          );
+        })}
       </div>
 
       {/* Receipt cards */}
       {filtered.length === 0 ? (
         <div className="py-8 text-center text-[13px] text-ink-tertiary">
-          Aucun reçu {filter !== "all" ? `avec le statut "${filter === "validated" ? "validé" : "en attente"}"` : "pour le moment"}
+          Aucun reçu {filter !== "all" ? `avec le statut "${filter === "validated" ? "validé" : filter === "pending" ? "en attente" : "refusé"}"` : "pour le moment"}
         </div>
       ) : (
         <div className="space-y-3">
@@ -94,7 +97,7 @@ export function RseReceiptsList({
 }
 
 function ReceiptCard({ receipt }: { receipt: RseReceiptForUser }): JSX.Element {
-  const isValidated = receipt.status === "validated";
+  const pillKind = receipt.status === "validated" ? "gold" : receipt.status === "rejected" ? "rejected" : "pending";
 
   return (
     <div className="bg-white border border-surface-border rounded-lg p-3 sm:p-4">
@@ -105,9 +108,7 @@ function ReceiptCard({ receipt }: { receipt: RseReceiptForUser }): JSX.Element {
             <h4 className="font-heading font-bold text-[14px] text-ink-primary leading-tight">
               {receipt.associationName}
             </h4>
-            <StatusPill kind={isValidated ? "gold" : "pending"}>
-              {isValidated ? "Validé" : "En attente de validation"}
-            </StatusPill>
+            <StatusPill kind={pillKind} />
           </div>
           <div className="text-[12px] text-ink-secondary leading-snug">
             <strong className="text-[#424242]">{formatDate(receipt.donationDate)}</strong>
@@ -116,10 +117,18 @@ function ReceiptCard({ receipt }: { receipt: RseReceiptForUser }): JSX.Element {
             )}
           </div>
           <div className="text-[11px] text-ink-tertiary mt-0.5">
-            {isValidated
+            {receipt.status === "validated"
               ? `Soumis le ${formatDate(receipt.submissionDate)}`
-              : "Validation admin sous 24-48 h"}
+              : receipt.status === "rejected"
+                ? `Soumis le ${formatDate(receipt.submissionDate)}`
+                : "Validation admin sous 24-48 h"}
           </div>
+          {receipt.status === "rejected" && receipt.rejectionReason && (
+            <div className="mt-2 p-2.5 bg-red-50 border border-red-200 rounded text-[12px] text-red-700 leading-snug">
+              <span className="font-semibold">Motif du refus :</span>{" "}
+              {receipt.rejectionReason}
+            </div>
+          )}
         </div>
 
         {/* Amount + actions */}
@@ -130,7 +139,7 @@ function ReceiptCard({ receipt }: { receipt: RseReceiptForUser }): JSX.Element {
             </div>
           </div>
           <div className="flex items-center gap-1">
-            {isValidated && receipt.attestationUrl && (
+            {receipt.status === "validated" && receipt.attestationUrl && (
               <a
                 href={receipt.attestationUrl}
                 target="_blank"

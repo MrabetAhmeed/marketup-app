@@ -51,9 +51,11 @@ export async function getNotificationsForUser(
   const { filter = "all", page = 1, pageSize = 10, lang = "fr" } = options;
 
   // Build query
+  // Explicit deletedAt: null — countDocuments does not trigger pre-find hooks
   const baseQuery: Record<string, unknown> = {
     recipientType: "owner",
     recipientId: userId,
+    deletedAt: null,
   };
 
   if (filter === "unread") {
@@ -74,6 +76,7 @@ export async function getNotificationsForUser(
       recipientType: "owner",
       recipientId: userId,
       read: false,
+      deletedAt: null,
     }),
     NotificationModel.find(baseQuery)
       .sort({ createdAt: -1 })
@@ -120,6 +123,70 @@ export interface CreateNotificationParams {
   actionUrl?: string;
   actionLabel?: { fr: string; ar?: string; en?: string };
 }
+
+// ---------------------------------------------------------------------------
+// markAllRead — mark all unread notifications as read for a given owner
+// ---------------------------------------------------------------------------
+
+export async function markAllNotificationsRead(userId: string): Promise<number> {
+  await connectDb();
+  const result = await NotificationModel.updateMany(
+    { recipientType: "owner", recipientId: userId, read: false },
+    { $set: { read: true, readAt: new Date() } },
+  );
+  return result.modifiedCount ?? 0;
+}
+
+// ---------------------------------------------------------------------------
+// markOneRead — mark a single notification as read (cross-tenant guarded)
+// ---------------------------------------------------------------------------
+
+export async function markNotificationRead(
+  userId: string,
+  notificationId: string,
+): Promise<void> {
+  await connectDb();
+  const notif = await NotificationModel.findById(notificationId);
+  if (!notif) {
+    const { NotFoundError } = await import("@/lib/api-error");
+    throw new NotFoundError("Notification");
+  }
+  if (notif.recipientType !== "owner" || String(notif.recipientId) !== userId) {
+    const { AuthError } = await import("@/lib/api-error");
+    throw new AuthError("FORBIDDEN", "Accès interdit.", 403);
+  }
+  if (!notif.read) {
+    notif.read = true;
+    notif.readAt = new Date();
+    await notif.save();
+  }
+}
+
+// ---------------------------------------------------------------------------
+// deleteNotification — soft-delete a single notification (cross-tenant guarded)
+// ---------------------------------------------------------------------------
+
+export async function deleteNotification(
+  userId: string,
+  notificationId: string,
+): Promise<void> {
+  await connectDb();
+  const notif = await NotificationModel.findById(notificationId);
+  if (!notif) {
+    const { NotFoundError } = await import("@/lib/api-error");
+    throw new NotFoundError("Notification");
+  }
+  if (notif.recipientType !== "owner" || String(notif.recipientId) !== userId) {
+    const { AuthError } = await import("@/lib/api-error");
+    throw new AuthError("FORBIDDEN", "Accès interdit.", 403);
+  }
+  notif.deletedAt = new Date();
+  await notif.save();
+}
+
+// ---------------------------------------------------------------------------
+// createNotification — generic helper for owner + admin notifs (C1/C2)
+// ---------------------------------------------------------------------------
 
 export async function createNotification(params: CreateNotificationParams): Promise<void> {
   await connectDb();

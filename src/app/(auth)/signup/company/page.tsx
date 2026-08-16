@@ -110,7 +110,7 @@ function SignupCompanyContent(): JSX.Element {
       // Store userId in sessionStorage for step 2
       sessionStorage.setItem("signupUserId", json.userId);
       sessionStorage.setItem("signupEmail", data.accountEmail);
-      router.push("/signup/user");
+      router.replace("/signup/user");
     } catch {
       showToast(getAuthErrorMessage("NETWORK_ERROR").message);
     } finally {

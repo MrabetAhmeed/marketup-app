@@ -140,7 +140,7 @@ export function DashboardTopbar({ me, notifications, title, subtitle }: Dashboar
               <div className="max-h-[320px] overflow-y-auto">
                 {notifications.length === 0 ? (
                   <div className="px-4 py-6 text-center text-[12px] text-ink-tertiary">
-                    Aucune notification
+                    Aucune nouvelle notification
                   </div>
                 ) : (
                   notifications.map((n) => (

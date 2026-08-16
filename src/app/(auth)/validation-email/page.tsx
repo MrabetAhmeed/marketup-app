@@ -3,6 +3,7 @@
 import { useState, useCallback } from "react";
 import Link from "next/link";
 import AuthLeftPanel from "@/components/shared/AuthLeftPanel";
+import { ObfuscatedEmail } from "@/components/shared/ObfuscatedEmail";
 
 export default function ValidationEmailPage(): JSX.Element {
   const [email, setEmail] = useState("");
@@ -105,7 +106,7 @@ export default function ValidationEmailPage(): JSX.Element {
               <div>
                 <p className="text-xs font-bold uppercase tracking-wider text-[#616161] mb-1">Vous ne recevez pas l&apos;email ?</p>
                 <p className="text-xs text-[#616161] leading-relaxed">
-                  Vérifiez votre dossier spam. Si le problème persiste, contactez notre support à <a href="mailto:manager@vivasky.media" className="text-[#0078D4] font-semibold hover:underline">manager@vivasky.media</a>.
+                  Vérifiez votre dossier spam. Si le problème persiste, contactez notre support à <ObfuscatedEmail className="text-[#0078D4] font-semibold hover:underline" />.
                 </p>
               </div>
             </div>

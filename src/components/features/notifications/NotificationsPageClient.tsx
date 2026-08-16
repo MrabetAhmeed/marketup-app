@@ -1,7 +1,7 @@
 "use client";
 
-import { useState } from "react";
-import { useFeatureSoonToast } from "@/hooks/useFeatureSoonToast";
+import { useState, useCallback } from "react";
+import { useRouter } from "next/navigation";
 import type { NotificationsPageData, NotificationFilter } from "@/types/notification";
 import { NotificationItemCard } from "./NotificationItemCard";
 
@@ -23,17 +23,19 @@ interface NotificationsPageClientProps {
 const PAGE_SIZE = 10;
 
 export function NotificationsPageClient({ data, initialFilter }: NotificationsPageClientProps): JSX.Element {
-  const toast = useFeatureSoonToast();
+  const router = useRouter();
   const [filter, setFilter] = useState<NotificationFilter>(initialFilter);
   const [page, setPage] = useState(1);
+  const [items, setItems] = useState(data.items);
+  const [unreadCount, setUnreadCount] = useState(data.unreadCount);
+  const [markingAll, setMarkingAll] = useState(false);
 
-  // Client-side filter (since we have all items from the page's RSC fetch)
-  // For Phase 4, this becomes a server-side URL param reload
+  // Client-side filter
   const filtered = filter === "all"
-    ? data.items
+    ? items
     : filter === "unread"
-      ? data.items.filter((n) => !n.isRead)
-      : data.items.filter((n) => {
+      ? items.filter((n) => !n.isRead)
+      : items.filter((n) => {
           const kindCategory = getKindCategory(n.kind);
           return kindCategory === filter;
         });
@@ -44,8 +46,48 @@ export function NotificationsPageClient({ data, initialFilter }: NotificationsPa
 
   const handleFilterChange = (f: NotificationFilter) => {
     setFilter(f);
-    setPage(1); // Reset to page 1 on filter change
+    setPage(1);
   };
+
+  const handleMarkAllRead = useCallback(async () => {
+    setMarkingAll(true);
+    // Optimistic
+    setItems((prev) => prev.map((n) => ({ ...n, isRead: true })));
+    setUnreadCount(0);
+    try {
+      await fetch("/api/v1/me/notifications/read-all", { method: "PATCH" });
+      router.refresh(); // Invalidate RSC cache (layout badge + dropdown)
+    } catch {
+      // Silent — optimistic already applied
+    } finally {
+      setMarkingAll(false);
+    }
+  }, [router]);
+
+  const handleMarkRead = useCallback(async (id: string) => {
+    // Optimistic
+    setItems((prev) => prev.map((n) => n.id === id ? { ...n, isRead: true } : n));
+    setUnreadCount((c) => Math.max(0, c - 1));
+    try {
+      await fetch(`/api/v1/me/notifications/${id}/read`, { method: "PATCH" });
+      router.refresh(); // Invalidate RSC cache (layout badge + dropdown)
+    } catch {
+      // Silent
+    }
+  }, [router]);
+
+  const handleDelete = useCallback(async (id: string) => {
+    const wasUnread = items.find((n) => n.id === id && !n.isRead);
+    // Optimistic
+    setItems((prev) => prev.filter((n) => n.id !== id));
+    if (wasUnread) setUnreadCount((c) => Math.max(0, c - 1));
+    try {
+      await fetch(`/api/v1/me/notifications/${id}`, { method: "DELETE" });
+      router.refresh(); // Invalidate RSC cache (layout badge + dropdown)
+    } catch {
+      // Silent
+    }
+  }, [items, router]);
 
   return (
     <div className="max-w-[900px] mx-auto space-y-6">
@@ -60,15 +102,16 @@ export function NotificationsPageClient({ data, initialFilter }: NotificationsPa
               Notifications
             </h2>
             <p className="text-[12.5px] text-ink-secondary mt-0.5">
-              {data.total} notification{data.total > 1 ? "s" : ""} · {data.unreadCount} non lue{data.unreadCount > 1 ? "s" : ""}
+              {items.length} notification{items.length > 1 ? "s" : ""} · {unreadCount} non lue{unreadCount > 1 ? "s" : ""}
             </p>
           </div>
         </div>
-        {data.unreadCount > 0 && (
+        {unreadCount > 0 && (
           <button
             type="button"
-            onClick={() => toast("FEATURE_COMING_SOON_MARK_ALL_READ")}
-            className="inline-flex items-center gap-1.5 px-4 py-[9px] text-[13px] font-semibold text-primary hover:bg-primary-light rounded transition-colors shrink-0"
+            disabled={markingAll}
+            onClick={handleMarkAllRead}
+            className="inline-flex items-center gap-1.5 px-4 py-[9px] text-[13px] font-semibold text-primary hover:bg-primary-light rounded transition-colors shrink-0 disabled:opacity-50"
           >
             <span className="material-symbols-outlined" style={{ fontSize: 16 }}>done_all</span>
             Tout marquer comme lu
@@ -110,7 +153,12 @@ export function NotificationsPageClient({ data, initialFilter }: NotificationsPa
       ) : (
         <div className="space-y-2">
           {paginated.map((notif) => (
-            <NotificationItemCard key={notif.id} notification={notif} />
+            <NotificationItemCard
+              key={notif.id}
+              notification={notif}
+              onMarkRead={handleMarkRead}
+              onDelete={handleDelete}
+            />
           ))}
         </div>
       )}

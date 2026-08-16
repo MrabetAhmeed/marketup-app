@@ -70,6 +70,11 @@ export default function SignupUserPage(): JSX.Element {
       const json = await res.json();
       if (!res.ok) {
         const code = json.error?.code || "SERVER_ERROR";
+        // Step 2 already done — redirect to OTP instead of showing banner
+        if (code === "STEP_ALREADY_COMPLETED") {
+          router.replace("/signup/verify");
+          return;
+        }
         const entry = getAuthErrorMessage(code);
         if (entry.presentation === "toast") {
           showToast(entry.message);
@@ -79,7 +84,7 @@ export default function SignupUserPage(): JSX.Element {
         }
         return;
       }
-      router.push("/signup/verify");
+      router.replace("/signup/verify");
     } catch {
       showToast(getAuthErrorMessage("NETWORK_ERROR").message);
     } finally {

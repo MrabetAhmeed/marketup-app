@@ -193,13 +193,7 @@ function SignupVerifyContent(): JSX.Element {
               </div>
             </form>
 
-            {/* Back */}
-            <div className="mt-10 pt-6 border-t border-[#E0E0E0]">
-              <Link href="/signup/user" className="inline-flex items-center justify-center gap-1.5 px-5 py-3 text-sm font-semibold text-[#0078D4] hover:bg-[#EFF6FC] rounded transition-colors">
-                <span className="material-symbols-outlined text-base">arrow_back</span>
-                Retour à l&apos;étape précédente
-              </Link>
-            </div>
+            {/* No back link — once on OTP, previous steps are locked */}
           </div>
         </div>
       </section>

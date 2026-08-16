@@ -22,12 +22,6 @@ export const AUTH_ERROR_MESSAGES: Record<string, ErrorMapEntry> = {
     ctaLabel: "Se connecter",
     ctaTarget: "/login",
   },
-  SIGNUP_IN_PROGRESS: {
-    message: "Une inscription est en cours pour cet email. Connectez-vous pour la finaliser.",
-    presentation: "banner",
-    ctaLabel: "Se connecter",
-    ctaTarget: "/login",
-  },
   INVALID_SECTOR: {
     message: "Le secteur d'activité sélectionné est invalide.",
     presentation: "field",
@@ -102,7 +96,7 @@ export const AUTH_ERROR_MESSAGES: Record<string, ErrorMapEntry> = {
     presentation: "banner",
   },
   COMPANY_SUSPENDED: {
-    message: "Votre compte a été désactivé. Pour toute question, contactez manager@vivasky.media.",
+    message: "Votre compte a été désactivé. Pour toute question, contactez le support.",
     presentation: "banner",
   },
 
@@ -116,7 +110,7 @@ export const AUTH_ERROR_MESSAGES: Record<string, ErrorMapEntry> = {
     presentation: "banner",
   },
   "COMPANY_NOT_ACTIVE.suspended": {
-    message: "Votre compte a été désactivé. Contactez manager@vivasky.media.",
+    message: "Votre compte a été désactivé. Contactez le support.",
     presentation: "banner",
   },
   "COMPANY_NOT_ACTIVE.deleted": {

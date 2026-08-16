@@ -148,10 +148,9 @@ describe("Auth Service", () => {
     ).rejects.toThrow("Cet email est déjà utilisé");
   });
 
-  // === (c) Signup orphan cleanup ===
-  it("signup cleans up orphan older than 7 days", async () => {
-    // Create orphan user+company with old createdAt
-    const oldDate = new Date(Date.now() - 8 * 24 * 60 * 60 * 1000);
+  // === (c) Signup overwrites user without passwordHash (step 1 only) ===
+  it("signup overwrites incomplete user without passwordHash", async () => {
+    // Step 1 only — no passwordHash
     const [oldCompany] = await CompanyModel.create([{
       slug: "old-co",
       type: "B2B",
@@ -165,12 +164,9 @@ describe("Auth Service", () => {
     await UserModel.create([{
       email: "orphan@example.tn",
       companyId: oldCompany._id,
-      createdAt: oldDate,
     }]);
-    // Force createdAt (Mongoose timestamps override)
-    await UserModel.updateOne({ email: "orphan@example.tn" }, { $set: { createdAt: oldDate } });
 
-    // New signup with same email should succeed (orphan cleaned up)
+    // Re-signup with same email should succeed (overwrite)
     const result = await signupCompany({
       type: "B2B",
       displayName: "New Co",
@@ -183,6 +179,88 @@ describe("Auth Service", () => {
 
     expect(result.userId).toBeTruthy();
     expect(result.companyId).toBeTruthy();
+  });
+
+  // === (c2) Signup refuses user with passwordHash (non-verified) ===
+  it("signup refuses user with passwordHash even if not verified", async () => {
+    // Complete step 1 + step 2 (has passwordHash) but don't verify OTP
+    await signupCompany({
+      type: "B2B",
+      displayName: "HasHash Co",
+      legalId: "HH00001",
+      accountEmail: "hashuser@example.tn",
+      sectorId: "mecanique",
+      gouvernorat: "sousse",
+      ville: "Sousse",
+    });
+    // signupUser sets passwordHash
+    const user = await UserModel.findOne({ email: "hashuser@example.tn" });
+    user.passwordHash = "fake-hash";
+    await user.save();
+
+    // Re-signup should be refused
+    await expect(
+      signupCompany({
+        type: "B2B",
+        displayName: "Another",
+        legalId: "HH00002",
+        accountEmail: "hashuser@example.tn",
+        sectorId: "mecanique",
+        gouvernorat: "sousse",
+        ville: "Sousse",
+      }),
+    ).rejects.toThrow("Cet email est déjà utilisé");
+  });
+
+  // === (c3) Slug recovered after overwrite (non-regression) ===
+  it("re-signup with same name recovers original slug", async () => {
+    // Step 1 with "Ma Société"
+    const [oldCompany] = await CompanyModel.create([{
+      slug: "ma-societe",
+      type: "B2B",
+      legalId: "SL00001",
+      accountEmail: "slug-test@example.tn",
+      data: { displayName: { fr: "Ma Société" } },
+      liveData: { sectorId: "mecanique", gouvernorat: "sousse", ville: "X", address: null },
+      status: "pending",
+      ownerUserId: new mongoose.Types.ObjectId(),
+    }]);
+    await UserModel.create([{
+      email: "slug-test@example.tn",
+      companyId: oldCompany._id,
+    }]);
+
+    // Re-signup with same name
+    const result = await signupCompany({
+      type: "B2B",
+      displayName: "Ma Société",
+      legalId: "SL00002",
+      accountEmail: "slug-test@example.tn",
+      sectorId: "mecanique",
+      gouvernorat: "sousse",
+      ville: "Sousse",
+    });
+
+    const newCompany = await CompanyModel.findById(result.companyId);
+    expect(newCompany.slug).toBe("ma-societe");
+  });
+
+  // === (c4) login without passwordHash returns generic error ===
+  it("login without passwordHash returns INVALID_CREDENTIALS (no enumeration)", async () => {
+    // Step 1 only user — no passwordHash
+    const [co] = await CompanyModel.create([{
+      slug: "nopw-co",
+      type: "B2B",
+      legalId: "NP00001",
+      accountEmail: "nopw@example.tn",
+      data: { displayName: { fr: "NoPw" } },
+      liveData: { sectorId: "mecanique", gouvernorat: "sousse", ville: "X", address: null },
+      status: "pending",
+      ownerUserId: new mongoose.Types.ObjectId(),
+    }]);
+    await UserModel.create([{ email: "nopw@example.tn", companyId: co._id }]);
+
+    await expect(login("nopw@example.tn", "anything")).rejects.toThrow("Email ou mot de passe incorrect");
   });
 
   // === (d) OTP expiry ===
@@ -339,6 +417,91 @@ describe("Auth Service", () => {
     );
 
     await expect(resetPassword(token, "NewPass1!")).rejects.toThrow("Lien invalide ou expiré");
+  });
+
+  // === (l2) Forgot-password on unverified user with passwordHash ===
+  it("forgotPassword sends reset email for unverified user with passwordHash", async () => {
+    // Step 1 + Step 2 done, but NO OTP verified
+    const companyResult = await signupCompany({
+      type: "B2B",
+      displayName: "Unverified PW",
+      legalId: "UPW0001",
+      accountEmail: "unverified-pw@example.tn",
+      sectorId: "mecanique",
+      gouvernorat: "sousse",
+      ville: "Sousse",
+    });
+    await signupUser({
+      userId: companyResult.userId,
+      firstName: "Test",
+      lastName: "Unverified",
+      phone: "+21600000000",
+      whatsapp: "+21600000000",
+      languages: ["fr"],
+      password: "Password1!",
+    });
+
+    (sendPasswordResetEmail as any).mockClear();
+    await forgotPassword("unverified-pw@example.tn");
+    expect(sendPasswordResetEmail).toHaveBeenCalledTimes(1);
+  });
+
+  // === (l3) forgotPassword no-op for user without passwordHash ===
+  it("forgotPassword no-op for user without passwordHash (step 1 only)", async () => {
+    await signupCompany({
+      type: "B2B",
+      displayName: "NoPW Forgot",
+      legalId: "NPF0001",
+      accountEmail: "nopw-forgot@example.tn",
+      sectorId: "mecanique",
+      gouvernorat: "sousse",
+      ville: "Sousse",
+    });
+
+    (sendPasswordResetEmail as any).mockClear();
+    await forgotPassword("nopw-forgot@example.tn");
+    expect(sendPasswordResetEmail).not.toHaveBeenCalled();
+  });
+
+  // === (l4) resetPassword on unverified user sets emailVerifiedAt + creates profiles ===
+  it("resetPassword on unverified user verifies email and creates profiles", async () => {
+    const companyResult = await signupCompany({
+      type: "B2B",
+      displayName: "Reset Verify",
+      legalId: "RV00001",
+      accountEmail: "reset-verify@example.tn",
+      sectorId: "mecanique",
+      gouvernorat: "sousse",
+      ville: "Sousse",
+    });
+    await signupUser({
+      userId: companyResult.userId,
+      firstName: "Test",
+      lastName: "Reset",
+      phone: "+21600000001",
+      whatsapp: "+21600000001",
+      languages: ["fr"],
+      password: "Password1!",
+    });
+
+    // Verify no profiles yet (verifyOtp was never called)
+    const profilesBefore = await ProfileModel.countDocuments({ companyId: companyResult.companyId });
+    expect(profilesBefore).toBe(0);
+
+    (sendPasswordResetEmail as any).mockClear();
+    await forgotPassword("reset-verify@example.tn");
+    const resetUrl: string = (sendPasswordResetEmail as any).mock.calls[0][1];
+    const token = new URL(resetUrl).searchParams.get("token")!;
+
+    await resetPassword(token, "NewPass1!");
+
+    // emailVerifiedAt should be set now
+    const user = await UserModel.findById(companyResult.userId);
+    expect(user.emailVerifiedAt).toBeTruthy();
+
+    // 3 profiles should exist
+    const profilesAfter = await ProfileModel.countDocuments({ companyId: companyResult.companyId });
+    expect(profilesAfter).toBe(3);
   });
 
   // === (n) Resend validation anti-enumeration ===

@@ -88,15 +88,12 @@ export async function signupCompany(input: SignupCompanyInput): Promise<SignupCo
       throw new ConflictError("EMAIL_ALREADY_USED", "Cet email est déjà utilisé par un compte actif.");
     }
 
-    const ageMs = Date.now() - new Date(existingUser.createdAt).getTime();
-    if (ageMs < ORPHAN_AGE_MS) {
-      throw new ConflictError(
-        "SIGNUP_IN_PROGRESS",
-        "Une inscription est en cours pour cet email. Connectez-vous pour la finaliser.",
-      );
+    if (existingUser.passwordHash) {
+      // User completed step 2 (has password) but never verified email — they must login + OTP
+      throw new ConflictError("EMAIL_ALREADY_USED", "Cet email est déjà utilisé. Connectez-vous.");
     }
 
-    // Orphan older than 7 days — cascade delete
+    // No passwordHash = step 1 only, incomplete signup — overwrite allowed
     if (existingUser.companyId) {
       await CompanyModel.deleteOne({ _id: existingUser.companyId });
     }
@@ -182,6 +179,27 @@ export async function signupCompany(input: SignupCompanyInput): Promise<SignupCo
     throw err;
   } finally {
     session.endSession();
+  }
+}
+
+// ---------------------------------------------------------------------------
+// ensureProfilesForCompany — idempotent, creates missing profiles (E11000-safe)
+// ---------------------------------------------------------------------------
+
+export async function ensureProfilesForCompany(companyId: string | mongoose.Types.ObjectId): Promise<void> {
+  for (const kind of ["brandup", "traceup", "linkup"] as const) {
+    try {
+      await PROFILE_MODELS[kind].create({
+        companyId,
+        status: "incomplete",
+        isPublic: true,
+        data: {},
+        stats: { viewsTotal: 0, views30d: 0, clicksTotal: 0 },
+      });
+    } catch (err: unknown) {
+      // Ignore duplicate key (E11000) — profile already exists
+      if (err instanceof Error && "code" in err && (err as any).code !== 11000) throw err;
+    }
   }
 }
 
@@ -313,21 +331,8 @@ export async function verifyOtp(input: VerifyOtpInput): Promise<VerifyOtpResult>
   user.otpLastSentAt = null;
   await user.save();
 
-  // Create 3 empty profiles for the company via discriminator models
-  for (const kind of ["brandup", "traceup", "linkup"] as const) {
-    try {
-      await PROFILE_MODELS[kind].create({
-        companyId: user.companyId,
-        status: "incomplete",
-        isPublic: true,
-        data: {},
-        stats: { viewsTotal: 0, views30d: 0, clicksTotal: 0 },
-      });
-    } catch (err: unknown) {
-      // Ignore duplicate key (E11000) — profiles already exist
-      if (err instanceof Error && "code" in err && (err as any).code !== 11000) throw err;
-    }
-  }
+  // Create 3 empty profiles for the company (idempotent)
+  await ensureProfilesForCompany(user.companyId);
 
   const company = await CompanyModel.findById(user.companyId);
 
@@ -368,7 +373,8 @@ export async function login(email: string, password: string): Promise<LoginResul
 
   if (user) {
     if (!user.passwordHash) {
-      throw new AuthError("SIGNUP_INCOMPLETE", "Inscription incomplète. Finalisez votre inscription.", 403);
+      // No passwordHash = step 1 only — generic response (anti-enumeration)
+      throw new AuthError("INVALID_CREDENTIALS", "Email ou mot de passe incorrect.", 401);
     }
 
     const valid = await bcrypt.compare(password, user.passwordHash);
@@ -409,20 +415,7 @@ export async function login(email: string, password: string): Promise<LoginResul
     // Lazy safety net: create missing profiles for existing accounts
     const profileCount = await ProfileModel.countDocuments({ companyId: company._id });
     if (profileCount < 3) {
-      for (const kind of ["brandup", "traceup", "linkup"] as const) {
-        try {
-          await PROFILE_MODELS[kind].create({
-            companyId: company._id,
-            status: "incomplete",
-            isPublic: true,
-            data: {},
-            stats: { viewsTotal: 0, views30d: 0, clicksTotal: 0 },
-          });
-        } catch (err: unknown) {
-          // Ignore duplicate key (E11000) — profile already exists
-          if (err instanceof Error && "code" in err && (err as any).code !== 11000) throw err;
-        }
-      }
+      await ensureProfilesForCompany(company._id);
     }
 
     return {
@@ -549,8 +542,9 @@ export async function forgotPassword(email: string): Promise<void> {
   }
 
   const user = await UserModel.findOne({ email: normalizedEmail });
-  if (!user || !user.emailVerifiedAt) {
+  if (!user || !user.passwordHash) {
     // Anti-enumeration: silent no-op
+    // Also covers users without passwordHash (step 1 only — no account to reset)
     return;
   }
 
@@ -595,11 +589,23 @@ export async function resetPassword(token: string, newPassword: string): Promise
   // Hash new password — NEVER log the plaintext
   const passwordHash = await bcrypt.hash(newPassword, BCRYPT_ROUNDS);
 
+  // If the user was never verified (forgot-password on unverified account),
+  // mark as verified now — the reset link proves email ownership.
+  const wasUnverified = !user.emailVerifiedAt;
+  if (wasUnverified) {
+    user.emailVerifiedAt = new Date();
+  }
+
   user.passwordHash = passwordHash;
   user.passwordResetTokenHash = null;
   user.passwordResetTokenPrefix = null;
   user.passwordResetExpiresAt = null;
   await user.save();
+
+  // Create profiles if the account was previously unverified (never went through OTP)
+  if (wasUnverified && user.companyId) {
+    await ensureProfilesForCompany(user.companyId);
+  }
 }
 
 // ---------------------------------------------------------------------------

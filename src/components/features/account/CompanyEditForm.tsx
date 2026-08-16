@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { signOut } from "next-auth/react";
+import { ObfuscatedEmail } from "@/components/shared/ObfuscatedEmail";
 import { useForm } from "react-hook-form";
 import { useToast } from "@/components/shared/Toast";
 
@@ -179,7 +180,7 @@ export function CompanyEditForm({ company }: { company: CompanyEditData }): JSX.
         {/* Read-only fields */}
         <section className="bg-white border border-surface-border rounded-lg p-5 space-y-4">
           <h3 className="font-heading font-bold text-[15px] text-ink-primary">Informations non modifiables</h3>
-          <p className="text-[12px] text-ink-secondary">Ces champs sont définis à l&apos;inscription et ne peuvent pas être modifiés. Contactez manager@vivasky.media si nécessaire.</p>
+          <p className="text-[12px] text-ink-secondary">Ces champs sont définis à l&apos;inscription et ne peuvent pas être modifiés. Contactez <ObfuscatedEmail className="text-primary hover:underline font-medium" /> si nécessaire.</p>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>

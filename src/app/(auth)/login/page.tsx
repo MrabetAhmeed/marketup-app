@@ -6,6 +6,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import AuthErrorBanner from "@/components/shared/AuthErrorBanner";
 import AuthLeftPanel from "@/components/shared/AuthLeftPanel";
+import { ObfuscatedEmail } from "@/components/shared/ObfuscatedEmail";
 import { useToast } from "@/components/shared/Toast";
 import { getAuthErrorMessage } from "@/lib/auth-error-messages";
 import type { ErrorMapEntry } from "@/lib/auth-error-messages";
@@ -237,7 +238,7 @@ function LoginContent(): JSX.Element {
 
             {/* Help */}
             <p className="mt-8 text-center text-xs text-[#8A8886]">
-              Problème de connexion ? Contactez <a href="mailto:manager@vivasky.media" className="text-[#0078D4] font-semibold hover:underline">manager@vivasky.media</a>
+              Problème de connexion ? Contactez <ObfuscatedEmail className="text-[#0078D4] font-semibold hover:underline" />
             </p>
           </div>
         </div>

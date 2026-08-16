@@ -3,6 +3,7 @@
 import { useState, useCallback } from "react";
 import Link from "next/link";
 import AuthLeftPanel from "@/components/shared/AuthLeftPanel";
+import { ObfuscatedEmail } from "@/components/shared/ObfuscatedEmail";
 
 export default function ForgotPasswordPage(): JSX.Element {
   const [email, setEmail] = useState("");
@@ -137,7 +138,7 @@ export default function ForgotPasswordPage(): JSX.Element {
                     <div>
                       <p className="text-xs font-bold uppercase tracking-wider text-[#616161] mb-1">Vous ne recevez rien ?</p>
                       <p className="text-xs text-[#616161] leading-relaxed mb-2">
-                        Vérifiez votre dossier spam. Si le problème persiste, contactez <a href="mailto:manager@vivasky.media" className="text-[#0078D4] font-semibold hover:underline">manager@vivasky.media</a>.
+                        Vérifiez votre dossier spam. Si le problème persiste, contactez <ObfuscatedEmail className="text-[#0078D4] font-semibold hover:underline" />.
                       </p>
                       <button type="button" onClick={handleResend} className="text-xs font-semibold text-[#0078D4] hover:underline mt-1">
                         Renvoyer le lien

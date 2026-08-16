@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
+import { ObfuscatedEmail } from "@/components/shared/ObfuscatedEmail";
 import { StatusPill } from "@/components/shared/StatusPill";
 import { FieldBadge } from "@/components/shared/FieldBadge";
 import { CopyGroup } from "@/components/shared/CopyGroup";
@@ -313,10 +314,8 @@ export function AccountForm({ me, gouvernorats }: AccountFormProps): JSX.Element
             </div>
             <div className="field-help">
               <span className="material-symbols-outlined" style={{ fontSize: 13 }}>info</span>
-              Pour changer de type, contactez le support à
-              <a href="mailto:manager@vivasky.media" className="text-primary hover:underline font-medium ml-1">
-                manager@vivasky.media
-              </a>
+              Pour changer de type, contactez le support à{" "}
+              <ObfuscatedEmail className="text-primary hover:underline font-medium" />
             </div>
           </div>
 
@@ -487,10 +486,8 @@ export function AccountForm({ me, gouvernorats }: AccountFormProps): JSX.Element
             </div>
             <div className="field-help">
               <span className="material-symbols-outlined" style={{ fontSize: 13 }}>info</span>
-              Identifiant de connexion · non modifiable ·
-              <a href="mailto:manager@vivasky.media" className="text-primary hover:underline font-medium mx-1">
-                manager@vivasky.media
-              </a>
+              Identifiant de connexion · non modifiable ·{" "}
+              <ObfuscatedEmail className="text-primary hover:underline font-medium" />{" "}
               si besoin
             </div>
           </div>

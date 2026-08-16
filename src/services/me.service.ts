@@ -82,6 +82,7 @@ export async function getMe(
       recipientType: "owner",
       recipientId: userId,
       read: false,
+      deletedAt: null,
     }),
     // Last validated RSE receipt (all-time, most recent by donationDate)
     RseReceiptModel.findOne({ companyId, status: "validated" })
@@ -304,9 +305,11 @@ export async function getNotificationPreviews(
 ): Promise<NotificationPreview[]> {
   await connectDb();
 
+  // Dropdown shows only unread notifications
   const notifications = await NotificationModel.find({
     recipientType: "owner",
     recipientId: userId,
+    read: false,
   })
     .sort({ createdAt: -1 })
     .limit(limit)
