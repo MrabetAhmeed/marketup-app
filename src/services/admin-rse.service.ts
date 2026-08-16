@@ -8,6 +8,7 @@ import { Company } from "@/models/company.model";
 import { User } from "@/models/user.model";
 import { Association } from "@/models/association.model";
 import { sendRseReceiptValidatedEmail, sendRseReceiptRejectedEmail } from "@/lib/email/sender";
+import { createNotification } from "@/services/notifications.service";
 import type { SupportedLang } from "@/lib/i18n";
 
 const RseReceiptModel = RseReceipt as any;
@@ -224,13 +225,27 @@ export async function rejectRseReceipt(
       UserModel.findOne({ companyId: receipt.companyId }).lean(),
     ]);
     if (user && company) {
+      const companyName = pickLocale(company.data?.displayName, lang);
+      const assocName = association ? pickLocale(association.name, lang) : "Association";
       await sendRseReceiptRejectedEmail({
         userEmail: user.email,
-        companyName: pickLocale(company.data?.displayName, lang),
-        associationName: association ? pickLocale(association.name, lang) : "Association",
+        companyName,
+        associationName: assocName,
         amount: receipt.amount,
         rejectedReason,
       });
+      // In-app notification for the owner
+      createNotification({
+        recipientType: "owner",
+        recipientId: String(user._id),
+        kind: "rse_receipt_rejected",
+        icon: "cancel",
+        color: "danger",
+        title: { fr: `Reçu RSE refusé — ${assocName}` },
+        body: { fr: rejectedReason },
+        actionUrl: "/dashboard/rse",
+        actionLabel: { fr: "Voir mes reçus" },
+      }).catch((e) => console.warn("[rejectRseReceipt] notification failed:", e));
     }
   } catch (err) {
     console.warn("[rejectRseReceipt] Email failed (non-blocking):", err);

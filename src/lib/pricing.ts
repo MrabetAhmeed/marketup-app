@@ -25,10 +25,14 @@ export function formatMoney(value: number): string {
  * @param priceHT - Price excluding tax (HT)
  * @param vatRate - VAT rate (e.g. 0.19 for 19%)
  */
-export function computeTTC(priceHT: number, vatRate: number): { vatAmount: number; priceTTC: number } {
+export function computeTTC(
+  priceHT: number,
+  vatRate: number,
+  fiscalStampDT: number = 0,
+): { vatAmount: number; fiscalStampDT: number; priceTTC: number } {
   const vatAmount = Math.round(priceHT * vatRate * 100) / 100;
-  const priceTTC = priceHT + vatAmount;
-  return { vatAmount, priceTTC };
+  const priceTTC = priceHT + vatAmount + fiscalStampDT;
+  return { vatAmount, fiscalStampDT, priceTTC };
 }
 
 // ---------------------------------------------------------------------------
@@ -45,3 +49,6 @@ export const SPONSORING_DURATION_DAYS = 7;
 
 /** Standard VAT rate (19%) */
 export const DEFAULT_VAT_RATE = 0.19;
+
+/** Fiscal stamp per transaction (1 DT, not subject to VAT) */
+export const FISCAL_STAMP_DT = 1;

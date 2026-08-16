@@ -12,6 +12,7 @@ interface TransactionAdminDTO {
   profileKind: "brandup" | "traceup" | "linkup" | null;
   priceHT: number;
   vatAmount: number;
+  fiscalStampDT: number;
   priceTTC: number;
   currency: string;
   status: "pending" | "paid" | "paid_simulated" | "refunded" | "failed";

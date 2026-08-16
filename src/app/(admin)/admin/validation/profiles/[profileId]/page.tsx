@@ -404,17 +404,15 @@ function LinkUpContent({
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                   <div className="p-3 bg-surface-muted rounded border border-surface-border">
                     <div className="text-[10px] font-semibold text-ink-tertiary mb-1">ACTUEL</div>
-                    <div className="text-[13px] text-ink-secondary truncate">{current || "(vide)"}</div>
+                    <SocialLinkValue value={current} className="text-ink-secondary" />
                   </div>
                   <div className="p-3 bg-[#F0FDF4] rounded border border-[#86EFAC]">
                     <div className="text-[10px] font-semibold text-[#166534] mb-1">PROPOSÉ</div>
-                    <div className="text-[13px] text-ink-primary truncate">{pending || "(vide)"}</div>
+                    <SocialLinkValue value={pending ?? ""} className="text-ink-primary" />
                   </div>
                 </div>
               ) : (
-                <div className="text-[13px] text-ink-primary truncate">
-                  {(hasDiff ? (pending ?? current) : current) || "Non renseigné"}
-                </div>
+                <SocialLinkValue value={(hasDiff ? (pending ?? current) : current)} fallback="Non renseigné" className="text-ink-primary" />
               )}
             </div>
           );
@@ -474,6 +472,19 @@ function FieldRow({
       )}
     </div>
   );
+}
+
+function SocialLinkValue({ value, fallback = "(vide)", className = "" }: { value: string; fallback?: string; className?: string }): JSX.Element {
+  if (!value) return <div className={`text-[13px] truncate ${className}`}>{fallback}</div>;
+  if (value.startsWith("http://") || value.startsWith("https://")) {
+    return (
+      <a href={value} target="_blank" rel="noopener noreferrer" className={`text-[13px] truncate flex items-center gap-1 text-primary hover:underline ${className}`}>
+        {value}
+        <span className="material-symbols-outlined shrink-0" style={{ fontSize: 13 }}>open_in_new</span>
+      </a>
+    );
+  }
+  return <div className={`text-[13px] truncate ${className}`}>{value}</div>;
 }
 
 function ModifiedBadge({ currentValue }: { currentValue?: string }): JSX.Element {

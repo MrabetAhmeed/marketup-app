@@ -10,6 +10,7 @@ interface TransactionDTO {
   profileKind: "brandup" | "traceup" | "linkup" | null;
   priceHT: number;
   vatAmount: number;
+  fiscalStampDT: number;
   priceTTC: number;
   currency: string;
   status: "pending" | "paid" | "refunded" | "failed";
@@ -121,6 +122,12 @@ export function TransactionsList({ transactions }: TransactionsListProps): JSX.E
                     <span className="text-ink-tertiary">TVA (19%)</span>
                     <div className="font-semibold text-ink-primary">{formatMoney(t.vatAmount)} DT</div>
                   </div>
+                  {t.fiscalStampDT > 0 && (
+                  <div>
+                    <span className="text-ink-tertiary">Timbre fiscal</span>
+                    <div className="font-semibold text-ink-primary">{formatMoney(t.fiscalStampDT)} DT</div>
+                  </div>
+                  )}
                   <div>
                     <span className="text-ink-tertiary">Total TTC</span>
                     <div className="font-bold text-ink-primary">{formatMoney(t.priceTTC)} DT</div>

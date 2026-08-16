@@ -3,7 +3,7 @@
 import { useState, useRef, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
-import { SPONSORING_DURATION_DAYS } from "@/lib/pricing";
+import { SPONSORING_PRICE_HT, SPONSORING_DURATION_DAYS, DEFAULT_VAT_RATE, FISCAL_STAMP_DT, computeTTC, formatMoney } from "@/lib/pricing";
 import type { SponsoringCardData } from "@/services/sponsoring.service";
 
 interface SponsoringCardsProps {
@@ -59,6 +59,7 @@ function CheckoutSponsoringModal({
   loading: boolean;
   error: string | null;
 }): JSX.Element {
+  const { vatAmount, priceTTC } = computeTTC(SPONSORING_PRICE_HT, DEFAULT_VAT_RATE, FISCAL_STAMP_DT);
   return (
     <Dialog open={open} onOpenChange={(v) => !v && onClose()}>
       <DialogContent className="sm:max-w-[440px] p-0 gap-0 overflow-hidden" showCloseButton={false}>
@@ -90,15 +91,19 @@ function CheckoutSponsoringModal({
           <div className="bg-surface-subtle rounded-lg border border-surface-border divide-y divide-surface-border">
             <div className="flex justify-between px-4 py-2.5">
               <span className="text-[13px] text-ink-secondary">Montant HT</span>
-              <span className="text-[13px] font-semibold text-ink-primary">100 DT</span>
+              <span className="text-[13px] font-semibold text-ink-primary">{formatMoney(SPONSORING_PRICE_HT)} DT</span>
             </div>
             <div className="flex justify-between px-4 py-2.5">
               <span className="text-[13px] text-ink-secondary">TVA (19 %)</span>
-              <span className="text-[13px] font-semibold text-ink-primary">19 DT</span>
+              <span className="text-[13px] font-semibold text-ink-primary">{formatMoney(vatAmount)} DT</span>
+            </div>
+            <div className="flex justify-between px-4 py-2.5">
+              <span className="text-[13px] text-ink-secondary">Timbre fiscal</span>
+              <span className="text-[13px] font-semibold text-ink-primary">{formatMoney(FISCAL_STAMP_DT)} DT</span>
             </div>
             <div className="flex justify-between px-4 py-2.5 bg-white rounded-b-lg">
               <span className="text-[13px] font-bold text-ink-primary">Total TTC</span>
-              <span className="text-[15px] font-bold text-ink-primary">119 DT</span>
+              <span className="text-[15px] font-bold text-ink-primary">{formatMoney(priceTTC)} DT</span>
             </div>
           </div>
 
@@ -155,7 +160,7 @@ function CheckoutSponsoringModal({
             ) : (
               <>
                 <span className="material-symbols-outlined" style={{ fontSize: 16 }}>payments</span>
-                Payer 119 DT TTC
+                Payer {formatMoney(priceTTC)} DT TTC
               </>
             )}
           </button>
@@ -355,6 +360,8 @@ export function SponsoringCards({ data }: SponsoringCardsProps): JSX.Element {
   const [checkoutTarget, setCheckoutTarget] = useState<CheckoutTarget | null>(null);
   const [checkoutError, setCheckoutError] = useState<string | null>(null);
   const [checkoutLoading, setCheckoutLoading] = useState(false);
+  const [cancelTarget, setCancelTarget] = useState<string | null>(null);
+  const [cancelLoading, setCancelLoading] = useState(false);
 
   async function handleRequest(profileKind: string): Promise<void> {
     setFormError(null);
@@ -391,14 +398,15 @@ export function SponsoringCards({ data }: SponsoringCardsProps): JSX.Element {
     }
   }
 
-  async function handleCancel(sponsoringId: string): Promise<void> {
-    if (!confirm("Annuler cette demande de sponsoring ?")) return;
-    setLoading(sponsoringId);
+  async function handleCancelConfirm(): Promise<void> {
+    if (!cancelTarget) return;
+    setCancelLoading(true);
     try {
-      await fetch(`/api/v1/me/sponsoring/${sponsoringId}/cancel`, { method: "POST" });
+      await fetch(`/api/v1/me/sponsoring/${cancelTarget}/cancel`, { method: "POST" });
+      setCancelTarget(null);
       router.refresh();
     } finally {
-      setLoading(null);
+      setCancelLoading(false);
     }
   }
 
@@ -432,7 +440,7 @@ export function SponsoringCards({ data }: SponsoringCardsProps): JSX.Element {
       <div className="space-y-4">
         <p className="text-[12.5px] text-ink-secondary leading-relaxed max-w-3xl">
           Affichez votre bannière en <strong className="text-ink-primary">tête des résultats</strong> du moteur de recherche.
-          Tarif : <strong className="text-ink-primary">100 DT HT (119 DT TTC)</strong> pour <strong>7 jours</strong>.{" "}
+          Tarif : <strong className="text-ink-primary">{formatMoney(SPONSORING_PRICE_HT)} DT HT ({formatMoney(computeTTC(SPONSORING_PRICE_HT, DEFAULT_VAT_RATE, FISCAL_STAMP_DT).priceTTC)} DT TTC, timbre inclus)</strong> pour <strong>7 jours</strong>.{" "}
           <span className="text-ink-tertiary">Les campagnes sponsorisées sont vérifiées par notre équipe avant publication.</span>
         </p>
 
@@ -463,7 +471,7 @@ export function SponsoringCards({ data }: SponsoringCardsProps): JSX.Element {
                     </span>
                     <img src={card.current.bannerUrl} alt="Bannière" className="w-full h-16 object-cover rounded" />
                     <button
-                      onClick={() => handleCancel(card.current!.id)}
+                      onClick={() => setCancelTarget(card.current!.id)}
                       disabled={loading === card.current.id}
                       className="w-full text-[12px] py-1.5 border border-[#D1D1D1] rounded-lg text-ink-secondary hover:bg-surface-muted transition-colors disabled:opacity-50"
                     >
@@ -489,13 +497,13 @@ export function SponsoringCards({ data }: SponsoringCardsProps): JSX.Element {
                       disabled={loading === card.current.id}
                       className="w-full text-[12px] py-2 bg-primary text-white font-semibold rounded-lg hover:bg-primary/90 transition-colors disabled:opacity-50"
                     >
-                      Payer 119 DT TTC
+                      Payer {formatMoney(SPONSORING_PRICE_HT)} DT HT
                     </button>
                     <p className="text-[10px] text-ink-tertiary text-center">
                       Campagne non annulable après paiement.
                     </p>
                     <button
-                      onClick={() => handleCancel(card.current!.id)}
+                      onClick={() => setCancelTarget(card.current!.id)}
                       disabled={loading === card.current.id}
                       className="w-full text-[11px] py-1 text-ink-tertiary hover:text-ink-secondary transition-colors disabled:opacity-50"
                     >
@@ -600,6 +608,50 @@ export function SponsoringCards({ data }: SponsoringCardsProps): JSX.Element {
         loading={checkoutLoading}
         error={checkoutError}
       />
+
+      {/* Cancel confirmation modal */}
+      <Dialog open={!!cancelTarget} onOpenChange={(v) => { if (!v && !cancelLoading) setCancelTarget(null); }}>
+        <DialogContent className="sm:max-w-[400px] p-0 gap-0 overflow-hidden" showCloseButton={false}>
+          <div className="flex items-start gap-3 px-5 py-4 border-b border-surface-border">
+            <div className="w-10 h-10 rounded-lg bg-[#FEF2F2] flex items-center justify-center shrink-0">
+              <span className="material-symbols-outlined text-[#B91C1C]" style={{ fontSize: 22 }}>cancel</span>
+            </div>
+            <div className="min-w-0 flex-1">
+              <h3 className="font-heading font-bold text-[15px] text-ink-primary leading-tight">
+                Annuler la demande ?
+              </h3>
+              <p className="text-[12px] text-ink-secondary mt-0.5 leading-snug">
+                Cette demande sera annulée. Vous pourrez en soumettre une nouvelle.
+              </p>
+            </div>
+          </div>
+          <div className="px-5 py-4 flex items-center justify-end gap-2">
+            <button
+              type="button"
+              onClick={() => setCancelTarget(null)}
+              disabled={cancelLoading}
+              className="inline-flex items-center gap-1.5 px-4 py-[9px] text-[13px] font-semibold text-ink-primary bg-white border border-[#D1D1D1] rounded hover:bg-surface-muted transition-colors disabled:opacity-60"
+            >
+              Retour
+            </button>
+            <button
+              type="button"
+              onClick={handleCancelConfirm}
+              disabled={cancelLoading}
+              className="inline-flex items-center gap-1.5 px-4 py-[9px] text-[13px] font-semibold text-white bg-[#B91C1C] hover:bg-[#991B1B] rounded transition-colors disabled:opacity-60"
+            >
+              {cancelLoading ? (
+                <>
+                  <span className="material-symbols-outlined animate-spin" style={{ fontSize: 16 }}>progress_activity</span>
+                  Annulation...
+                </>
+              ) : (
+                "Confirmer l'annulation"
+              )}
+            </button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </>
   );
 }

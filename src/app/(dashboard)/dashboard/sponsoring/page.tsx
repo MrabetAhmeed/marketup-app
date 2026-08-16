@@ -50,7 +50,7 @@ export default async function SponsoringPage(): Promise<JSX.Element> {
         <div className="text-[12.5px] text-ink-primary leading-snug">
           Affichez votre <strong>bannière sponsorisée</strong> en tête des résultats de recherche pendant <strong>7 jours</strong>.{" "}
           <span className="text-ink-secondary">
-            Tarif : 100 DT HT (119 DT TTC — TVA 19 %). Les campagnes sponsorisées sont vérifiées par notre équipe avant publication.
+            Tarif : 100 DT HT (120 DT TTC — TVA 19 % + timbre fiscal 1 DT). Les campagnes sponsorisées sont vérifiées par notre équipe avant publication.
           </span>
         </div>
       </div>

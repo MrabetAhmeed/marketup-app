@@ -67,6 +67,16 @@ export default function MapPicker({ position, onPositionChange }: MapPickerProps
     [onPositionChange],
   );
 
+  // Remove Leaflet attribution flag (political marker) — JS fallback for CSS
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      document.querySelectorAll(".leaflet-attribution-flag").forEach((el) => {
+        (el as HTMLElement).style.display = "none";
+      });
+    }, 500);
+    return () => clearTimeout(timer);
+  }, []);
+
   const center = markerPos ?? TUNISIA_CENTER;
   const zoom = markerPos ? PIN_ZOOM : TUNISIA_ZOOM;
 

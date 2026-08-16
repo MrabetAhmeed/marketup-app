@@ -3,7 +3,7 @@ import mongoose from "mongoose";
 import { connectDb } from "@/lib/db";
 import { env } from "@/lib/env";
 import { AppError, BusinessRuleError, NotFoundError } from "@/lib/api-error";
-import { BOOST_PRICE_HT, BOOST_DURATION_DAYS, DEFAULT_VAT_RATE, computeTTC, formatMoney } from "@/lib/pricing";
+import { BOOST_PRICE_HT, BOOST_DURATION_DAYS, DEFAULT_VAT_RATE, FISCAL_STAMP_DT, computeTTC, formatMoney } from "@/lib/pricing";
 import { generateInvoiceNumber } from "@/lib/invoice";
 import { payment } from "@/lib/payment";
 import { Transaction } from "@/models/transaction.model";
@@ -37,6 +37,7 @@ export interface CheckoutBoostResult {
     type: string;
     priceHT: number;
     vatAmount: number;
+    fiscalStampDT: number;
     priceTTC: number;
     currency: string;
     status: string;
@@ -60,7 +61,7 @@ export async function checkoutBoost(
   }).lean();
   if (existing) {
     const existingBoost = await BoostModel.findOne({ transactionId: existing._id }).lean();
-    const { vatAmount, priceTTC } = computeTTC(existing.priceHT, existing.vatRate);
+    const { vatAmount, priceTTC } = computeTTC(existing.priceHT, existing.vatRate, existing.fiscalStampDT ?? 0);
     return {
       boost: {
         id: existingBoost ? String(existingBoost._id) : "",
@@ -74,6 +75,7 @@ export async function checkoutBoost(
         type: "boost",
         priceHT: existing.priceHT,
         vatAmount,
+        fiscalStampDT: existing.fiscalStampDT ?? 0,
         priceTTC,
         currency: existing.currency || "DT",
         status: existing.status === "paid_simulated" ? "paid" : existing.status,
@@ -131,6 +133,7 @@ export async function checkoutBoost(
         profileKind,
         priceHT: BOOST_PRICE_HT,
         vatRate: DEFAULT_VAT_RATE,
+        fiscalStampDT: FISCAL_STAMP_DT,
         currency: "DT",
         status: "pending",
         paymentMethod: null,
@@ -174,7 +177,7 @@ export async function checkoutBoost(
 
     await session.commitTransaction();
 
-    const { vatAmount, priceTTC } = computeTTC(BOOST_PRICE_HT, DEFAULT_VAT_RATE);
+    const { vatAmount, priceTTC } = computeTTC(BOOST_PRICE_HT, DEFAULT_VAT_RATE, FISCAL_STAMP_DT);
     result = {
       boost: {
         id: String(boostDoc._id),
@@ -188,6 +191,7 @@ export async function checkoutBoost(
         type: "boost",
         priceHT: BOOST_PRICE_HT,
         vatAmount,
+        fiscalStampDT: FISCAL_STAMP_DT,
         priceTTC,
         currency: "DT",
         status: checkout.status === "paid_simulated" ? "paid" : checkout.status,
@@ -203,7 +207,7 @@ export async function checkoutBoost(
   }
 
   // --- Post-commit: notifications (non-blocking) ---
-  const { vatAmount: va, priceTTC: ttc } = computeTTC(BOOST_PRICE_HT, DEFAULT_VAT_RATE);
+  const { priceTTC: ttc } = computeTTC(BOOST_PRICE_HT, DEFAULT_VAT_RATE, FISCAL_STAMP_DT);
   const companyName = company.data?.displayName?.fr || "Entreprise";
   const kindLabel = profileKind === "brandup" ? "BrandUP" : profileKind === "traceup" ? "TraceUP" : "LinkUP";
 
@@ -242,7 +246,7 @@ export async function checkoutBoost(
     adminEmail: env.ADMIN_NOTIFICATION_EMAIL,
     companyName,
     type: "boost",
-    amountTTC: formatMoney(va + BOOST_PRICE_HT),
+    amountTTC: formatMoney(ttc),
     invoiceNumber: result.transaction.invoiceNumber,
   }).catch((err) => console.error("[boost] admin email failed:", err));
 
@@ -311,6 +315,7 @@ export async function getBoostHistory(companyId: string): Promise<BoostHistoryIt
     const { priceTTC } = computeTTC(
       (d.priceHT as number) ?? BOOST_PRICE_HT,
       (d.vatRate as number) ?? DEFAULT_VAT_RATE,
+      (d.fiscalStampDT as number) ?? 0,
     );
     return {
       id: String(d._id),

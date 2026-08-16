@@ -300,7 +300,8 @@ describe("checkoutSponsoring", () => {
     expect(result.sponsoring.status).toBe("active");
     expect(result.transaction.priceHT).toBe(100);
     expect(result.transaction.vatAmount).toBeCloseTo(19);
-    expect(result.transaction.priceTTC).toBeCloseTo(119);
+    expect(result.transaction.fiscalStampDT).toBe(1);
+    expect(result.transaction.priceTTC).toBeCloseTo(120);
     expect(result.transaction.status).toBe("paid");
     expect(result.transaction.invoiceNumber).toMatch(/^MU-\d{4}-\d{5}$/);
 

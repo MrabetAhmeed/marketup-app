@@ -10,6 +10,7 @@ const TransactionSchema = new Schema(
     // Money: HT in storage, TTC computed at read-time. Currency is DT only.
     priceHT: { type: Number, required: true },
     vatRate: { type: Number, required: true, default: 0.19 },
+    fiscalStampDT: { type: Number, default: 0 },
     currency: { type: String, default: "DT" },
 
     status: {

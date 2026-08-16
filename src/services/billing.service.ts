@@ -12,6 +12,7 @@ export interface TransactionOwnerDTO {
   profileKind: "brandup" | "traceup" | "linkup" | null;
   priceHT: number;
   vatAmount: number;
+  fiscalStampDT: number;
   priceTTC: number;
   currency: string;
   status: "pending" | "paid" | "refunded" | "failed";
@@ -29,6 +30,7 @@ export interface TransactionAdminDTO {
   profileKind: "brandup" | "traceup" | "linkup" | null;
   priceHT: number;
   vatAmount: number;
+  fiscalStampDT: number;
   priceTTC: number;
   currency: string;
   status: "pending" | "paid" | "paid_simulated" | "refunded" | "failed";
@@ -52,7 +54,8 @@ export async function getOwnerTransactions(companyId: string): Promise<Transacti
     .lean();
 
   return (docs as Record<string, unknown>[]).map((t) => {
-    const { vatAmount, priceTTC } = computeTTC(t.priceHT as number, t.vatRate as number);
+    const stamp = (t.fiscalStampDT as number) ?? 0;
+    const { vatAmount, priceTTC } = computeTTC(t.priceHT as number, t.vatRate as number, stamp);
     // D12: paid_simulated → "paid" for owner
     let ownerStatus = t.status as string;
     if (ownerStatus === "paid_simulated") ownerStatus = "paid";
@@ -63,6 +66,7 @@ export async function getOwnerTransactions(companyId: string): Promise<Transacti
       profileKind: (t.profileKind ?? null) as TransactionOwnerDTO["profileKind"],
       priceHT: t.priceHT as number,
       vatAmount,
+      fiscalStampDT: stamp,
       priceTTC,
       currency: (t.currency as string) || "DT",
       status: ownerStatus as TransactionOwnerDTO["status"],
@@ -113,6 +117,7 @@ export async function getAdminTransactions(
         profileKind: 1,
         priceHT: 1,
         vatRate: 1,
+        fiscalStampDT: 1,
         currency: 1,
         status: 1,
         paymentMethod: 1,
@@ -125,7 +130,8 @@ export async function getAdminTransactions(
   ]);
 
   return docs.map((t) => {
-    const { vatAmount, priceTTC } = computeTTC(t.priceHT as number, t.vatRate as number);
+    const stamp = (t.fiscalStampDT as number) ?? 0;
+    const { vatAmount, priceTTC } = computeTTC(t.priceHT as number, t.vatRate as number, stamp);
     return {
       id: String(t._id),
       companyId: String(t.companyId),
@@ -134,6 +140,7 @@ export async function getAdminTransactions(
       profileKind: (t.profileKind ?? null) as TransactionAdminDTO["profileKind"],
       priceHT: t.priceHT as number,
       vatAmount,
+      fiscalStampDT: stamp,
       priceTTC,
       currency: (t.currency as string) || "DT",
       status: t.status as TransactionAdminDTO["status"],

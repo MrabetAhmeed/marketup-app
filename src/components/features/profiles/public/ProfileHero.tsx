@@ -48,12 +48,13 @@ export default function ProfileHero({
         {/* Info */}
         <div className="md:col-span-8 lg:col-span-9 space-y-6">
           <div className="space-y-2">
-            {/* RSE badge */}
+            {/* RSE badge — ESG icon + label */}
             {rseBadgeStatus === "validated" && (
               <div className="flex flex-wrap gap-2 mb-4">
-                <div className="inline-flex items-center gap-2 bg-[#FEFCE8] text-[#8A6A1F] border border-[#E8C96A] px-3 py-1.5 rounded shadow-sm">
-                  <span className="material-symbols-outlined text-[#C5A059] text-[16px]" style={{ fontVariationSettings: "'FILL' 1" }}>star</span>
-                  <span className="text-[11px] font-bold uppercase tracking-wider">Engagement Social Attest&eacute;</span>
+                <div className="inline-flex items-center gap-2 bg-[#F0F4FF] border border-[#C5CCE8] px-3 py-1.5 rounded shadow-sm">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src="/badges/esg-icon.svg" alt="ESG" className="w-5 h-5" />
+                  <span className="text-[11px] font-bold uppercase tracking-wider text-[#1A2B8C]">Engagement Social Attest&eacute;</span>
                 </div>
               </div>
             )}

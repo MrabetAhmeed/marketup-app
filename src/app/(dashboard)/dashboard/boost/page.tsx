@@ -80,7 +80,7 @@ export default async function BoostPage(): Promise<JSX.Element> {
         <div className="text-[12.5px] text-ink-primary leading-snug">
           Un <strong>Boost</strong> place votre profil en <strong>tête des résultats</strong> du moteur
           pendant <strong>30 jours</strong>.{" "}
-          <span className="text-ink-secondary">Tarif unique : 50 DT HT (59,50 DT TTC — TVA 19 % incluse) par profil.</span>
+          <span className="text-ink-secondary">Tarif unique : 50 DT HT (60,50 DT TTC — TVA 19 % + timbre fiscal 1 DT) par profil.</span>
         </div>
       </div>
 

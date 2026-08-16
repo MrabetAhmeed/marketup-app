@@ -105,7 +105,8 @@ describe("checkoutBoost", () => {
     expect(result.boost.profileKind).toBe("brandup");
     expect(result.transaction.priceHT).toBe(50);
     expect(result.transaction.vatAmount).toBeCloseTo(9.5);
-    expect(result.transaction.priceTTC).toBeCloseTo(59.5);
+    expect(result.transaction.fiscalStampDT).toBe(1);
+    expect(result.transaction.priceTTC).toBeCloseTo(60.5);
     expect(result.transaction.currency).toBe("DT");
     expect(result.transaction.status).toBe("paid"); // paid_simulated mapped for owner
     expect(result.transaction.invoiceNumber).toMatch(/^MU-\d{4}-\d{5}$/);
@@ -114,6 +115,7 @@ describe("checkoutBoost", () => {
     const tx = await TransactionModel.findById(result.transaction.id).lean();
     expect(tx!.status).toBe("paid_simulated"); // raw DB has paid_simulated
     expect(tx!.paymentReference).toMatch(/^SIM-/);
+    expect(tx!.fiscalStampDT).toBe(1);
 
     const boost = await BoostModel.findById(result.boost.id).lean();
     expect(boost!.status).toBe("active");

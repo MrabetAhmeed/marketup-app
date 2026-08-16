@@ -75,3 +75,9 @@
     -moz-osx-font-smoothing: grayscale;
   }
 }
+
+/* Hide Leaflet attribution flag (political marker) — data attribution kept */
+.leaflet-attribution-flag,
+.leaflet-control-attribution .leaflet-attribution-flag,
+.leaflet-control-attribution svg.leaflet-attribution-flag,
+svg.leaflet-attribution-flag[viewBox] { display: none !important; width: 0 !important; height: 0 !important; }

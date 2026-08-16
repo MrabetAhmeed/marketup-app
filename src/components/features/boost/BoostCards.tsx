@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { formatMoney, BOOST_PRICE_HT, BOOST_DURATION_DAYS, DEFAULT_VAT_RATE, computeTTC } from "@/lib/pricing";
+import { formatMoney, BOOST_PRICE_HT, BOOST_DURATION_DAYS, DEFAULT_VAT_RATE, FISCAL_STAMP_DT, computeTTC } from "@/lib/pricing";
 
 interface BoostInfo {
   id: string;
@@ -96,7 +96,7 @@ export function BoostCards({ data }: BoostCardsProps): JSX.Element {
   // B1: local override after successful checkout — card shows active immediately
   const [localBoosts, setLocalBoosts] = useState<Record<string, BoostInfo>>({});
 
-  const { vatAmount, priceTTC } = computeTTC(BOOST_PRICE_HT, DEFAULT_VAT_RATE);
+  const { vatAmount, priceTTC } = computeTTC(BOOST_PRICE_HT, DEFAULT_VAT_RATE, FISCAL_STAMP_DT);
 
   async function handleCheckout(kind: string): Promise<void> {
     setLoading(true);
@@ -293,6 +293,10 @@ export function BoostCards({ data }: BoostCardsProps): JSX.Element {
               <div className="flex justify-between">
                 <span className="text-ink-secondary">TVA (19%)</span>
                 <span className="font-semibold text-ink-primary">{formatMoney(vatAmount)} DT</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-ink-secondary">Timbre fiscal</span>
+                <span className="font-semibold text-ink-primary">{formatMoney(FISCAL_STAMP_DT)} DT</span>
               </div>
               <div className="flex justify-between border-t border-surface-border pt-2">
                 <span className="font-semibold text-ink-primary">Total TTC</span>

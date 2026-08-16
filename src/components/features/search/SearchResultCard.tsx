@@ -42,11 +42,12 @@ export default function SearchResultCard({
     >
       {/* Visual area */}
       <div className="h-[107px] bg-[#F5F5F5] p-2 relative flex-shrink-0">
+        {/* Boosted: bare golden star */}
         {boosted && (
-          <div className="absolute top-2 right-2 z-10 flex items-center gap-0.5 bg-[#FEFCE8] border border-[#E8C96A] px-1.5 py-0.5 rounded">
-            <span className="material-symbols-outlined text-[#C5A059] text-[11px]" style={{ fontVariationSettings: "'FILL' 1" }}>bolt</span>
-            <span className="text-[10px] font-bold text-[#854D0E]">Boosté</span>
-          </div>
+          <span
+            className="absolute top-2 right-2 z-10 material-symbols-outlined text-[#C5A059] text-[22px] drop-shadow-[0_1px_2px_rgba(0,0,0,0.3)]"
+            style={{ fontVariationSettings: "'FILL' 1" }}
+          >star</span>
         )}
         {bannerUrl ? (
           <img
@@ -91,10 +92,7 @@ export default function SearchResultCard({
           {gouvernoratName}
         </div>
         {rseBadgeStatus === "validated" && (
-          <div className="flex items-center gap-1 bg-[#FEFCE8] border border-[#E8C96A] px-2 py-1 rounded h-[20px]">
-            <span className="material-symbols-outlined text-[#C5A059] text-[12px]" style={{ fontVariationSettings: "'FILL' 1" }}>star</span>
-            <span className="text-[10px] font-bold text-[#854D0E]">RSE</span>
-          </div>
+          <span className="text-[10px] font-bold text-[#16A34A]">RSE attest&eacute;e</span>
         )}
       </div>
     </button>

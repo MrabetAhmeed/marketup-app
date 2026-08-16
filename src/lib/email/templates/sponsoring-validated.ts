@@ -20,7 +20,7 @@ export function sponsoringValidatedEmailTemplate(params: {
           <p style="margin:0 0 20px;font-size:14px;color:#616161;line-height:1.5;">
             Bonjour,<br><br>
             Votre demande de campagne sponsorisée <strong>${kindLabel}</strong> pour <strong>${params.companyName}</strong> a été <strong style="color:#16A34A;">validée</strong> par notre équipe.<br><br>
-            Vous pouvez maintenant procéder au paiement pour lancer la campagne (119 DT TTC pour 7 jours).
+            Vous pouvez maintenant procéder au paiement pour lancer la campagne (120 DT TTC, timbre inclus, pour 7 jours).
           </p>
           <a href="${params.dashboardUrl}" style="display:inline-block;padding:12px 24px;background:#0078D4;color:#FFFFFF;text-decoration:none;font-size:14px;font-weight:600;border-radius:6px;">
             Payer et lancer la campagne

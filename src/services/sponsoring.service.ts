@@ -3,7 +3,7 @@ import mongoose from "mongoose";
 import { connectDb } from "@/lib/db";
 import { env } from "@/lib/env";
 import { AppError, BusinessRuleError, NotFoundError } from "@/lib/api-error";
-import { SPONSORING_PRICE_HT, SPONSORING_DURATION_DAYS, DEFAULT_VAT_RATE, computeTTC, formatMoney } from "@/lib/pricing";
+import { SPONSORING_PRICE_HT, SPONSORING_DURATION_DAYS, DEFAULT_VAT_RATE, FISCAL_STAMP_DT, computeTTC, formatMoney } from "@/lib/pricing";
 import { generateInvoiceNumber } from "@/lib/invoice";
 import { payment } from "@/lib/payment";
 import { Transaction } from "@/models/transaction.model";
@@ -281,6 +281,7 @@ export interface CheckoutSponsoringResult {
     type: string;
     priceHT: number;
     vatAmount: number;
+    fiscalStampDT: number;
     priceTTC: number;
     currency: string;
     status: string;
@@ -304,7 +305,7 @@ export async function checkoutSponsoring(
   }).lean();
   if (existingTx) {
     const existingSponsoring = await SponsoringModel.findOne({ transactionId: existingTx._id }).lean();
-    const { vatAmount, priceTTC } = computeTTC(existingTx.priceHT, existingTx.vatRate);
+    const { vatAmount, priceTTC } = computeTTC(existingTx.priceHT, existingTx.vatRate, existingTx.fiscalStampDT ?? 0);
     return {
       sponsoring: {
         id: existingSponsoring ? String(existingSponsoring._id) : "",
@@ -318,6 +319,7 @@ export async function checkoutSponsoring(
         type: "sponsoring",
         priceHT: existingTx.priceHT,
         vatAmount,
+        fiscalStampDT: existingTx.fiscalStampDT ?? 0,
         priceTTC,
         currency: existingTx.currency || "DT",
         status: existingTx.status === "paid_simulated" ? "paid" : existingTx.status,
@@ -363,6 +365,7 @@ export async function checkoutSponsoring(
         profileKind,
         priceHT: SPONSORING_PRICE_HT,
         vatRate: DEFAULT_VAT_RATE,
+        fiscalStampDT: FISCAL_STAMP_DT,
         currency: "DT",
         status: "pending",
         paymentMethod: null,
@@ -409,7 +412,7 @@ export async function checkoutSponsoring(
 
     await session.commitTransaction();
 
-    const { vatAmount, priceTTC } = computeTTC(SPONSORING_PRICE_HT, DEFAULT_VAT_RATE);
+    const { vatAmount, priceTTC } = computeTTC(SPONSORING_PRICE_HT, DEFAULT_VAT_RATE, FISCAL_STAMP_DT);
     result = {
       sponsoring: {
         id: String(sponsoringId),
@@ -423,6 +426,7 @@ export async function checkoutSponsoring(
         type: "sponsoring",
         priceHT: SPONSORING_PRICE_HT,
         vatAmount,
+        fiscalStampDT: FISCAL_STAMP_DT,
         priceTTC,
         currency: "DT",
         status: checkout.status === "paid_simulated" ? "paid" : checkout.status,
@@ -438,7 +442,7 @@ export async function checkoutSponsoring(
   }
 
   // Post-commit notifications (non-blocking)
-  const { priceTTC: ttc } = computeTTC(SPONSORING_PRICE_HT, DEFAULT_VAT_RATE);
+  const { priceTTC: ttc } = computeTTC(SPONSORING_PRICE_HT, DEFAULT_VAT_RATE, FISCAL_STAMP_DT);
   const companyName = (company as any).data?.displayName?.fr || "Entreprise";
 
   // Owner notification
@@ -733,7 +737,7 @@ export async function getSponsoringDashboard(
     .map((s) => {
       let priceTTC: number | null = null;
       if (s.paidAt) {
-        const { priceTTC: ttc } = computeTTC(SPONSORING_PRICE_HT, DEFAULT_VAT_RATE);
+        const { priceTTC: ttc } = computeTTC(SPONSORING_PRICE_HT, DEFAULT_VAT_RATE, FISCAL_STAMP_DT);
         priceTTC = ttc;
       }
       return {
