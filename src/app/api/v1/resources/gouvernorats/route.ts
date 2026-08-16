@@ -14,7 +14,6 @@ export async function GET(req: NextRequest) {
 
   const gouvernorats = await (Gouvernorat as any)
     .find({})
-    .sort({ order: 1 })
     .lean();
 
   const items = gouvernorats.map((g: any) => ({
@@ -22,6 +21,7 @@ export async function GET(req: NextRequest) {
     name: pickLocale(g.name, lang),
     order: g.order,
   }));
+  items.sort((a: { name: string }, b: { name: string }) => a.name.localeCompare(b.name, "fr"));
 
   return NextResponse.json(items, {
     status: 200,

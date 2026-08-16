@@ -14,12 +14,15 @@ export async function GET(req: NextRequest) {
 
   const categories = await (Sector as any)
     .find({ kind: "B2C", active: true })
-    .sort({ order: 1 })
+    .sort({ groupOrder: 1, order: 1 })
     .lean();
 
   const items = categories.map((s: any) => ({
     slug: s.slug,
     name: pickLocale(s.name, lang),
+    description: s.description || "",
+    group: s.group || "",
+    groupOrder: s.groupOrder ?? 0,
     icon: s.icon || null,
     order: s.order,
   }));

@@ -116,17 +116,6 @@ Effort: 15 min
 
 ---
 
-### R9 — Reset password : pre-validate token on load
-
-/reset?token=xxx affiche le formulaire meme avec token invalide/expiré. L'erreur
-n'apparait qu'au submit.
-
-Implementation:
-- Endpoint GET /api/v1/auth/password/validate-token?token=xxx (200/410/400)
-- Page /reset: useEffect fetch on mount, loading state, error state si invalide
-
-Effort: 1h
-
 ---
 
 ### R10 — Harmoniser conditions disabled toggle isPublic
@@ -282,12 +271,13 @@ Effort: 2-3h
 
 ---
 
-### R25 — Cleanup orphan signups script
+### R25 — Purge orphelins signup → cron BACKUP-1
 
-Dev tooling: `scripts/cleanup-orphan-signups.ts` pour supprimer les Users
-emailVerifiedAt=null créés pendant les tests.
+Cron ou script pour nettoyer les User sans passwordHash + Company associee ages de > 30 jours.
+FB-2 Bloc C ecrase a la re-inscription, mais les comptes abandonnes sans re-signup restent indefiniment.
+Inclut aussi le nettoyage des fichiers Cloudinary orphelins (identityDocumentUrl).
 
-Effort: 30 min
+Effort: 1-2h
 
 ---
 

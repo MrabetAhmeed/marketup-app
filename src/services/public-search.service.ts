@@ -215,11 +215,14 @@ export async function searchBrandUp(
       const pData = (profile as Record<string, unknown>).data as Record<string, unknown>;
       const sectorName = sectorMap.get((cAny.liveData as Record<string, unknown>).sectorId as string) ?? "";
 
+      const liveData = cAny.liveData as Record<string, unknown>;
       const haystack = normalize([
         pickLocale((cAny.data as Record<string, unknown>)?.displayName as { fr: string } | undefined, lang),
         pickLocale(pData?.pitch as { fr: string } | undefined, lang),
         pickLocale(pData?.about as { fr: string } | undefined, lang),
         sectorName,
+        (liveData.ville as string) ?? "",
+        gouvMap.get(liveData.gouvernorat as string) ?? "",
       ].join(" "));
 
       return regexes.every((r) => r.test(haystack));
@@ -300,10 +303,13 @@ export async function searchTraceUp(
         ].join(" "))
         .join(" ");
 
+      const liveData = cAny.liveData as Record<string, unknown>;
       const haystack = normalize([
         pickLocale((cAny.data as Record<string, unknown>)?.displayName as { fr: string } | undefined, lang),
         sectorName,
         videoText,
+        (liveData.ville as string) ?? "",
+        gouvMap.get(liveData.gouvernorat as string) ?? "",
       ].join(" "));
 
       return regexes.every((r) => r.test(haystack));
@@ -384,10 +390,13 @@ export async function searchLinkUp(
       const cAny = company as Record<string, unknown>;
       const sectorName = sectorMap.get((cAny.liveData as Record<string, unknown>).sectorId as string) ?? "";
 
+      const liveData = cAny.liveData as Record<string, unknown>;
       const haystack = normalize([
         pickLocale((cAny.data as Record<string, unknown>)?.displayName as { fr: string } | undefined, lang),
         sectorName,
         (cAny.ownerFullName as string) ?? "",
+        (liveData.ville as string) ?? "",
+        gouvMap.get(liveData.gouvernorat as string) ?? "",
       ].join(" "));
 
       return regexes.every((r) => r.test(haystack));

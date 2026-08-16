@@ -352,6 +352,10 @@ These rules are fully implemented and tested. **Summaries below; full details in
 
 - **6.23 Obfuscation email support (FB-2):** l'email de support (`manager@vivasky.media`) n'apparait JAMAIS en clair dans le HTML source des pages rendues. Composant `<ObfuscatedEmail />` (client, assemble user+domain au mount via JS). Constante dans `src/lib/constants/support-email.ts`. Les emails HTML (templates Nodemailer) conservent l'email en clair (pas d'obfuscation dans un email).
 
+- **6.24 Secteurs referentiel definitif (FB-5):** 50 secteurs (25 B2B en 7 poles, 25 B2C en 8 groupes). Model Sector a 3 nouveaux champs : `group` (libelle du pole), `groupOrder` (tri des poles), `description` (texte entre parentheses). Le seed remplace integralement les anciens secteurs. Le modal picker `SectorPickerModal` remplace le dropdown de selection : titres de poles NON cliquables, items numerotes avec description, recherche interne. Gouvernorats tries alphabetiquement. Les secteurs suivent l'ordre des poles du client (PAS alphabetique).
+
+- **6.25 Recherche refonte (FB-3):** resultats affiches au chargement (auto-fetch au mount, limit 200). Pagination client 8/page (retour page 1 a chaque recherche). Secteur integre dans la barre de recherche (a cote de la ville). Liste "Populaire" retiree. Padding hero reduit (py-5). Ville + gouvernorat ajoutes au haystack texte des 3 moteurs (cherchable sans placeholder). Placeholders : BrandUP "Entreprise, secteur, activite…" · TraceUP "Entreprise, secteur, titre de video…" · LinkUP "Entreprise, contact, secteur…". Banniere sponsor filtre par secteur selectionne (client-side via `companySectorId` dans SponsorBannerData). Hauteur banniere x3 (h-[360px] md:h-[540px]).
+
 ---
 
 ## 7. API Conventions

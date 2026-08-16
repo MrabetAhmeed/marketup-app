@@ -8,6 +8,8 @@ import Link from "next/link";
 import useSWR from "swr";
 import AuthErrorBanner from "@/components/shared/AuthErrorBanner";
 import AuthLeftPanel from "@/components/shared/AuthLeftPanel";
+import { SectorPickerModal } from "@/components/shared/SectorPickerModal";
+import type { SectorPickerItem } from "@/components/shared/SectorPickerModal";
 import { useToast } from "@/components/shared/Toast";
 import { getAuthErrorMessage } from "@/lib/auth-error-messages";
 import type { ErrorMapEntry } from "@/lib/auth-error-messages";
@@ -53,7 +55,9 @@ function SignupCompanyContent(): JSX.Element {
 
   // Fetch sectors based on market type
   const sectorUrl = marketType === "B2C" ? "/api/v1/resources/categories-b2c" : "/api/v1/resources/sectors-b2b";
-  const { data: sectors } = useSWR<{ slug: string; name: string }[]>(sectorUrl, fetcher);
+  const { data: sectors } = useSWR<SectorPickerItem[]>(sectorUrl, fetcher);
+  const [sectorModalOpen, setSectorModalOpen] = useState(false);
+  const [sectorLabel, setSectorLabel] = useState("");
 
   // Fetch gouvernorats
   const { data: gouvernorats } = useSWR<{ slug: string; name: string }[]>("/api/v1/resources/gouvernorats", fetcher);
@@ -61,6 +65,7 @@ function SignupCompanyContent(): JSX.Element {
   // Reset sector when market type changes
   useEffect(() => {
     setValue("sectorId", "");
+    setSectorLabel("");
   }, [marketType, setValue]);
 
   async function handleDocUpload(file: File): Promise<void> {
@@ -245,26 +250,38 @@ function SignupCompanyContent(): JSX.Element {
                 {errors.accountEmail && <p className="text-xs text-[#D13438] mt-1">{errors.accountEmail.message}</p>}
               </div>
 
-              {/* Sector */}
+              {/* Sector — modal picker */}
               <div>
-                <label htmlFor="sectorId" className="block text-[11px] font-bold uppercase tracking-[0.06em] text-[#616161] mb-1.5 after:content-['*'] after:text-[#D13438] after:ml-1">
+                <label className="block text-[11px] font-bold uppercase tracking-[0.06em] text-[#616161] mb-1.5 after:content-['*'] after:text-[#D13438] after:ml-1">
                   {marketType === "B2C" ? "Catégorie d'activité" : "Secteur d'activité"}
                 </label>
-                <select
-                  id="sectorId"
-                  {...register("sectorId")}
-                  className="w-full px-3.5 py-2.5 bg-white border border-[#D1D1D1] rounded text-sm text-[#242424] appearance-none focus:border-[#0078D4] focus:outline-none focus:ring-2 focus:ring-[#EFF6FC] bg-[length:16px] bg-[right_12px_center] bg-no-repeat"
-                  style={{ backgroundImage: `url("data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23616161' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E")`, paddingRight: "40px" }}
+                <input type="hidden" {...register("sectorId")} />
+                <button
+                  type="button"
+                  onClick={() => setSectorModalOpen(true)}
+                  className={`w-full px-3.5 py-2.5 bg-white border rounded text-sm text-left flex items-center justify-between transition-colors ${
+                    errors.sectorId ? "border-[#D13438]" : "border-[#D1D1D1]"
+                  } hover:border-[#0078D4] focus:border-[#0078D4] focus:outline-none focus:ring-2 focus:ring-[#EFF6FC]`}
                 >
-                  <option value="">— Sélectionner —</option>
-                  {sectors?.map((s) => (
-                    <option key={s.slug} value={s.slug}>{s.name}</option>
-                  ))}
-                </select>
+                  <span className={sectorLabel ? "text-[#242424]" : "text-[#8A8886]"}>
+                    {sectorLabel || "— Sélectionner —"}
+                  </span>
+                  <span className="material-symbols-outlined text-[#616161]" style={{ fontSize: 18 }}>expand_more</span>
+                </button>
                 <p className="text-xs text-[#8A8886] mt-1">
                   {marketType === "B2C" ? "Choisissez la catégorie qui décrit le mieux votre offre" : "Choisissez le secteur qui correspond le mieux à votre activité"}
                 </p>
                 {errors.sectorId && <p className="text-xs text-[#D13438] mt-1">{errors.sectorId.message}</p>}
+                <SectorPickerModal
+                  open={sectorModalOpen}
+                  onClose={() => setSectorModalOpen(false)}
+                  onSelect={(slug, name) => {
+                    setValue("sectorId", slug, { shouldValidate: true });
+                    setSectorLabel(name);
+                  }}
+                  sectors={sectors ?? []}
+                  title={marketType === "B2C" ? "Choisir une catégorie" : "Choisir un secteur"}
+                />
               </div>
 
               {/* Country + Gouvernorat */}

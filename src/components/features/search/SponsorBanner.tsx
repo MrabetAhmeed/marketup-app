@@ -86,7 +86,7 @@ export default function SponsorBanner({ sponsors, accent }: SponsorBannerProps):
     const cfg = ACCENT_CONFIG[accent] ?? ACCENT_CONFIG["#0078D4"]!;
     return (
       <section className="px-6 pt-6 pb-2 max-w-7xl mx-auto">
-        <div className={`w-full rounded-lg overflow-hidden ${cfg.bg} border ${cfg.border} px-6 md:px-10 py-8 flex flex-col md:flex-row items-center justify-between gap-4`}>
+        <div className={`w-full rounded-lg overflow-hidden ${cfg.bg} border ${cfg.border} px-6 md:px-10 flex flex-col md:flex-row items-center justify-between gap-4 h-[180px] md:h-[270px] justify-center`}>
           <div>
             <p className={`text-base font-semibold ${cfg.text}`}>
               Votre bannière ici — Sponsorisez votre entreprise sur MARKET-UP
@@ -118,7 +118,7 @@ export default function SponsorBanner({ sponsors, accent }: SponsorBannerProps):
         target="_blank"
         rel="noopener noreferrer"
         onClick={() => trackClick(sponsor.id)}
-        className="block relative w-full h-[120px] md:h-[180px] rounded-lg overflow-hidden bg-slate-900 group"
+        className="block relative w-full h-[180px] md:h-[270px] rounded-lg overflow-hidden bg-slate-900 group"
       >
         <img
           key={sponsor.id}

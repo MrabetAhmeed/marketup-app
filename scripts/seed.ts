@@ -218,60 +218,83 @@ async function seedGouvernorats(): Promise<void> {
 }
 
 async function seedSectors(): Promise<void> {
+  // ===================================================================
+  // B2B — 25 secteurs en 7 pôles (source: REFERENTIELS_SECTEURS_B2B_B2C_v_definitive.md)
+  // ===================================================================
   const b2b = [
-    { slug: "mecanique", kind: "B2B", name: i18n("Mécanique"), icon: "settings", order: 1 },
-    { slug: "electronique", kind: "B2B", name: i18n("Électronique"), icon: "memory", order: 2 },
-    { slug: "informatique", kind: "B2B", name: i18n("Informatique & IT"), icon: "computer", order: 3 },
-    { slug: "btp", kind: "B2B", name: i18n("Construction & BTP"), icon: "construction", order: 4 },
-    { slug: "architecture", kind: "B2B", name: i18n("Architecture"), icon: "architecture", order: 5 },
-    { slug: "agroalimentaire", kind: "B2B", name: i18n("Industrie agroalimentaire"), icon: "agriculture", order: 6 },
-    { slug: "textile", kind: "B2B", name: i18n("Textile"), icon: "checkroom", order: 7 },
-    { slug: "pharmaceutique", kind: "B2B", name: i18n("Pharmaceutique"), icon: "medication", order: 8 },
-    { slug: "chimie", kind: "B2B", name: i18n("Chimie"), icon: "science", order: 9 },
-    { slug: "energie", kind: "B2B", name: i18n("Énergie & Pétrole"), icon: "bolt", order: 10 },
-    { slug: "logistique", kind: "B2B", name: i18n("Logistique & Transport"), icon: "local_shipping", order: 11 },
-    { slug: "imprimerie", kind: "B2B", name: i18n("Imprimerie & Édition"), icon: "print", order: 12 },
-    { slug: "conseil", kind: "B2B", name: i18n("Conseil & Audit"), icon: "business_center", order: 13 },
-    { slug: "marketing", kind: "B2B", name: i18n("Marketing & Publicité"), icon: "campaign", order: 14 },
-    { slug: "juridique", kind: "B2B", name: i18n("Juridique"), icon: "gavel", order: 15 },
-    { slug: "comptabilite", kind: "B2B", name: i18n("Comptabilité"), icon: "calculate", order: 16 },
-    { slug: "formation-pro", kind: "B2B", name: i18n("Formation professionnelle"), icon: "school", order: 17 },
-    { slug: "sante-pro", kind: "B2B", name: i18n("Santé professionnelle"), icon: "medical_services", order: 18 },
-    { slug: "environnement", kind: "B2B", name: i18n("Environnement"), icon: "eco", order: 19 },
-    { slug: "securite", kind: "B2B", name: i18n("Sécurité"), icon: "shield", order: 20 },
-    { slug: "banque-finance", kind: "B2B", name: i18n("Banque & Finance"), icon: "account_balance", order: 21 },
-    { slug: "assurance", kind: "B2B", name: i18n("Assurance"), icon: "verified_user", order: 22 },
-    { slug: "immobilier-pro", kind: "B2B", name: i18n("Immobilier professionnel"), icon: "business", order: 23 },
-    { slug: "recherche-rd", kind: "B2B", name: i18n("Recherche & R&D"), icon: "biotech", order: 24 },
-    { slug: "automobile-pro", kind: "B2B", name: i18n("Industrie automobile"), icon: "directions_car", order: 25 },
+    // Pôle Industrie & Production (groupOrder 1)
+    { slug: "agro-industrie", kind: "B2B", name: i18n("Agro-Industrie & Transformation"), description: "Conserveries, conditionnement, produits du terroir", group: "Industrie & Production", groupOrder: 1, icon: "agriculture", order: 1 },
+    { slug: "textile-confection", kind: "B2B", name: i18n("Textile, Confection & Habillement"), description: "Filature, usines de textile, accessoires pro", group: "Industrie & Production", groupOrder: 1, icon: "checkroom", order: 2 },
+    { slug: "plasturgie-chimie", kind: "B2B", name: i18n("Plasturgie, Chimie & Matériaux"), description: "Injection, moules, caoutchouc, matières premières", group: "Industrie & Production", groupOrder: 1, icon: "science", order: 3 },
+    { slug: "metallurgie-mecanique", kind: "B2B", name: i18n("Métallurgie, Sidérurgie & Mécanique"), description: "Soudure, usinage de précision, fonderie", group: "Industrie & Production", groupOrder: 1, icon: "settings", order: 4 },
+    { slug: "machinerie-robotique", kind: "B2B", name: i18n("Machinerie, Robotique & Automatisme"), description: "Lignes de production, maintenance machines", group: "Industrie & Production", groupOrder: 1, icon: "precision_manufacturing", order: 5 },
+    { slug: "packaging-imprimerie", kind: "B2B", name: i18n("Packaging, Imprimerie & Édition"), description: "Cartonnerie, étiquetage, impression industrielle", group: "Industrie & Production", groupOrder: 1, icon: "print", order: 6 },
+    { slug: "maintenance-industrielle", kind: "B2B", name: i18n("Maintenance & Maintenance Industrielle"), description: "Pièces de rechange, froid, dépannage usine", group: "Industrie & Production", groupOrder: 1, icon: "build", order: 7 },
+    // Pôle Bâtiment & Infrastructure (groupOrder 2)
+    { slug: "btp-construction", kind: "B2B", name: i18n("BTP & Matériaux de Construction"), description: "Gros œuvre, carrelage, ciment, infrastructures", group: "Bâtiment & Infrastructure", groupOrder: 2, icon: "construction", order: 8 },
+    { slug: "energie-electricite", kind: "B2B", name: i18n("Énergie, Électricité & Environnement"), description: "Solaire, traitement des eaux, recyclage", group: "Bâtiment & Infrastructure", groupOrder: 2, icon: "bolt", order: 9 },
+    { slug: "immobilier-professionnel", kind: "B2B", name: i18n("Immobilier Professionnel"), description: "Vente/Location de bureaux, entrepôts, parcs industriels", group: "Bâtiment & Infrastructure", groupOrder: 2, icon: "business", order: 10 },
+    // Pôle Logistique & Mobilité (groupOrder 3)
+    { slug: "logistique-transport", kind: "B2B", name: i18n("Logistique, Transport & Transit"), description: "Fret maritime/aérien, entreposage, douane", group: "Logistique & Mobilité", groupOrder: 3, icon: "local_shipping", order: 11 },
+    { slug: "automobile-flottes", kind: "B2B", name: i18n("Automobile Professionnel & Flottes"), description: "Vente/Leasing de camions, utilitaires, engins", group: "Logistique & Mobilité", groupOrder: 3, icon: "directions_car", order: 12 },
+    // Pôle Commerce & International (groupOrder 4)
+    { slug: "commerce-gros", kind: "B2B", name: i18n("Commerce de Gros & Distribution"), description: "Plateformes de revente B2B, centrales d'achat", group: "Commerce & International", groupOrder: 4, icon: "inventory_2", order: 13 },
+    { slug: "negoce-import-export", kind: "B2B", name: i18n("Négoce & Import-Export"), description: "Accompagnement international, trading", group: "Commerce & International", groupOrder: 4, icon: "public", order: 14 },
+    // Pôle Technologie & Digital (groupOrder 5)
+    { slug: "it-logiciels-cloud", kind: "B2B", name: i18n("IT, Logiciels & Solutions Cloud"), description: "ERP, CRM, développement sur mesure", group: "Technologie & Digital", groupOrder: 5, icon: "computer", order: 15 },
+    { slug: "telecoms-cybersecurite", kind: "B2B", name: i18n("Télécoms, Réseaux & Cybersécurité"), description: "Fibre pro, sécurité des données", group: "Technologie & Digital", groupOrder: 5, icon: "cell_tower", order: 16 },
+    // Pôle Finance & Conseil (groupOrder 6)
+    { slug: "banques-leasing", kind: "B2B", name: i18n("Banques, Leasing & Micro-finance"), description: "Financement d'investissements, crédits pros", group: "Finance & Conseil", groupOrder: 6, icon: "account_balance", order: 17 },
+    { slug: "conseils-audit", kind: "B2B", name: i18n("Conseils, Audit & Expertise Comptable"), description: "Juridique, fiscalité, stratégie", group: "Finance & Conseil", groupOrder: 6, icon: "business_center", order: 18 },
+    { slug: "assurances-professionnelles", kind: "B2B", name: i18n("Assurances Professionnelles"), description: "RC Pro, assurance flottes et marchandises", group: "Finance & Conseil", groupOrder: 6, icon: "verified_user", order: 19 },
+    // Pôle Santé & Services Spécialisés (groupOrder 7)
+    { slug: "sante-equipements", kind: "B2B", name: i18n("Santé & Équipements Médicaux"), description: "Matériel clinique, laboratoires, dispositifs", group: "Santé & Services Spécialisés", groupOrder: 7, icon: "medical_services", order: 20 },
+    { slug: "hotellerie-chr", kind: "B2B", name: i18n("Hôtellerie, Restauration & CHR"), description: "Équipements de cuisines pro, linge hôtelier", group: "Santé & Services Spécialisés", groupOrder: 7, icon: "hotel", order: 21 },
+    { slug: "services-nettoyage", kind: "B2B", name: i18n("Services Généraux & Nettoyage Pro"), description: "Entretien de locaux, hygiène industrielle", group: "Santé & Services Spécialisés", groupOrder: 7, icon: "cleaning_services", order: 22 },
+    { slug: "securite-gardiennage", kind: "B2B", name: i18n("Sécurité, Gardiennage & Protection"), description: "Surveillance de sites, alarmes, sécurité", group: "Santé & Services Spécialisés", groupOrder: 7, icon: "shield", order: 23 },
+    { slug: "rh-recrutement", kind: "B2B", name: i18n("Ressources Humaines & Recrutement"), description: "Formation, intérim, cabinets de RH", group: "Santé & Services Spécialisés", groupOrder: 7, icon: "group", order: 24 },
+    { slug: "artisanat-export", kind: "B2B", name: i18n("Artisanat d'Exportation & Design"), description: "Production de masse pour l'export, mobilier", group: "Santé & Services Spécialisés", groupOrder: 7, icon: "palette", order: 25 },
   ];
+
+  // ===================================================================
+  // B2C — 25 catégories en 8 groupes
+  // ===================================================================
   const b2c = [
-    { slug: "alimentation", kind: "B2C", name: i18n("Alimentation & Épicerie"), icon: "storefront", order: 1 },
-    { slug: "restauration", kind: "B2C", name: i18n("Restauration"), icon: "restaurant", order: 2 },
-    { slug: "hotellerie", kind: "B2C", name: i18n("Hôtellerie & Tourisme"), icon: "hotel", order: 3 },
-    { slug: "mode", kind: "B2C", name: i18n("Mode & Habillement"), icon: "checkroom", order: 4 },
-    { slug: "beaute", kind: "B2C", name: i18n("Beauté & Cosmétique"), icon: "spa", order: 5 },
-    { slug: "sante", kind: "B2C", name: i18n("Santé & Pharmacie"), icon: "local_pharmacy", order: 6 },
-    { slug: "sport", kind: "B2C", name: i18n("Sport & Fitness"), icon: "fitness_center", order: 7 },
-    { slug: "loisirs", kind: "B2C", name: i18n("Loisirs & Culture"), icon: "theaters", order: 8 },
-    { slug: "education", kind: "B2C", name: i18n("Éducation"), icon: "school", order: 9 },
-    { slug: "maison-deco", kind: "B2C", name: i18n("Maison & Décoration"), icon: "chair", order: 10 },
-    { slug: "auto-particulier", kind: "B2C", name: i18n("Automobile particulier"), icon: "directions_car", order: 11 },
-    { slug: "telephonie-tech", kind: "B2C", name: i18n("Téléphonie & Tech"), icon: "smartphone", order: 12 },
-    { slug: "commerce", kind: "B2C", name: i18n("Boutique & Commerce"), icon: "shopping_cart", order: 13 },
-    { slug: "animaux", kind: "B2C", name: i18n("Animaux"), icon: "pets", order: 14 },
-    { slug: "bijouterie", kind: "B2C", name: i18n("Bijouterie & Joaillerie"), icon: "diamond", order: 15 },
-    { slug: "optique", kind: "B2C", name: i18n("Optique"), icon: "visibility", order: 16 },
-    { slug: "boulangerie", kind: "B2C", name: i18n("Boulangerie & Pâtisserie"), icon: "bakery_dining", order: 17 },
-    { slug: "cafe", kind: "B2C", name: i18n("Café & Salon de thé"), icon: "local_cafe", order: 18 },
-    { slug: "banque-retail", kind: "B2C", name: i18n("Banque retail"), icon: "account_balance", order: 19 },
-    { slug: "immobilier-part", kind: "B2C", name: i18n("Immobilier particulier"), icon: "home", order: 20 },
-    { slug: "voyage", kind: "B2C", name: i18n("Voyage & Agences"), icon: "flight", order: 21 },
-    { slug: "coiffure", kind: "B2C", name: i18n("Salons de coiffure"), icon: "content_cut", order: 22 },
-    { slug: "spa-bienetre", kind: "B2C", name: i18n("Spas & Bien-être"), icon: "self_care", order: 23 },
-    { slug: "photo", kind: "B2C", name: i18n("Photographie"), icon: "photo_camera", order: 24 },
-    { slug: "services-personne", kind: "B2C", name: i18n("Services à la personne"), icon: "support_agent", order: 25 },
+    // Se nourrir & Savourer (groupOrder 1)
+    { slug: "manger-sortir", kind: "B2C", name: i18n("Manger & Sortir"), description: "Restaurants, cafés, fast-food, salons de thé", group: "Se nourrir & Savourer", groupOrder: 1, icon: "restaurant", order: 1 },
+    { slug: "faire-ses-courses", kind: "B2C", name: i18n("Faire ses courses"), description: "Supermarchés, boucheries, épiceries fines, boulangeries", group: "Se nourrir & Savourer", groupOrder: 1, icon: "storefront", order: 2 },
+    // S'habiller & Rayonner (groupOrder 2)
+    { slug: "habiller-chausser", kind: "B2C", name: i18n("S'habiller & Se chausser"), description: "Boutiques de mode, prêt-à-porter, accessoires", group: "S'habiller & Rayonner", groupOrder: 2, icon: "checkroom", order: 3 },
+    { slug: "se-faire-beau", kind: "B2C", name: i18n("Se faire beau / belle"), description: "Coiffure, instituts de beauté, spas, cosmétique", group: "S'habiller & Rayonner", groupOrder: 2, icon: "spa", order: 4 },
+    { slug: "offrir-luxe", kind: "B2C", name: i18n("S'offrir du luxe"), description: "Bijouterie, horlogerie, cadeaux de prestige", group: "S'habiller & Rayonner", groupOrder: 2, icon: "diamond", order: 5 },
+    // Se loger & Aménager (groupOrder 3)
+    { slug: "se-loger", kind: "B2C", name: i18n("Se loger"), description: "Agences immobilières, vente et location d'appartements/villas", group: "Se loger & Aménager", groupOrder: 3, icon: "home", order: 6 },
+    { slug: "decorer-meubler", kind: "B2C", name: i18n("Décorer & Meubler"), description: "Magasins de meubles, luminaires, art de la table", group: "Se loger & Aménager", groupOrder: 3, icon: "chair", order: 7 },
+    { slug: "bricoler-jardiner", kind: "B2C", name: i18n("Bricoler & Jardiner"), description: "Quincaillerie, pépinières, outillage, piscines", group: "Se loger & Aménager", groupOrder: 3, icon: "yard", order: 8 },
+    // Se déplacer & Voyager (groupOrder 4)
+    { slug: "se-deplacer", kind: "B2C", name: i18n("Se déplacer (Auto/Moto)"), description: "Concessionnaires, vente d'occasions, location", group: "Se déplacer & Voyager", groupOrder: 4, icon: "directions_car", order: 9 },
+    { slug: "entretenir-vehicule", kind: "B2C", name: i18n("Entretenir son véhicule"), description: "Mécanique, lavage, centres de diagnostic", group: "Se déplacer & Voyager", groupOrder: 4, icon: "car_repair", order: 10 },
+    { slug: "voyager-evader", kind: "B2C", name: i18n("Voyager & S'évader"), description: "Agences de voyage, hôtels, maisons d'hôtes", group: "Se déplacer & Voyager", groupOrder: 4, icon: "flight", order: 11 },
+    { slug: "demenager", kind: "B2C", name: i18n("Déménager"), description: "Services de déménagement, garde-meubles", group: "Se déplacer & Voyager", groupOrder: 4, icon: "local_shipping", order: 12 },
+    // Prendre soin de soi & des siens (groupOrder 5)
+    { slug: "se-soigner", kind: "B2C", name: i18n("Se soigner"), description: "Cliniques, cabinets médicaux, dentistes, opticiens", group: "Prendre soin de soi & des siens", groupOrder: 5, icon: "local_pharmacy", order: 13 },
+    { slug: "se-ressourcer", kind: "B2C", name: i18n("Se ressourcer"), description: "Bien-être mental, psychologie, sophrologie", group: "Prendre soin de soi & des siens", groupOrder: 5, icon: "self_improvement", order: 14 },
+    { slug: "occuper-enfants", kind: "B2C", name: i18n("S'occuper des enfants"), description: "Crèches, univers bébé, magasins de jouets", group: "Prendre soin de soi & des siens", groupOrder: 5, icon: "child_care", order: 15 },
+    { slug: "apprendre-former", kind: "B2C", name: i18n("Apprendre & Se former"), description: "Écoles privées, centres de langues, coaching", group: "Prendre soin de soi & des siens", groupOrder: 5, icon: "school", order: 16 },
+    { slug: "soigner-animaux", kind: "B2C", name: i18n("Soigner ses animaux"), description: "Vétérinaires, toilettage, animaleries", group: "Prendre soin de soi & des siens", groupOrder: 5, icon: "pets", order: 17 },
+    // Bouger & Se divertir (groupOrder 6)
+    { slug: "faire-sport", kind: "B2C", name: i18n("Faire du sport"), description: "Salles de fitness, clubs de sport, nutrition sportive", group: "Bouger & Se divertir", groupOrder: 6, icon: "fitness_center", order: 18 },
+    { slug: "se-divertir", kind: "B2C", name: i18n("Se divertir"), description: "Cinémas, parcs de jeux, culture, librairies", group: "Bouger & Se divertir", groupOrder: 6, icon: "theaters", order: 19 },
+    { slug: "decouvrir-terroir", kind: "B2C", name: i18n("Découvrir le terroir"), description: "Artisanat local, ateliers créatifs, produits traditionnels", group: "Bouger & Se divertir", groupOrder: 6, icon: "explore", order: 20 },
+    // Gérer & Réparer (groupOrder 7)
+    { slug: "reparer-maison", kind: "B2C", name: i18n("Réparer sa maison"), description: "Plomberie, électricité, dépannage urgent", group: "Gérer & Réparer", groupOrder: 7, icon: "handyman", order: 21 },
+    { slug: "depanner-materiel", kind: "B2C", name: i18n("Dépanner son matériel"), description: "Réparation informatique, écrans mobiles, électronique", group: "Gérer & Réparer", groupOrder: 7, icon: "smartphone", order: 22 },
+    { slug: "gerer-argent", kind: "B2C", name: i18n("Gérer son argent & s'assurer"), description: "Banques, assurances vie/auto, finance", group: "Gérer & Réparer", groupOrder: 7, icon: "account_balance", order: 23 },
+    { slug: "occuper-linge", kind: "B2C", name: i18n("S'occuper de son linge"), description: "Pressing, blanchisserie, couture", group: "Gérer & Réparer", groupOrder: 7, icon: "local_laundry_service", order: 24 },
+    // Célébrer (groupOrder 8)
+    { slug: "organiser-evenement", kind: "B2C", name: i18n("Organiser un événement"), description: "Mariages, salles des fêtes, traiteurs, fleurs, photographes", group: "Célébrer", groupOrder: 8, icon: "celebration", order: 25 },
   ];
+
   await insertBulk(Sector, [...b2b, ...b2c]);
   counts.sectorsB2B = b2b.length;
   counts.sectorsB2C = b2c.length;
@@ -457,7 +480,7 @@ function buildCompanies(): CompanySeedData[] {
       legalId: "B12345",
       accountEmail: "ahmed@technofab.tn",
       user: { firstName: "Ahmed", lastName: "Mrabet", phone: "+216 71 234 567", languages: ["fr"] },
-      liveData: { contactEmail: "contact@technofab.tn", phone: "+216 73 222 333", whatsapp: "+216 20 123 456", address: "Rue de l'Industrie, ZI Sahline", gouvernorat: "sousse", ville: "Sahline", sectorId: "mecanique", languages: ["fr"], gpsPosition: { type: "Point", coordinates: [10.7148, 35.7628] } },
+      liveData: { contactEmail: "contact@technofab.tn", phone: "+216 73 222 333", whatsapp: "+216 20 123 456", address: "Rue de l'Industrie, ZI Sahline", gouvernorat: "sousse", ville: "Sahline", sectorId: "metallurgie-mecanique", languages: ["fr"], gpsPosition: { type: "Point", coordinates: [10.7148, 35.7628] } },
       data: { displayName: i18n("TechnoFab Industries"), logoUrl: logoUrl("TechnoFab", "0078D4"), bannerUrl: bannerUrl("c-001") },
       status: "active",
       pendingUpdates: null,
@@ -589,7 +612,7 @@ function buildCompanies(): CompanySeedData[] {
     {
       seedId: "c-002", slug: "mediacom-communication", type: "B2B", legalId: "B98765", accountEmail: "leila@mediacom.tn",
       user: { firstName: "Leila", lastName: "Karoui", phone: "+216 71 555 100", languages: ["fr"] },
-      liveData: { contactEmail: "contact@mediacom.tn", phone: "+216 71 555 200", whatsapp: "+216 20 555 200", address: "Avenue Habib Bourguiba, Tunis Centre", gouvernorat: "tunis", ville: "Tunis", sectorId: "marketing", languages: ["fr"], gpsPosition: { type: "Point", coordinates: [10.1815, 36.8065] } },
+      liveData: { contactEmail: "contact@mediacom.tn", phone: "+216 71 555 200", whatsapp: "+216 20 555 200", address: "Avenue Habib Bourguiba, Tunis Centre", gouvernorat: "tunis", ville: "Tunis", sectorId: "conseils-audit", languages: ["fr"], gpsPosition: { type: "Point", coordinates: [10.1815, 36.8065] } },
       data: { displayName: i18n("MediaCom Communication & Stratégie de Marque"), logoUrl: logoUrl("MediaCom", "6366F1"), bannerUrl: bannerUrl("c-002") },
       status: "active", registeredAt: daysAgo(80), validatedAt: daysAgo(79), rseBadgeStatus: "none",
       pendingUpdates: { submittedAt: daysAgo(2), fields: [{ key: "liveData.gouvernorat", label: "Gouvernorat", currentValue: "tunis", newValue: "ariana" }, { key: "liveData.ville", label: "Ville", currentValue: "Tunis", newValue: "Ariana" }, { key: "liveData.address", label: "Adresse", currentValue: "Avenue Habib Bourguiba, Tunis Centre", newValue: "Avenue de la République, Ariana Centre" }], note: "Ouverture d'une agence à Ariana — changement du gouvernorat de rattachement." },
@@ -625,7 +648,7 @@ function buildCompanies(): CompanySeedData[] {
     {
       seedId: "c-003", slug: "greenlife-bio", type: "B2C", legalId: "B33445", accountEmail: "karim@greenlife.tn",
       user: { firstName: "Karim", lastName: "Slim", phone: "+216 73 411 222", languages: ["fr"] },
-      liveData: { contactEmail: "hello@greenlife.tn", phone: "+216 73 411 333", whatsapp: "+216 20 411 333", address: "Avenue Mohamed V, Sousse", gouvernorat: "sousse", ville: "Sousse", sectorId: "alimentation", languages: ["fr"], gpsPosition: { type: "Point", coordinates: [10.6411, 35.8245] } },
+      liveData: { contactEmail: "hello@greenlife.tn", phone: "+216 73 411 333", whatsapp: "+216 20 411 333", address: "Avenue Mohamed V, Sousse", gouvernorat: "sousse", ville: "Sousse", sectorId: "faire-ses-courses", languages: ["fr"], gpsPosition: { type: "Point", coordinates: [10.6411, 35.8245] } },
       data: { displayName: i18n("GreenLife — Bio & Naturel"), logoUrl: logoUrl("GreenLife", "10B981"), bannerUrl: bannerUrl("c-003") },
       status: "active", registeredAt: daysAgo(173), validatedAt: daysAgo(172), rseBadgeStatus: "validated",
       pendingUpdates: { submittedAt: daysAgo(2), fields: [{ key: "data.displayName", label: "Nom de l'entreprise", currentValue: i18n("GreenLife — Bio & Naturel"), newValue: i18n("GreenLife Marché Bio") }] },
@@ -643,7 +666,7 @@ function buildCompanies(): CompanySeedData[] {
     {
       seedId: "c-004", slug: "buildtech-construction", type: "B2B", legalId: "B77123", accountEmail: "sami@buildtech.tn",
       user: { firstName: "Sami", lastName: "Bouazizi", phone: "+216 71 877 555", languages: ["fr"] },
-      liveData: { contactEmail: "contact@buildtech.tn", phone: "+216 71 877 600", whatsapp: "+216 20 877 600", address: "Z.I. Charguia II, Tunis", gouvernorat: "tunis", ville: "Tunis", sectorId: "btp", languages: ["fr"], gpsPosition: { type: "Point", coordinates: [10.1553, 36.8375] } },
+      liveData: { contactEmail: "contact@buildtech.tn", phone: "+216 71 877 600", whatsapp: "+216 20 877 600", address: "Z.I. Charguia II, Tunis", gouvernorat: "tunis", ville: "Tunis", sectorId: "btp-construction", languages: ["fr"], gpsPosition: { type: "Point", coordinates: [10.1553, 36.8375] } },
       data: { displayName: i18n("BuildTech Construction"), logoUrl: logoUrl("BuildTech", "F59E0B"), bannerUrl: bannerUrl("c-004") },
       status: "pending", registeredAt: daysAgo(58), validatedAt: daysAgo(57), rseBadgeStatus: "none",
       pendingUpdates: { submittedAt: daysAgo(3), fields: [{ key: "data.bannerUrl", label: "Bannière", currentValue: bannerUrl("c-004"), newValue: "https://picsum.photos/seed/c-004-banner-v2/1200/400" }] },
@@ -658,7 +681,7 @@ function buildCompanies(): CompanySeedData[] {
     {
       seedId: "c-005", slug: "foodcorner-restaurant", type: "B2C", legalId: "B55678", accountEmail: "mehdi@foodcorner.tn",
       user: { firstName: "Mehdi", lastName: "Trabelsi", phone: "+216 74 222 100", languages: ["fr"] },
-      liveData: { contactEmail: "contact@foodcorner.tn", phone: "+216 74 222 200", whatsapp: "+216 20 222 200", address: "Avenue Hedi Chaker, Sfax", gouvernorat: "sfax", ville: "Sfax", sectorId: "restauration", languages: ["fr"], gpsPosition: { type: "Point", coordinates: [10.7603, 34.7406] } },
+      liveData: { contactEmail: "contact@foodcorner.tn", phone: "+216 74 222 200", whatsapp: "+216 20 222 200", address: "Avenue Hedi Chaker, Sfax", gouvernorat: "sfax", ville: "Sfax", sectorId: "manger-sortir", languages: ["fr"], gpsPosition: { type: "Point", coordinates: [10.7603, 34.7406] } },
       data: { displayName: i18n("FoodCorner — Cuisine Tunisienne"), logoUrl: logoUrl("FoodCorner", "EF4444"), bannerUrl: bannerUrl("c-005") },
       status: "suspended", registeredAt: daysAgo(244), validatedAt: daysAgo(242), suspendedAt: daysAgo(21), suspendedReason: "Suspension suite à litige de facturation non résolu (boost facturé en double, dispute en cours).", rseBadgeStatus: "none",
       profiles: {
@@ -676,7 +699,7 @@ function buildCompanies(): CompanySeedData[] {
     {
       seedId: "c-006", slug: "archstudio-architecture", type: "B2B", legalId: "B66890", accountEmail: "salma@archstudio.tn",
       user: { firstName: "Salma", lastName: "Ben Aissa", phone: "+216 71 333 100", languages: ["fr"] },
-      liveData: { contactEmail: "studio@archstudio.tn", phone: "+216 71 333 200", whatsapp: "+216 20 333 200", address: "Rue de Marseille, Tunis", gouvernorat: "tunis", ville: "Tunis", sectorId: "architecture", languages: ["fr"], gpsPosition: { type: "Point", coordinates: [10.1658, 36.7998] } },
+      liveData: { contactEmail: "studio@archstudio.tn", phone: "+216 71 333 200", whatsapp: "+216 20 333 200", address: "Rue de Marseille, Tunis", gouvernorat: "tunis", ville: "Tunis", sectorId: "btp-construction", languages: ["fr"], gpsPosition: { type: "Point", coordinates: [10.1658, 36.7998] } },
       data: { displayName: i18n("ArchStudio"), logoUrl: logoUrl("ArchStudio", "8B5CF6"), bannerUrl: bannerUrl("c-006") },
       status: "pending", registeredAt: daysAgo(158), validatedAt: daysAgo(157), rseBadgeStatus: "validated",
       pendingUpdates: { submittedAt: daysAgo(7), fields: [{ key: "data.logoUrl", label: "Logo", currentValue: logoUrl("ArchStudio", "8B5CF6"), newValue: logoUrl("ArchStudioNew", "7C3AED") }] },
@@ -695,7 +718,7 @@ function buildCompanies(): CompanySeedData[] {
     {
       seedId: "c-007", slug: "autoplus", type: "B2B", legalId: "B22334", accountEmail: "omar@autoplus.tn",
       user: { firstName: "Omar", lastName: "Belhaj", phone: "+216 73 600 100", languages: ["fr"] },
-      liveData: { contactEmail: "contact@autoplus.tn", phone: "+216 73 600 200", whatsapp: "+216 20 600 200", address: "Route de Sahline, Sousse", gouvernorat: "sousse", ville: "Sousse", sectorId: "automobile-pro", languages: ["fr"], gpsPosition: { type: "Point", coordinates: [10.6350, 35.8280] } },
+      liveData: { contactEmail: "contact@autoplus.tn", phone: "+216 73 600 200", whatsapp: "+216 20 600 200", address: "Route de Sahline, Sousse", gouvernorat: "sousse", ville: "Sousse", sectorId: "automobile-flottes", languages: ["fr"], gpsPosition: { type: "Point", coordinates: [10.6350, 35.8280] } },
       data: { displayName: i18n("AutoPlus"), logoUrl: logoUrl("AutoPlus", "DC2626"), bannerUrl: bannerUrl("c-007") },
       status: "active", registeredAt: daysAgo(203), validatedAt: daysAgo(202), rseBadgeStatus: "none",
       profiles: {
@@ -716,7 +739,7 @@ function buildCompanies(): CompanySeedData[] {
     {
       seedId: "c-008", slug: "pharmatn", type: "B2C", legalId: "B11225", accountEmail: "nadia@pharmatn.tn",
       user: { firstName: "Nadia", lastName: "Saidi", phone: "+216 71 999 100", languages: ["fr"] },
-      liveData: { contactEmail: "contact@pharmatn.tn", phone: "+216 71 999 200", whatsapp: "+216 20 999 200", address: "Avenue de la Liberté, Tunis", gouvernorat: "tunis", ville: "Tunis", sectorId: "sante", languages: ["fr"], gpsPosition: { type: "Point", coordinates: [10.1797, 36.8008] } },
+      liveData: { contactEmail: "contact@pharmatn.tn", phone: "+216 71 999 200", whatsapp: "+216 20 999 200", address: "Avenue de la Liberté, Tunis", gouvernorat: "tunis", ville: "Tunis", sectorId: "se-soigner", languages: ["fr"], gpsPosition: { type: "Point", coordinates: [10.1797, 36.8008] } },
       data: { displayName: i18n("PharmaTN"), logoUrl: logoUrl("PharmaTN", "0EA5E9"), bannerUrl: bannerUrl("c-008") },
       status: "pending", registeredAt: daysAgo(2), rseBadgeStatus: "none",
       profiles: {
@@ -730,7 +753,7 @@ function buildCompanies(): CompanySeedData[] {
     {
       seedId: "c-009", slug: "edupro", type: "B2B", legalId: "B44556", accountEmail: "hatem@edupro.tn",
       user: { firstName: "Hatem", lastName: "Gharbi", phone: "+216 71 444 100", languages: ["fr"] },
-      liveData: { contactEmail: "contact@edupro.tn", phone: "+216 71 444 200", whatsapp: "+216 20 444 200", address: "Avenue Mohamed V, Tunis", gouvernorat: "tunis", ville: "Tunis", sectorId: "formation-pro", languages: ["fr"], gpsPosition: { type: "Point", coordinates: [10.1720, 36.8028] } },
+      liveData: { contactEmail: "contact@edupro.tn", phone: "+216 71 444 200", whatsapp: "+216 20 444 200", address: "Avenue Mohamed V, Tunis", gouvernorat: "tunis", ville: "Tunis", sectorId: "rh-recrutement", languages: ["fr"], gpsPosition: { type: "Point", coordinates: [10.1720, 36.8028] } },
       data: { displayName: i18n("EduPro Formation"), logoUrl: logoUrl("EduPro", "7C3AED"), bannerUrl: bannerUrl("c-009") },
       status: "active", registeredAt: daysAgo(260), validatedAt: daysAgo(259), rseBadgeStatus: "validated",
       profiles: {
@@ -748,7 +771,7 @@ function buildCompanies(): CompanySeedData[] {
     {
       seedId: "c-010", slug: "textiltunis", type: "B2B", legalId: "B99887", accountEmail: "ali@textiltunis.tn",
       user: { firstName: "Ali", lastName: "Ben Amor", phone: "+216 71 888 100", languages: ["fr"] },
-      liveData: { contactEmail: "contact@textiltunis.tn", phone: "+216 71 888 200", whatsapp: "+216 20 888 200", address: "Z.I. Mégrine, Ben Arous", gouvernorat: "ben-arous", ville: "Mégrine", sectorId: "textile", languages: ["fr"], gpsPosition: { type: "Point", coordinates: [10.2320, 36.7680] } },
+      liveData: { contactEmail: "contact@textiltunis.tn", phone: "+216 71 888 200", whatsapp: "+216 20 888 200", address: "Z.I. Mégrine, Ben Arous", gouvernorat: "ben-arous", ville: "Mégrine", sectorId: "textile-confection", languages: ["fr"], gpsPosition: { type: "Point", coordinates: [10.2320, 36.7680] } },
       data: { displayName: i18n("TextilTunis"), logoUrl: logoUrl("TextilTunis", "EC4899"), bannerUrl: bannerUrl("c-010") },
       status: "active", registeredAt: daysAgo(220), validatedAt: daysAgo(219), rseBadgeStatus: "none",
       profiles: {
@@ -776,7 +799,7 @@ function buildCompanies(): CompanySeedData[] {
     {
       seedId: "c-011", slug: "digiagency", type: "B2B", legalId: "B11011", accountEmail: "youssef@digiagency.tn",
       user: { firstName: "Youssef", lastName: "Hamdi", phone: "+216 71 222 300", languages: ["fr"] },
-      liveData: { contactEmail: "hello@digiagency.tn", phone: "+216 71 222 400", whatsapp: "+216 20 222 400", address: "Rue du Lac Léman, Les Berges du Lac", gouvernorat: "tunis", ville: "Tunis", sectorId: "informatique", languages: ["fr"], gpsPosition: { type: "Point", coordinates: [10.2100, 36.8420] } },
+      liveData: { contactEmail: "hello@digiagency.tn", phone: "+216 71 222 400", whatsapp: "+216 20 222 400", address: "Rue du Lac Léman, Les Berges du Lac", gouvernorat: "tunis", ville: "Tunis", sectorId: "it-logiciels-cloud", languages: ["fr"], gpsPosition: { type: "Point", coordinates: [10.2100, 36.8420] } },
       data: { displayName: i18n("Digital Agency Tunis"), logoUrl: logoUrl("DigiAgency", "3B82F6"), bannerUrl: "" },
       status: "active", registeredAt: daysAgo(45), validatedAt: daysAgo(44), rseBadgeStatus: "none",
       profiles: {

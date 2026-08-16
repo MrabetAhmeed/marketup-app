@@ -503,6 +503,7 @@ export interface SponsorBannerData {
   bannerUrl: string;
   linkUrl: string;
   companyName: string;
+  companySectorId: string;
 }
 
 export async function getActiveSponsoringForKind(
@@ -533,22 +534,29 @@ export async function getActiveSponsoringsForKind(
 
   if (actives.length === 0) return [];
 
-  // Batch-resolve company names (avoid N+1)
+  // Batch-resolve company names + sectorId (avoid N+1)
   const companyIds = Array.from(new Set((actives as any[]).map((a) => String(a.companyId))));
   const companies = await CompanyModel.find({ _id: { $in: companyIds } })
-    .select("_id data.displayName")
+    .select("_id data.displayName liveData.sectorId")
     .lean();
-  const nameMap = new Map(
-    (companies as any[]).map((c) => [String(c._id), c.data?.displayName?.fr || "Entreprise"]),
+  const companyMap = new Map(
+    (companies as any[]).map((c) => [String(c._id), {
+      name: c.data?.displayName?.fr || "Entreprise",
+      sectorId: c.liveData?.sectorId || "",
+    }]),
   );
 
   // Fisher-Yates shuffle
-  const result: SponsorBannerData[] = (actives as any[]).map((a) => ({
-    id: String(a._id),
-    bannerUrl: a.bannerUrl,
-    linkUrl: a.linkUrl,
-    companyName: nameMap.get(String(a.companyId)) || "Entreprise",
-  }));
+  const result: SponsorBannerData[] = (actives as any[]).map((a) => {
+    const co = companyMap.get(String(a.companyId));
+    return {
+      id: String(a._id),
+      bannerUrl: a.bannerUrl,
+      linkUrl: a.linkUrl,
+      companyName: co?.name || "Entreprise",
+      companySectorId: co?.sectorId || "",
+    };
+  });
   for (let i = result.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1));
     [result[i], result[j]] = [result[j]!, result[i]!];
