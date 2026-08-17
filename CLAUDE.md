@@ -233,7 +233,7 @@ Every editable field in `Company` and in each `Profile` falls into one of three 
 
 For profile-level edits: when a profile is `active` and the owner submits changes, write to `profile.pendingData` (not to `data`). The profile becomes **invisible publicly** until admin approves. On approve: merge `pendingData` into `data`, clear `pendingData`, re-publish. On reject: discard `pendingData`, keep `data`.
 
-For company-level edits to validation-gated fields, write to `company.pendingUpdates` (the company stays `active`, profiles stay visible). Hard-change Company fields as of PP-12.5:
+For company-level edits to validation-gated fields, write to `company.pendingUpdates` (the company stays `active`, profiles stay visible). Hard-change Company fields as of FB-7a:
 
 | Field | key in pendingUpdates |
 |---|---|
@@ -243,8 +243,15 @@ For company-level edits to validation-gated fields, write to `company.pendingUpd
 | Gouvernorat | `liveData.gouvernorat` |
 | Ville | `liveData.ville` |
 | Adresse | `liveData.address` |
+| Prénom du gérant | `liveData.gerantFirstName` |
+| Nom du gérant | `liveData.gerantLastName` |
+| Email de contact public | `liveData.contactEmail` |
+| Téléphone | `liveData.phone` |
+| WhatsApp | `liveData.whatsapp` |
 
-Live Company fields (instant, no admin review): `liveData.phone`, `liveData.whatsapp`, `liveData.contactEmail`, `liveData.languages`, `liveData.sectorId`, `liveData.gpsPosition` (set via Leaflet pin in LinkUP dashboard — Nominatim removed in PP-12.6). Identity fields (User table): `firstName`, `lastName`.
+Live Company fields (instant, no admin review): `liveData.languages`, `liveData.sectorId`, `liveData.gpsPosition` (set via Leaflet pin in LinkUP dashboard — Nominatim removed in PP-12.6).
+
+**Gerant identity (FB-7a):** `User.firstName`/`lastName` = identité déclarée à l'inscription, resynchronisée en best-effort à chaque approbation admin, utilisée uniquement pour le guard de signup (`verifyOtp`) — NON affichée dans l'application. `Company.liveData.gerantFirstName`/`gerantLastName` = identité publiée du gérant, modifiable uniquement via `pendingUpdates` + validation admin ; source de vérité de l'affichage dashboard, des fiches admin et de la dénormalisation `ownerFullName`.
 
 **GPS position (PP-12.6):** `Company.liveData.gpsPosition` is a GeoJSON Point set by the owner via a draggable map marker in the LinkUP dashboard editor. It is a live field (instant, no admin review). Submitting a LinkUP profile requires `gpsPosition != null` (guard `MISSING_GPS` 422). The Nominatim geocoding service has been fully removed — the pin is the sole source of GPS coordinates.
 
@@ -549,6 +556,8 @@ npm run lint && npm run typecheck && npm test
 5. Diff reviewed (no `console.log`, no `TODO` without ticket reference, no commented-out code)
 
 If any gate fails, fix before committing.
+
+**Gate tsc — cache propre obligatoire :** le cache `tsbuildinfo` / `.next` peut masquer des erreurs préexistantes. Au démarrage de chaque sprint (Phase 0), exécuter `tsc --noEmit` sur un cache propre (`rm -rf .next tsconfig.tsbuildinfo` avant). Un tsc vert sur cache chaud ne prouve rien.
 
 ---
 

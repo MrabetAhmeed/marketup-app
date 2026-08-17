@@ -27,10 +27,12 @@ interface AccountFormValues {
   address: string;
 }
 
-/** LIVE fields that the PATCH endpoint accepts */
-const LIVE_KEYS = ["contactEmail", "phone", "whatsapp"] as const;
-const IDENTITY_KEYS = ["firstName", "lastName"] as const;
-const HARD_KEYS = ["displayName", "gouvernorat", "ville", "address"] as const;
+/** All editable fields go through pendingUpdates (validation admin) */
+const ALL_FIELD_KEYS = [
+  "firstName", "lastName",
+  "displayName", "gouvernorat", "ville", "address",
+  "contactEmail", "phone", "whatsapp",
+] as const;
 
 interface GouvernoratOption {
   slug: string;
@@ -52,8 +54,8 @@ export function AccountForm({ me, gouvernorats }: AccountFormProps): JSX.Element
 
   const { register, handleSubmit, formState: { isDirty, dirtyFields, errors }, reset, setError } = useForm<AccountFormValues>({
     defaultValues: {
-      firstName: me.user.firstName,
-      lastName: me.user.lastName,
+      firstName: me.company.gerantFirstName,
+      lastName: me.company.gerantLastName,
       displayName: company.displayName,
       gouvernorat: company.gouvernorat.slug,
       contactEmail: company.contactEmail,
@@ -104,20 +106,23 @@ export function AccountForm({ me, gouvernorats }: AccountFormProps): JSX.Element
   const pendingLogoUrl = pendingFields?.fields?.find((x) => x.key === "data.logoUrl")?.newValue as string | undefined ?? null;
   const pendingBannerUrl = pendingFields?.fields?.find((x) => x.key === "data.bannerUrl")?.newValue as string | undefined ?? null;
 
+  // Helper for simple string pending fields
+  const pendingSimple = (key: string): { current: string; next: string } | null => {
+    if (!pendingFields?.fields) return null;
+    const f = pendingFields.fields.find((x) => x.key === key);
+    if (!f) return null;
+    return { current: String(f.currentValue ?? ""), next: String(f.newValue ?? "") };
+  };
+  const pendingGerantFirst = pendingSimple("liveData.gerantFirstName");
+  const pendingGerantLast = pendingSimple("liveData.gerantLastName");
+  const pendingContactEmail = pendingSimple("liveData.contactEmail");
+  const pendingPhone = pendingSimple("liveData.phone");
+  const pendingWhatsapp = pendingSimple("liveData.whatsapp");
+
   async function onSubmit(values: AccountFormValues): Promise<void> {
-    // Build patch with only dirty fields (identity + live + hard)
+    // Build patch with only dirty fields (all go through pendingUpdates)
     const patch: Record<string, string> = {};
-    for (const key of IDENTITY_KEYS) {
-      if (dirtyFields[key]) {
-        patch[key] = values[key];
-      }
-    }
-    for (const key of HARD_KEYS) {
-      if (dirtyFields[key]) {
-        patch[key] = values[key];
-      }
-    }
-    for (const key of LIVE_KEYS) {
+    for (const key of ALL_FIELD_KEYS) {
       if (dirtyFields[key]) {
         patch[key] = values[key];
       }
@@ -139,9 +144,8 @@ export function AccountForm({ me, gouvernorats }: AccountFormProps): JSX.Element
         // Zod field-level errors → inline under each field
         if (json.error?.code === "VALIDATION_FAILED" && json.error.fields) {
           const fields = json.error.fields as Record<string, string[]>;
-          const allKeys = [...IDENTITY_KEYS, ...HARD_KEYS, ...LIVE_KEYS] as readonly string[];
           for (const [field, messages] of Object.entries(fields)) {
-            if (allKeys.includes(field)) {
+            if ((ALL_FIELD_KEYS as readonly string[]).includes(field)) {
               setError(field as keyof AccountFormValues, { message: messages[0] });
             }
           }
@@ -155,8 +159,8 @@ export function AccountForm({ me, gouvernorats }: AccountFormProps): JSX.Element
       // Success — reset form with updated values from response
       const meData = json as MeResponse;
       reset({
-        firstName: meData.user.firstName,
-        lastName: meData.user.lastName,
+        firstName: meData.company.gerantFirstName,
+        lastName: meData.company.gerantLastName,
         displayName: meData.company.displayName,
         gouvernorat: meData.company.gouvernorat.slug,
         contactEmail: meData.company.contactEmail,
@@ -165,10 +169,7 @@ export function AccountForm({ me, gouvernorats }: AccountFormProps): JSX.Element
         ville: meData.company.ville,
         address: meData.company.address ?? "",
       });
-      const hasHardChange = HARD_KEYS.some((k) => dirtyFields[k]);
-      showToast(hasHardChange
-        ? "Modification soumise · en attente de validation admin"
-        : "Modifications enregistrées");
+      showToast("Modification soumise · en attente de validation admin");
       router.refresh();
     } catch {
       showToast("Erreur, veuillez réessayer");
@@ -214,10 +215,8 @@ export function AccountForm({ me, gouvernorats }: AccountFormProps): JSX.Element
           info
         </span>
         <div className="min-w-0 flex-1 text-[12.5px] text-ink-primary leading-snug">
-          Les informations ci-dessous alimentent vos <strong>3 profils publics</strong>.
-          La modification du <strong>logo</strong>, du <strong>nom d&apos;entreprise</strong>{" "}
-          ou de la <strong>localisation</strong> (gouvernorat, ville, adresse){" "}
-          nécessite une validation admin (24-48 h). Les champs contact, identité gérant et langues sont mis à jour <strong>instantanément</strong>.
+          Toute modification des informations de l&apos;entreprise nécessite une <strong>validation admin (24-48 h)</strong>.
+          Vos profils publics conservent les informations actuelles jusqu&apos;à validation.
         </div>
       </section>
 
@@ -314,8 +313,7 @@ export function AccountForm({ me, gouvernorats }: AccountFormProps): JSX.Element
             </div>
             <div className="field-help">
               <span className="material-symbols-outlined" style={{ fontSize: 13 }}>info</span>
-              Pour changer de type, contactez le support à{" "}
-              <ObfuscatedEmail className="text-primary hover:underline font-medium" />
+              Défini à l&apos;inscription — non modifiable
             </div>
           </div>
 
@@ -397,10 +395,10 @@ export function AccountForm({ me, gouvernorats }: AccountFormProps): JSX.Element
               Identité gérant
             </h3>
             <p className="text-[12px] text-ink-secondary mt-0.5 leading-snug">
-              Vos coordonnées personnelles · mises à jour instantanément
+              Vos coordonnées personnelles · soumises à validation admin
             </p>
           </div>
-          <FieldBadge kind="live" />
+          <FieldBadge kind="validation" />
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
@@ -422,10 +420,17 @@ export function AccountForm({ me, gouvernorats }: AccountFormProps): JSX.Element
             </div>
             {errors.firstName ? (
               <p className="text-[12px] text-[#B91C1C] mt-1">{errors.firstName.message}</p>
+            ) : pendingGerantFirst ? (
+              <div className="mt-1.5 px-3 py-2 bg-[#FEF3C7] border border-[#FDE68A] rounded text-[12px] text-[#92400E] flex items-start gap-2">
+                <span className="material-symbols-outlined shrink-0 mt-[1px]" style={{ fontSize: 14 }}>schedule</span>
+                <span>
+                  Modification en attente de validation : <strong>{pendingGerantFirst.current}</strong> → <strong>{pendingGerantFirst.next}</strong>
+                </span>
+              </div>
             ) : (
               <div className="field-help">
                 <span className="material-symbols-outlined" style={{ fontSize: 13 }}>info</span>
-                Modifiable instantanément · utilisé pour la recherche par nom
+                La modification nécessite une validation admin
               </div>
             )}
           </div>
@@ -448,14 +453,32 @@ export function AccountForm({ me, gouvernorats }: AccountFormProps): JSX.Element
             </div>
             {errors.lastName ? (
               <p className="text-[12px] text-[#B91C1C] mt-1">{errors.lastName.message}</p>
+            ) : pendingGerantLast ? (
+              <div className="mt-1.5 px-3 py-2 bg-[#FEF3C7] border border-[#FDE68A] rounded text-[12px] text-[#92400E] flex items-start gap-2">
+                <span className="material-symbols-outlined shrink-0 mt-[1px]" style={{ fontSize: 14 }}>schedule</span>
+                <span>
+                  Modification en attente de validation : <strong>{pendingGerantLast.current}</strong> → <strong>{pendingGerantLast.next}</strong>
+                </span>
+              </div>
             ) : (
               <div className="field-help">
                 <span className="material-symbols-outlined" style={{ fontSize: 13 }}>info</span>
-                Modifiable instantanément · utilisé pour la recherche par nom
+                La modification nécessite une validation admin
               </div>
             )}
           </div>
         </div>
+
+        {/* Info message: gerant name changed → suggest updating legal doc */}
+        {(dirtyFields.firstName || dirtyFields.lastName) && (
+          <div className="mt-4 px-3 py-2.5 bg-[#EFF6FC] border border-[#C7DDF1] rounded flex items-start gap-2 text-[12px] text-ink-primary leading-snug">
+            <span className="material-symbols-outlined text-primary shrink-0 mt-[1px]" style={{ fontSize: 16 }}>info</span>
+            <span>
+              En cas de changement de gérant, pensez à mettre à jour votre <strong>document légal</strong> depuis
+              la section correspondante.
+            </span>
+          </div>
+        )}
       </section>
 
       {/* ═══ SECTION: CONTACT & LOCALISATION ═══ */}
@@ -466,7 +489,7 @@ export function AccountForm({ me, gouvernorats }: AccountFormProps): JSX.Element
               Contact &amp; localisation
             </h3>
             <p className="text-[12px] text-ink-secondary mt-0.5 leading-snug">
-              Coordonnées affichées sur vos profils · contact instantané · localisation soumise à validation admin
+              Coordonnées affichées sur vos profils · toute modification soumise à validation admin
             </p>
           </div>
         </div>
@@ -492,10 +515,11 @@ export function AccountForm({ me, gouvernorats }: AccountFormProps): JSX.Element
             </div>
           </div>
 
-          {/* Contact email (live) */}
+          {/* Contact email (validation-gated) */}
           <div>
-            <label htmlFor="acc-email-contact" className="field-label">
+            <label htmlFor="acc-email-contact" className="field-label flex items-center gap-2 flex-wrap">
               Email de contact public <span className="text-[#B91C1C] font-bold ml-0.5">*</span>
+              <FieldBadge kind="validation" />
             </label>
             <div className="relative">
               <span className="absolute left-3 top-1/2 -translate-y-1/2 material-symbols-outlined text-ink-tertiary pointer-events-none" style={{ fontSize: 16 }}>
@@ -505,18 +529,26 @@ export function AccountForm({ me, gouvernorats }: AccountFormProps): JSX.Element
             </div>
             {errors.contactEmail ? (
               <p className="text-[12px] text-[#B91C1C] mt-1">{errors.contactEmail.message}</p>
+            ) : pendingContactEmail ? (
+              <div className="mt-1.5 px-3 py-2 bg-[#FEF3C7] border border-[#FDE68A] rounded text-[12px] text-[#92400E] flex items-start gap-2">
+                <span className="material-symbols-outlined shrink-0 mt-[1px]" style={{ fontSize: 14 }}>schedule</span>
+                <span>
+                  Modification en attente de validation : <strong>{pendingContactEmail.current}</strong> → <strong>{pendingContactEmail.next}</strong>
+                </span>
+              </div>
             ) : (
               <div className="field-help">
                 <span className="material-symbols-outlined" style={{ fontSize: 13 }}>info</span>
-                Affiché sur vos profils publics — peut différer de l&apos;email de compte
+                La modification nécessite une validation admin
               </div>
             )}
           </div>
 
-          {/* Phone (live) */}
+          {/* Phone (validation-gated) */}
           <div>
-            <label htmlFor="acc-phone" className="field-label">
+            <label htmlFor="acc-phone" className="field-label flex items-center gap-2 flex-wrap">
               Téléphone <span className="text-[#B91C1C] font-bold ml-0.5">*</span>
+              <FieldBadge kind="validation" />
             </label>
             <div className="relative">
               <span className="absolute left-3 top-1/2 -translate-y-1/2 material-symbols-outlined text-ink-tertiary pointer-events-none" style={{ fontSize: 16 }}>
@@ -526,18 +558,26 @@ export function AccountForm({ me, gouvernorats }: AccountFormProps): JSX.Element
             </div>
             {errors.phone ? (
               <p className="text-[12px] text-[#B91C1C] mt-1">{errors.phone.message}</p>
+            ) : pendingPhone ? (
+              <div className="mt-1.5 px-3 py-2 bg-[#FEF3C7] border border-[#FDE68A] rounded text-[12px] text-[#92400E] flex items-start gap-2">
+                <span className="material-symbols-outlined shrink-0 mt-[1px]" style={{ fontSize: 14 }}>schedule</span>
+                <span>
+                  Modification en attente de validation : <strong>{pendingPhone.current}</strong> → <strong>{pendingPhone.next}</strong>
+                </span>
+              </div>
             ) : (
               <div className="field-help">
                 <span className="material-symbols-outlined" style={{ fontSize: 13 }}>info</span>
-                Ligne fixe ou standard · Affiché sur vos 3 profils publics
+                La modification nécessite une validation admin
               </div>
             )}
           </div>
 
-          {/* WhatsApp (live) */}
+          {/* WhatsApp (validation-gated) */}
           <div>
-            <label htmlFor="acc-whatsapp" className="field-label">
+            <label htmlFor="acc-whatsapp" className="field-label flex items-center gap-2 flex-wrap">
               WhatsApp <span className="text-[#B91C1C] font-bold ml-0.5">*</span>
+              <FieldBadge kind="validation" />
             </label>
             <div className="relative">
               <span className="absolute left-3 top-1/2 -translate-y-1/2 material-symbols-outlined icon-fill text-status-active-fg pointer-events-none" style={{ fontSize: 16 }}>
@@ -547,10 +587,17 @@ export function AccountForm({ me, gouvernorats }: AccountFormProps): JSX.Element
             </div>
             {errors.whatsapp ? (
               <p className="text-[12px] text-[#B91C1C] mt-1">{errors.whatsapp.message}</p>
+            ) : pendingWhatsapp ? (
+              <div className="mt-1.5 px-3 py-2 bg-[#FEF3C7] border border-[#FDE68A] rounded text-[12px] text-[#92400E] flex items-start gap-2">
+                <span className="material-symbols-outlined shrink-0 mt-[1px]" style={{ fontSize: 14 }}>schedule</span>
+                <span>
+                  Modification en attente de validation : <strong>{pendingWhatsapp.current}</strong> → <strong>{pendingWhatsapp.next}</strong>
+                </span>
+              </div>
             ) : (
               <div className="field-help">
                 <span className="material-symbols-outlined" style={{ fontSize: 13 }}>info</span>
-                Numéro WhatsApp business · peut être identique au téléphone
+                La modification nécessite une validation admin
               </div>
             )}
           </div>
@@ -623,14 +670,14 @@ export function AccountForm({ me, gouvernorats }: AccountFormProps): JSX.Element
           {/* Address (hard change, optional) */}
           <div className="md:col-span-2">
             <label htmlFor="acc-address" className="field-label flex items-center gap-2 flex-wrap">
-              Adresse <span className="text-ink-tertiary font-normal normal-case tracking-normal ml-1">(optionnel)</span>
+              Adresse <span className="text-[#B91C1C] font-bold ml-0.5">*</span>
               <FieldBadge kind="validation" />
             </label>
             <div className="relative">
               <span className="absolute left-3 top-1/2 -translate-y-1/2 material-symbols-outlined text-ink-tertiary pointer-events-none" style={{ fontSize: 16 }}>
                 location_on
               </span>
-              <input id="acc-address" type="text" className={`field-input pl-9 ${errors.address ? "border-[#B91C1C]" : ""}`} {...register("address")} />
+              <input id="acc-address" type="text" className={`field-input pl-9 ${errors.address ? "border-[#B91C1C]" : ""}`} {...register("address", { required: "L'adresse est obligatoire." })} />
             </div>
             {errors.address ? (
               <p className="text-[12px] text-[#B91C1C] mt-1">{errors.address.message}</p>

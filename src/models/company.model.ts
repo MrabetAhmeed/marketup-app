@@ -84,6 +84,8 @@ const CompanySchema = new Schema(
       contactEmail: { type: String, lowercase: true, trim: true },
       phone: { type: String, default: null },
       whatsapp: { type: String, default: null },
+      gerantFirstName: { type: String, default: null },
+      gerantLastName: { type: String, default: null },
       languages: [{ type: String, enum: ["fr", "ar", "en"] }],
       gpsPosition: {
         type: new Schema(

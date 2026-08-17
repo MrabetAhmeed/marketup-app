@@ -261,6 +261,8 @@ export async function signupUser(input: SignupUserInput): Promise<SignupUserResu
     $set: {
       "liveData.phone": input.phone,
       "liveData.whatsapp": input.whatsapp,
+      "liveData.gerantFirstName": input.firstName,
+      "liveData.gerantLastName": input.lastName,
       ownerFullName: `${input.firstName} ${input.lastName}`.trim(),
     },
   });

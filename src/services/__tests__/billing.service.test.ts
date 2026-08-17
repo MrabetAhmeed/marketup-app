@@ -35,7 +35,11 @@ afterEach(async () => {
 // ---------------------------------------------------------------------------
 
 let companyCounter = 0;
-function makeCompany(overrides: Record<string, unknown> = {}) {
+// Return type is `any` because Company model has no exported TS interface —
+// Mongoose infers a complex HydratedDocument type that fights with .lean() and
+// the `as any` casts already used throughout this file. Revisit if Company
+// gets a typed interface (ICompany).
+async function makeCompany(overrides: Record<string, unknown> = {}): Promise<any> { // eslint-disable-line @typescript-eslint/no-explicit-any
   companyCounter++;
   return Company.create({
     slug: `test-co-${companyCounter}`,

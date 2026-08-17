@@ -192,7 +192,9 @@ export async function getCompanyForAdminReview(
     address: company.liveData?.address ?? null,
     identityDocumentUrl: company.identityDocumentUrl ?? null,
     registeredAt: new Date(company.registeredAt).toISOString(),
-    ownerName: user ? `${user.firstName ?? ""} ${user.lastName ?? ""}`.trim() : "",
+    ownerName: company.liveData?.gerantFirstName || company.liveData?.gerantLastName
+      ? `${company.liveData.gerantFirstName ?? ""} ${company.liveData.gerantLastName ?? ""}`.trim()
+      : user ? `${user.firstName ?? ""} ${user.lastName ?? ""}`.trim() : "",
     ownerEmail: user?.email ?? company.accountEmail,
     profiles: linkedProfiles,
     pendingUpdates: company.pendingUpdates
@@ -480,6 +482,35 @@ export async function approvePendingUpdates(
   }
 
   await CompanyModel.findByIdAndUpdate(companyId, updateOps);
+
+  // --- Fire-and-forget: sync-back User identity + ownerFullName ---
+  try {
+    const gerantFirstField = company.pendingUpdates.fields.find(
+      (f: { key: string }) => f.key === "liveData.gerantFirstName",
+    );
+    const gerantLastField = company.pendingUpdates.fields.find(
+      (f: { key: string }) => f.key === "liveData.gerantLastName",
+    );
+
+    if (gerantFirstField || gerantLastField) {
+      // Sync User.firstName / User.lastName
+      const userSetMap: Record<string, string> = {};
+      if (gerantFirstField) userSetMap.firstName = gerantFirstField.newValue as string;
+      if (gerantLastField) userSetMap.lastName = gerantLastField.newValue as string;
+      await UserModel.findOneAndUpdate(
+        { companyId: new mongoose.Types.ObjectId(companyId) },
+        { $set: userSetMap },
+      );
+
+      // Recalculate ownerFullName for search haystack
+      const mergedFirst = (gerantFirstField?.newValue as string) ?? company.liveData?.gerantFirstName ?? "";
+      const mergedLast = (gerantLastField?.newValue as string) ?? company.liveData?.gerantLastName ?? "";
+      const ownerFullName = `${mergedFirst} ${mergedLast}`.trim();
+      await CompanyModel.findByIdAndUpdate(companyId, { ownerFullName });
+    }
+  } catch (err) {
+    console.warn("[approvePendingUpdates] User sync-back failed (non-blocking):", err);
+  }
 }
 
 // ---------------------------------------------------------------------------

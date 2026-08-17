@@ -64,6 +64,8 @@ export interface MeResponse {
     contactEmail: string;
     phone: string | null;
     whatsapp: string | null;
+    gerantFirstName: string;
+    gerantLastName: string;
     languages: string[];
     registeredAt: string;
     validatedAt: string | null;

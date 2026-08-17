@@ -248,7 +248,7 @@ function SidebarContent({
           </div>
           <div className="min-w-0 flex-1">
             <div className="text-[11px] font-medium text-[#424242] truncate">
-              {me.user.firstName} {me.user.lastName}
+              {me.company.gerantFirstName} {me.company.gerantLastName}
             </div>
             <div className="text-[9px] text-ink-tertiary">Propriétaire</div>
           </div>

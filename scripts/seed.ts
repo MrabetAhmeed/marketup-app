@@ -859,7 +859,11 @@ async function seedCompanies(
         color: c.data.color ?? "#0078D4",
       },
       pendingUpdates: c.pendingUpdates ?? null,
-      liveData: c.liveData,
+      liveData: {
+        ...c.liveData,
+        gerantFirstName: c.user.firstName,
+        gerantLastName: c.user.lastName,
+      },
       status: c.status,
       registeredAt: c.registeredAt,
       validatedAt: c.validatedAt ?? null,

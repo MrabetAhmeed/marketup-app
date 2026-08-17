@@ -228,8 +228,8 @@ export function DashboardTopbar({ me, notifications, title, subtitle }: Dashboar
                     {me.company.displayName}
                   </div>
                   <div className="text-[11px] text-ink-secondary truncate">
-                    {me.company.type} · {me.company.gouvernorat.name} · {me.user.firstName}{" "}
-                    {me.user.lastName}
+                    {me.company.type} · {me.company.gouvernorat.name} · {me.company.gerantFirstName}{" "}
+                    {me.company.gerantLastName}
                   </div>
                 </div>
               </div>

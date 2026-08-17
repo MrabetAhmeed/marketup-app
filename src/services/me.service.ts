@@ -233,7 +233,9 @@ export async function getMe(
   };
 
   const displayName = pickLocale(company.data?.displayName, lang);
-  const ownerFullName = [user.firstName, user.lastName].filter(Boolean).join(" ");
+  const gerantFirst: string = company.liveData?.gerantFirstName ?? user.firstName ?? "";
+  const gerantLast: string = company.liveData?.gerantLastName ?? user.lastName ?? "";
+  const ownerFullName = [gerantFirst, gerantLast].filter(Boolean).join(" ");
 
   return {
     user: {
@@ -271,6 +273,8 @@ export async function getMe(
       contactEmail: company.liveData.contactEmail ?? "",
       phone: company.liveData.phone ?? null,
       whatsapp: company.liveData.whatsapp ?? null,
+      gerantFirstName: gerantFirst,
+      gerantLastName: gerantLast,
       languages: company.liveData.languages ?? ["fr"],
       registeredAt: new Date(company.registeredAt).toISOString(),
       validatedAt: toISOOrNull(company.validatedAt),

@@ -454,3 +454,112 @@ describe("approvePendingUpdates — slug γ", () => {
     });
   });
 });
+
+// =========================================================================
+// FB-7a — sync-back User identity on gerant* approval
+// =========================================================================
+
+describe("approvePendingUpdates — gerant sync-back (FB-7a)", () => {
+  it("syncs User.firstName when gerantFirstName is approved", async () => {
+    await CompanyModel.findByIdAndUpdate(companyId, {
+      "liveData.gerantFirstName": "Ahmed",
+      "liveData.gerantLastName": "Mrabet",
+      pendingUpdates: {
+        submittedAt: new Date(),
+        fields: [{
+          key: "liveData.gerantFirstName",
+          label: "Prénom du gérant",
+          currentValue: "Ahmed",
+          newValue: "Mohamed",
+        }],
+      },
+    });
+
+    await approvePendingUpdates(companyId, adminId);
+
+    // Company.liveData.gerantFirstName merged
+    const company = await CompanyModel.findById(companyId).lean();
+    expect(company.liveData.gerantFirstName).toBe("Mohamed");
+    expect(company.pendingUpdates).toBeNull();
+
+    // User.firstName synced back (best-effort)
+    const user = await UserModel.findOne({ companyId: company._id }).lean();
+    expect(user.firstName).toBe("Mohamed");
+
+    // ownerFullName recalculated
+    expect(company.ownerFullName).toBe("Mohamed Mrabet");
+  });
+
+  it("syncs both User.firstName + User.lastName when both approved", async () => {
+    await CompanyModel.findByIdAndUpdate(companyId, {
+      "liveData.gerantFirstName": "Ahmed",
+      "liveData.gerantLastName": "Mrabet",
+      pendingUpdates: {
+        submittedAt: new Date(),
+        fields: [
+          { key: "liveData.gerantFirstName", label: "Prénom", currentValue: "Ahmed", newValue: "Youssef" },
+          { key: "liveData.gerantLastName", label: "Nom", currentValue: "Mrabet", newValue: "Trabelsi" },
+        ],
+      },
+    });
+
+    await approvePendingUpdates(companyId, adminId);
+
+    const user = await UserModel.findOne({ companyId: new (mongoose.Types.ObjectId as any)(companyId) }).lean();
+    expect(user.firstName).toBe("Youssef");
+    expect(user.lastName).toBe("Trabelsi");
+
+    const company = await CompanyModel.findById(companyId).lean();
+    expect(company.ownerFullName).toBe("Youssef Trabelsi");
+  });
+
+  it("does NOT sync User when no gerant fields in lot", async () => {
+    // Default fixture has displayName pending — no gerant fields
+    await approvePendingUpdates(companyId, adminId);
+
+    const user = await UserModel.findOne({ companyId: new (mongoose.Types.ObjectId as any)(companyId) }).lean();
+    expect(user.firstName).toBe("Ahmed"); // unchanged
+    expect(user.lastName).toBe("Mrabet");
+  });
+});
+
+describe("approvePendingUpdates — contact fields (FB-7a)", () => {
+  it("merges liveData.phone from pendingUpdates", async () => {
+    await CompanyModel.findByIdAndUpdate(companyId, {
+      pendingUpdates: {
+        submittedAt: new Date(),
+        fields: [{
+          key: "liveData.phone",
+          label: "Téléphone",
+          currentValue: null,
+          newValue: "+21699123456",
+        }],
+      },
+    });
+
+    await approvePendingUpdates(companyId, adminId);
+
+    const company = await CompanyModel.findById(companyId).lean();
+    expect(company.liveData.phone).toBe("+21699123456");
+    expect(company.pendingUpdates).toBeNull();
+  });
+
+  it("merges liveData.contactEmail from pendingUpdates", async () => {
+    await CompanyModel.findByIdAndUpdate(companyId, {
+      pendingUpdates: {
+        submittedAt: new Date(),
+        fields: [{
+          key: "liveData.contactEmail",
+          label: "Email de contact",
+          currentValue: "old@test.tn",
+          newValue: "new@test.tn",
+        }],
+      },
+    });
+
+    await approvePendingUpdates(companyId, adminId);
+
+    const company = await CompanyModel.findById(companyId).lean();
+    expect(company.liveData.contactEmail).toBe("new@test.tn");
+  });
+});

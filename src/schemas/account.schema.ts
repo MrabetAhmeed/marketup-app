@@ -1,7 +1,9 @@
 import { z } from "zod";
 
 // ---------------------------------------------------------------------------
-// Account update — live fields + hard fields (displayName → pendingUpdates)
+// Account update — all editable fields go through pendingUpdates (validation
+// admin) except gpsPosition which stays live. .strict() rejects unknown keys
+// at the API boundary (C3 lockdown).
 // ---------------------------------------------------------------------------
 
 export const AccountLiveUpdateSchema = z.object({
@@ -34,7 +36,7 @@ export const AccountLiveUpdateSchema = z.object({
     .optional()
     .transform((v) => (v === "" ? null : v)),
 
-  // --- Identity fields (User table) ---
+  // --- Gerant identity (validation-gated → pendingUpdates) ---
   firstName: z
     .string()
     .trim()
@@ -49,7 +51,7 @@ export const AccountLiveUpdateSchema = z.object({
     .max(60, "60 caractères maximum.")
     .optional(),
 
-  // --- Company.liveData fields (instantaneous) ---
+  // --- Contact fields (validation-gated → pendingUpdates) ---
   contactEmail: z
     .string()
     .trim()
@@ -77,7 +79,7 @@ export const AccountLiveUpdateSchema = z.object({
     )
     .optional(),
 
-  // --- GPS position (live, set via Leaflet pin in LinkUP dashboard) ---
+  // --- GPS position (live — instant, no admin review) ---
   gpsPosition: z
     .object({
       type: z.literal("Point"),
@@ -88,6 +90,6 @@ export const AccountLiveUpdateSchema = z.object({
     })
     .optional(),
 
-});
+}).strict();
 
 export type AccountLiveUpdateInput = z.infer<typeof AccountLiveUpdateSchema>;

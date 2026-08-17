@@ -13,7 +13,7 @@ const CompanyModel = Company as any;
 const UserModel = User as any;
 
 // ---------------------------------------------------------------------------
-// syncOwnerFullName — recompute Company.ownerFullName from User names
+// syncOwnerFullName — recompute Company.ownerFullName from gerant names
 // ---------------------------------------------------------------------------
 
 export async function syncOwnerFullName(
@@ -26,7 +26,78 @@ export async function syncOwnerFullName(
 }
 
 // ---------------------------------------------------------------------------
-// updateMeAccount — apply LIVE field patch to Company.liveData + User identity
+// HARD_FIELD_DEFS — all fields that go through pendingUpdates
+// Keys prefixed "liveData." are written to Company.liveData on approval.
+// ---------------------------------------------------------------------------
+
+interface HardFieldDef {
+  patchKey: keyof AccountLiveUpdateInput;
+  dbKey: string;
+  label: string;
+  readCurrent: (company: any) => unknown;
+  transformNew?: (value: unknown) => unknown;
+}
+
+const HARD_FIELD_DEFS: HardFieldDef[] = [
+  {
+    patchKey: "displayName",
+    dbKey: "data.displayName",
+    label: "Nom de l'entreprise",
+    readCurrent: (c) => ({ fr: c.data?.displayName?.fr ?? "", ar: "", en: "" }),
+    transformNew: (v) => ({ fr: v as string, ar: "", en: "" }),
+  },
+  {
+    patchKey: "gouvernorat",
+    dbKey: "liveData.gouvernorat",
+    label: "Gouvernorat",
+    readCurrent: (c) => c.liveData?.gouvernorat ?? "",
+  },
+  {
+    patchKey: "ville",
+    dbKey: "liveData.ville",
+    label: "Ville",
+    readCurrent: (c) => c.liveData?.ville ?? "",
+  },
+  {
+    patchKey: "address",
+    dbKey: "liveData.address",
+    label: "Adresse",
+    readCurrent: (c) => c.liveData?.address ?? null,
+  },
+  {
+    patchKey: "firstName",
+    dbKey: "liveData.gerantFirstName",
+    label: "Prénom du gérant",
+    readCurrent: (c) => c.liveData?.gerantFirstName ?? null,
+  },
+  {
+    patchKey: "lastName",
+    dbKey: "liveData.gerantLastName",
+    label: "Nom du gérant",
+    readCurrent: (c) => c.liveData?.gerantLastName ?? null,
+  },
+  {
+    patchKey: "contactEmail",
+    dbKey: "liveData.contactEmail",
+    label: "Email de contact public",
+    readCurrent: (c) => c.liveData?.contactEmail ?? "",
+  },
+  {
+    patchKey: "phone",
+    dbKey: "liveData.phone",
+    label: "Téléphone",
+    readCurrent: (c) => c.liveData?.phone ?? null,
+  },
+  {
+    patchKey: "whatsapp",
+    dbKey: "liveData.whatsapp",
+    label: "WhatsApp",
+    readCurrent: (c) => c.liveData?.whatsapp ?? null,
+  },
+];
+
+// ---------------------------------------------------------------------------
+// updateMeAccount — all editable fields go to pendingUpdates except gpsPosition
 // ---------------------------------------------------------------------------
 
 export async function updateMeAccount(
@@ -43,35 +114,10 @@ export async function updateMeAccount(
   const companyId = user.companyId?.toString();
   if (!companyId) throw new NotFoundError("Company");
 
-  // --- Handle User identity fields (firstName / lastName) ---
-  const hasIdentity = patch.firstName !== undefined || patch.lastName !== undefined;
-
-  if (hasIdentity) {
-    const userUpdate: Record<string, string> = {};
-    if (patch.firstName !== undefined) userUpdate.firstName = patch.firstName;
-    if (patch.lastName !== undefined) userUpdate.lastName = patch.lastName;
-
-    await UserModel.findByIdAndUpdate(userId, { $set: userUpdate });
-
-    // Recompute ownerFullName with merged values
-    const newFirst = patch.firstName ?? (user.firstName || "");
-    const newLast = patch.lastName ?? (user.lastName || "");
-
-    try {
-      await syncOwnerFullName(companyId, newFirst, newLast);
-    } catch (err) {
-      console.warn("[updateMeAccount] syncOwnerFullName failed, denormalization stale:", err);
-    }
-  }
-
   // --- Handle hard fields → pendingUpdates ---
-  const hasHardChange =
-    patch.displayName !== undefined ||
-    patch.gouvernorat !== undefined ||
-    patch.ville !== undefined ||
-    patch.address !== undefined;
+  const touchedDefs = HARD_FIELD_DEFS.filter((d) => (patch as any)[d.patchKey] !== undefined);
 
-  if (hasHardChange) {
+  if (touchedDefs.length > 0) {
     const company = await CompanyModel.findById(companyId).lean();
     if (!company) throw new NotFoundError("Company");
 
@@ -79,62 +125,30 @@ export async function updateMeAccount(
       [...(company.pendingUpdates?.fields ?? [])];
     let changed = false;
 
-    // displayName hard change
-    if (patch.displayName !== undefined) {
-      const currentFr: string = company.data?.displayName?.fr ?? "";
-      if (patch.displayName !== currentFr) {
-        fields = fields.filter((f) => f.key !== "data.displayName");
-        fields.push({
-          key: "data.displayName",
-          label: "Nom de l'entreprise",
-          currentValue: { fr: currentFr, ar: "", en: "" },
-          newValue: { fr: patch.displayName, ar: "", en: "" },
-        });
-        changed = true;
-      }
-    }
+    for (const def of touchedDefs) {
+      const rawValue = (patch as any)[def.patchKey];
+      const currentValue = def.readCurrent(company);
+      const newValue = def.transformNew ? def.transformNew(rawValue) : rawValue;
 
-    // gouvernorat hard change
-    if (patch.gouvernorat !== undefined) {
-      const currentGouv: string = company.liveData?.gouvernorat ?? "";
-      if (patch.gouvernorat !== currentGouv) {
-        fields = fields.filter((f) => f.key !== "liveData.gouvernorat");
-        fields.push({
-          key: "liveData.gouvernorat",
-          label: "Gouvernorat",
-          currentValue: currentGouv,
-          newValue: patch.gouvernorat,
-        });
-        changed = true;
-      }
-    }
+      // displayName: compare fr strings
+      const currentCmp = def.patchKey === "displayName"
+        ? (currentValue as { fr: string }).fr
+        : currentValue;
+      const newCmp = def.patchKey === "displayName"
+        ? (newValue as { fr: string }).fr
+        : newValue;
 
-    // ville hard change
-    if (patch.ville !== undefined) {
-      const currentVille: string = company.liveData?.ville ?? "";
-      if (patch.ville !== currentVille) {
-        fields = fields.filter((f) => f.key !== "liveData.ville");
-        fields.push({
-          key: "liveData.ville",
-          label: "Ville",
-          currentValue: currentVille,
-          newValue: patch.ville,
-        });
-        changed = true;
-      }
-    }
+      // address: normalize "" → null for comparison
+      const normalizedNew = def.patchKey === "address" && newCmp === "" ? null : newCmp;
+      const normalizedCurrent = def.patchKey === "address" && currentCmp === "" ? null : currentCmp;
 
-    // address hard change
-    if (patch.address !== undefined) {
-      const currentAddress: string | null = company.liveData?.address ?? null;
-      const newAddress = patch.address === "" ? null : patch.address;
-      if (newAddress !== currentAddress) {
-        fields = fields.filter((f) => f.key !== "liveData.address");
+      if (normalizedNew !== normalizedCurrent) {
+        fields = fields.filter((f) => f.key !== def.dbKey);
         fields.push({
-          key: "liveData.address",
-          label: "Adresse",
-          currentValue: currentAddress,
-          newValue: newAddress,
+          key: def.dbKey,
+          label: def.label,
+          currentValue,
+          newValue: def.patchKey === "address" ? (rawValue === "" ? null : rawValue) : newValue,
         });
         changed = true;
       }
@@ -151,28 +165,13 @@ export async function updateMeAccount(
     }
   }
 
-  // --- Handle Company.liveData fields ---
-  const setMap: Record<string, unknown> = {};
-  if (patch.contactEmail !== undefined) setMap["liveData.contactEmail"] = patch.contactEmail;
-  if (patch.phone !== undefined) setMap["liveData.phone"] = patch.phone;
-  if (patch.whatsapp !== undefined) setMap["liveData.whatsapp"] = patch.whatsapp;
-  if (patch.gpsPosition !== undefined) setMap["liveData.gpsPosition"] = patch.gpsPosition;
-
-  if (Object.keys(setMap).length > 0) {
-    const updated = await CompanyModel.findByIdAndUpdate(
+  // --- Handle live fields (only gpsPosition remains instant) ---
+  if (patch.gpsPosition !== undefined) {
+    await CompanyModel.findByIdAndUpdate(
       companyId,
-      { $set: setMap },
+      { $set: { "liveData.gpsPosition": patch.gpsPosition } },
       { new: true },
-    ).lean();
-
-    if (!updated) throw new NotFoundError("Company");
-  }
-
-  // Nothing at all? (no identity, no liveData, no hard change)
-  if (!hasIdentity && !hasHardChange && Object.keys(setMap).length === 0) {
-    const me = await getMe(userId, companyId, lang);
-    if (!me) throw new NotFoundError("Company");
-    return me;
+    );
   }
 
   // Return fresh MeResponse
