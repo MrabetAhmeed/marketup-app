@@ -102,6 +102,47 @@ export default async function CompanyReviewPage({ params }: PageProps): Promise<
           </div>
           <div className="divide-y divide-surface-border">
             {company.pendingUpdates.fields.map((f) => {
+              // Legal document: PDF → link, image → preview
+              if (f.key === "identityDocumentUrl") {
+                const currentUrl = f.currentValue as string | null;
+                const newUrl = f.newValue as string;
+                const isNewImage = /\.(jpg|jpeg|png|webp)$/i.test(newUrl);
+                const isCurrentImage = currentUrl ? /\.(jpg|jpeg|png|webp)$/i.test(currentUrl) : false;
+                return (
+                  <div key={f.key} className="px-5 py-4">
+                    <div className="text-[12px] font-semibold text-ink-tertiary mb-3">{f.label}</div>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div className="p-3 bg-surface-muted rounded border border-surface-border">
+                        <div className="text-[10px] font-semibold text-ink-tertiary mb-2">ACTUEL</div>
+                        {currentUrl ? (
+                          isCurrentImage ? (
+                            /* eslint-disable-next-line @next/next/no-img-element */
+                            <img src={currentUrl} alt="Document actuel" className="w-full max-h-[200px] object-contain rounded" />
+                          ) : (
+                            <a href={ensurePdfExtension(currentUrl) ?? "#"} target="_blank" rel="noopener noreferrer" className="text-[13px] text-primary hover:underline font-semibold inline-flex items-center gap-1.5">
+                              <span className="material-symbols-outlined" style={{ fontSize: 16 }}>open_in_new</span>Ouvrir le document actuel
+                            </a>
+                          )
+                        ) : (
+                          <span className="text-[13px] text-ink-secondary">(aucun)</span>
+                        )}
+                      </div>
+                      <div className="p-3 bg-[#F0FDF4] rounded border border-[#86EFAC]">
+                        <div className="text-[10px] font-semibold text-[#166534] mb-2">PROPOSÉ</div>
+                        {isNewImage ? (
+                          /* eslint-disable-next-line @next/next/no-img-element */
+                          <img src={newUrl} alt="Document proposé" className="w-full max-h-[200px] object-contain rounded" />
+                        ) : (
+                          <a href={ensurePdfExtension(newUrl) ?? "#"} target="_blank" rel="noopener noreferrer" className="text-[13px] text-[#166534] hover:underline font-semibold inline-flex items-center gap-1.5">
+                            <span className="material-symbols-outlined" style={{ fontSize: 16 }}>open_in_new</span>Ouvrir le document proposé
+                          </a>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                );
+              }
+
               const isImage = f.key === "data.logoUrl" || f.key === "data.bannerUrl";
               const isLogo = f.key === "data.logoUrl";
 

@@ -1,0 +1,45 @@
+export function companyUpdatesRejectedEmailTemplate(params: {
+  companyName: string;
+  fieldLabels: string[];
+  rejectionNote: string;
+  dashboardUrl: string;
+}): { subject: string; html: string } {
+  const fieldList = params.fieldLabels.map((l) => `<li style="margin:0 0 4px;font-size:14px;color:#242424;">${l}</li>`).join("");
+  const escapedNote = params.rejectionNote.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+  return {
+    subject: `Modifications refusées — ${params.companyName} — MARKET-UP`,
+    html: `<!DOCTYPE html>
+<html lang="fr">
+<head><meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1.0" /></head>
+<body style="margin:0;padding:0;background:#F5F5F5;font-family:'Segoe UI',Inter,Arial,sans-serif;color:#242424;">
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#F5F5F5;padding:40px 16px;">
+    <tr><td align="center">
+      <table role="presentation" width="100%" style="max-width:480px;background:#FFFFFF;border-radius:8px;border:1px solid #E0E0E0;padding:40px 32px;">
+        <tr><td>
+          <p style="margin:0 0 24px;font-size:20px;font-weight:700;color:#0078D4;">MARKET-UP</p>
+          <h1 style="margin:0 0 8px;font-size:18px;font-weight:600;color:#242424;">Modifications refusées</h1>
+          <p style="margin:0 0 16px;font-size:14px;color:#616161;line-height:1.5;">
+            Bonjour,<br><br>
+            Les modifications soumises pour <strong>${params.companyName}</strong> ont été refusées par notre équipe.
+            Vos profils publics conservent les informations précédentes.
+          </p>
+          <p style="margin:0 0 8px;font-size:13px;font-weight:600;color:#242424;">Champs concernés :</p>
+          <ul style="margin:0 0 16px;padding-left:20px;">${fieldList}</ul>
+          <div style="margin:0 0 20px;padding:12px 16px;background:#FEF2F2;border:1px solid #FCA5A5;border-radius:6px;">
+            <p style="margin:0 0 4px;font-size:12px;font-weight:700;color:#991B1B;">MOTIF DU REFUS</p>
+            <p style="margin:0;font-size:14px;color:#991B1B;line-height:1.5;">${escapedNote}</p>
+          </div>
+          <a href="${params.dashboardUrl}" style="display:inline-block;padding:12px 24px;background:#0078D4;color:#FFFFFF;text-decoration:none;font-size:14px;font-weight:600;border-radius:6px;">
+            Corriger et resoumettre
+          </a>
+          <p style="margin:24px 0 0;font-size:13px;color:#616161;line-height:1.5;">
+            Merci de faire confiance à MARKET-UP.<br>L'équipe MARKET-UP
+          </p>
+        </td></tr>
+      </table>
+    </td></tr>
+  </table>
+</body>
+</html>`,
+  };
+}

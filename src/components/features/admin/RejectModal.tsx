@@ -8,11 +8,14 @@ interface RejectModalProps {
   onClose: () => void;
   onConfirm: (reason: string) => void;
   submitting: boolean;
+  title?: string;
+  subtitle?: string;
+  minLength?: number;
 }
 
-export function RejectModal({ open, onClose, onConfirm, submitting }: RejectModalProps): JSX.Element {
+export function RejectModal({ open, onClose, onConfirm, submitting, title, subtitle, minLength = 1 }: RejectModalProps): JSX.Element {
   const [reason, setReason] = useState("");
-  const canSubmit = reason.trim().length > 0 && reason.length <= 500 && !submitting;
+  const canSubmit = reason.trim().length >= minLength && reason.length <= 500 && !submitting;
 
   function handleClose(): void {
     setReason("");
@@ -27,8 +30,8 @@ export function RejectModal({ open, onClose, onConfirm, submitting }: RejectModa
             <span className="material-symbols-outlined icon-fill text-[#DC2626]" style={{ fontSize: 22 }}>block</span>
           </div>
           <div className="min-w-0 flex-1">
-            <h3 className="font-heading font-bold text-[15px] text-[#991B1B] leading-tight">Refuser ce profil</h3>
-            <p className="text-[12px] text-[#991B1B] mt-0.5">Le propriétaire recevra un email avec le motif</p>
+            <h3 className="font-heading font-bold text-[15px] text-[#991B1B] leading-tight">{title ?? "Refuser ce profil"}</h3>
+            <p className="text-[12px] text-[#991B1B] mt-0.5">{subtitle ?? "Le propriétaire recevra un email avec le motif"}</p>
           </div>
         </div>
         <div className="p-5">

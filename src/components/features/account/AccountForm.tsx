@@ -1,9 +1,10 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
+import QRCode from "qrcode";
 import { ObfuscatedEmail } from "@/components/shared/ObfuscatedEmail";
 import { StatusPill } from "@/components/shared/StatusPill";
 import { FieldBadge } from "@/components/shared/FieldBadge";
@@ -48,9 +49,20 @@ export function AccountForm({ me, gouvernorats }: AccountFormProps): JSX.Element
   const { company } = me;
   const [baseUrl, setBaseUrl] = useState("");
   useEffect(() => { setBaseUrl(window.location.origin); }, []);
+
+  // QR code for LinkUP profile
+  const qrCanvasRef = useRef<HTMLCanvasElement>(null);
+  const linkupUrl = `${baseUrl}/linkup/${company.slug}`;
+  useEffect(() => {
+    if (!baseUrl || !qrCanvasRef.current) return;
+    QRCode.toCanvas(qrCanvasRef.current, linkupUrl, { width: 104, margin: 1 }, (err) => {
+      if (err) console.error("QR render error:", err);
+    });
+  }, [baseUrl, linkupUrl]);
   const router = useRouter();
   const { showToast } = useToast();
   const [saving, setSaving] = useState(false);
+  const [uploadingDoc, setUploadingDoc] = useState(false);
 
   const { register, handleSubmit, formState: { isDirty, dirtyFields, errors }, reset, setError } = useForm<AccountFormValues>({
     defaultValues: {
@@ -118,6 +130,7 @@ export function AccountForm({ me, gouvernorats }: AccountFormProps): JSX.Element
   const pendingContactEmail = pendingSimple("liveData.contactEmail");
   const pendingPhone = pendingSimple("liveData.phone");
   const pendingWhatsapp = pendingSimple("liveData.whatsapp");
+  const pendingDocUrl = pendingFields?.fields?.find((x) => x.key === "identityDocumentUrl")?.newValue as string | undefined ?? null;
 
   async function onSubmit(values: AccountFormValues): Promise<void> {
     // Build patch with only dirty fields (all go through pendingUpdates)
@@ -219,6 +232,20 @@ export function AccountForm({ me, gouvernorats }: AccountFormProps): JSX.Element
           Vos profils publics conservent les informations actuelles jusqu&apos;à validation.
         </div>
       </section>
+
+      {/* ═══ REJECTION BANNER ═══ */}
+      {me.company.lastPendingRejection && (
+        <section className="bg-[#FEF2F2] border border-[#FCA5A5] rounded-lg px-4 py-3 flex items-start gap-3">
+          <span className="material-symbols-outlined icon-fill text-[#DC2626] shrink-0 mt-[1px]" style={{ fontSize: 20 }}>
+            error
+          </span>
+          <div className="min-w-0 flex-1 text-[12.5px] text-ink-primary leading-snug">
+            <strong className="text-[#991B1B]">Modifications refusées</strong>{" "}
+            le {new Date(me.company.lastPendingRejection.rejectedAt).toLocaleDateString("fr-FR", { day: "numeric", month: "long", year: "numeric" })}{" "}
+            — <strong>Motif :</strong> {me.company.lastPendingRejection.note}
+          </div>
+        </section>
+      )}
 
       {/* ═══ SECTION: IDENTITÉ ═══ */}
       <section className="card p-5 md:p-6">
@@ -358,30 +385,84 @@ export function AccountForm({ me, gouvernorats }: AccountFormProps): JSX.Element
             <div>
               <label className="field-label flex items-center gap-2 flex-wrap">
                 Document légal
-                <FieldBadge kind="locked" />
+                <FieldBadge kind="validation" />
               </label>
-              <div className="flex items-center gap-3 px-3 py-2.5 bg-surface-muted border border-surface-border rounded-lg">
-                <span className="inline-flex items-center justify-center w-9 h-9 rounded bg-white border border-surface-border">
-                  <span className="material-symbols-outlined text-primary" style={{ fontSize: 18 }}>
-                    description
+              {/* Current document */}
+              {company.identityDocumentUrl && (
+                <div className="flex items-center gap-3 px-3 py-2.5 bg-surface-muted border border-surface-border rounded-lg mb-2">
+                  <span className="inline-flex items-center justify-center w-9 h-9 rounded bg-white border border-surface-border">
+                    <span className="material-symbols-outlined text-primary" style={{ fontSize: 18 }}>
+                      description
+                    </span>
                   </span>
-                </span>
-                <div className="min-w-0 flex-1">
-                  <div className="text-[13px] font-semibold text-ink-primary truncate">
-                    document-legal.pdf
+                  <div className="min-w-0 flex-1">
+                    <div className="text-[13px] font-semibold text-ink-primary truncate">Document actuel</div>
                   </div>
-                  <div className="text-[11px] text-ink-secondary">
-                    Téléversé à l&apos;inscription
+                  <a href={company.identityDocumentUrl} target="_blank" rel="noopener noreferrer" className="text-ink-secondary hover:text-primary">
+                    <span className="material-symbols-outlined" style={{ fontSize: 18 }}>open_in_new</span>
+                  </a>
+                </div>
+              )}
+              {/* Pending document */}
+              {pendingDocUrl && (
+                <div className="mt-1.5 px-3 py-2 bg-[#FEF3C7] border border-[#FDE68A] rounded text-[12px] text-[#92400E] flex items-start gap-2 mb-2">
+                  <span className="material-symbols-outlined shrink-0 mt-[1px]" style={{ fontSize: 14 }}>schedule</span>
+                  <span>
+                    Nouveau document en attente de validation ·{" "}
+                    <a href={pendingDocUrl} target="_blank" rel="noopener noreferrer" className="text-[#92400E] underline font-semibold">
+                      Voir le document proposé
+                    </a>
+                  </span>
+                </div>
+              )}
+              {/* Upload replacement */}
+              {!pendingDocUrl && (
+                <div className="mt-1">
+                  <label className={`inline-flex items-center gap-1.5 px-3 py-[7px] text-[12px] font-semibold bg-white border border-[#C7DDF1] rounded transition-colors ${uploadingDoc ? "text-ink-tertiary opacity-60 cursor-not-allowed" : "text-primary cursor-pointer hover:bg-primary-light"}`}>
+                    <span className="material-symbols-outlined" style={{ fontSize: 14 }}>{uploadingDoc ? "hourglass_top" : "upload_file"}</span>
+                    {uploadingDoc ? "Téléversement en cours…" : "Remplacer le document"}
+                    <input
+                      type="file"
+                      accept=".pdf,.jpg,.jpeg,.png"
+                      className="hidden"
+                      disabled={uploadingDoc}
+                      onChange={async (e) => {
+                        const file = e.target.files?.[0];
+                        if (!file) return;
+                        if (file.size > 2 * 1024 * 1024) {
+                          showToast("Fichier trop volumineux (2 Mo maximum)");
+                          return;
+                        }
+                        setUploadingDoc(true);
+                        const fd = new FormData();
+                        fd.append("file", file);
+                        try {
+                          const res = await fetch("/api/v1/me/legal-document", { method: "POST", body: fd });
+                          const json = await res.json();
+                          if (!res.ok) { showToast(json.error?.message || "Erreur d'upload"); return; }
+                          // Submit the URL to pendingUpdates via the account PATCH
+                          const patchRes = await fetch("/api/v1/me/account", {
+                            method: "PATCH",
+                            headers: { "Content-Type": "application/json" },
+                            body: JSON.stringify({ identityDocumentUrl: json.url }),
+                          });
+                          if (patchRes.ok) {
+                            showToast("Document soumis · en attente de validation admin");
+                            router.refresh();
+                          } else {
+                            showToast("Erreur lors de la soumission");
+                          }
+                        } catch { showToast("Erreur, veuillez réessayer"); } finally { setUploadingDoc(false); }
+                        e.target.value = "";
+                      }}
+                    />
+                  </label>
+                  <div className="field-help mt-1">
+                    <span className="material-symbols-outlined" style={{ fontSize: 13 }}>info</span>
+                    PDF, JPG ou PNG · 2 Mo max · La modification nécessite une validation admin
                   </div>
                 </div>
-                <span className="material-symbols-outlined text-ink-secondary" style={{ fontSize: 18 }}>
-                  open_in_new
-                </span>
-              </div>
-              <div className="field-help">
-                <span className="material-symbols-outlined" style={{ fontSize: 13 }}>info</span>
-                Document fourni à l&apos;inscription
-              </div>
+              )}
             </div>
           </div>
         </div>
@@ -769,11 +850,12 @@ export function AccountForm({ me, gouvernorats }: AccountFormProps): JSX.Element
               Profil LinkUP
             </label>
             <div className="flex flex-col sm:flex-row items-start gap-4">
-              {/* QR placeholder — TODO Phase 4: real QR generation */}
-              <div className="w-[120px] h-[120px] p-2.5 bg-white border border-surface-border rounded-lg shrink-0 flex items-center justify-center">
-                <span className="material-symbols-outlined text-ink-tertiary" style={{ fontSize: 48 }}>
-                  qr_code_2
-                </span>
+              <div className="w-[120px] h-[120px] p-2 bg-white border border-surface-border rounded-lg shrink-0 flex items-center justify-center">
+                {baseUrl ? (
+                  <canvas ref={qrCanvasRef} />
+                ) : (
+                  <span className="material-symbols-outlined text-ink-tertiary" style={{ fontSize: 48 }}>qr_code_2</span>
+                )}
               </div>
               <div className="min-w-0 flex-1 w-full">
                 <div className="mb-3">
@@ -782,8 +864,17 @@ export function AccountForm({ me, gouvernorats }: AccountFormProps): JSX.Element
                 <div className="flex items-center gap-2 flex-wrap">
                   <button
                     type="button"
-                    disabled
-                    className="inline-flex items-center gap-1.5 px-4 py-[9px] text-[13px] font-semibold text-ink-primary bg-white border border-[#D1D1D1] rounded opacity-60 cursor-not-allowed"
+                    disabled={!baseUrl}
+                    onClick={() => {
+                      const canvas = qrCanvasRef.current;
+                      if (!canvas) return;
+                      const dataUrl = canvas.toDataURL("image/png");
+                      const a = document.createElement("a");
+                      a.href = dataUrl;
+                      a.download = `linkup-${company.slug}-qr.png`;
+                      a.click();
+                    }}
+                    className="inline-flex items-center gap-1.5 px-4 py-[9px] text-[13px] font-semibold text-ink-primary bg-white border border-[#D1D1D1] rounded hover:bg-surface-muted transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
                   >
                     <span className="material-symbols-outlined" style={{ fontSize: 16 }}>download</span>
                     Télécharger QR (PNG)

@@ -18,6 +18,8 @@ import { companyRestoredEmailTemplate } from "./templates/company-restored";
 import { sponsoringSubmittedEmailTemplate } from "./templates/sponsoring-submitted";
 import { sponsoringValidatedEmailTemplate } from "./templates/sponsoring-validated";
 import { sponsoringRejectedEmailTemplate } from "./templates/sponsoring-rejected";
+import { companyUpdatesApprovedEmailTemplate } from "./templates/company-updates-approved";
+import { companyUpdatesRejectedEmailTemplate } from "./templates/company-updates-rejected";
 import type { Transporter } from "nodemailer";
 
 const FROM_ADDRESS = `MARKET-UP <${env.EMAIL_FROM}>`;
@@ -336,6 +338,36 @@ export async function sendSponsoringRejectedEmail(params: {
     profileKind: params.profileKind,
     rejectionReason: params.rejectionReason,
     dashboardUrl: `${env.NEXTAUTH_URL}/dashboard/sponsoring`,
+  });
+  await sendEmail(params.userEmail, subject, html);
+}
+
+/** Notify owner that their pending account modifications have been approved. */
+export async function sendCompanyUpdatesApprovedEmail(params: {
+  userEmail: string;
+  companyName: string;
+  fieldLabels: string[];
+}): Promise<void> {
+  const { subject, html } = companyUpdatesApprovedEmailTemplate({
+    companyName: params.companyName,
+    fieldLabels: params.fieldLabels,
+    dashboardUrl: `${env.NEXTAUTH_URL}/dashboard/account`,
+  });
+  await sendEmail(params.userEmail, subject, html);
+}
+
+/** Notify owner that their pending account modifications have been rejected. */
+export async function sendCompanyUpdatesRejectedEmail(params: {
+  userEmail: string;
+  companyName: string;
+  fieldLabels: string[];
+  rejectionNote: string;
+}): Promise<void> {
+  const { subject, html } = companyUpdatesRejectedEmailTemplate({
+    companyName: params.companyName,
+    fieldLabels: params.fieldLabels,
+    rejectionNote: params.rejectionNote,
+    dashboardUrl: `${env.NEXTAUTH_URL}/dashboard/account`,
   });
   await sendEmail(params.userEmail, subject, html);
 }

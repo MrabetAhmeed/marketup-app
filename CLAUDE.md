@@ -367,6 +367,12 @@ These rules are fully implemented and tested. **Summaries below; full details in
 
 - **6.27 Visuels et finitions (FB-8):** Cards de recherche : boosted = etoile doree en overlay (rond, coin haut-droit), RSE = texte vert "RSE attestee" (remplace le pill gold). Badge RSE public : icone ESG (`public/badges/esg-icon.svg`, fill #1A2B8C) + libelle HTML "ENGAGEMENT SOCIAL ATTESTE" bleu marine a cote (responsive). Texte RSE : "Nous contribuons activement a la vie locale…". RseSection au canon (font-bold, rounded-xl, pas de gradient). Carte : tiles CARTO Light (`basemaps.cartocdn.com/light_all`). Admin : liens sociaux cliquables dans la fiche de validation (target=_blank + open_in_new). Notification in-app au refus RSE (`rse_receipt_rejected`, kind+icon+color coherents).
 
+- **6.28 Motif de refus pendingUpdates (FB-7b):** `rejectPendingUpdates` exige un `rejectionNote` (min 3 caractères). Le motif est stocké dans `Company.lastPendingRejection { note, rejectedAt }` (visible au owner via MeResponse, jamais dans un DTO public) ET dans `auditTrail.details.note`. Le champ `lastPendingRejection` est effacé (`null`) à la prochaine soumission de modifications par l'owner. Le refus d'inscription (compte) reste inchangé (motif dans `Company.rejectedReason`).
+
+- **6.29 Notifications/emails validation compte (FB-7b):** `approvePendingUpdates` et `rejectPendingUpdates` envoient notification in-app (`account_updates_approved` / `account_updates_rejected`) + email au owner. Les deux sont non-bloquants (try/catch). Les emails listent les labels des champs concernés. Le refus inclut le motif.
+
+- **6.30 Document légal remplaçable (FB-7b):** `Company.identityDocumentUrl` est remplaçable via `pendingUpdates` (key `"identityDocumentUrl"`). Upload via `POST /api/v1/me/legal-document` (requireOwner, PDF/JPG/PNG, 2 Mo, catégorie storage `identity-docs`). Coexistence : l'ancien reste dans `identityDocumentUrl`, le nouveau dans `pendingUpdates.fields[].newValue`. Approbation : le nouveau remplace l'ancien. Refus : `storage.delete(newUrl)` best-effort, l'ancien demeure.
+
 ---
 
 ## 7. API Conventions

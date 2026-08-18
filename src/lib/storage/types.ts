@@ -4,7 +4,7 @@ import { AppError } from "@/lib/api-error";
 // Storage adapter interface
 // ---------------------------------------------------------------------------
 
-export type UploadCategory = "logos" | "banners" | "gallery" | "legal-docs" | "thumbnails";
+export type UploadCategory = "logos" | "banners" | "gallery" | "legal-docs" | "identity-docs" | "thumbnails";
 
 export interface UploadOptions {
   companyId: string;

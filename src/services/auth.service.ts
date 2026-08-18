@@ -35,7 +35,7 @@ import { BCRYPT_ROUNDS, BCRYPT_OTP_ROUNDS } from "@/lib/crypto";
 const OTP_EXPIRY_MS = 10 * 60 * 1000; // 10 minutes
 const OTP_MAX_ATTEMPTS = 5;
 const RESET_TOKEN_EXPIRY_MS = 60 * 60 * 1000; // 60 minutes
-const ORPHAN_AGE_MS = 7 * 24 * 60 * 60 * 1000; // 7 days
+const _ORPHAN_AGE_MS = 7 * 24 * 60 * 60 * 1000; // 7 days
 
 // ---------------------------------------------------------------------------
 // Helpers

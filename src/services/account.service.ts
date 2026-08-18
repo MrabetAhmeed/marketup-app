@@ -94,6 +94,12 @@ const HARD_FIELD_DEFS: HardFieldDef[] = [
     label: "WhatsApp",
     readCurrent: (c) => c.liveData?.whatsapp ?? null,
   },
+  {
+    patchKey: "identityDocumentUrl",
+    dbKey: "identityDocumentUrl",
+    label: "Document légal",
+    readCurrent: (c) => c.identityDocumentUrl ?? null,
+  },
 ];
 
 // ---------------------------------------------------------------------------
@@ -161,6 +167,7 @@ export async function updateMeAccount(
           fields,
           note: null,
         },
+        lastPendingRejection: null, // Clear rejection banner on new submission
       });
     }
   }

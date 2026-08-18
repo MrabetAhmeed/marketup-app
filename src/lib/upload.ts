@@ -99,6 +99,51 @@ export async function uploadReceiptFromFile(
 }
 
 /**
+ * Parse a legal identity document from a Request (multipart/form-data).
+ * Accepts PDF, JPG, PNG — 2 MB max. Category: identity-docs.
+ */
+export async function uploadLegalDocFromRequest(
+  req: Request,
+  fieldName: string,
+  companyId: string,
+): Promise<UploadResult> {
+  const formData = await req.formData();
+  const file = formData.get(fieldName);
+
+  if (!file || !(file instanceof File)) {
+    throw new AppError("VALIDATION_FAILED", "Aucun fichier fourni.", 400);
+  }
+
+  const ALLOWED = new Set(["application/pdf", "image/jpeg", "image/png"]);
+  if (!ALLOWED.has(file.type)) {
+    throw new AppError(
+      "VALIDATION_FAILED",
+      "Format non accepté. Formats autorisés : PDF, JPG, PNG.",
+      400,
+      { fields: { [fieldName]: ["Format non accepté (PDF, JPG, PNG uniquement)."] } },
+    );
+  }
+
+  const MAX_BYTES = 2 * 1024 * 1024; // 2 MB
+  if (file.size > MAX_BYTES) {
+    throw new AppError(
+      "VALIDATION_FAILED",
+      "Fichier trop volumineux (2 Mo maximum).",
+      400,
+      { fields: { [fieldName]: ["Taille maximum : 2 Mo."] } },
+    );
+  }
+
+  const buffer = Buffer.from(await file.arrayBuffer());
+  return storage.upload(buffer, {
+    companyId,
+    category: "identity-docs",
+    originalName: file.name,
+    contentType: file.type,
+  });
+}
+
+/**
  * Upload a document file (PDF only) from a File object.
  */
 export async function uploadDocumentFromFile(

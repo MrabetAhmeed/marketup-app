@@ -19,6 +19,14 @@ vi.mock("@/lib/email/sender", () => ({
   sendAccountApprovedEmail: vi.fn().mockResolvedValue(undefined),
   sendCompanyValidatedEmail: vi.fn().mockResolvedValue(undefined),
   sendCompanyRejectedEmail: vi.fn().mockResolvedValue(undefined),
+  sendCompanyUpdatesApprovedEmail: vi.fn().mockResolvedValue(undefined),
+  sendCompanyUpdatesRejectedEmail: vi.fn().mockResolvedValue(undefined),
+}));
+vi.mock("@/services/notifications.service", () => ({
+  createNotification: vi.fn().mockResolvedValue(undefined),
+}));
+vi.mock("@/lib/storage", () => ({
+  storage: { delete: vi.fn().mockResolvedValue(undefined) },
 }));
 vi.mock("@/lib/env", () => ({
   env: {
@@ -561,5 +569,122 @@ describe("approvePendingUpdates — contact fields (FB-7a)", () => {
 
     const company = await CompanyModel.findById(companyId).lean();
     expect(company.liveData.contactEmail).toBe("new@test.tn");
+  });
+});
+
+// =========================================================================
+// FB-7b — rejection note mandatory
+// =========================================================================
+
+describe("rejectPendingUpdates — mandatory note (FB-7b)", () => {
+  it("rejects when note is missing", async () => {
+    await expect(rejectPendingUpdates(companyId, adminId, "")).rejects.toThrow("motif du refus est obligatoire");
+  });
+
+  it("rejects when note is too short (< 3 chars)", async () => {
+    await expect(rejectPendingUpdates(companyId, adminId, "ab")).rejects.toThrow("motif du refus est obligatoire");
+  });
+
+  it("persists note in lastPendingRejection", async () => {
+    await rejectPendingUpdates(companyId, adminId, "Nom non conforme, merci de corriger");
+
+    const company = await CompanyModel.findById(companyId).lean();
+    expect(company.lastPendingRejection).not.toBeNull();
+    expect(company.lastPendingRejection.note).toBe("Nom non conforme, merci de corriger");
+    expect(company.lastPendingRejection.rejectedAt).toBeDefined();
+    expect(company.pendingUpdates).toBeNull();
+  });
+
+  it("sends notification + email on rejection (non-blocking)", async () => {
+    const { createNotification: mockNotif } = await import("@/services/notifications.service");
+    const { sendCompanyUpdatesRejectedEmail: mockEmail } = await import("@/lib/email/sender");
+
+    await rejectPendingUpdates(companyId, adminId, "Données incorrectes");
+
+    expect(mockNotif).toHaveBeenCalledWith(expect.objectContaining({
+      kind: "account_updates_rejected",
+    }));
+    expect(mockEmail).toHaveBeenCalledWith(expect.objectContaining({
+      rejectionNote: "Données incorrectes",
+    }));
+  });
+});
+
+describe("approvePendingUpdates — notification + email (FB-7b)", () => {
+  it("sends notification + email on approval (non-blocking)", async () => {
+    const { createNotification: mockNotif } = await import("@/services/notifications.service");
+    const { sendCompanyUpdatesApprovedEmail: mockEmail } = await import("@/lib/email/sender");
+
+    await approvePendingUpdates(companyId, adminId);
+
+    expect(mockNotif).toHaveBeenCalledWith(expect.objectContaining({
+      kind: "account_updates_approved",
+    }));
+    expect(mockEmail).toHaveBeenCalledWith(expect.objectContaining({
+      fieldLabels: expect.arrayContaining(["Nom de l'entreprise"]),
+    }));
+  });
+
+  it("approval succeeds even if notification fails", async () => {
+    const { createNotification: mockNotif } = await import("@/services/notifications.service");
+    (mockNotif as any).mockRejectedValueOnce(new Error("DB down"));
+
+    // Should not throw
+    await approvePendingUpdates(companyId, adminId);
+
+    const company = await CompanyModel.findById(companyId).lean();
+    expect(company.pendingUpdates).toBeNull();
+    expect(company.data.displayName.fr).toBe("TechnoFab International");
+  });
+});
+
+// =========================================================================
+// FB-7b — identityDocumentUrl in pendingUpdates
+// =========================================================================
+
+describe("approvePendingUpdates — identityDocumentUrl (FB-7b)", () => {
+  it("merges identityDocumentUrl from pendingUpdates", async () => {
+    await CompanyModel.findByIdAndUpdate(companyId, {
+      identityDocumentUrl: "https://old-doc.pdf",
+      pendingUpdates: {
+        submittedAt: new Date(),
+        fields: [{
+          key: "identityDocumentUrl",
+          label: "Document légal",
+          currentValue: "https://old-doc.pdf",
+          newValue: "https://new-doc.pdf",
+        }],
+      },
+    });
+
+    await approvePendingUpdates(companyId, adminId);
+
+    const company = await CompanyModel.findById(companyId).lean();
+    expect(company.identityDocumentUrl).toBe("https://new-doc.pdf");
+    expect(company.pendingUpdates).toBeNull();
+  });
+});
+
+describe("rejectPendingUpdates — identityDocumentUrl cleanup (FB-7b)", () => {
+  it("calls storage.delete on rejected document (best-effort)", async () => {
+    const { storage: mockStorage } = await import("@/lib/storage");
+
+    await CompanyModel.findByIdAndUpdate(companyId, {
+      pendingUpdates: {
+        submittedAt: new Date(),
+        fields: [{
+          key: "identityDocumentUrl",
+          label: "Document légal",
+          currentValue: "https://old-doc.pdf",
+          newValue: "https://rejected-doc.pdf",
+        }],
+      },
+    });
+
+    await rejectPendingUpdates(companyId, adminId, "Document illisible");
+
+    expect(mockStorage.delete).toHaveBeenCalledWith("https://rejected-doc.pdf");
+    const company = await CompanyModel.findById(companyId).lean();
+    expect(company.identityDocumentUrl).toBeNull(); // old value not touched by reject (Mongoose default)
   });
 });

@@ -22,7 +22,11 @@ import {
   sendCompanySuspendedEmail,
   sendCompanyReactivatedEmail,
   sendCompanyRestoredEmail,
+  sendCompanyUpdatesApprovedEmail,
+  sendCompanyUpdatesRejectedEmail,
 } from "@/lib/email/sender";
+import { createNotification } from "@/services/notifications.service";
+import { storage } from "@/lib/storage";
 import type { SupportedLang } from "@/lib/i18n";
 import type { ProfileKind } from "@/types";
 
@@ -511,6 +515,34 @@ export async function approvePendingUpdates(
   } catch (err) {
     console.warn("[approvePendingUpdates] User sync-back failed (non-blocking):", err);
   }
+
+  // --- Fire-and-forget: notification + email to owner ---
+  try {
+    const user = await UserModel.findOne({ companyId: new mongoose.Types.ObjectId(companyId) }).lean();
+    if (user) {
+      const fieldLabels = company.pendingUpdates.fields.map((f: { label: string }) => f.label);
+      const companyName = pickLocale(company.data?.displayName, "fr");
+
+      await createNotification({
+        recipientType: "owner",
+        recipientId: (user._id as mongoose.Types.ObjectId).toString(),
+        kind: "account_updates_approved",
+        icon: "check_circle",
+        color: "success",
+        title: { fr: "Modifications validées", ar: "", en: "" },
+        body: { fr: `Vos modifications de compte (${fieldLabels.join(", ")}) ont été validées.`, ar: "", en: "" },
+        actionUrl: "/dashboard/account",
+      });
+
+      await sendCompanyUpdatesApprovedEmail({
+        userEmail: user.email,
+        companyName,
+        fieldLabels,
+      });
+    }
+  } catch (err) {
+    console.warn("[approvePendingUpdates] Notification/email failed (non-blocking):", err);
+  }
 }
 
 // ---------------------------------------------------------------------------
@@ -520,10 +552,13 @@ export async function approvePendingUpdates(
 export async function rejectPendingUpdates(
   companyId: string,
   adminId: string,
-  rejectionNote?: string,
+  rejectionNote: string,
 ): Promise<void> {
   if (!isValidObjectId(companyId)) {
     throw new BusinessRuleError("INVALID_ID", "Identifiant invalide.");
+  }
+  if (!rejectionNote || rejectionNote.trim().length < 3) {
+    throw new BusinessRuleError("REJECTION_NOTE_REQUIRED", "Le motif du refus est obligatoire (3 caractères minimum).");
   }
   await connectDb();
 
@@ -533,21 +568,68 @@ export async function rejectPendingUpdates(
     throw new BusinessRuleError("NO_PENDING", "Aucune modification en attente.");
   }
 
+  const now = new Date();
+  const trimmedNote = rejectionNote.trim();
+
   await CompanyModel.findByIdAndUpdate(companyId, {
-    $set: { pendingUpdates: null },
+    $set: {
+      pendingUpdates: null,
+      lastPendingRejection: { note: trimmedNote, rejectedAt: now },
+    },
     $push: {
       auditTrail: {
-        at: new Date(),
+        at: now,
         by: new mongoose.Types.ObjectId(adminId),
         byRole: "SUPER_ADMIN",
         action: "reject_pending_updates",
         details: {
           fields: company.pendingUpdates.fields.map((f: { key: string }) => f.key),
-          note: rejectionNote ?? null,
+          note: trimmedNote,
         },
       },
     },
   });
+
+  // --- Fire-and-forget: notification + email to owner ---
+  try {
+    const user = await UserModel.findOne({ companyId: new mongoose.Types.ObjectId(companyId) }).lean();
+    if (user) {
+      const fieldLabels = company.pendingUpdates.fields.map((f: { label: string }) => f.label);
+      const companyName = pickLocale(company.data?.displayName, "fr");
+
+      await createNotification({
+        recipientType: "owner",
+        recipientId: (user._id as mongoose.Types.ObjectId).toString(),
+        kind: "account_updates_rejected",
+        icon: "block",
+        color: "danger",
+        title: { fr: "Modifications refusées", ar: "", en: "" },
+        body: { fr: `Vos modifications de compte ont été refusées. Motif : ${trimmedNote}`, ar: "", en: "" },
+        actionUrl: "/dashboard/account",
+      });
+
+      await sendCompanyUpdatesRejectedEmail({
+        userEmail: user.email,
+        companyName,
+        fieldLabels,
+        rejectionNote: trimmedNote,
+      });
+    }
+  } catch (err) {
+    console.warn("[rejectPendingUpdates] Notification/email failed (non-blocking):", err);
+  }
+
+  // --- Best-effort: delete rejected identity document from storage ---
+  try {
+    const docField = company.pendingUpdates.fields.find(
+      (f: { key: string }) => f.key === "identityDocumentUrl",
+    );
+    if (docField && typeof docField.newValue === "string") {
+      await storage.delete(docField.newValue);
+    }
+  } catch (err) {
+    console.warn("[rejectPendingUpdates] Storage cleanup failed (non-blocking):", err);
+  }
 }
 
 // ---------------------------------------------------------------------------

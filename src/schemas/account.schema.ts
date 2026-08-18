@@ -79,6 +79,13 @@ export const AccountLiveUpdateSchema = z.object({
     )
     .optional(),
 
+  // --- Legal document (validation-gated → pendingUpdates) ---
+  identityDocumentUrl: z
+    .string()
+    .trim()
+    .url("URL du document invalide.")
+    .optional(),
+
   // --- GPS position (live — instant, no admin review) ---
   gpsPosition: z
     .object({

@@ -258,6 +258,7 @@ export async function getMe(
       color: company.data?.color ?? "#0078D4",
       legalId: company.legalId,
       vatNumber: company.vatNumber ?? null,
+      identityDocumentUrl: company.identityDocumentUrl ?? null,
       accountEmail: company.accountEmail,
       country: company.country ?? "TN",
       sector: {
@@ -279,6 +280,9 @@ export async function getMe(
       registeredAt: new Date(company.registeredAt).toISOString(),
       validatedAt: toISOOrNull(company.validatedAt),
       pendingUpdates: company.pendingUpdates ?? null,
+      lastPendingRejection: company.lastPendingRejection
+        ? { note: company.lastPendingRejection.note, rejectedAt: new Date(company.lastPendingRejection.rejectedAt).toISOString() }
+        : null,
       avatarInitials: getInitials(displayName),
     },
     profiles: profileSummaries,

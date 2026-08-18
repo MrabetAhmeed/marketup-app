@@ -75,6 +75,18 @@ const CompanySchema = new Schema(
       default: null,
     },
 
+    // Last rejection of pendingUpdates (visible to owner until next submission)
+    lastPendingRejection: {
+      type: new Schema(
+        {
+          note: { type: String, required: true },
+          rejectedAt: { type: Date, required: true },
+        },
+        { _id: false },
+      ),
+      default: null,
+    },
+
     // Live data (instant edits, no admin review)
     liveData: {
       sectorId: { type: String, required: true },

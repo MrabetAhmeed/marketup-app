@@ -55,6 +55,7 @@ export interface MeResponse {
     color: string;
     legalId: string;
     vatNumber: string | null;
+    identityDocumentUrl: string | null;
     accountEmail: string;
     country: string;
     sector: { slug: string; name: string };
@@ -70,6 +71,7 @@ export interface MeResponse {
     registeredAt: string;
     validatedAt: string | null;
     pendingUpdates: unknown | null;
+    lastPendingRejection: { note: string; rejectedAt: string } | null;
     avatarInitials: string;
   };
   profiles: {

@@ -1,8 +1,9 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useCallback } from "react";
 import { signOut } from "next-auth/react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import type { MeResponse, NotificationPreview } from "@/types/dashboard";
 
 interface DashboardTopbarProps {
@@ -44,10 +45,29 @@ function relativeTime(iso: string): string {
 // ---------------------------------------------------------------------------
 
 export function DashboardTopbar({ me, notifications, title, subtitle }: DashboardTopbarProps): JSX.Element {
+  const router = useRouter();
   const [bellOpen, setBellOpen] = useState(false);
   const [avatarOpen, setAvatarOpen] = useState(false);
   const bellRef = useRef<HTMLDivElement>(null);
   const avatarRef = useRef<HTMLDivElement>(null);
+  const [localNotifs, setLocalNotifs] = useState(notifications);
+  const [localUnread, setLocalUnread] = useState(me.stats.unreadNotifications);
+
+  // Sync when props change (RSC re-render)
+  useEffect(() => { setLocalNotifs(notifications); }, [notifications]);
+  useEffect(() => { setLocalUnread(me.stats.unreadNotifications); }, [me.stats.unreadNotifications]);
+
+  const handleNotifClick = useCallback((n: NotificationPreview) => {
+    setBellOpen(false);
+    if (n.read) return;
+    // Optimistic update
+    setLocalNotifs((prev) => prev.map((x) => x.id === n.id ? { ...x, read: true } : x));
+    setLocalUnread((c) => Math.max(0, c - 1));
+    // Fire-and-forget PATCH + refresh RSC cache
+    fetch(`/api/v1/me/notifications/${n.id}/read`, { method: "PATCH" })
+      .then(() => router.refresh())
+      .catch(() => { /* silent */ });
+  }, [router]);
 
   // Close dropdowns on outside click or Escape
   useEffect(() => {
@@ -69,7 +89,7 @@ export function DashboardTopbar({ me, notifications, title, subtitle }: Dashboar
     };
   }, []);
 
-  const unread = me.stats.unreadNotifications;
+  const unread = localUnread;
   const isRejected = me.company.status === "rejected";
 
   return (
@@ -143,11 +163,11 @@ export function DashboardTopbar({ me, notifications, title, subtitle }: Dashboar
                     Aucune nouvelle notification
                   </div>
                 ) : (
-                  notifications.map((n) => (
+                  localNotifs.map((n) => (
                     <Link
                       key={n.id}
                       href={n.href}
-                      onClick={() => setBellOpen(false)}
+                      onClick={() => handleNotifClick(n)}
                       className="flex items-start gap-3 px-4 py-3 hover:bg-surface-subtle border-t border-surface-border"
                     >
                       {!n.read && (

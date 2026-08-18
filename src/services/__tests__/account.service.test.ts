@@ -420,3 +420,49 @@ describe("updateMeAccount — MeResponse shape", () => {
     expect(me.user.lastName).toBe("Mrabet");
   });
 });
+
+// ---------------------------------------------------------------------------
+// FB-7b: identityDocumentUrl goes through pendingUpdates
+// ---------------------------------------------------------------------------
+
+describe("updateMeAccount — identityDocumentUrl (FB-7b)", () => {
+  it("PATCH identityDocumentUrl → creates pendingUpdates", async () => {
+    await CompanyModel.findByIdAndUpdate(companyId, { identityDocumentUrl: "https://old-doc.pdf" });
+    await updateMeAccount(userId, { identityDocumentUrl: "https://new-doc.pdf" });
+
+    const company = await CompanyModel.findById(companyId).lean();
+    expect(company.pendingUpdates).not.toBeNull();
+    const f = company.pendingUpdates.fields.find((x: any) => x.key === "identityDocumentUrl");
+    expect(f).toBeDefined();
+    expect(f.currentValue).toBe("https://old-doc.pdf");
+    expect(f.newValue).toBe("https://new-doc.pdf");
+    // identityDocumentUrl NOT changed yet
+    expect(company.identityDocumentUrl).toBe("https://old-doc.pdf");
+  });
+
+  it("no-op when identityDocumentUrl same as current", async () => {
+    await CompanyModel.findByIdAndUpdate(companyId, { identityDocumentUrl: "https://same.pdf" });
+    await updateMeAccount(userId, { identityDocumentUrl: "https://same.pdf" });
+
+    const company = await CompanyModel.findById(companyId).lean();
+    expect(company.pendingUpdates).toBeNull();
+  });
+});
+
+// ---------------------------------------------------------------------------
+// FB-7b: lastPendingRejection cleared on new submission
+// ---------------------------------------------------------------------------
+
+describe("updateMeAccount — lastPendingRejection cleared (FB-7b)", () => {
+  it("clears lastPendingRejection when new pendingUpdates are submitted", async () => {
+    await CompanyModel.findByIdAndUpdate(companyId, {
+      lastPendingRejection: { note: "Refusé", rejectedAt: new Date() },
+    });
+
+    await updateMeAccount(userId, { displayName: "New Name" });
+
+    const company = await CompanyModel.findById(companyId).lean();
+    expect(company.lastPendingRejection).toBeNull();
+    expect(company.pendingUpdates).not.toBeNull();
+  });
+});
