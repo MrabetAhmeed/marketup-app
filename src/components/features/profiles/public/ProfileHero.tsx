@@ -46,7 +46,7 @@ export default function ProfileHero({
         </div>
 
         {/* Info */}
-        <div className="md:col-span-8 lg:col-span-9 space-y-6">
+        <div className="md:col-span-8 lg:col-span-9 space-y-6 min-w-0">
           <div className="space-y-2">
             {/* RSE badge — ESG icon + label */}
             {rseBadgeStatus === "validated" && (
@@ -60,7 +60,7 @@ export default function ProfileHero({
             )}
 
             {/* Name */}
-            <h1 className="text-4xl md:text-5xl font-extrabold tracking-tight text-on-surface">{displayName}</h1>
+            <h1 className="text-3xl sm:text-4xl md:text-5xl font-extrabold tracking-tight text-on-surface break-words">{displayName}</h1>
 
             {/* Badges */}
             <div className="flex flex-wrap items-center gap-2 mt-2">
@@ -78,30 +78,30 @@ export default function ProfileHero({
 
           {/* Contact */}
           <div className="space-y-4">
-            <div className="flex flex-col md:flex-row flex-wrap gap-6 items-start md:items-center">
+            <div className="flex flex-col md:flex-row flex-wrap gap-6 items-start md:items-center min-w-0">
               {phone && (
-                <div className="flex items-center space-x-3 text-on-surface">
-                  <span className="material-symbols-outlined text-primary text-[20px]">call</span>
+                <div className="flex items-center space-x-3 text-on-surface min-w-0">
+                  <span className="material-symbols-outlined text-primary text-[20px] shrink-0">call</span>
                   <span className="text-sm font-medium">{phone}</span>
                 </div>
               )}
               {whatsapp && (
-                <div className="flex items-center space-x-3 text-on-surface">
-                  <span className="material-symbols-outlined text-primary text-[20px]">chat</span>
+                <div className="flex items-center space-x-3 text-on-surface min-w-0">
+                  <span className="material-symbols-outlined text-primary text-[20px] shrink-0">chat</span>
                   <span className="text-sm font-medium">{whatsapp}</span>
                 </div>
               )}
               {email && (
-                <div className="flex items-center space-x-3 text-on-surface">
-                  <span className="material-symbols-outlined text-primary text-[20px]">mail</span>
-                  <span className="text-sm font-medium">{email}</span>
+                <div className="flex items-center space-x-3 text-on-surface min-w-0">
+                  <span className="material-symbols-outlined text-primary text-[20px] shrink-0">mail</span>
+                  <span className="text-sm font-medium break-all">{email}</span>
                 </div>
               )}
             </div>
             {fullAddress && (
-              <div className="w-full flex items-center space-x-3 text-on-surface">
-                <span className="material-symbols-outlined text-primary text-[20px]">location_on</span>
-                <span className="text-sm font-medium">{fullAddress}</span>
+              <div className="w-full flex items-center space-x-3 text-on-surface min-w-0">
+                <span className="material-symbols-outlined text-primary text-[20px] shrink-0">location_on</span>
+                <span className="text-sm font-medium break-words min-w-0">{fullAddress}</span>
               </div>
             )}
           </div>

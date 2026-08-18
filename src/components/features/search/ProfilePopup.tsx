@@ -55,7 +55,7 @@ export default function ProfilePopup({ product, slug, onClose }: ProfilePopupPro
   const companyName = data?.company?.displayName ?? slug;
 
   return (
-    <div className="fixed inset-0 z-[80] bg-white overflow-y-auto">
+    <div className="fixed inset-0 z-[80] bg-white overflow-y-auto overflow-x-hidden">
       <PopupHeader
         product={product}
         companyName={companyName}

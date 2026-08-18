@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo, useCallback } from "react";
+import { useState, useMemo, useCallback, useRef, useEffect } from "react";
 
 interface Video {
   id: string;
@@ -52,6 +52,20 @@ export default function VideoLibrary({ videos }: VideoLibraryProps): JSX.Element
   const [autoplay, setAutoplay] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [displayCount, setDisplayCount] = useState(6);
+
+  // Scrollable tabs fade indicator
+  const tabsRef = useRef<HTMLDivElement>(null);
+  const [canScrollRight, setCanScrollRight] = useState(false);
+  const checkTabScroll = useCallback(() => {
+    const el = tabsRef.current;
+    if (!el) return;
+    setCanScrollRight(el.scrollWidth - el.scrollLeft - el.clientWidth > 2);
+  }, []);
+  useEffect(() => {
+    checkTabScroll();
+    window.addEventListener("resize", checkTabScroll);
+    return () => window.removeEventListener("resize", checkTabScroll);
+  }, [checkTabScroll]);
 
   const counts = useMemo(() => {
     const c: Record<string, number> = {};
@@ -119,33 +133,42 @@ export default function VideoLibrary({ videos }: VideoLibraryProps): JSX.Element
             </span>
             <span className="text-[12px] text-outline">{formatDateLong(activeVideo.publishedAt)}</span>
           </div>
-          <h2 className="text-2xl font-bold text-on-surface mt-2">{activeVideo.title}</h2>
+          <h2 className="text-xl sm:text-2xl font-bold text-on-surface mt-2 break-words">{activeVideo.title}</h2>
         </div>
       )}
 
       {/* Tabs + search */}
       <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 border-b border-surface-container pb-0 mb-8">
-        <div className="flex overflow-x-auto gap-6">
-          {CATEGORIES.map((cat) => (
-            <button
-              key={cat.key}
-              type="button"
-              onClick={() => {
-                setActiveCategory(cat.key);
-                setDisplayCount(6);
-                setSearchQuery("");
-                const firstInCat = videos.find((v) => v.category === cat.key);
-                setActiveVideoId(firstInCat?.id ?? null);
-              }}
-              className={`pb-3 text-sm font-medium whitespace-nowrap transition-colors ${
-                activeCategory === cat.key
-                  ? "font-bold text-primary border-b-2 border-primary"
-                  : "text-outline hover:text-on-surface"
-              }`}
-            >
-              {cat.label} ({counts[cat.key] ?? 0})
-            </button>
-          ))}
+        <div className="relative w-full md:w-auto min-w-0">
+          <div
+            ref={tabsRef}
+            onScroll={checkTabScroll}
+            className="flex overflow-x-auto gap-6"
+          >
+            {CATEGORIES.map((cat) => (
+              <button
+                key={cat.key}
+                type="button"
+                onClick={() => {
+                  setActiveCategory(cat.key);
+                  setDisplayCount(6);
+                  setSearchQuery("");
+                  const firstInCat = videos.find((v) => v.category === cat.key);
+                  setActiveVideoId(firstInCat?.id ?? null);
+                }}
+                className={`pb-3 text-sm font-medium whitespace-nowrap transition-colors shrink-0 ${
+                  activeCategory === cat.key
+                    ? "font-bold text-primary border-b-2 border-primary"
+                    : "text-outline hover:text-on-surface"
+                }`}
+              >
+                {cat.label} ({counts[cat.key] ?? 0})
+              </button>
+            ))}
+          </div>
+          {canScrollRight && (
+            <div className="absolute right-0 top-0 bottom-0 w-8 pointer-events-none bg-gradient-to-l from-white to-transparent md:hidden" />
+          )}
         </div>
         <div className="relative w-full md:max-w-[300px]">
           <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-outline text-lg">search</span>

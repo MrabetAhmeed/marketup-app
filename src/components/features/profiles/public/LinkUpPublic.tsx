@@ -19,7 +19,7 @@ export default function LinkUpPublic({ data, embedded }: LinkUpPublicProps): JSX
           <span className="text-primary font-semibold text-sm">Profil mis en avant</span>
         </div>
       )}
-      <div className="max-w-[1280px] mx-auto px-6 py-8">
+      <div className="max-w-[1280px] mx-auto px-4 sm:px-6 py-8">
         <ProfileHero
           logoUrl={c.logoUrl}
           displayName={c.displayName}
