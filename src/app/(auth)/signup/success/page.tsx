@@ -41,7 +41,7 @@ export default function SignupSuccessPage(): JSX.Element {
               </div>
               <div className="pt-1">
                 <div className="text-sm font-semibold text-white">Validation par notre équipe</div>
-                <div className="text-xs text-[#d3e3ff]/80 mt-0.5">En cours — 24 à 48h</div>
+                <div className="text-xs text-[#d3e3ff]/80 mt-0.5">En cours — 24 h</div>
               </div>
             </div>
 
@@ -59,8 +59,7 @@ export default function SignupSuccessPage(): JSX.Element {
         </div>
 
         <div className="text-xs text-[#d3e3ff]/70">
-          <p>© 2026 MARKET-UP · AGGREGAX SUARL</p>
-          <p className="mt-1">Fait en Tunisie 🇹🇳</p>
+          <p>© 2026 Vivaskymedia s.à.r.l. Tous droits réservés. Développée par AGGREGAX.</p>
         </div>
       </aside>
 
@@ -84,7 +83,7 @@ export default function SignupSuccessPage(): JSX.Element {
                 Votre email est confirmé
               </h1>
               <p className="text-[#616161] text-base leading-relaxed">
-                Bienvenue sur MARKET-UP. Votre compte est en attente de validation manuelle par notre équipe pour garantir l&apos;intégrité de la plateforme.
+                Bienvenue sur vivasky.media. Votre compte est en attente de validation manuelle par notre équipe pour garantir l&apos;intégrité de la plateforme.
               </p>
             </header>
 
@@ -93,7 +92,7 @@ export default function SignupSuccessPage(): JSX.Element {
               <div className="flex items-start gap-3">
                 <span className="material-symbols-outlined text-[#0078D4] shrink-0 mt-0.5">schedule</span>
                 <div>
-                  <p className="text-sm font-bold text-[#242424] mb-1">Validation sous 24 à 48 heures</p>
+                  <p className="text-sm font-bold text-[#242424] mb-1">Validation sous 24 heures</p>
                   <p className="text-sm text-[#616161] leading-relaxed">
                     Vous recevrez un email de confirmation dès que votre compte sera activé. Vous pourrez alors vous connecter et compléter vos profils BrandUP, TraceUP et LinkUP.
                   </p>

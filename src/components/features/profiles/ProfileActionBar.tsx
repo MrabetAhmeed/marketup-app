@@ -41,7 +41,7 @@ export function ProfileActionBar({ status, isDirty, onReset, softDirtyCount = 0,
             schedule
           </span>
           <span>
-            <strong className="text-[#92400E]">En attente de validation</strong> · réponse admin sous 24-48 h
+            <strong className="text-[#92400E]">En attente de validation</strong> · réponse admin sous 24 h
           </span>
         </div>
         <div className="flex items-center gap-2 shrink-0">

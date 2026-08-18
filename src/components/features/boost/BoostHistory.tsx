@@ -42,7 +42,7 @@ export function BoostHistory({ items }: BoostHistoryProps): JSX.Element {
     <>
       <p className="text-[12.5px] text-ink-secondary leading-relaxed mb-5 max-w-3xl">
         Historique de vos achats Boost · les reçus sont aussi disponibles dans{" "}
-        <a href="/dashboard/billing" className="text-primary hover:underline font-medium">Facturation</a>.
+        <a href="/dashboard/commandes" className="text-primary hover:underline font-medium">Commandes</a>.
       </p>
 
       {/* Desktop table */}

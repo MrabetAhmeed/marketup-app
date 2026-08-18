@@ -38,7 +38,7 @@ export default async function AdminDashboardPage(): Promise<JSX.Element> {
     <div className="max-w-[1120px] mx-auto space-y-6">
       <div>
         <h1 className="font-heading font-bold text-[22px] text-ink-primary">Vue d&apos;ensemble</h1>
-        <p className="text-[13px] text-ink-secondary mt-1">Tableau de bord administration MARKET-UP</p>
+        <p className="text-[13px] text-ink-secondary mt-1">Tableau de bord administration vivasky.media</p>
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">

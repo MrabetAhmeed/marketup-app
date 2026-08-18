@@ -385,7 +385,7 @@ export function LinkUpEditor({ profile, company }: LinkUpEditorProps): JSX.Eleme
         <div className="mb-5">
           <h3 className="font-heading font-bold text-[15px] text-ink-primary">Liens automatiques</h3>
           <p className="text-[12px] text-ink-secondary mt-0.5 leading-snug">
-            Générés par MARKET-UP à partir de vos profils BrandUP et TraceUP — non modifiables
+            Générés par vivasky.media à partir de vos profils BrandUP et TraceUP — non modifiables
           </p>
         </div>
         <div className="space-y-4">

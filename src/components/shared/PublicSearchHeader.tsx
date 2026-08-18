@@ -111,7 +111,7 @@ export default function PublicSearchHeader({ product, activeType, onTypeChange }
               href="/signup/company"
               className="px-5 py-2 text-sm font-semibold rounded-lg bg-primary text-white hover:bg-[#106EBE] transition-colors whitespace-nowrap"
             >
-              Inscrire une marque
+              Référencer une marque
             </Link>
           </div>
           <button
@@ -146,7 +146,7 @@ export default function PublicSearchHeader({ product, activeType, onTypeChange }
                 className="text-center px-5 py-3 text-sm font-semibold rounded-lg bg-primary text-white hover:bg-[#106EBE] transition-colors"
                 onClick={() => setMobileOpen(false)}
               >
-                Inscrire une marque
+                Référencer une marque
               </Link>
             </div>
           </div>

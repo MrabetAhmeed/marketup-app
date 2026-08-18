@@ -1,11 +1,11 @@
 export function accountDeletedEmailTemplate(companyName: string): { subject: string; html: string } {
   return {
-    subject: "Votre compte MARKET-UP a été supprimé",
+    subject: "Votre compte vivasky.media a été supprimé",
     html: `
       <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 560px; margin: 0 auto; padding: 32px 24px;">
         <h2 style="color: #1A1A1A; font-size: 18px; margin-bottom: 16px;">Compte supprimé</h2>
         <p style="color: #424242; font-size: 14px; line-height: 1.6;">
-          Le compte <strong>${companyName}</strong> a été supprimé de la plateforme MARKET-UP
+          Le compte <strong>${companyName}</strong> a été supprimé de la plateforme vivasky.media
           à votre demande.
         </p>
         <p style="color: #424242; font-size: 14px; line-height: 1.6;">
@@ -17,7 +17,7 @@ export function accountDeletedEmailTemplate(companyName: string): { subject: str
           à <a href="mailto:manager@vivasky.media" style="color: #0078D4;">manager@vivasky.media</a>.
         </p>
         <hr style="border: none; border-top: 1px solid #E0E0E0; margin: 24px 0;" />
-        <p style="color: #9E9E9E; font-size: 12px;">MARKET-UP — vivasky.media</p>
+        <p style="color: #9E9E9E; font-size: 12px;">vivasky.media - Tunisie</p>
       </div>
     `,
   };

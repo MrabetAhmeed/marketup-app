@@ -63,14 +63,14 @@ export default function ProfileHero({
             <h1 className="text-3xl sm:text-4xl md:text-5xl font-extrabold tracking-tight text-on-surface break-words">{displayName}</h1>
 
             {/* Badges */}
-            <div className="flex flex-wrap items-center gap-2 mt-2">
-              <span className="inline-flex items-center gap-1 bg-[#EFF6FC] border border-primary/20 text-primary text-[11px] font-semibold px-2 py-1 rounded">
-                <span className="material-symbols-outlined text-[13px]" style={{ fontVariationSettings: "'FILL' 1" }}>verified</span>
+            <div className="flex flex-wrap items-center gap-2 mt-2 min-w-0">
+              <span className="inline-flex items-center gap-1 bg-[#EFF6FC] border border-primary/20 text-primary text-[11px] font-semibold px-2 py-1 rounded max-w-full truncate">
+                <span className="material-symbols-outlined text-[13px] shrink-0" style={{ fontVariationSettings: "'FILL' 1" }}>verified</span>
                 RNE &middot; {legalId}
               </span>
-              <span className="text-[11px] font-bold text-primary uppercase tracking-wider">{sectorName}</span>
-              <span className="text-outline">&middot;</span>
-              <span className="inline-flex items-center text-[11px] font-semibold bg-surface-container-low border border-outline-variant text-on-surface px-2 py-0.5 rounded">
+              <span className="text-[11px] font-bold text-primary uppercase tracking-wider truncate max-w-[200px] sm:max-w-none">{sectorName}</span>
+              <span className="text-outline shrink-0">&middot;</span>
+              <span className="inline-flex items-center text-[11px] font-semibold bg-surface-container-low border border-outline-variant text-on-surface px-2 py-0.5 rounded shrink-0">
                 {type}
               </span>
             </div>

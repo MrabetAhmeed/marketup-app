@@ -503,8 +503,8 @@ export function BrandUpEditor({ profile, company }: BrandUpEditorProps): JSX.Ele
           <div className="min-w-0 flex-1 text-[12.5px] text-[#92400E] leading-snug">
             <strong>En resoumettant ces modifications</strong>, votre profil BrandUP{" "}
             {profile.publishedAt
-              ? <>restera <strong>visible</strong> avec vos données validées pendant la période de validation (24-48 h).</>
-              : <>sera <strong>invisible</strong> sur le moteur MARKET-UP pendant la période de validation (24-48 h).</>
+              ? <>restera <strong>visible</strong> avec vos données validées pendant la période de validation (24 h).</>
+              : <>sera <strong>invisible</strong> sur le moteur vivasky.media pendant la période de validation (24 h).</>
             }
           </div>
         </section>

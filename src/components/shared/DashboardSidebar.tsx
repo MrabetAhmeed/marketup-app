@@ -103,7 +103,7 @@ function buildNavSections(me: MeResponse): NavSection[] {
     {
       label: "Administration",
       items: [
-        { label: "Facturation", icon: "receipt_long", href: "/dashboard/billing" },
+        { label: "Commandes", icon: "receipt_long", href: "/dashboard/commandes" },
         {
           label: "Notifications",
           icon: "notifications",
@@ -163,9 +163,6 @@ function SidebarContent({
         className="flex items-center gap-2.5 h-14 px-5 py-4 border-b border-surface-border hover:bg-surface-subtle shrink-0"
         onClick={onNavigate}
       >
-        <span className="material-symbols-outlined icon-fill text-primary" style={{ fontSize: 22 }}>
-          hexagon
-        </span>
         <div>
           <div className="font-heading font-bold text-[15px] text-ink-primary tracking-tight leading-none">
             MARKET-UP

@@ -187,7 +187,7 @@ function BannerInput({
   const [uploading, setUploading] = useState(false);
   const [uploadError, setUploadError] = useState<string | null>(null);
   const [urlInput, setUrlInput] = useState("");
-  const [urlValid, setUrlValid] = useState<boolean | null>(null);
+  const [_urlValid, setUrlValid] = useState<boolean | null>(null);
   const fileRef = useRef<HTMLInputElement>(null);
 
   const handleFileChange = useCallback(async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -224,7 +224,7 @@ function BannerInput({
     }
   }, [onChange]);
 
-  const handleUrlBlur = useCallback(() => {
+  const _handleUrlBlur = useCallback(() => {
     if (!urlInput.trim()) {
       setUrlValid(null);
       onChange("");
@@ -242,7 +242,7 @@ function BannerInput({
     img.src = urlInput;
   }, [urlInput, onChange]);
 
-  const switchMode = useCallback((m: BannerMode) => {
+  const _switchMode = useCallback((m: BannerMode) => {
     setMode(m);
     setUploadError(null);
     setUrlInput("");
@@ -255,23 +255,7 @@ function BannerInput({
     <div className="space-y-2">
       <label className="text-[11px] font-medium text-ink-secondary block">Bannière</label>
 
-      {/* Mode tabs */}
-      <div className="flex rounded-lg border border-[#D1D1D1] overflow-hidden">
-        <button
-          type="button"
-          onClick={() => switchMode("upload")}
-          className={`flex-1 text-[11px] font-semibold py-1.5 transition-colors ${mode === "upload" ? "bg-primary text-white" : "bg-white text-ink-secondary hover:bg-surface-muted"}`}
-        >
-          Téléverser une image
-        </button>
-        <button
-          type="button"
-          onClick={() => switchMode("url")}
-          className={`flex-1 text-[11px] font-semibold py-1.5 transition-colors border-l border-[#D1D1D1] ${mode === "url" ? "bg-primary text-white" : "bg-white text-ink-secondary hover:bg-surface-muted"}`}
-        >
-          Coller un lien
-        </button>
-      </div>
+      {/* Mode tabs — URL mode disabled (allowUrlMode=false), code preserved */}
 
       {mode === "upload" && (
         <>
@@ -309,23 +293,7 @@ function BannerInput({
         </>
       )}
 
-      {mode === "url" && (
-        <>
-          <input
-            type="url"
-            value={urlInput}
-            onChange={(e) => { setUrlInput(e.target.value); setUrlValid(null); }}
-            onBlur={handleUrlBlur}
-            placeholder="https://cdn.example.com/banner.jpg"
-            className="w-full text-[12px] px-3 py-2 border border-[#D1D1D1] rounded-lg focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none"
-          />
-          {urlValid === false && (
-            <p className="text-[10px] text-red-600">
-              Image inaccessible ou lien invalide. Le lien doit commencer par https://.
-            </p>
-          )}
-        </>
-      )}
+      {/* URL mode hidden — code preserved for future re-enablement */}
 
       {/* Preview */}
       {value && (
@@ -334,12 +302,12 @@ function BannerInput({
             src={value}
             alt="Aperçu bannière"
             className="w-full h-auto"
-            style={{ aspectRatio: "6/1", objectFit: "cover" }}
+            style={{ aspectRatio: "4/1", objectFit: "cover" }}
           />
         </div>
       )}
 
-      <p className="text-[10px] text-ink-tertiary">Recommandé : 1200×200 px · La bannière sur la plateforme sera identique à cet aperçu.</p>
+      <p className="text-[10px] text-ink-tertiary">Recommandé : 1600×400 px · La bannière sur la plateforme sera identique à cet aperçu.</p>
     </div>
   );
 }

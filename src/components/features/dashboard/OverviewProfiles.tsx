@@ -33,7 +33,7 @@ const PROFILE_CONFIGS: ProfileCardConfig[] = [
     label: "TraceUP",
     icon: "play_circle",
     editorHref: "/dashboard/traceup",
-    description: "Votre chaîne média\u00A0: actualités, offres, astuces, emplois — vidéos YouTube intégrées.",
+    description: "Votre chaîne média\u00A0: actualités, offres, astuces, emplois — Vidéos YouTube, Vimeo et Dailymotion intégrées.",
   },
   {
     kind: "linkup",

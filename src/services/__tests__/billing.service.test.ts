@@ -77,7 +77,7 @@ function makeTransaction(companyId: Types.ObjectId, overrides: Record<string, un
     paidAt: new Date(),
     paymentMethod: "card",
     paymentReference: "REF-TEST",
-    invoiceNumber: "MU-2026-00001",
+    invoiceNumber: "2026-00001",
     ...overrides,
   } as any);
 }
@@ -90,7 +90,7 @@ describe("getOwnerTransactions", () => {
   it("returns transactions for the given company", async () => {
     const company = await makeCompany();
     await makeTransaction(company._id as Types.ObjectId);
-    await makeTransaction(company._id as Types.ObjectId, { invoiceNumber: "MU-2026-00002" });
+    await makeTransaction(company._id as Types.ObjectId, { invoiceNumber: "2026-00002" });
 
     const result = await getOwnerTransactions(String(company._id));
     expect(result).toHaveLength(2);
@@ -122,7 +122,7 @@ describe("getOwnerTransactions", () => {
     const companyA = await makeCompany();
     const companyB = await makeCompany();
     await makeTransaction(companyA._id as Types.ObjectId);
-    await makeTransaction(companyB._id as Types.ObjectId, { invoiceNumber: "MU-2026-00002" });
+    await makeTransaction(companyB._id as Types.ObjectId, { invoiceNumber: "2026-00002" });
 
     const resultA = await getOwnerTransactions(String(companyA._id));
     const resultB = await getOwnerTransactions(String(companyB._id));
@@ -157,7 +157,7 @@ describe("getAdminTransactions", () => {
   it("filters by status", async () => {
     const company = await makeCompany();
     await makeTransaction(company._id as Types.ObjectId, { status: "paid" });
-    await makeTransaction(company._id as Types.ObjectId, { status: "refunded", invoiceNumber: "MU-2026-00002" });
+    await makeTransaction(company._id as Types.ObjectId, { status: "refunded", invoiceNumber: "2026-00002" });
 
     const paid = await getAdminTransactions({ status: "paid" });
     expect(paid).toHaveLength(1);
@@ -171,7 +171,7 @@ describe("getAdminTransactions", () => {
   it("filters by type", async () => {
     const company = await makeCompany();
     await makeTransaction(company._id as Types.ObjectId, { type: "boost" });
-    await makeTransaction(company._id as Types.ObjectId, { type: "sponsoring", invoiceNumber: "MU-2026-00002" });
+    await makeTransaction(company._id as Types.ObjectId, { type: "sponsoring", invoiceNumber: "2026-00002" });
 
     const boosts = await getAdminTransactions({ type: "boost" });
     expect(boosts).toHaveLength(1);
@@ -184,14 +184,14 @@ describe("getAdminTransactions", () => {
 // ---------------------------------------------------------------------------
 
 describe("generateInvoiceNumber", () => {
-  it("generates sequential numbers in MU-YYYY-NNNNN format", async () => {
+  it("generates sequential numbers in YYYY-NNNNN format", async () => {
     const n1 = await generateInvoiceNumber(new Date("2026-01-15"));
     const n2 = await generateInvoiceNumber(new Date("2026-06-20"));
     const n3 = await generateInvoiceNumber(new Date("2026-12-31"));
 
-    expect(n1).toBe("MU-2026-00001");
-    expect(n2).toBe("MU-2026-00002");
-    expect(n3).toBe("MU-2026-00003");
+    expect(n1).toBe("2026-00001");
+    expect(n2).toBe("2026-00002");
+    expect(n3).toBe("2026-00003");
   });
 
   it("resets sequence per year", async () => {
@@ -199,7 +199,7 @@ describe("generateInvoiceNumber", () => {
     await generateInvoiceNumber(new Date("2026-06-01"));
     const n2027 = await generateInvoiceNumber(new Date("2027-01-01"));
 
-    expect(n2027).toBe("MU-2027-00001");
+    expect(n2027).toBe("2027-00001");
   });
 
   it("concurrent calls produce distinct numbers", async () => {
@@ -210,9 +210,9 @@ describe("generateInvoiceNumber", () => {
     const unique = new Set(results);
     expect(unique.size).toBe(5);
 
-    // All should be MU-2028-0000X
+    // All should be 2028-0000X
     for (const r of results) {
-      expect(r).toMatch(/^MU-2028-\d{5}$/);
+      expect(r).toMatch(/^2028-\d{5}$/);
     }
   });
 
@@ -220,6 +220,6 @@ describe("generateInvoiceNumber", () => {
     // Simulate seed counter at 46
     await Counter.create({ _id: "invoice-2026", seq: 46 });
     const next = await generateInvoiceNumber(new Date("2026-07-01"));
-    expect(next).toBe("MU-2026-00047");
+    expect(next).toBe("2026-00047");
   });
 });

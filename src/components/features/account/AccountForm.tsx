@@ -9,7 +9,7 @@ import { ObfuscatedEmail } from "@/components/shared/ObfuscatedEmail";
 import { StatusPill } from "@/components/shared/StatusPill";
 import { FieldBadge } from "@/components/shared/FieldBadge";
 import { CopyGroup } from "@/components/shared/CopyGroup";
-import { LangChip } from "@/components/shared/LangChip";
+
 import { useToast } from "@/components/shared/Toast";
 import type { MeResponse } from "@/types/dashboard";
 import { LogoUploadZone } from "./LogoUploadZone";
@@ -228,7 +228,7 @@ export function AccountForm({ me, gouvernorats }: AccountFormProps): JSX.Element
           info
         </span>
         <div className="min-w-0 flex-1 text-[12.5px] text-ink-primary leading-snug">
-          Toute modification des informations de l&apos;entreprise nécessite une <strong>validation admin (24-48 h)</strong>.
+          Toute modification des informations de l&apos;entreprise nécessite une <strong>validation admin (24 h)</strong>.
           Vos profils publics conservent les informations actuelles jusqu&apos;à validation.
         </div>
       </section>
@@ -779,33 +779,7 @@ export function AccountForm({ me, gouvernorats }: AccountFormProps): JSX.Element
         </div>
       </section>
 
-      {/* ═══ SECTION: LANGUES ═══ */}
-      <section className="card p-5 md:p-6">
-        <div className="flex items-start justify-between mb-5 flex-wrap gap-2">
-          <div>
-            <h3 className="font-heading font-bold text-[15px] text-ink-primary">Langues</h3>
-            <p className="text-[12px] text-ink-secondary mt-0.5 leading-snug">
-              Langues parlées par votre équipe — aide les visiteurs à vous contacter
-            </p>
-          </div>
-          <FieldBadge kind="live" />
-        </div>
-
-        <div>
-          <label className="field-label">
-            Langues parlées par votre équipe <span className="text-[#B91C1C] font-bold ml-0.5">*</span>
-          </label>
-          <div className="flex flex-wrap gap-2">
-            <LangChip value="fr" label="Français" checked={true} />
-            <LangChip value="ar" label="العربية" checked={false} disabled comingSoon />
-            <LangChip value="en" label="English" checked={false} disabled comingSoon />
-          </div>
-          <div className="field-help mt-1">
-            <span className="material-symbols-outlined" style={{ fontSize: 13 }}>info</span>
-            V1 : français uniquement · Arabe et anglais disponibles dans une prochaine version
-          </div>
-        </div>
-      </section>
+      {/* ═══ SECTION: LANGUES — masquée V1 (données conservées) ═══ */}
 
       {/* ═══ SECTION: PARTAGE PROFILS ═══ */}
       <section className="card p-5 md:p-6">

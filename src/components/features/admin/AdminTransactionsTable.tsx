@@ -119,7 +119,7 @@ export function AdminTransactionsTable({ transactions }: AdminTransactionsTableP
                   <th className="text-left px-4 py-2.5 font-semibold text-ink-secondary">Profil</th>
                   <th className="text-right px-4 py-2.5 font-semibold text-ink-secondary">Montant TTC</th>
                   <th className="text-left px-4 py-2.5 font-semibold text-ink-secondary">Statut</th>
-                  <th className="text-left px-4 py-2.5 font-semibold text-ink-secondary">Facture</th>
+                  <th className="text-left px-4 py-2.5 font-semibold text-ink-secondary">Commande</th>
                   <th className="text-left px-4 py-2.5 font-semibold text-ink-secondary">Date</th>
                 </tr>
               </thead>

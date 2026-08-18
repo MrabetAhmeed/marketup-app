@@ -51,7 +51,7 @@ export function ProfileStatusBlock({
               </li>
               <li className="flex items-start gap-2">
                 <span className="material-symbols-outlined shrink-0 mt-[1px] text-[#D97706]" style={{ fontSize: 14 }}>mail</span>
-                <span>Un email vous sera envoyé dès acceptation ou refus (délai estimé 24-48 h)</span>
+                <span>Un email vous sera envoyé dès acceptation ou refus (délai estimé 24 h)</span>
               </li>
             </ul>
             {submittedAt && (

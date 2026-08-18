@@ -3,6 +3,11 @@ const nextConfig = {
   experimental: {
     cpus: 1,
   },
+  async redirects() {
+    return [
+      { source: "/dashboard/billing", destination: "/dashboard/commandes", permanent: true },
+    ];
+  },
   images: {
     remotePatterns: [
       { protocol: "https", hostname: "api.dicebear.com" },

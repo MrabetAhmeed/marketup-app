@@ -164,7 +164,7 @@ function ResetPasswordContent(): JSX.Element {
                     Nouveau mot de passe
                   </h1>
                   <p className="text-[#616161] text-base leading-relaxed">
-                    Choisissez un mot de passe sécurisé pour votre compte MARKET-UP.
+                    Choisissez un mot de passe sécurisé pour votre compte vivasky.media.
                   </p>
                 </header>
 

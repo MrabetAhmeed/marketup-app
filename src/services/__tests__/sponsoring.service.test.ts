@@ -303,7 +303,7 @@ describe("checkoutSponsoring", () => {
     expect(result.transaction.fiscalStampDT).toBe(1);
     expect(result.transaction.priceTTC).toBeCloseTo(120);
     expect(result.transaction.status).toBe("paid");
-    expect(result.transaction.invoiceNumber).toMatch(/^MU-\d{4}-\d{5}$/);
+    expect(result.transaction.invoiceNumber).toMatch(/^\d{4}-\d{5}$/);
 
     const updated = await SponsoringModel.findById(doc._id).lean();
     expect(updated.status).toBe("active");

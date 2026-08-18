@@ -1,11 +1,11 @@
 import { Counter } from "@/models/counter.model";
 
 /**
- * Generate a sequential invoice number: MU-{YYYY}-{5-digit seq}.
+ * Generate a sequential order number: {YYYY}-{5-digit seq}.
  * Uses atomic $inc + upsert on the Counter collection (zero collision).
  *
  * @param date - Date to derive the year from (defaults to now)
- * @returns e.g. "MU-2026-00001"
+ * @returns e.g. "2026-00001"
  */
 export async function generateInvoiceNumber(date: Date = new Date()): Promise<string> {
   const year = date.getFullYear();
@@ -19,5 +19,5 @@ export async function generateInvoiceNumber(date: Date = new Date()): Promise<st
   );
 
   const seq = (counter as unknown as { seq: number }).seq;
-  return `MU-${year}-${String(seq).padStart(5, "0")}`;
+  return `${year}-${String(seq).padStart(5, "0")}`;
 }

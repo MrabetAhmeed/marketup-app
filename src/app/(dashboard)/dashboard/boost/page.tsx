@@ -92,7 +92,7 @@ export default async function BoostPage(): Promise<JSX.Element> {
       />
 
       <div className="text-center">
-        <a href="/dashboard/billing" className="text-[12px] text-primary hover:underline">
+        <a href="/dashboard/commandes" className="text-[12px] text-primary hover:underline">
           Consulter l&apos;historique des transactions →
         </a>
       </div>

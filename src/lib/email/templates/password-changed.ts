@@ -4,7 +4,7 @@
  */
 export function passwordChangedEmailTemplate(forgotUrl: string): { subject: string; html: string } {
   return {
-    subject: "Votre mot de passe MARKET-UP a été modifié",
+    subject: "Votre mot de passe vivasky.media a été modifié",
     html: `<!DOCTYPE html>
 <html lang="fr">
 <head><meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1.0" /></head>
@@ -13,7 +13,7 @@ export function passwordChangedEmailTemplate(forgotUrl: string): { subject: stri
     <tr><td align="center">
       <table role="presentation" width="100%" style="max-width:480px;background:#FFFFFF;border-radius:8px;border:1px solid #E0E0E0;padding:40px 32px;">
         <tr><td>
-          <p style="margin:0 0 24px;font-size:20px;font-weight:700;color:#0078D4;">MARKET-UP</p>
+          <p style="margin:0 0 24px;font-size:20px;font-weight:700;color:#0078D4;">vivasky.media</p>
           <h1 style="margin:0 0 8px;font-size:22px;font-weight:600;color:#242424;">Mot de passe modifié</h1>
           <p style="margin:0 0 24px;font-size:14px;color:#616161;line-height:1.5;">
             Votre mot de passe a été modifié avec succès. Toutes les autres sessions ont été déconnectées.
@@ -30,7 +30,7 @@ export function passwordChangedEmailTemplate(forgotUrl: string): { subject: stri
           </table>
           <hr style="border:none;border-top:1px solid #E0E0E0;margin:24px 0;" />
           <p style="margin:0;font-size:11px;color:#8A8886;line-height:1.4;">
-            MARKET-UP · AGGREGAX SUARL · Tunisie<br/>
+            vivasky.media - Tunisie<br/>
             Cet email a été envoyé automatiquement. Merci de ne pas y répondre.
           </p>
         </td></tr>

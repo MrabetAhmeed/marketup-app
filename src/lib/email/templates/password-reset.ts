@@ -4,7 +4,7 @@
  */
 export function passwordResetEmailTemplate(resetUrl: string): { subject: string; html: string } {
   return {
-    subject: "Réinitialisation de votre mot de passe MARKET-UP",
+    subject: "Réinitialisation de votre mot de passe vivasky.media",
     html: `<!DOCTYPE html>
 <html lang="fr">
 <head><meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1.0" /></head>
@@ -13,7 +13,7 @@ export function passwordResetEmailTemplate(resetUrl: string): { subject: string;
     <tr><td align="center">
       <table role="presentation" width="100%" style="max-width:480px;background:#FFFFFF;border-radius:8px;border:1px solid #E0E0E0;padding:40px 32px;">
         <tr><td>
-          <p style="margin:0 0 24px;font-size:20px;font-weight:700;color:#0078D4;">MARKET-UP</p>
+          <p style="margin:0 0 24px;font-size:20px;font-weight:700;color:#0078D4;">vivasky.media</p>
           <h1 style="margin:0 0 8px;font-size:22px;font-weight:600;color:#242424;">Réinitialisation du mot de passe</h1>
           <p style="margin:0 0 24px;font-size:14px;color:#616161;line-height:1.5;">
             Vous avez demandé la réinitialisation de votre mot de passe. Cliquez sur le bouton ci-dessous pour choisir un nouveau mot de passe.
@@ -37,7 +37,7 @@ export function passwordResetEmailTemplate(resetUrl: string): { subject: string;
           </p>
           <hr style="border:none;border-top:1px solid #E0E0E0;margin:24px 0;" />
           <p style="margin:0;font-size:11px;color:#8A8886;line-height:1.4;">
-            MARKET-UP · AGGREGAX SUARL · Tunisie<br/>
+            vivasky.media - Tunisie<br/>
             Cet email a été envoyé automatiquement. Merci de ne pas y répondre.
           </p>
         </td></tr>

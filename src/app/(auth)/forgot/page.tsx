@@ -61,7 +61,8 @@ export default function ForgotPasswordPage(): JSX.Element {
                     Mot de passe oublié
                   </h1>
                   <p className="text-[#616161] text-base leading-relaxed">
-                    Saisissez votre adresse email d&apos;inscription et nous vous enverrons un lien sécurisé pour réinitialiser votre mot de passe.
+                    Saisissez votre adresse email d&apos;inscription et nous vous enverrons un<br />
+                    lien sécurisé pour réinitialiser votre mot de passe.
                   </p>
                 </header>
 

@@ -24,10 +24,19 @@ const PRODUCT_PLACEHOLDER: Record<ProductKey, string> = {
   linkup: "Entreprise, contact, secteur\u2026",
 };
 
-const PRODUCT_SUBTITLE: Record<ProductKey, string> = {
-  brandup: "Base de donn\u00e9es compl\u00e8te des professionnels en Tunisie",
-  traceup: "Les vid\u00e9os des entreprises tunisiennes",
-  linkup: "Le carnet de contacts des entreprises tunisiennes",
+const PRODUCT_TITLES: Record<ProductKey, Record<"B2B" | "B2C", { title: string; subtitle: string }>> = {
+  brandup: {
+    B2B: { title: "La référence des acteurs économiques tunisiens", subtitle: "Au cœur des marques" },
+    B2C: { title: "La référence des marques en Tunisie", subtitle: "Au cœur des marques" },
+  },
+  traceup: {
+    B2B: { title: "Le flux vidéo de l'économie tunisienne", subtitle: "L'actualité des entreprises près de chez vous" },
+    B2C: { title: "Le flux vidéo de l'économie tunisienne", subtitle: "L'actualité des entreprises près de chez vous" },
+  },
+  linkup: {
+    B2B: { title: "L'accès direct à l'économie tunisienne", subtitle: "S'interconnecter et échanger" },
+    B2C: { title: "L'accès direct à l'économie tunisienne", subtitle: "S'interconnecter et échanger" },
+  },
 };
 
 const PAGE_SIZE = 8;
@@ -162,10 +171,10 @@ export default function SearchPageClient({ product, sectors, categories, gouvern
         <section className="bg-white pt-12 lg:pt-20 pb-5 px-6">
           <div className="max-w-4xl mx-auto text-center">
             <h1 className="text-3xl lg:text-[42px] leading-tight font-bold text-[#242424] mb-3">
-              Trouvez les entreprises tunisiennes
+              {PRODUCT_TITLES[product][activeType].title}
             </h1>
             <p className="text-[#616161] text-base lg:text-lg mb-6">
-              {PRODUCT_SUBTITLE[product]}
+              {PRODUCT_TITLES[product][activeType].subtitle}
             </p>
 
             {/* Search bar — sector integrated, stronger border */}
@@ -225,7 +234,7 @@ export default function SearchPageClient({ product, sectors, categories, gouvern
         </section>
 
         {/* Sponsor banner */}
-        <SponsorBanner sponsors={filteredSponsors} accent={accent} />
+        <SponsorBanner sponsors={filteredSponsors} accent={accent} product={product} />
 
         {/* Sticky results count bar */}
         <div className="sticky top-[64px] md:top-[72px] z-40 bg-[#F5F5F5] border-y border-[#E0E0E0] px-6 py-3">

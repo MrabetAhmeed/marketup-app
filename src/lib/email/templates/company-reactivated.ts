@@ -3,13 +3,13 @@ export function companyReactivatedEmailTemplate(params: {
   dashboardUrl: string;
 }): { subject: string; html: string } {
   return {
-    subject: "Votre compte MARKET-UP a été réactivé",
+    subject: "Votre compte vivasky.media a été réactivé",
     html: `
       <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 560px; margin: 0 auto; padding: 32px 24px;">
         <h2 style="color: #1A1A1A; font-size: 18px; margin-bottom: 16px;">Compte réactivé</h2>
         <p style="color: #424242; font-size: 14px; line-height: 1.6;">
           Bonne nouvelle ! Le compte <strong>${params.companyName}</strong> a été réactivé par
-          l'équipe MARKET-UP.
+          l'équipe vivasky.media.
         </p>
         <p style="color: #424242; font-size: 14px; line-height: 1.6;">
           Vos profils publics sont de nouveau visibles et vous pouvez accéder à votre tableau de bord.
@@ -20,7 +20,7 @@ export function companyReactivatedEmailTemplate(params: {
           </a>
         </div>
         <hr style="border: none; border-top: 1px solid #E0E0E0; margin: 24px 0;" />
-        <p style="color: #9E9E9E; font-size: 12px;">MARKET-UP — vivasky.media</p>
+        <p style="color: #9E9E9E; font-size: 12px;">vivasky.media - Tunisie</p>
       </div>
     `,
   };

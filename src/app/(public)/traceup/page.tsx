@@ -7,7 +7,7 @@ import type { Metadata } from "next";
 export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
-  title: "TraceUP — Moteur de recherche MARKET-UP",
+  title: "TraceUP — Moteur de recherche vivasky.media",
   description: "Les vidéos des entreprises tunisiennes. Découvrez les contenus médias des professionnels en Tunisie.",
 };
 

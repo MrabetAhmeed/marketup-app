@@ -26,19 +26,19 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
       };
     }
     const profile = data as PublicTraceUpProfile;
-    const description = `${profile.videos.length} vidéo${profile.videos.length !== 1 ? "s" : ""} — ${profile.company.displayName} sur MARKET-UP`;
+    const description = `${profile.videos.length} vidéo${profile.videos.length !== 1 ? "s" : ""} — ${profile.company.displayName} sur vivasky.media`;
     return {
-      title: `${profile.company.displayName} — MARKET-UP`,
+      title: `${profile.company.displayName} — vivasky.media`,
       description,
       openGraph: {
-        title: `${profile.company.displayName} — MARKET-UP`,
+        title: `${profile.company.displayName} — vivasky.media`,
         description,
         images: profile.company.logoUrl ? [{ url: profile.company.logoUrl }] : [],
       },
     };
   } catch (e) {
     if (e instanceof SlugRedirectError) return {};
-    return { title: "Profil introuvable — MARKET-UP" };
+    return { title: "Profil introuvable — vivasky.media" };
   }
 }
 

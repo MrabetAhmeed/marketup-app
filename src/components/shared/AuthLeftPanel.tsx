@@ -28,7 +28,7 @@ export default function AuthLeftPanel({ step, completedSteps = [] }: AuthLeftPan
         {/* Tagline */}
         <div className="max-w-sm mb-16">
           <h2 className="text-3xl font-semibold leading-tight mb-4 tracking-tight text-white">
-            La plateforme digitale des entreprises.
+            La référence des entreprises en Tunisie.
           </h2>
           <p className="text-[#d3e3ff] text-base leading-relaxed">
             BrandUP, TraceUP, LinkUP — un seul compte, trois vitrines.
@@ -75,8 +75,7 @@ export default function AuthLeftPanel({ step, completedSteps = [] }: AuthLeftPan
 
       {/* Footer */}
       <div className="text-xs text-[#d3e3ff]/70">
-        <p>© 2026 MARKET-UP · AGGREGAX SUARL</p>
-        <p className="mt-1">Fait en Tunisie 🇹🇳</p>
+        <p>© 2026 Vivaskymedia s.à.r.l. Tous droits réservés. Développée par AGGREGAX.</p>
       </div>
     </aside>
   );

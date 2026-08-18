@@ -121,7 +121,7 @@ function ReceiptCard({ receipt }: { receipt: RseReceiptForUser }): JSX.Element {
               ? `Soumis le ${formatDate(receipt.submissionDate)}`
               : receipt.status === "rejected"
                 ? `Soumis le ${formatDate(receipt.submissionDate)}`
-                : "Validation admin sous 24-48 h"}
+                : "Validation admin sous 24 h"}
           </div>
           {receipt.status === "rejected" && receipt.rejectionReason && (
             <div className="mt-2 p-2.5 bg-red-50 border border-red-200 rounded text-[12px] text-red-700 leading-snug">

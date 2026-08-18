@@ -52,6 +52,9 @@ export default function AppLauncher({ current }: AppLauncherProps): JSX.Element 
       </button>
       {open && (
         <div className="absolute top-[calc(100%+8px)] right-0 w-[260px] md:w-[320px] bg-white rounded-lg border border-outline-variant p-3 md:p-4 z-[60]" style={{ boxShadow: "0 8px 32px rgba(0,0,0,0.16)" }}>
+          <div className="text-[10px] font-bold uppercase tracking-widest text-on-surface-variant px-2 pb-2">
+            Produits MARKET-UP
+          </div>
           <div className="grid grid-cols-3 gap-2">
             {PRODUCTS.map((p) => {
               const isCurrent = p.key === current;
@@ -95,6 +98,12 @@ export default function AppLauncher({ current }: AppLauncherProps): JSX.Element 
               );
             })}
           </div>
+          <a
+            href="/"
+            className="block mt-2 pt-2 border-t border-outline-variant text-center text-[11px] font-semibold text-on-surface-variant hover:text-primary transition-colors py-1.5"
+          >
+            Voir tout l&apos;écosystème VIVASKY
+          </a>
         </div>
       )}
     </div>

@@ -598,5 +598,34 @@ If any gate fails, fix before committing.
 
 ---
 
-*Last updated: July 25, 2026.*
+## W-B Sprint Changes (August 2026)
+
+### Branding: MARKET-UP → vivasky.media
+- **BRAND_NAME constant:** `src/lib/constants/brand.ts` — `BRAND_NAME = "vivasky.media"`, `BRAND_EMAIL_FOOTER = "vivasky.media - Tunisie"`.
+- All UI, emails, metadata now use `vivasky.media` instead of `MARKET-UP`.
+- Email display name: `vivasky.media <email@...>`.
+- Copyright: `© 2026 Vivaskymedia s.à.r.l. Tous droits réservés. Développée par AGGREGAX.` (year auto-extends after 2026).
+
+### Facturation → Commandes
+- **URL:** `/dashboard/billing` → `/dashboard/commandes` (301 redirect in `next.config.mjs`).
+- **Vocabulary:** "Facturation" → "Commandes", "N° de facture" → "N° de commande" everywhere.
+- **Numbering format:** `YYYY-NNNNN` (e.g. `2026-00001`). Old `MU-` prefix removed. Counter key unchanged (`invoice-{year}`).
+
+### Search titles per B2B/B2C type
+`PRODUCT_TITLES` in `SearchPageClient.tsx` — 6 combinations (3 engines × 2 types):
+- BrandUP B2B: "La référence des acteurs économiques tunisiens" / "Au cœur des marques"
+- BrandUP B2C: "La référence des marques en Tunisie" / "Au cœur des marques"
+- TraceUP: "Le flux vidéo de l'économie tunisienne" / "L'actualité des entreprises près de chez vous"
+- LinkUP: "L'accès direct à l'économie tunisienne" / "S'interconnecter et échanger"
+
+### Banner system
+- **Public banner ratio:** `aspect-ratio: 4/1` (replaces fixed heights `h-[180px] md:h-[270px]`).
+- **Default images:** `public/banners/default-{brandup,traceup,linkup}.jpg` per engine. HTML/CSS fallback if image missing.
+- **"En savoir plus" button:** HTML overlay `absolute bottom-3 right-3`, default banner only.
+- **Dashboard preview:** `aspect-ratio: 4/1`, recommended `1600×400 px`.
+- **URL paste mode:** disabled via `_switchMode` prefix (code preserved).
+
+---
+
+*Last updated: August 18, 2026.*
 *Maintained by: AGGREGAX SUARL — Ahmed Mrabet.*

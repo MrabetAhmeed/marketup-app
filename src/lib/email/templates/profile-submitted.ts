@@ -24,7 +24,7 @@ export function profileSubmittedEmailTemplate(params: {
     <tr><td align="center">
       <table role="presentation" width="100%" style="max-width:480px;background:#FFFFFF;border-radius:8px;border:1px solid #E0E0E0;padding:40px 32px;">
         <tr><td>
-          <p style="margin:0 0 24px;font-size:20px;font-weight:700;color:#5C2D91;">MARKET-UP Admin</p>
+          <p style="margin:0 0 24px;font-size:20px;font-weight:700;color:#5C2D91;">vivasky.media Admin</p>
           <h1 style="margin:0 0 8px;font-size:18px;font-weight:600;color:#242424;">Profil ${kindLabel} soumis</h1>
           <p style="margin:0 0 20px;font-size:14px;color:#616161;line-height:1.5;">
             L'entreprise <strong>${params.companyName}</strong> a soumis son profil ${kindLabel} pour validation.
@@ -51,7 +51,7 @@ export function profileSubmittedEmailTemplate(params: {
             Valider dans le dashboard admin
           </a>
           <p style="margin:24px 0 0;font-size:12px;color:#A0A0A0;line-height:1.4;">
-            Cet email est envoyé automatiquement par MARKET-UP. Ne pas répondre.
+            Cet email est envoyé automatiquement par vivasky.media. Ne pas répondre.
           </p>
         </td></tr>
       </table>

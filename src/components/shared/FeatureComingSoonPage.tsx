@@ -10,19 +10,19 @@ const KIND_CONFIG: Record<FeatureKind, { icon: string; title: string; descriptio
   boost: {
     icon: "trending_up",
     title: "Boost — Bientôt disponible",
-    description: "Boostez la visibilité de vos profils dans les moteurs de recherche MARKET-UP. Mettez en avant votre entreprise pendant 30 jours et générez plus de vues. Module en développement final.",
+    description: "Boostez la visibilité de vos profils dans les moteurs de recherche vivasky.media. Mettez en avant votre entreprise pendant 30 jours et générez plus de vues. Module en développement final.",
     stubKey: "FEATURE_COMING_SOON_BOOST",
   },
   sponsoring: {
     icon: "campaign",
     title: "Sponsoring — Bientôt disponible",
-    description: "Lancez des campagnes ciblées sur les profils MARKET-UP. Bannières sponsorisées dans les résultats de recherche pour toucher votre audience B2B. Module en développement final.",
+    description: "Lancez des campagnes ciblées sur les profils vivasky.media. Bannières sponsorisées dans les résultats de recherche pour toucher votre audience B2B. Module en développement final.",
     stubKey: "FEATURE_COMING_SOON_SPONSORING",
   },
   billing: {
     icon: "receipt_long",
-    title: "Facturation — Bientôt disponible",
-    description: "Consultez votre historique de paiements, téléchargez vos factures et suivez vos dépenses sur MARKET-UP. Module en développement final.",
+    title: "Commandes — Bientôt disponible",
+    description: "Consultez votre historique de commandes et suivez vos dépenses sur vivasky.media. Module en développement final.",
     stubKey: "FEATURE_COMING_SOON_BILLING",
   },
 };

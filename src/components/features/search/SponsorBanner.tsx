@@ -3,12 +3,21 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import type { SponsorBannerData } from "@/services/sponsoring.service";
 
+type ProductKey = "brandup" | "traceup" | "linkup";
+
 interface SponsorBannerProps {
   sponsors: SponsorBannerData[];
   accent: string;
+  product: ProductKey;
 }
 
 const ROTATION_INTERVAL_MS = 10_000;
+
+const DEFAULT_BANNER_IMAGES: Record<ProductKey, string> = {
+  brandup: "/banners/default-brandup.jpg",
+  traceup: "/banners/default-traceup.jpg",
+  linkup: "/banners/default-linkup.jpg",
+};
 
 /** Beacon impression tracking — fire-and-forget, never blocks UI. */
 function trackImpression(sponsoringId: string): void {
@@ -34,17 +43,18 @@ function trackClick(sponsoringId: string): void {
   }
 }
 
-// Accent config per engine for default banner
+// Accent config per engine for default banner fallback
 const ACCENT_CONFIG: Record<string, { bg: string; border: string; text: string; label: string }> = {
   "#0078D4": { bg: "bg-blue-50", border: "border-blue-200", text: "text-blue-700", label: "BrandUP" },
   "#8764B8": { bg: "bg-purple-50", border: "border-purple-200", text: "text-purple-700", label: "TraceUP" },
   "#000000": { bg: "bg-amber-50", border: "border-amber-200", text: "text-amber-800", label: "LinkUP" },
 };
 
-export default function SponsorBanner({ sponsors, accent }: SponsorBannerProps): JSX.Element {
+export default function SponsorBanner({ sponsors, accent, product }: SponsorBannerProps): JSX.Element {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [fade, setFade] = useState(true);
   const impressedRef = useRef<Set<string>>(new Set());
+  const [imgError, setImgError] = useState(false);
 
   // Track impression for the current banner (dedup per page mount cycle)
   const trackCurrentImpression = useCallback((sponsor: SponsorBannerData) => {
@@ -66,7 +76,6 @@ export default function SponsorBanner({ sponsors, accent }: SponsorBannerProps):
 
     const timer = setInterval(() => {
       setFade(false);
-      // After fade-out, switch banner and fade-in
       setTimeout(() => {
         setCurrentIndex((prev) => {
           const next = (prev + 1) % sponsors.length;
@@ -84,12 +93,39 @@ export default function SponsorBanner({ sponsors, accent }: SponsorBannerProps):
   // Default banner (no active sponsoring)
   if (sponsors.length === 0) {
     const cfg = ACCENT_CONFIG[accent] ?? ACCENT_CONFIG["#0078D4"]!;
+    const defaultImg = DEFAULT_BANNER_IMAGES[product];
+
+    // Image-based default banner (with HTML button overlay)
+    if (!imgError) {
+      return (
+        <section className="px-6 pt-6 pb-2 max-w-7xl mx-auto">
+          <div className="relative w-full rounded-lg overflow-hidden" style={{ aspectRatio: "4/1" }}>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={defaultImg}
+              alt={`Bannière ${cfg.label}`}
+              className="absolute inset-0 w-full h-full object-cover"
+              onError={() => setImgError(true)}
+            />
+            <a
+              href="/dashboard/sponsoring"
+              className="absolute bottom-2 right-2 sm:bottom-3 sm:right-3 z-10 inline-flex items-center px-2.5 py-1 sm:px-4 sm:py-2 rounded-lg text-[11px] sm:text-[13px] font-semibold text-white bg-black/50 backdrop-blur-sm hover:bg-black/70 transition-colors"
+            >
+              En savoir plus
+              <span className="material-symbols-outlined ml-1 sm:ml-1.5 text-sm sm:text-base">arrow_forward</span>
+            </a>
+          </div>
+        </section>
+      );
+    }
+
+    // Fallback HTML/CSS banner (if image file is missing)
     return (
       <section className="px-6 pt-6 pb-2 max-w-7xl mx-auto">
-        <div className={`w-full rounded-lg overflow-hidden ${cfg.bg} border ${cfg.border} px-6 md:px-10 flex flex-col md:flex-row items-center justify-between gap-4 h-[180px] md:h-[270px] justify-center`}>
+        <div className={`w-full rounded-lg overflow-hidden ${cfg.bg} border ${cfg.border} px-6 md:px-10 flex flex-col md:flex-row items-center justify-center gap-4`} style={{ aspectRatio: "4/1" }}>
           <div>
             <p className={`text-base font-semibold ${cfg.text}`}>
-              Votre bannière ici — Sponsorisez votre entreprise sur MARKET-UP
+              Votre bannière ici — Sponsorisez votre entreprise sur vivasky.media
             </p>
             <p className="text-sm text-[#616161] mt-1">
               Affichez votre entreprise en tête des résultats de recherche {cfg.label}.
@@ -118,8 +154,10 @@ export default function SponsorBanner({ sponsors, accent }: SponsorBannerProps):
         target="_blank"
         rel="noopener noreferrer"
         onClick={() => trackClick(sponsor.id)}
-        className="block relative w-full h-[180px] md:h-[270px] rounded-lg overflow-hidden bg-slate-900 group"
+        className="block relative w-full rounded-lg overflow-hidden bg-slate-900 group"
+        style={{ aspectRatio: "4/1" }}
       >
+        {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
           key={sponsor.id}
           alt={`Sponsorisé — ${sponsor.companyName}`}

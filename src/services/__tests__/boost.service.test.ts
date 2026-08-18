@@ -109,7 +109,7 @@ describe("checkoutBoost", () => {
     expect(result.transaction.priceTTC).toBeCloseTo(60.5);
     expect(result.transaction.currency).toBe("DT");
     expect(result.transaction.status).toBe("paid"); // paid_simulated mapped for owner
-    expect(result.transaction.invoiceNumber).toMatch(/^MU-\d{4}-\d{5}$/);
+    expect(result.transaction.invoiceNumber).toMatch(/^\d{4}-\d{5}$/);
 
     // Verify DB state
     const tx = await TransactionModel.findById(result.transaction.id).lean();

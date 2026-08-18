@@ -22,7 +22,7 @@ import { companyUpdatesApprovedEmailTemplate } from "./templates/company-updates
 import { companyUpdatesRejectedEmailTemplate } from "./templates/company-updates-rejected";
 import type { Transporter } from "nodemailer";
 
-const FROM_ADDRESS = `MARKET-UP <${env.EMAIL_FROM}>`;
+const FROM_ADDRESS = `vivasky.media <${env.EMAIL_FROM}>`;
 
 /** Strip HTML tags to produce a text/plain alternative (anti-spam multipart). */
 function htmlToText(html: string): string {

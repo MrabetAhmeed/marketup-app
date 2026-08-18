@@ -53,9 +53,9 @@ export function RsePageClient({ data, companySlug }: RsePageClientProps): JSX.El
 
 function HowItWorks(): JSX.Element {
   const steps = [
-    { title: "Faites votre don", description: "Directement auprès d'une association tunisienne reconnue. MARKET-UP ne gère pas les fonds." },
+    { title: "Faites votre don", description: "Directement auprès d'une association tunisienne reconnue. vivasky.media ne gère pas les fonds." },
     { title: "Soumettez le reçu", description: "Téléversez le justificatif (PDF ou photo) avec le montant et la date du don." },
-    { title: "Badge activé", description: "Après validation admin (24-48 h), le badge « Engagement Social Attesté » apparaît sur vos profils." },
+    { title: "Badge activé", description: "Après validation admin (24 h), le badge « Engagement Social Attesté » apparaît sur vos profils." },
   ];
 
   return (

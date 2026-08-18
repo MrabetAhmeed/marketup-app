@@ -140,7 +140,7 @@ export function TransactionsList({ transactions }: TransactionsListProps): JSX.E
                   </div>
                   {t.invoiceNumber && (
                     <div>
-                      <span className="text-ink-tertiary">N° de facture</span>
+                      <span className="text-ink-tertiary">N° de commande</span>
                       <div className="font-semibold text-ink-primary font-mono text-[11px]">{t.invoiceNumber}</div>
                     </div>
                   )}

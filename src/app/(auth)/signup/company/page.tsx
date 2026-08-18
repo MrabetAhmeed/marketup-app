@@ -146,7 +146,7 @@ function SignupCompanyContent(): JSX.Element {
             <header className="mb-10">
               <span className="inline-block px-2.5 py-1 bg-[#EFF6FC] text-[#0078D4] text-[10px] font-bold uppercase tracking-widest rounded mb-4">Étape 1 sur 3</span>
               <h1 className="text-3xl md:text-[32px] font-semibold text-[#242424] mb-3 tracking-tight">Votre entreprise</h1>
-              <p className="text-[#616161] text-base">Renseignez les informations légales pour créer votre compte MARKET-UP.</p>
+              <p className="text-[#616161] text-base">Renseignez les informations légales pour créer votre compte vivasky.media.</p>
             </header>
 
             {errorEntry && <AuthErrorBanner entry={errorEntry} scrollKey={scrollKey} />}

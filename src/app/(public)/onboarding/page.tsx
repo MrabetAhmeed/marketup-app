@@ -137,7 +137,7 @@ export default function OnboardingPage(): JSX.Element {
               <span className="material-symbols-outlined">apps</span>
             </button>
             {launcherOpen && (
-              <div className="absolute right-0 mt-2 w-80 bg-white rounded-xl border border-[#E0E0E0] p-3 z-50" style={{ boxShadow: "0 8px 32px rgba(0,0,0,0.16)" }}>
+              <div className="max-md:fixed max-md:left-4 max-md:right-4 max-md:top-[57px] max-md:w-auto md:absolute md:right-0 md:mt-2 md:w-80 bg-white rounded-xl border border-[#E0E0E0] p-3 z-50" style={{ boxShadow: "0 8px 32px rgba(0,0,0,0.16)" }}>
                 <div className="text-[11px] font-bold uppercase tracking-wider text-[#616161] px-2 pt-1 pb-2">
                   Produits MARKET-UP
                 </div>
@@ -185,7 +185,7 @@ export default function OnboardingPage(): JSX.Element {
             href="/signup/company"
             className="px-3 py-2 md:px-5 md:py-2.5 bg-[#0078D4] hover:bg-[#106EBE] text-white rounded-lg text-xs md:text-sm font-semibold transition-colors whitespace-nowrap"
           >
-            <span className="hidden md:inline">Inscrire une marque</span>
+            <span className="hidden md:inline">Référencer une marque</span>
             <span className="md:hidden">S&apos;inscrire</span>
           </Link>
         </div>
@@ -198,47 +198,17 @@ export default function OnboardingPage(): JSX.Element {
         </div>
       </div>
 
-      {/* Main — Split B2B / B2C */}
+      {/* Main — Split B2C (left/top) / B2B (right/bottom) */}
       <main className="split-container group/split flex flex-col md:flex-row flex-grow w-full overflow-hidden">
-        {/* B2B Panel */}
-        <section
-          className="split-panel group relative w-full md:w-1/2 h-1/2 md:h-full cursor-pointer overflow-hidden"
-          onClick={() => router.push(`${product.searchUrl}?type=B2B`)}
-        >
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img alt="B2B" className="absolute inset-0 w-full h-full object-cover transition-transform duration-[1500ms] group-hover:scale-105" src="/shared/onboarding-images/onboarding-images-b2b_img.jpg" />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/95 via-black/50 to-black/30 z-[6]" />
-          <div className="relative z-10 h-full flex flex-col justify-end p-8 pt-24 md:p-16 lg:p-24">
-            <div className="max-w-md">
-              <div className="flex items-center gap-2 mb-4 bg-black/40 w-fit px-3 py-1 rounded-full backdrop-blur-sm">
-                <span className="w-8 h-[2px] bg-[#0078D4]" />
-                <span className="font-bold text-xs uppercase tracking-widest text-white">Espace Professionnel</span>
-              </div>
-              <h2 className="text-white text-4xl md:text-6xl font-extrabold mb-6 tracking-tight">B2B</h2>
-              <p className="text-white/80 text-base md:text-lg font-medium leading-relaxed mb-8 md:opacity-0 group-hover:opacity-100 transition-opacity duration-500">
-                Connectez votre entreprise aux fournisseurs, partenaires et services industriels. Développez votre réseau professionnel.
-              </p>
-              <Link
-                href={`${product.searchUrl}?type=B2B`}
-                onClick={(e) => e.stopPropagation()}
-                className="w-full sm:w-auto inline-flex py-4 px-8 bg-[#0078D4] hover:bg-[#106EBE] text-white rounded-lg font-bold items-center justify-center gap-3 transition-colors"
-              >
-                Choisir B2B
-                <span className="material-symbols-outlined text-sm">arrow_forward</span>
-              </Link>
-            </div>
-          </div>
-        </section>
-
         {/* B2C Panel */}
         <section
-          className="split-panel group relative w-full md:w-1/2 h-1/2 md:h-full cursor-pointer overflow-hidden border-t md:border-t-0 md:border-l border-white/10"
+          className="split-panel group relative w-full md:w-1/2 h-1/2 md:h-full cursor-pointer overflow-hidden"
           onClick={() => router.push(`${product.searchUrl}?type=B2C`)}
         >
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img alt="B2C" className="absolute inset-0 w-full h-full object-cover transition-transform duration-[1500ms] group-hover:scale-105" src="/shared/onboarding-images/onboarding-images-b2c_img.jpg" />
           <div className="absolute inset-0 bg-gradient-to-t from-black/95 via-black/50 to-black/30 z-[6]" />
-          <div className="relative z-10 h-full flex flex-col justify-end p-8 pt-24 md:p-16 lg:p-24">
+          <div className="relative z-10 h-full flex flex-col justify-end p-4 pt-24 sm:p-8 md:p-16 lg:p-24">
             <div className="max-w-md">
               <div className="flex items-center gap-2 mb-4 bg-black/40 w-fit px-3 py-1 rounded-full backdrop-blur-sm">
                 <span className="w-8 h-[2px] bg-white" />
@@ -253,7 +223,37 @@ export default function OnboardingPage(): JSX.Element {
                 onClick={(e) => e.stopPropagation()}
                 className="w-full sm:w-auto inline-flex py-4 px-8 border border-white text-white rounded-lg font-bold items-center justify-center gap-3 transition-colors hover:bg-white hover:text-[#242424]"
               >
-                Choisir B2C
+                À vos marques
+                <span className="material-symbols-outlined text-sm">arrow_forward</span>
+              </Link>
+            </div>
+          </div>
+        </section>
+
+        {/* B2B Panel */}
+        <section
+          className="split-panel group relative w-full md:w-1/2 h-1/2 md:h-full cursor-pointer overflow-hidden border-t md:border-t-0 md:border-l border-white/10"
+          onClick={() => router.push(`${product.searchUrl}?type=B2B`)}
+        >
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img alt="B2B" className="absolute inset-0 w-full h-full object-cover transition-transform duration-[1500ms] group-hover:scale-105" src="/shared/onboarding-images/onboarding-images-b2b_img.jpg" />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/95 via-black/50 to-black/30 z-[6]" />
+          <div className="relative z-10 h-full flex flex-col justify-end p-4 pt-24 sm:p-8 md:p-16 lg:p-24">
+            <div className="max-w-md">
+              <div className="flex items-center gap-2 mb-4 bg-black/40 w-fit px-3 py-1 rounded-full backdrop-blur-sm">
+                <span className="w-8 h-[2px] bg-[#0078D4]" />
+                <span className="font-bold text-xs uppercase tracking-widest text-white">Espace Professionnel</span>
+              </div>
+              <h2 className="text-white text-4xl md:text-6xl font-extrabold mb-6 tracking-tight">B2B</h2>
+              <p className="text-white/80 text-base md:text-lg font-medium leading-relaxed mb-8 md:opacity-0 group-hover:opacity-100 transition-opacity duration-500">
+                Connectez votre entreprise aux fournisseurs, partenaires et services industriels.
+              </p>
+              <Link
+                href={`${product.searchUrl}?type=B2B`}
+                onClick={(e) => e.stopPropagation()}
+                className="w-full sm:w-auto inline-flex py-4 px-8 bg-[#0078D4] hover:bg-[#106EBE] text-white rounded-lg font-bold items-center justify-center gap-3 transition-colors"
+              >
+                Sourcing center
                 <span className="material-symbols-outlined text-sm">arrow_forward</span>
               </Link>
             </div>

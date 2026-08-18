@@ -68,7 +68,7 @@ export const STUB_MESSAGES = {
     presentation: "toast" as const,
   },
   FEATURE_COMING_SOON_BILLING: {
-    message: "Le module Facturation sera disponible dans une prochaine version.",
+    message: "Le module Commandes sera disponible dans une prochaine version.",
     presentation: "toast" as const,
   },
 } as const;

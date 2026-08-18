@@ -370,7 +370,7 @@ export function SettingsForm({ companyName, accountEmail }: SettingsFormProps): 
                 "Vos **3 profils publics** (BrandUP, TraceUP, LinkUP) et leur contenu",
                 "Votre **badge RSE validé** et l'historique de vos dons",
                 "Vos **campagnes Boost / Sponsoring** actives — aucun remboursement possible",
-                "L'historique de **facturation** et les reçus PDF",
+                "L'historique **des commandes** et les reçus PDF",
                 "Les **URL publiques** (/brandup/..., /traceup/..., /linkup/...) — elles renverront 404",
               ].map((text, i) => (
                 <li key={i} className="flex items-start gap-2">

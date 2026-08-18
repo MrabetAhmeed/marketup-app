@@ -69,7 +69,7 @@ function getBlockingReason(item: ProfileBoostData): { color: string; bgColor: st
   };
   if (item.profileStatus === "pending") return {
     color: "#92400E", bgColor: "#FFFBEB", borderColor: "#FDE68A", icon: "schedule",
-    message: "Profil en cours de validation. Vous pourrez le booster une fois publié (24-48 h).",
+    message: "Profil en cours de validation. Vous pourrez le booster une fois publié (24 h).",
   };
   if (item.profileStatus === "disabled") return {
     color: "#616161", bgColor: "#F5F5F5", borderColor: "#E0E0E0", icon: "visibility_off",

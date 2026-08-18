@@ -174,7 +174,7 @@ export default function VideoLibrary({ videos }: VideoLibraryProps): JSX.Element
           <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-outline text-lg">search</span>
           <input
             type="text"
-            placeholder="Rechercher une vid\u00e9o..."
+            placeholder="Rechercher une vidéo…"
             className="w-full bg-surface-container-high border-none rounded-[14px] pl-10 pr-4 py-2.5 text-sm focus:ring-2 focus:ring-primary/20"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}

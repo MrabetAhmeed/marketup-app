@@ -5,7 +5,7 @@ export function rseReceiptValidatedEmailTemplate(params: {
   rsePageUrl: string;
 }): { subject: string; html: string } {
   return {
-    subject: `Reçu RSE validé — ${params.associationName} — MARKET-UP`,
+    subject: `Reçu RSE validé — ${params.associationName} — vivasky.media`,
     html: `<!DOCTYPE html>
 <html lang="fr">
 <head><meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1.0" /></head>
@@ -14,7 +14,7 @@ export function rseReceiptValidatedEmailTemplate(params: {
     <tr><td align="center">
       <table role="presentation" width="100%" style="max-width:480px;background:#FFFFFF;border-radius:8px;border:1px solid #E0E0E0;padding:40px 32px;">
         <tr><td>
-          <p style="margin:0 0 24px;font-size:20px;font-weight:700;color:#0078D4;">MARKET-UP</p>
+          <p style="margin:0 0 24px;font-size:20px;font-weight:700;color:#0078D4;">vivasky.media</p>
           <h1 style="margin:0 0 8px;font-size:18px;font-weight:600;color:#242424;">Reçu RSE validé</h1>
           <p style="margin:0 0 20px;font-size:14px;color:#616161;line-height:1.5;">
             Bonjour,<br><br>
@@ -26,7 +26,7 @@ export function rseReceiptValidatedEmailTemplate(params: {
             Voir mon historique RSE
           </a>
           <p style="margin:24px 0 0;font-size:13px;color:#616161;line-height:1.5;">
-            Merci de faire confiance à MARKET-UP.<br>L'équipe MARKET-UP
+            Merci de faire confiance à vivasky.media.<br>L'équipe vivasky.media
           </p>
         </td></tr>
       </table>

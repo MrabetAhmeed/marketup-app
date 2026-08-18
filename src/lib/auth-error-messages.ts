@@ -92,7 +92,7 @@ export const AUTH_ERROR_MESSAGES: Record<string, ErrorMapEntry> = {
 
   // === Company status errors (dedicated codes) ===
   COMPANY_PENDING: {
-    message: "Votre compte est en attente de validation par notre équipe. Vous recevrez un email sous 24-48h.",
+    message: "Votre compte est en attente de validation par notre équipe. Vous recevrez un email sous 24 h.",
     presentation: "banner",
   },
   COMPANY_SUSPENDED: {
@@ -102,7 +102,7 @@ export const AUTH_ERROR_MESSAGES: Record<string, ErrorMapEntry> = {
 
   // Legacy sub-codes (kept for backward compat)
   "COMPANY_NOT_ACTIVE.pending": {
-    message: "Votre compte est en attente de validation par notre équipe (24-48h).",
+    message: "Votre compte est en attente de validation par notre équipe (24 h).",
     presentation: "banner",
   },
   "COMPANY_NOT_ACTIVE.rejected": {

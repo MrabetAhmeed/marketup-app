@@ -197,35 +197,19 @@ export default function SignupUserPage(): JSX.Element {
                 </div>
               </div>
 
-              {/* Languages */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-                <div>
-                  <label htmlFor="primaryLang" className="block text-[11px] font-bold uppercase tracking-[0.06em] text-[#616161] mb-1.5 after:content-['*'] after:text-[#D13438] after:ml-1">Langue principale</label>
-                  <select
-                    id="primaryLang"
-                    defaultValue="fr"
-                    className="w-full px-3.5 py-2.5 bg-white border border-[#D1D1D1] rounded text-sm text-[#242424] appearance-none focus:border-[#0078D4] focus:outline-none focus:ring-2 focus:ring-[#EFF6FC]"
-                    style={{ backgroundImage: `url("data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23616161' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E")`, paddingRight: "40px", backgroundPosition: "right 12px center", backgroundRepeat: "no-repeat", backgroundSize: "16px" }}
-                  >
-                    <option value="fr">Français</option>
-                    <option value="en" disabled>English — Bientôt disponible</option>
-                    <option value="ar" disabled>العربية — Bientôt disponible</option>
-                  </select>
-                </div>
-                <div>
-                  <label htmlFor="secondaryLang" className="block text-[11px] font-bold uppercase tracking-[0.06em] text-[#616161] mb-1.5">Langue secondaire</label>
-                  <select
-                    id="secondaryLang"
-                    defaultValue=""
-                    className="w-full px-3.5 py-2.5 bg-white border border-[#D1D1D1] rounded text-sm text-[#242424] appearance-none focus:border-[#0078D4] focus:outline-none focus:ring-2 focus:ring-[#EFF6FC]"
-                    style={{ backgroundImage: `url("data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23616161' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E")`, paddingRight: "40px", backgroundPosition: "right 12px center", backgroundRepeat: "no-repeat", backgroundSize: "16px" }}
-                  >
-                    <option value="">— Aucune —</option>
-                    <option value="fr">Français</option>
-                    <option value="en" disabled>English — Bientôt disponible</option>
-                    <option value="ar" disabled>العربية — Bientôt disponible</option>
-                  </select>
-                </div>
+              {/* Languages — langue principale seule, secondaire masquée V1 */}
+              <div>
+                <label htmlFor="primaryLang" className="block text-[11px] font-bold uppercase tracking-[0.06em] text-[#616161] mb-1.5 after:content-['*'] after:text-[#D13438] after:ml-1">Langue principale</label>
+                <select
+                  id="primaryLang"
+                  defaultValue="fr"
+                  className="w-full px-3.5 py-2.5 bg-white border border-[#D1D1D1] rounded text-sm text-[#242424] appearance-none focus:border-[#0078D4] focus:outline-none focus:ring-2 focus:ring-[#EFF6FC]"
+                  style={{ backgroundImage: `url("data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23616161' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E")`, paddingRight: "40px", backgroundPosition: "right 12px center", backgroundRepeat: "no-repeat", backgroundSize: "16px" }}
+                >
+                  <option value="fr">Français</option>
+                  <option value="en" disabled>English — Bientôt disponible</option>
+                  <option value="ar" disabled>العربية — Bientôt disponible</option>
+                </select>
               </div>
 
               {/* Password */}
@@ -276,10 +260,10 @@ export default function SignupUserPage(): JSX.Element {
                   <input type="checkbox" required className="mt-0.5 w-[18px] h-[18px] border-[1.5px] border-[#8A8886] rounded-[3px] bg-white appearance-none cursor-pointer shrink-0 checked:bg-[#0078D4] checked:border-[#0078D4] focus:ring-2 focus:ring-[#EFF6FC] focus:outline-none" />
                   <span className="text-sm text-[#242424] leading-snug">
                     J&apos;accepte les{" "}
-                    <a href="#" className="text-[#0078D4] font-semibold hover:underline">Conditions Générales d&apos;Utilisation</a>{" "}
-                    et la{" "}
-                    <a href="#" className="text-[#0078D4] font-semibold hover:underline">Politique de confidentialité</a>{" "}
-                    de MARKET-UP.
+                    <a href="https://vivasky.media/cgu_cgv.html" target="_blank" rel="noopener noreferrer" className="text-[#0078D4] font-semibold hover:underline">Conditions Générales d&apos;Utilisation (CGU)</a>{" "}
+                    et les{" "}
+                    <span className="text-[#0078D4] font-semibold">Conditions Générales de Vente (CGV)</span>{" "}
+                    de vivasky.media.
                   </span>
                 </label>
               </div>
