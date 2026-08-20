@@ -242,7 +242,7 @@ function SignupCompanyContent(): JSX.Element {
                 {errors.identityDocumentUrl ? (
                   <p className="text-xs text-[#D13438] mt-1">{errors.identityDocumentUrl.message}</p>
                 ) : (
-                  <p className="text-xs text-[#8A8886] mt-1">Document officiel (RNE, patente…) — PDF, JPG ou PNG · 5 Mo max</p>
+                  <p className="text-xs text-[#8A8886] mt-1">Document officiel (RNE) — PDF, JPG ou PNG · 5 Mo max</p>
                 )}
               </div>
 
