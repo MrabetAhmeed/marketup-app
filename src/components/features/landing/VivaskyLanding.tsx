@@ -32,35 +32,35 @@ type EcosystemCard = {
 };
 
 const ECOSYSTEM_CARDS: readonly EcosystemCard[] = [
-  {
-    title: "SkyMind",
-    description: "Progressez. Écrivez.",
-    icon: "edit",
-    imageUrl:
-      "https://images.unsplash.com/photo-1607551848581-7ee851bf978b?q=80&w=1174&auto=format&fit=crop",
-    href: "#",
-    layoutClass: "min-h-[280px] sm:col-span-2",
-  },
-  {
-    title: "WikiLife",
-    description: "Connaissance vivante pour le quotidien.",
-    icon: "public",
-    imageUrl:
-      "https://plus.unsplash.com/premium_photo-1723619021737-df1d775eccc8?q=80&w=1169&auto=format&fit=crop",
-    href: "#",
-    layoutClass: "min-h-[240px]",
-    breatheDelay: "2s",
-  },
-  {
-    title: "SkyBook",
-    description: "Lire à ciel ouvert.",
-    icon: "menu_book",
-    imageUrl:
-      "https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?q=80&w=600&auto=format&fit=crop",
-    href: "#",
-    layoutClass: "min-h-[240px]",
-    breatheDelay: "4s",
-  },
+  // {
+  //   title: "SkyMind",
+  //   description: "Progressez. Écrivez.",
+  //   icon: "edit",
+  //   imageUrl:
+  //     "https://images.unsplash.com/photo-1607551848581-7ee851bf978b?q=80&w=1174&auto=format&fit=crop",
+  //   href: "#",
+  //   layoutClass: "min-h-[280px] sm:col-span-2",
+  // },
+  // {
+  //   title: "WikiLife",
+  //   description: "Connaissance vivante pour le quotidien.",
+  //   icon: "public",
+  //   imageUrl:
+  //     "https://plus.unsplash.com/premium_photo-1723619021737-df1d775eccc8?q=80&w=1169&auto=format&fit=crop",
+  //   href: "#",
+  //   layoutClass: "min-h-[240px]",
+  //   breatheDelay: "2s",
+  // },
+  // {
+  //   title: "SkyBook",
+  //   description: "Lire à ciel ouvert.",
+  //   icon: "menu_book",
+  //   imageUrl:
+  //     "https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?q=80&w=600&auto=format&fit=crop",
+  //   href: "#",
+  //   layoutClass: "min-h-[240px]",
+  //   breatheDelay: "4s",
+  // },
   {
     title: "TraceUP",
     description: "Média vidéo, entreprises traçables.",
@@ -91,25 +91,25 @@ const ECOSYSTEM_CARDS: readonly EcosystemCard[] = [
     layoutClass: "min-h-[240px]",
     breatheDelay: "4s",
   },
-  {
-    title: "SkyERP",
-    description: "Manager online. Pilotage visionnaire.",
-    icon: "trending_up",
-    imageUrl:
-      "https://images.unsplash.com/photo-1551288049-bebda4e38f71?q=80&w=800&auto=format&fit=crop",
-    href: "#",
-    layoutClass: "min-h-[240px]",
-  },
-  {
-    title: "SkyQR",
-    description: "Générateur de QR code intelligent.",
-    icon: "qr_code_2",
-    imageUrl:
-      "https://images.unsplash.com/photo-1550482781-48d477e61c72?q=80&w=1170&auto=format&fit=crop",
-    href: "#",
-    layoutClass: "min-h-[240px]",
-    breatheDelay: "2s",
-  },
+  // {
+  //   title: "SkyERP",
+  //   description: "Manager online. Pilotage visionnaire.",
+  //   icon: "trending_up",
+  //   imageUrl:
+  //     "https://images.unsplash.com/photo-1551288049-bebda4e38f71?q=80&w=800&auto=format&fit=crop",
+  //   href: "#",
+  //   layoutClass: "min-h-[240px]",
+  // },
+  // {
+  //   title: "SkyQR",
+  //   description: "Générateur de QR code intelligent.",
+  //   icon: "qr_code_2",
+  //   imageUrl:
+  //     "https://images.unsplash.com/photo-1550482781-48d477e61c72?q=80&w=1170&auto=format&fit=crop",
+  //   href: "#",
+  //   layoutClass: "min-h-[240px]",
+  //   breatheDelay: "2s",
+  // },
 ];
 
 const CARD_CLASS = [
