@@ -93,6 +93,7 @@ const CompanySchema = new Schema(
       gouvernorat: { type: String, required: true },
       ville: { type: String, required: true },
       address: { type: String, default: null },
+      postalCode: { type: String, default: null },
       contactEmail: { type: String, lowercase: true, trim: true },
       phone: { type: String, default: null },
       whatsapp: { type: String, default: null },

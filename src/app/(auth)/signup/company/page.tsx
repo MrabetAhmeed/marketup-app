@@ -196,15 +196,15 @@ function SignupCompanyContent(): JSX.Element {
               {/* Legal ID */}
               <div>
                 <label htmlFor="legalId" className="block text-[11px] font-bold uppercase tracking-[0.06em] text-[#616161] mb-1.5 after:content-['*'] after:text-[#D13438] after:ml-1">Identifiant légal</label>
-                <input id="legalId" {...register("legalId")} className="w-full px-3.5 py-2.5 bg-white border border-[#D1D1D1] rounded text-sm text-[#242424] placeholder:text-[#8A8886] focus:border-[#0078D4] focus:outline-none focus:ring-2 focus:ring-[#EFF6FC]" placeholder="Ex : 1234567 / A / 000" />
-                <p className="text-xs text-[#8A8886] mt-1">Registre National des Entreprises (RNE) ou équivalent légal officiel</p>
+                <input id="legalId" autoComplete="off" {...register("legalId")} className={`w-full px-3.5 py-2.5 bg-white border ${errors.legalId ? "border-[#D13438]" : "border-[#D1D1D1]"} rounded text-sm text-[#242424] placeholder:text-[#8A8886] focus:border-[#0078D4] focus:outline-none focus:ring-2 focus:ring-[#EFF6FC]`} placeholder="1234567A" />
+                <p className="text-xs text-[#8A8886] mt-1">Registre National des Entreprises (RNE) — 7 chiffres suivis d&apos;une lettre</p>
                 {errors.legalId && <p className="text-xs text-[#D13438] mt-1">{errors.legalId.message}</p>}
               </div>
 
               {/* Legal document upload */}
               <div>
-                <label className="block text-[11px] font-bold uppercase tracking-[0.06em] text-[#616161] mb-1.5">Document légal officiel</label>
-                <div className={`flex items-center gap-3.5 px-4 py-3.5 border border-dashed rounded-lg transition-colors ${docUrl ? "bg-[#F0FDF4] border-[#86EFAC]" : "bg-[#F5F5F5] border-[#D1D1D1] hover:border-[#0078D4]"}`}>
+                <label className="block text-[11px] font-bold uppercase tracking-[0.06em] text-[#616161] mb-1.5 after:content-['*'] after:text-[#D13438] after:ml-1">Document officiel récent (RNE)</label>
+                <div className={`flex items-center gap-3.5 px-4 py-3.5 border border-dashed rounded-lg transition-colors ${docUrl ? "bg-[#F0FDF4] border-[#86EFAC]" : errors.identityDocumentUrl ? "bg-[#FEF2F2] border-[#D13438]" : "bg-[#F5F5F5] border-[#D1D1D1] hover:border-[#0078D4]"}`}>
                   <div className="w-11 h-11 rounded-lg bg-white border border-[#E0E0E0] flex items-center justify-center shrink-0 text-[#0078D4]">
                     <span className="material-symbols-outlined" style={{ fontSize: "22px" }}>
                       {docUrl ? "check_circle" : "description"}
@@ -239,7 +239,11 @@ function SignupCompanyContent(): JSX.Element {
                     />
                   </label>
                 </div>
-                <p className="text-xs text-[#8A8886] mt-1">Document officiel (RNE, patente...) — optionnel mais accélère la validation.</p>
+                {errors.identityDocumentUrl ? (
+                  <p className="text-xs text-[#D13438] mt-1">{errors.identityDocumentUrl.message}</p>
+                ) : (
+                  <p className="text-xs text-[#8A8886] mt-1">Document officiel (RNE, patente…) — PDF, JPG ou PNG · 5 Mo max</p>
+                )}
               </div>
 
               {/* Email */}
@@ -294,17 +298,14 @@ function SignupCompanyContent(): JSX.Element {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                 <div>
                   <label htmlFor="country" className="block text-[11px] font-bold uppercase tracking-[0.06em] text-[#616161] mb-1.5 after:content-['*'] after:text-[#D13438] after:ml-1">Pays</label>
-                  <select
+                  {/* V1: Tunisie only — country hardcoded "TN" server-side. Dormant options preserved for international rollout. */}
+                  <input
                     id="country"
-                    defaultValue="TN"
-                    className="w-full px-3.5 py-2.5 bg-white border border-[#D1D1D1] rounded text-sm text-[#242424] appearance-none focus:border-[#0078D4] focus:outline-none focus:ring-2 focus:ring-[#EFF6FC]"
-                    style={{ backgroundImage: `url("data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23616161' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E")`, paddingRight: "40px", backgroundPosition: "right 12px center", backgroundRepeat: "no-repeat", backgroundSize: "16px" }}
-                  >
-                    <option value="TN">🇹🇳 Tunisie</option>
-                    <option value="FR" disabled>🇫🇷 France — Bientôt disponible</option>
-                    <option value="MA" disabled>🇲🇦 Maroc — Bientôt disponible</option>
-                    <option value="DZ" disabled>🇩🇿 Algérie — Bientôt disponible</option>
-                  </select>
+                    type="text"
+                    readOnly
+                    value="🇹🇳 Tunisie"
+                    className="w-full px-3.5 py-2.5 bg-[#F5F5F5] border border-[#D1D1D1] rounded text-sm text-[#616161] cursor-not-allowed"
+                  />
                 </div>
                 <div>
                   <label htmlFor="gouvernorat" className="block text-[11px] font-bold uppercase tracking-[0.06em] text-[#616161] mb-1.5 after:content-['*'] after:text-[#D13438] after:ml-1">Gouvernorat</label>
@@ -323,17 +324,25 @@ function SignupCompanyContent(): JSX.Element {
                 </div>
               </div>
 
-              {/* Ville + Address */}
+              {/* Ville + Code postal */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                 <div>
                   <label htmlFor="ville" className="block text-[11px] font-bold uppercase tracking-[0.06em] text-[#616161] mb-1.5 after:content-['*'] after:text-[#D13438] after:ml-1">Ville</label>
-                  <input id="ville" {...register("ville")} className="w-full px-3.5 py-2.5 bg-white border border-[#D1D1D1] rounded text-sm text-[#242424] placeholder:text-[#8A8886] focus:border-[#0078D4] focus:outline-none focus:ring-2 focus:ring-[#EFF6FC]" placeholder="Ex : Tunis" />
+                  <input id="ville" {...register("ville")} className={`w-full px-3.5 py-2.5 bg-white border ${errors.ville ? "border-[#D13438]" : "border-[#D1D1D1]"} rounded text-sm text-[#242424] placeholder:text-[#8A8886] focus:border-[#0078D4] focus:outline-none focus:ring-2 focus:ring-[#EFF6FC]`} placeholder="Ex : Tunis" />
                   {errors.ville && <p className="text-xs text-[#D13438] mt-1">{errors.ville.message}</p>}
                 </div>
                 <div>
-                  <label htmlFor="address" className="block text-[11px] font-bold uppercase tracking-[0.06em] text-[#616161] mb-1.5">Adresse du siège</label>
-                  <input id="address" {...register("address")} className="w-full px-3.5 py-2.5 bg-white border border-[#D1D1D1] rounded text-sm text-[#242424] placeholder:text-[#8A8886] focus:border-[#0078D4] focus:outline-none focus:ring-2 focus:ring-[#EFF6FC]" placeholder="Ex : 12 rue de Syrie" />
+                  <label htmlFor="postalCode" className="block text-[11px] font-bold uppercase tracking-[0.06em] text-[#616161] mb-1.5 after:content-['*'] after:text-[#D13438] after:ml-1">Code postal</label>
+                  <input id="postalCode" inputMode="numeric" autoComplete="postal-code" {...register("postalCode")} className={`w-full px-3.5 py-2.5 bg-white border ${errors.postalCode ? "border-[#D13438]" : "border-[#D1D1D1]"} rounded text-sm text-[#242424] placeholder:text-[#8A8886] focus:border-[#0078D4] focus:outline-none focus:ring-2 focus:ring-[#EFF6FC]`} placeholder="Ex : 4000" />
+                  {errors.postalCode && <p className="text-xs text-[#D13438] mt-1">{errors.postalCode.message}</p>}
                 </div>
+              </div>
+
+              {/* Adresse */}
+              <div>
+                <label htmlFor="address" className="block text-[11px] font-bold uppercase tracking-[0.06em] text-[#616161] mb-1.5 after:content-['*'] after:text-[#D13438] after:ml-1">Adresse du siège</label>
+                <input id="address" {...register("address")} className={`w-full px-3.5 py-2.5 bg-white border ${errors.address ? "border-[#D13438]" : "border-[#D1D1D1]"} rounded text-sm text-[#242424] placeholder:text-[#8A8886] focus:border-[#0078D4] focus:outline-none focus:ring-2 focus:ring-[#EFF6FC]`} placeholder="Ex : 12 rue de Syrie" />
+                {errors.address && <p className="text-xs text-[#D13438] mt-1">{errors.address.message}</p>}
               </div>
 
               {/* Actions */}

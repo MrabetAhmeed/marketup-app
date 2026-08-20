@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { tunisianPhoneSchema } from "@/lib/phone";
 
 // ---------------------------------------------------------------------------
 // Account update — all editable fields go through pendingUpdates (validation
@@ -36,6 +37,12 @@ export const AccountLiveUpdateSchema = z.object({
     .optional()
     .transform((v) => (v === "" ? null : v)),
 
+  postalCode: z
+    .string()
+    .trim()
+    .regex(/^\d{4}$/, "Code postal invalide (4 chiffres).")
+    .optional(),
+
   // --- Gerant identity (validation-gated → pendingUpdates) ---
   firstName: z
     .string()
@@ -59,25 +66,9 @@ export const AccountLiveUpdateSchema = z.object({
     .max(255, "255 caractères maximum.")
     .optional(),
 
-  phone: z
-    .string()
-    .trim()
-    .refine((v) => /^[+\s\-()0-9]*$/.test(v), "Numéro de téléphone invalide (format attendu : +216XXXXXXXX).")
-    .transform((v) => v.replace(/[\s\-()]/g, ""))
-    .pipe(
-      z.string().regex(/^\+[0-9]{8,15}$/, "Numéro de téléphone invalide (format attendu : +216XXXXXXXX)."),
-    )
-    .optional(),
+  phone: tunisianPhoneSchema.optional(),
 
-  whatsapp: z
-    .string()
-    .trim()
-    .refine((v) => /^[+\s\-()0-9]*$/.test(v), "Numéro WhatsApp invalide (format attendu : +216XXXXXXXX).")
-    .transform((v) => v.replace(/[\s\-()]/g, ""))
-    .pipe(
-      z.string().regex(/^\+[0-9]{8,15}$/, "Numéro WhatsApp invalide (format attendu : +216XXXXXXXX)."),
-    )
-    .optional(),
+  whatsapp: tunisianPhoneSchema.optional(),
 
   // --- Legal document (validation-gated → pendingUpdates) ---
   identityDocumentUrl: z

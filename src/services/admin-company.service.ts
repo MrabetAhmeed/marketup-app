@@ -129,6 +129,7 @@ export interface CompanyForAdminReview {
   sector: string;
   gouvernorat: string;
   ville: string;
+  postalCode: string | null;
   address: string | null;
   identityDocumentUrl: string | null;
   registeredAt: string;
@@ -193,6 +194,7 @@ export async function getCompanyForAdminReview(
     sector: sector ? pickLocale(sector.name, lang) : company.liveData?.sectorId ?? "",
     gouvernorat: gouvernorat ? pickLocale(gouvernorat.name, lang) : company.liveData?.gouvernorat ?? "",
     ville: company.liveData?.ville ?? "",
+    postalCode: company.liveData?.postalCode ?? null,
     address: company.liveData?.address ?? null,
     identityDocumentUrl: company.identityDocumentUrl ?? null,
     registeredAt: new Date(company.registeredAt).toISOString(),

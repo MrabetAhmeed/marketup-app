@@ -167,7 +167,7 @@ export default function SignupUserPage(): JSX.Element {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                 <div>
                   <label htmlFor="phone" className="block text-[11px] font-bold uppercase tracking-[0.06em] text-[#616161] mb-1.5 after:content-['*'] after:text-[#D13438] after:ml-1">Téléphone</label>
-                  <input id="phone" type="tel" {...register("phone")} className={`w-full px-3.5 py-2.5 bg-white border ${errors.phone ? "border-[#D13438]" : "border-[#D1D1D1]"} rounded text-sm text-[#242424] placeholder:text-[#8A8886] focus:border-[#0078D4] focus:outline-none focus:ring-2 focus:ring-[#EFF6FC]`} placeholder="+216 12 345 678" />
+                  <input id="phone" type="tel" inputMode="tel" autoComplete="tel" {...register("phone")} className={`w-full px-3.5 py-2.5 bg-white border ${errors.phone ? "border-[#D13438]" : "border-[#D1D1D1]"} rounded text-sm text-[#242424] placeholder:text-[#8A8886] focus:border-[#0078D4] focus:outline-none focus:ring-2 focus:ring-[#EFF6FC]`} placeholder="+216 12 345 678" />
                   {errors.phone ? (
                     <p className="text-xs text-[#D13438] mt-1">{errors.phone.message}</p>
                   ) : (
@@ -188,7 +188,7 @@ export default function SignupUserPage(): JSX.Element {
                       Même que le téléphone
                     </button>
                   </div>
-                  <input id="whatsapp" type="tel" {...register("whatsapp")} className={`w-full px-3.5 py-2.5 bg-white border ${errors.whatsapp ? "border-[#D13438]" : "border-[#D1D1D1]"} rounded text-sm text-[#242424] placeholder:text-[#8A8886] focus:border-[#0078D4] focus:outline-none focus:ring-2 focus:ring-[#EFF6FC]`} placeholder="+216 12 345 678" />
+                  <input id="whatsapp" type="tel" inputMode="tel" autoComplete="tel" {...register("whatsapp")} className={`w-full px-3.5 py-2.5 bg-white border ${errors.whatsapp ? "border-[#D13438]" : "border-[#D1D1D1]"} rounded text-sm text-[#242424] placeholder:text-[#8A8886] focus:border-[#0078D4] focus:outline-none focus:ring-2 focus:ring-[#EFF6FC]`} placeholder="+216 12 345 678" />
                   {errors.whatsapp ? (
                     <p className="text-xs text-[#D13438] mt-1">{errors.whatsapp.message}</p>
                   ) : (

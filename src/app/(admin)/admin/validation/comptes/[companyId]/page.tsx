@@ -27,6 +27,7 @@ export default async function CompanyReviewPage({ params }: PageProps): Promise<
     { label: "Secteur", value: company.sector },
     { label: "Gouvernorat", value: company.gouvernorat },
     { label: "Ville", value: company.ville },
+    { label: "Code postal", value: company.postalCode ?? "Non renseigné" },
     { label: "Adresse", value: company.address ?? "Non renseignée" },
     { label: "Propriétaire", value: company.ownerName || company.ownerEmail },
   ];

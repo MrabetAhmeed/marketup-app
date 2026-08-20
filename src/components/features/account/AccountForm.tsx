@@ -25,13 +25,14 @@ interface AccountFormValues {
   phone: string;
   whatsapp: string;
   ville: string;
+  postalCode: string;
   address: string;
 }
 
 /** All editable fields go through pendingUpdates (validation admin) */
 const ALL_FIELD_KEYS = [
   "firstName", "lastName",
-  "displayName", "gouvernorat", "ville", "address",
+  "displayName", "gouvernorat", "ville", "postalCode", "address",
   "contactEmail", "phone", "whatsapp",
 ] as const;
 
@@ -74,6 +75,7 @@ export function AccountForm({ me, gouvernorats }: AccountFormProps): JSX.Element
       phone: company.phone ?? "",
       whatsapp: company.whatsapp ?? "",
       ville: company.ville,
+      postalCode: company.postalCode ?? "",
       address: company.address ?? "",
     },
   });
@@ -130,6 +132,7 @@ export function AccountForm({ me, gouvernorats }: AccountFormProps): JSX.Element
   const pendingContactEmail = pendingSimple("liveData.contactEmail");
   const pendingPhone = pendingSimple("liveData.phone");
   const pendingWhatsapp = pendingSimple("liveData.whatsapp");
+  const pendingPostalCode = pendingSimple("liveData.postalCode");
   const pendingDocUrl = pendingFields?.fields?.find((x) => x.key === "identityDocumentUrl")?.newValue as string | undefined ?? null;
 
   async function onSubmit(values: AccountFormValues): Promise<void> {
@@ -180,6 +183,7 @@ export function AccountForm({ me, gouvernorats }: AccountFormProps): JSX.Element
         phone: meData.company.phone ?? "",
         whatsapp: meData.company.whatsapp ?? "",
         ville: meData.company.ville,
+        postalCode: meData.company.postalCode ?? "",
         address: meData.company.address ?? "",
       });
       showToast("Modification soumise · en attente de validation admin");
@@ -635,7 +639,7 @@ export function AccountForm({ me, gouvernorats }: AccountFormProps): JSX.Element
               <span className="absolute left-3 top-1/2 -translate-y-1/2 material-symbols-outlined text-ink-tertiary pointer-events-none" style={{ fontSize: 16 }}>
                 call
               </span>
-              <input id="acc-phone" type="text" inputMode="tel" className={`field-input pl-9 ${errors.phone ? "border-[#B91C1C]" : ""}`} {...register("phone")} />
+              <input id="acc-phone" type="tel" inputMode="tel" autoComplete="tel" className={`field-input pl-9 ${errors.phone ? "border-[#B91C1C]" : ""}`} {...register("phone")} />
             </div>
             {errors.phone ? (
               <p className="text-[12px] text-[#B91C1C] mt-1">{errors.phone.message}</p>
@@ -664,7 +668,7 @@ export function AccountForm({ me, gouvernorats }: AccountFormProps): JSX.Element
               <span className="absolute left-3 top-1/2 -translate-y-1/2 material-symbols-outlined icon-fill text-status-active-fg pointer-events-none" style={{ fontSize: 16 }}>
                 chat
               </span>
-              <input id="acc-whatsapp" type="text" inputMode="tel" className={`field-input pl-9 ${errors.whatsapp ? "border-[#B91C1C]" : ""}`} {...register("whatsapp")} />
+              <input id="acc-whatsapp" type="tel" inputMode="tel" autoComplete="tel" className={`field-input pl-9 ${errors.whatsapp ? "border-[#B91C1C]" : ""}`} {...register("whatsapp")} />
             </div>
             {errors.whatsapp ? (
               <p className="text-[12px] text-[#B91C1C] mt-1">{errors.whatsapp.message}</p>
@@ -748,7 +752,31 @@ export function AccountForm({ me, gouvernorats }: AccountFormProps): JSX.Element
             )}
           </div>
 
-          {/* Address (hard change, optional) */}
+          {/* Code postal (hard change) */}
+          <div>
+            <label htmlFor="acc-postalcode" className="field-label flex items-center gap-2 flex-wrap">
+              Code postal <span className="text-[#B91C1C] font-bold ml-0.5">*</span>
+              <FieldBadge kind="validation" />
+            </label>
+            <input id="acc-postalcode" type="text" inputMode="numeric" autoComplete="postal-code" className={`field-input ${errors.postalCode ? "border-[#B91C1C]" : ""}`} {...register("postalCode")} placeholder="4000" />
+            {errors.postalCode ? (
+              <p className="text-[12px] text-[#B91C1C] mt-1">{errors.postalCode.message}</p>
+            ) : pendingPostalCode ? (
+              <div className="mt-1.5 px-3 py-2 bg-[#FEF3C7] border border-[#FDE68A] rounded text-[12px] text-[#92400E] flex items-start gap-2">
+                <span className="material-symbols-outlined shrink-0 mt-[1px]" style={{ fontSize: 14 }}>schedule</span>
+                <span>
+                  Modification en attente de validation : <strong>{pendingPostalCode.current}</strong> → <strong>{pendingPostalCode.next}</strong>
+                </span>
+              </div>
+            ) : (
+              <div className="field-help">
+                <span className="material-symbols-outlined" style={{ fontSize: 13 }}>info</span>
+                La modification nécessite une validation admin
+              </div>
+            )}
+          </div>
+
+          {/* Address (hard change) */}
           <div className="md:col-span-2">
             <label htmlFor="acc-address" className="field-label flex items-center gap-2 flex-wrap">
               Adresse <span className="text-[#B91C1C] font-bold ml-0.5">*</span>

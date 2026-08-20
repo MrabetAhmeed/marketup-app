@@ -65,6 +65,7 @@ interface SignupCompanyInput {
   sectorId: string;
   gouvernorat: string;
   ville: string;
+  postalCode?: string | null;
   address?: string | null;
   identityDocumentUrl?: string | null;
 }
@@ -139,6 +140,7 @@ export async function signupCompany(input: SignupCompanyInput): Promise<SignupCo
             gouvernorat: input.gouvernorat,
             ville: input.ville,
             address: input.address || null,
+            postalCode: input.postalCode || null,
             contactEmail: email,
             phone: null,
             whatsapp: null,

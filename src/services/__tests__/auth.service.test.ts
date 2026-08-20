@@ -85,7 +85,7 @@ async function doFullSignup(email = "test@example.tn") {
   const company = await signupCompany({
     type: "B2B",
     displayName: "Test Company",
-    legalId: "1234567",
+    legalId: "1234567A",
     accountEmail: email,
     sectorId: "mecanique",
     gouvernorat: "sousse",
@@ -139,7 +139,7 @@ describe("Auth Service", () => {
       signupCompany({
         type: "B2B",
         displayName: "Another Co",
-        legalId: "7654321",
+        legalId: "7654321B",
         accountEmail: "dup@example.tn",
         sectorId: "mecanique",
         gouvernorat: "sousse",
@@ -154,7 +154,7 @@ describe("Auth Service", () => {
     const [oldCompany] = await CompanyModel.create([{
       slug: "old-co",
       type: "B2B",
-      legalId: "0000001",
+      legalId: "0000001A",
       accountEmail: "orphan@example.tn",
       data: { displayName: { fr: "Old Co" } },
       liveData: { sectorId: "mecanique", gouvernorat: "sousse", ville: "X", address: null },
@@ -170,7 +170,7 @@ describe("Auth Service", () => {
     const result = await signupCompany({
       type: "B2B",
       displayName: "New Co",
-      legalId: "1111111",
+      legalId: "1111111A",
       accountEmail: "orphan@example.tn",
       sectorId: "mecanique",
       gouvernorat: "sousse",
@@ -187,7 +187,7 @@ describe("Auth Service", () => {
     await signupCompany({
       type: "B2B",
       displayName: "HasHash Co",
-      legalId: "HH00001",
+      legalId: "1100001A",
       accountEmail: "hashuser@example.tn",
       sectorId: "mecanique",
       gouvernorat: "sousse",
@@ -203,7 +203,7 @@ describe("Auth Service", () => {
       signupCompany({
         type: "B2B",
         displayName: "Another",
-        legalId: "HH00002",
+        legalId: "1100002A",
         accountEmail: "hashuser@example.tn",
         sectorId: "mecanique",
         gouvernorat: "sousse",
@@ -218,7 +218,7 @@ describe("Auth Service", () => {
     const [oldCompany] = await CompanyModel.create([{
       slug: "ma-societe",
       type: "B2B",
-      legalId: "SL00001",
+      legalId: "2200001A",
       accountEmail: "slug-test@example.tn",
       data: { displayName: { fr: "Ma Société" } },
       liveData: { sectorId: "mecanique", gouvernorat: "sousse", ville: "X", address: null },
@@ -234,7 +234,7 @@ describe("Auth Service", () => {
     const result = await signupCompany({
       type: "B2B",
       displayName: "Ma Société",
-      legalId: "SL00002",
+      legalId: "2200002A",
       accountEmail: "slug-test@example.tn",
       sectorId: "mecanique",
       gouvernorat: "sousse",
@@ -251,7 +251,7 @@ describe("Auth Service", () => {
     const [co] = await CompanyModel.create([{
       slug: "nopw-co",
       type: "B2B",
-      legalId: "NP00001",
+      legalId: "3300001A",
       accountEmail: "nopw@example.tn",
       data: { displayName: { fr: "NoPw" } },
       liveData: { sectorId: "mecanique", gouvernorat: "sousse", ville: "X", address: null },
@@ -425,7 +425,7 @@ describe("Auth Service", () => {
     const companyResult = await signupCompany({
       type: "B2B",
       displayName: "Unverified PW",
-      legalId: "UPW0001",
+      legalId: "4400001A",
       accountEmail: "unverified-pw@example.tn",
       sectorId: "mecanique",
       gouvernorat: "sousse",
@@ -451,7 +451,7 @@ describe("Auth Service", () => {
     await signupCompany({
       type: "B2B",
       displayName: "NoPW Forgot",
-      legalId: "NPF0001",
+      legalId: "5500001A",
       accountEmail: "nopw-forgot@example.tn",
       sectorId: "mecanique",
       gouvernorat: "sousse",
@@ -468,7 +468,7 @@ describe("Auth Service", () => {
     const companyResult = await signupCompany({
       type: "B2B",
       displayName: "Reset Verify",
-      legalId: "RV00001",
+      legalId: "6600001A",
       accountEmail: "reset-verify@example.tn",
       sectorId: "mecanique",
       gouvernorat: "sousse",
@@ -516,7 +516,7 @@ describe("Auth Service", () => {
     const companyResult = await signupCompany({
       type: "B2B",
       displayName: "OwnerName Co",
-      legalId: "ON00001",
+      legalId: "7700001A",
       accountEmail: "owner-name@example.tn",
       sectorId: "mecanique",
       gouvernorat: "sousse",
@@ -579,7 +579,7 @@ describe("Auth Service", () => {
     const companyResult = await signupCompany({
       type: "B2B",
       displayName: "PhoneTest Co",
-      legalId: "PT00001",
+      legalId: "8800001A",
       accountEmail: "phone-test@example.tn",
       sectorId: "mecanique",
       gouvernorat: "sousse",
@@ -615,7 +615,7 @@ describe("Auth Service", () => {
     const companyResult = await signupCompany({
       type: "B2B",
       displayName: "NoPhone Co",
-      legalId: "NP00001",
+      legalId: "3300001A",
       accountEmail: "no-phone@example.tn",
       sectorId: "mecanique",
       gouvernorat: "sousse",

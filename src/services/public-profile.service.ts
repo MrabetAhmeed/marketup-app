@@ -41,6 +41,7 @@ interface PublicCompanyBase {
   gouvernorat: string;
   gouvernoratName: string;
   ville: string;
+  postalCode: string | null;
   contactEmail: string;
   phone: string | null;
   whatsapp: string | null;
@@ -58,6 +59,12 @@ interface PublicRseReceipt {
   receiptDocumentUrl: string | null;
 }
 
+export interface SiblingProfiles {
+  brandup: boolean;
+  traceup: boolean;
+  linkup: boolean;
+}
+
 export interface PublicBrandUpProfile {
   profileId: string;
   company: PublicCompanyBase;
@@ -71,6 +78,7 @@ export interface PublicBrandUpProfile {
   certifications: { id: string; name: string; label: string; icon: string | null; image: string | null }[];
   services: { name: string }[];
   rseReceipts: PublicRseReceipt[];
+  siblingProfiles: SiblingProfiles;
 }
 
 export interface PublicTraceUpProfile {
@@ -89,6 +97,7 @@ export interface PublicTraceUpProfile {
     publishedAt: string | null;
   }[];
   rseReceipts: PublicRseReceipt[];
+  siblingProfiles: SiblingProfiles;
 }
 
 export interface PublicLinkUpProfile {
@@ -97,7 +106,7 @@ export interface PublicLinkUpProfile {
   kind: "linkup";
   socials: { platform: string; url: string | null }[];
   rseReceipts: PublicRseReceipt[];
-  siblingProfiles: { brandup: boolean; traceup: boolean };
+  siblingProfiles: SiblingProfiles;
 }
 
 export interface PublicPlaceholderProfile {
@@ -144,6 +153,7 @@ async function resolveCompanyBase(
     gouvernorat: company.liveData.gouvernorat,
     gouvernoratName: gouvDoc ? pickLocale((gouvDoc as Record<string, unknown>).name as { fr: string; ar?: string; en?: string }, lang) : company.liveData.gouvernorat,
     ville: company.liveData.ville,
+    postalCode: company.liveData.postalCode ?? null,
     contactEmail: company.liveData.contactEmail ?? company.accountEmail,
     phone: company.liveData.phone ?? null,
     whatsapp: company.liveData.whatsapp ?? null,
@@ -293,6 +303,7 @@ export async function getPublicProfileBySlug(
         name: pickLocale(s.name as { fr: string; ar?: string; en?: string }, lang),
       })),
       rseReceipts,
+      siblingProfiles: await resolveSiblingProfiles(companyAny, type),
     };
   }
 
@@ -321,27 +332,12 @@ export async function getPublicProfileBySlug(
         publishedAt: v.publishedAt ? new Date(v.publishedAt as string).toISOString() : null,
       })),
       rseReceipts,
+      siblingProfiles: await resolveSiblingProfiles(companyAny, type),
     };
   }
 
   // linkup
   const socials = (data.socials as Array<Record<string, unknown>>) ?? [];
-
-  // Check sibling profile visibility
-  const siblingProfiles = { brandup: false, traceup: false };
-  const siblings = await ProfileModel.find({
-    companyId: companyAny._id,
-    kind: { $in: ["brandup", "traceup"] },
-  }).lean();
-  for (const s of siblings) {
-    const sAny = s as Record<string, unknown>;
-    const sVisible = isProfileVisible(
-      { status: sAny.status as "active", isPublic: sAny.isPublic as boolean, publishedAt: sAny.publishedAt as Date | null },
-      { status: companyAny.status as "active" },
-    );
-    if (sVisible && sAny.kind === "brandup") siblingProfiles.brandup = true;
-    if (sVisible && sAny.kind === "traceup") siblingProfiles.traceup = true;
-  }
 
   return {
     profileId: String(profileAny._id),
@@ -352,6 +348,31 @@ export async function getPublicProfileBySlug(
       url: (s.url as string) || null,
     })),
     rseReceipts,
-    siblingProfiles,
+    siblingProfiles: await resolveSiblingProfiles(companyAny, type),
   };
+}
+
+// ---------------------------------------------------------------------------
+// resolveSiblingProfiles — check visibility of the 3 sibling profiles
+// ---------------------------------------------------------------------------
+
+async function resolveSiblingProfiles(
+  companyAny: Record<string, unknown>,
+  currentKind: "brandup" | "traceup" | "linkup",
+): Promise<SiblingProfiles> {
+  const result: SiblingProfiles = { brandup: false, traceup: false, linkup: false };
+  const otherKinds = (["brandup", "traceup", "linkup"] as const).filter((k) => k !== currentKind);
+  const siblings = await ProfileModel.find({
+    companyId: companyAny._id,
+    kind: { $in: otherKinds },
+  }).lean();
+  for (const s of siblings) {
+    const sAny = s as Record<string, unknown>;
+    const sVisible = isProfileVisible(
+      { status: sAny.status as "active", isPublic: sAny.isPublic as boolean, publishedAt: sAny.publishedAt as Date | null },
+      { status: companyAny.status as "active" },
+    );
+    if (sVisible) result[sAny.kind as keyof SiblingProfiles] = true;
+  }
+  return result;
 }

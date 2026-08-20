@@ -462,7 +462,7 @@ export function BrandUpEditor({ profile, company }: BrandUpEditorProps): JSX.Ele
         <div className="flex items-start justify-between mb-5 flex-wrap gap-2">
           <div>
             <h3 className="font-heading font-bold text-[15px] text-ink-primary">
-              Galerie &amp; catalogue de production
+              Galerie &amp; nos activités
             </h3>
             <p className="text-[12px] text-ink-secondary mt-0.5 leading-snug">
               Organisez jusqu&apos;à {MAX_GALLERY} images. L&apos;image <strong>#1</strong> est mise en avant (HERO).

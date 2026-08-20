@@ -8,6 +8,7 @@ interface ProfileHeroProps {
   whatsapp: string | null;
   email: string;
   address: string | null;
+  postalCode: string | null;
   gouvernoratName: string;
   ville: string;
   rseBadgeStatus: string;
@@ -23,11 +24,12 @@ export default function ProfileHero({
   whatsapp,
   email,
   address,
+  postalCode,
   gouvernoratName,
   ville,
   rseBadgeStatus,
 }: ProfileHeroProps): JSX.Element {
-  const fullAddress = [address, ville, gouvernoratName, "Tunisie"].filter(Boolean).join(", ");
+  const fullAddress = [address, postalCode, ville, gouvernoratName, "Tunisie"].filter(Boolean).join(", ");
 
   return (
     <>

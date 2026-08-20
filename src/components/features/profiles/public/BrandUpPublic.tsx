@@ -31,6 +31,7 @@ export default function BrandUpPublic({ data, embedded }: BrandUpPublicProps): J
           whatsapp={c.whatsapp}
           email={c.contactEmail}
           address={c.address}
+          postalCode={c.postalCode}
           gouvernoratName={c.gouvernoratName}
           ville={c.ville}
           rseBadgeStatus={c.rseBadgeStatus}
@@ -87,7 +88,7 @@ export default function BrandUpPublic({ data, embedded }: BrandUpPublicProps): J
         <RseSection receipts={data.rseReceipts} />
 
         {/* Cross-links */}
-        <CrossLinks current="brandup" />
+        <CrossLinks current="brandup" slug={c.slug} visibleProfiles={data.siblingProfiles} />
       </div>
     </div>
   );

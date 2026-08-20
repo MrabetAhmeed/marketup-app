@@ -33,7 +33,7 @@ type ProductKey = keyof typeof PRODUCTS;
 export default function OnboardingPage(): JSX.Element {
   const router = useRouter();
   const [productKey, setProductKey] = useState<ProductKey>("brandup");
-  const [countryOpen, setCountryOpen] = useState(false);
+  const [, setCountryOpen] = useState(false);
   const [launcherOpen, setLauncherOpen] = useState(false);
   const countryRef = useRef<HTMLDivElement>(null);
   const launcherRef = useRef<HTMLDivElement>(null);
@@ -78,39 +78,20 @@ export default function OnboardingPage(): JSX.Element {
       <header className="fixed top-0 left-0 w-full z-50 flex items-center gap-2 md:gap-3 px-3 md:px-6 min-h-[64px] md:h-[72px] bg-gradient-to-b from-black/70 to-black/30 border-b border-white/10">
         {/* Left — Country */}
         <div className="shrink-0 md:w-1/3 flex items-center">
+          {/* Country selector — V1: Tunisie only, disabled (structure preserved for international rollout) */}
           <div className="relative" ref={countryRef}>
-            <button
-              type="button"
-              onClick={(e) => { e.stopPropagation(); setCountryOpen(!countryOpen); setLauncherOpen(false); }}
-              className="flex items-center gap-2 px-3 py-2 bg-black/40 backdrop-blur-sm text-white text-sm rounded-lg border border-white/10 hover:bg-black/60 transition-colors"
+            <div
+              className="flex items-center gap-2 px-3 py-2 bg-black/40 backdrop-blur-sm text-white/60 text-sm rounded-lg border border-white/10 cursor-not-allowed"
             >
               <span className="text-base">🇹🇳</span>
               <span className="font-medium hidden sm:inline">Tunisie</span>
-              <span className="material-symbols-outlined text-lg">keyboard_arrow_down</span>
-            </button>
-            {countryOpen && (
-              <div className="absolute left-0 mt-2 w-60 bg-white rounded-xl border border-[#E0E0E0] overflow-hidden z-50" style={{ boxShadow: "0 8px 32px rgba(0,0,0,0.16)" }}>
-                <button type="button" className="w-full flex items-center gap-3 px-4 py-3 text-left hover:bg-[#EFF6FC] transition-colors">
-                  <span className="text-lg">🇹🇳</span>
-                  <span className="flex-1 text-sm font-semibold text-[#242424]">Tunisie</span>
-                  <span className="material-symbols-outlined text-[#0078D4] text-lg" style={{ fontVariationSettings: "'FILL' 1" }}>check</span>
-                </button>
-                <div className="border-t border-[#F0F0F0]" />
-                {[
-                  { flag: "🇫🇷", name: "France" },
-                  { flag: "🇲🇦", name: "Maroc" },
-                  { flag: "🇩🇿", name: "Algérie" },
-                ].map((c) => (
-                  <button key={c.name} type="button" className="w-full flex items-center gap-3 px-4 py-3 text-left opacity-50 cursor-not-allowed" disabled>
-                    <span className="text-lg">{c.flag}</span>
-                    <div className="flex-1">
-                      <div className="text-sm font-medium text-[#242424]">{c.name}</div>
-                      <div className="text-xs text-[#616161]">Bientôt disponible</div>
-                    </div>
-                  </button>
-                ))}
-              </div>
-            )}
+            </div>
+            {/* Dormant: other countries for future international rollout
+            const FUTURE_COUNTRIES = [
+              { flag: "🇫🇷", name: "France" },
+              { flag: "🇲🇦", name: "Maroc" },
+              { flag: "🇩🇿", name: "Algérie" },
+            ]; */}
           </div>
         </div>
 

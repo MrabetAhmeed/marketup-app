@@ -47,7 +47,7 @@ export default function ProjectGallery({ projects }: ProjectGalleryProps): JSX.E
   return (
     <div className="mb-20">
       <div className="flex items-center gap-4 mb-10">
-        <h2 className="text-2xl font-extrabold text-on-surface tracking-tight">Catalogue de Production</h2>
+        <h2 className="text-2xl font-extrabold text-on-surface tracking-tight">Nos activités</h2>
         <div className="h-[1px] flex-grow bg-outline-variant" />
       </div>
 

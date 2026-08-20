@@ -30,6 +30,7 @@ export default function TraceUpPublic({ data, embedded }: TraceUpPublicProps): J
           whatsapp={c.whatsapp}
           email={c.contactEmail}
           address={c.address}
+          postalCode={c.postalCode}
           gouvernoratName={c.gouvernoratName}
           ville={c.ville}
           rseBadgeStatus={c.rseBadgeStatus}
@@ -39,7 +40,7 @@ export default function TraceUpPublic({ data, embedded }: TraceUpPublicProps): J
 
         <RseSection receipts={data.rseReceipts} />
 
-        <CrossLinks current="traceup" />
+        <CrossLinks current="traceup" slug={c.slug} visibleProfiles={data.siblingProfiles} />
       </div>
     </div>
   );

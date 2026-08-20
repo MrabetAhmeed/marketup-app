@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { tunisianPhoneSchema } from "@/lib/phone";
 
 // --- Shared password rule ---
 const passwordSchema = z
@@ -8,28 +9,33 @@ const passwordSchema = z
   .regex(/[0-9]/, "Le mot de passe doit contenir au moins un chiffre.")
   .regex(/[^A-Za-z0-9]/, "Le mot de passe doit contenir au moins un caractère spécial.");
 
+// --- Shared RNE validation: 7 digits + 1 uppercase letter ---
+const legalIdSchema = z
+  .string()
+  .trim()
+  .transform((v) => v.replace(/\s/g, "").toUpperCase())
+  .pipe(
+    z.string().regex(
+      /^\d{7}[A-Z]$/,
+      "Format RNE invalide (7 chiffres suivis d'une lettre, ex : 1234567A).",
+    ),
+  );
+
 // --- Step 1: Signup Company ---
 export const SignupCompanySchema = z.object({
   type: z.enum(["B2B", "B2C"]),
   displayName: z.string().min(1, "Le nom est obligatoire.").max(120),
-  legalId: z.string().min(1, "L'identifiant légal est obligatoire.").max(30),
+  legalId: legalIdSchema,
   vatNumber: z.string().max(30).optional().nullable(),
   accountEmail: z.string().email("Email invalide.").max(255),
   sectorId: z.string().min(1, "Le secteur est obligatoire."),
   gouvernorat: z.string().min(1, "Le gouvernorat est obligatoire."),
   ville: z.string().min(1, "La ville est obligatoire.").max(100),
-  address: z.string().max(300).optional().nullable(),
-  identityDocumentUrl: z.string().url().optional().nullable(),
+  postalCode: z.string().trim().regex(/^\d{4}$/, "Code postal invalide (4 chiffres)."),
+  address: z.string().min(1, "L'adresse est obligatoire.").max(300),
+  identityDocumentUrl: z.string().url("L'URL du document est invalide.").min(1, "Le document légal est obligatoire."),
 });
 export type SignupCompanyInput = z.infer<typeof SignupCompanySchema>;
-
-// --- Shared phone validation (reused in AccountLiveUpdateSchema) ---
-const phoneValidation = z
-  .string()
-  .trim()
-  .refine((v) => /^[+\s\-()0-9]*$/.test(v), "Numéro invalide (format attendu : +216XXXXXXXX).")
-  .transform((v) => v.replace(/[\s\-()]/g, ""))
-  .pipe(z.string().regex(/^\+[0-9]{8,15}$/, "Numéro invalide (format attendu : +216XXXXXXXX)."));
 
 // --- Step 2: Signup User ---
 // Form-level schema: includes passwordConfirm for client-side validation.
@@ -40,8 +46,8 @@ export const SignupUserSchema = z
     userId: z.string().min(1, "userId requis."),
     firstName: z.string().min(1, "Le prénom est obligatoire.").max(60),
     lastName: z.string().min(1, "Le nom est obligatoire.").max(60),
-    phone: phoneValidation,
-    whatsapp: phoneValidation,
+    phone: tunisianPhoneSchema,
+    whatsapp: tunisianPhoneSchema,
     languages: z.array(z.enum(["fr", "ar", "en"])).min(1),
     password: passwordSchema,
     passwordConfirm: z.string().min(1, "Veuillez confirmer le mot de passe."),

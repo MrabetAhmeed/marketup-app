@@ -61,6 +61,7 @@ export interface MeResponse {
     sector: { slug: string; name: string };
     gouvernorat: { slug: string; name: string };
     ville: string;
+    postalCode: string | null;
     address: string | null;
     contactEmail: string;
     phone: string | null;

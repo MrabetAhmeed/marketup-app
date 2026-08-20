@@ -270,6 +270,7 @@ export async function getMe(
         name: gouvernorat ? pickLocale(gouvernorat.name, lang) : company.liveData.gouvernorat,
       },
       ville: company.liveData.ville ?? "",
+      postalCode: company.liveData.postalCode ?? null,
       address: company.liveData.address ?? null,
       contactEmail: company.liveData.contactEmail ?? "",
       phone: company.liveData.phone ?? null,

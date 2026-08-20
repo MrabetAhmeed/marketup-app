@@ -17,9 +17,9 @@ const ALL_LINKS: CrossLink[] = [
   {
     key: "brandup",
     name: "BrandUP",
-    subtitle: "Pr\u00e9sentation institutionnelle",
-    description: "D\u00e9couvrez le profil institutionnel, les certifications et le catalogue de production.",
-    cta: "D\u00e9couvrir BrandUP",
+    subtitle: "Nos activités",
+    description: "Découvrez le profil institutionnel, les certifications et nos activités.",
+    cta: "Découvrir BrandUP",
     icon: "branding_watermark",
     color: "#0078D4",
     textColor: "text-primary",
@@ -27,9 +27,9 @@ const ALL_LINKS: CrossLink[] = [
   {
     key: "traceup",
     name: "TraceUP",
-    subtitle: "Vid\u00e9os & M\u00e9dias",
-    description: "Explorez les contenus vid\u00e9o, les coulisses et les d\u00e9monstrations techniques.",
-    cta: "D\u00e9couvrir TraceUP",
+    subtitle: "Vidéos & Médias",
+    description: "Explorez les contenus vidéo, les coulisses et les démonstrations techniques.",
+    cta: "Découvrir TraceUP",
     icon: "play_circle",
     color: "#8764B8",
     textColor: "text-secondary",
@@ -37,9 +37,9 @@ const ALL_LINKS: CrossLink[] = [
   {
     key: "linkup",
     name: "LinkUP",
-    subtitle: "R\u00e9seau & Contacts",
-    description: "Connectez-vous avec les d\u00e9cideurs et consultez les coordonn\u00e9es professionnelles.",
-    cta: "D\u00e9couvrir LinkUP",
+    subtitle: "Réseau & Contacts",
+    description: "Connectez-vous avec les décideurs et consultez les coordonnées professionnelles.",
+    cta: "Découvrir LinkUP",
     icon: "hub",
     color: "#C5A059",
     textColor: "text-[#C5A059]",
@@ -48,25 +48,29 @@ const ALL_LINKS: CrossLink[] = [
 
 interface CrossLinksProps {
   current: ProductKey;
+  slug: string;
+  visibleProfiles: { brandup: boolean; traceup: boolean; linkup: boolean };
 }
 
-export default function CrossLinks({ current }: CrossLinksProps): JSX.Element {
-  const links = ALL_LINKS.filter((l) => l.key !== current);
+export default function CrossLinks({ current, slug, visibleProfiles }: CrossLinksProps): JSX.Element {
+  const links = ALL_LINKS.filter((l) => l.key !== current && visibleProfiles[l.key]);
+
+  if (links.length === 0) return <></>;
 
   return (
-    <div className="bg-[#0b1120] rounded-xl p-8 md:p-12 text-white relative overflow-hidden">
+    <div className="bg-[#0b1120] rounded-xl p-6 sm:p-8 md:p-12 text-white relative overflow-hidden">
       <div className="absolute top-0 right-0 w-64 h-64 bg-primary/10 blur-[100px]" />
 
       <div className="relative z-10 mb-10">
-        <h2 className="text-3xl font-bold mb-2 tracking-tight">D&eacute;couvrez aussi</h2>
-        <p className="text-slate-400">Explorez l&apos;&eacute;cosyst&egrave;me complet des entreprises sur nos plateformes partenaires.</p>
+        <h2 className="text-3xl font-bold mb-2 tracking-tight">Découvrez aussi</h2>
+        <p className="text-slate-400">Explorez l&apos;écosystème complet de cette entreprise.</p>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 relative z-10">
+      <div className={`grid grid-cols-1 ${links.length > 1 ? "md:grid-cols-2" : ""} gap-6 relative z-10`}>
         {links.map((l) => (
           <Link
             key={l.key}
-            href={`/${l.key}`}
+            href={`/${l.key}/${slug}`}
             className="bg-slate-800/60 border border-white/10 rounded-lg p-6 hover:bg-slate-800 transition-colors cursor-pointer group block"
           >
             <div className="flex items-center gap-4 mb-6">

@@ -95,6 +95,12 @@ const HARD_FIELD_DEFS: HardFieldDef[] = [
     readCurrent: (c) => c.liveData?.whatsapp ?? null,
   },
   {
+    patchKey: "postalCode",
+    dbKey: "liveData.postalCode",
+    label: "Code postal",
+    readCurrent: (c) => c.liveData?.postalCode ?? null,
+  },
+  {
     patchKey: "identityDocumentUrl",
     dbKey: "identityDocumentUrl",
     label: "Document légal",

@@ -30,6 +30,7 @@ export default function LinkUpPublic({ data, embedded }: LinkUpPublicProps): JSX
           whatsapp={c.whatsapp}
           email={c.contactEmail}
           address={c.address}
+          postalCode={c.postalCode}
           gouvernoratName={c.gouvernoratName}
           ville={c.ville}
           rseBadgeStatus={c.rseBadgeStatus}
@@ -50,7 +51,7 @@ export default function LinkUpPublic({ data, embedded }: LinkUpPublicProps): JSX
 
         <RseSection receipts={data.rseReceipts} />
 
-        <CrossLinks current="linkup" />
+        <CrossLinks current="linkup" slug={c.slug} visibleProfiles={data.siblingProfiles} />
       </div>
     </div>
   );

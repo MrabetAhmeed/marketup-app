@@ -20,16 +20,16 @@ interface PublicSearchHeaderProps {
 
 export default function PublicSearchHeader({ product, activeType, onTypeChange }: PublicSearchHeaderProps): JSX.Element {
   const config = PRODUCT_CONFIG[product];
-  const [countryOpen, setCountryOpen] = useState(false);
+  const [_countryOpen, _setCountryOpen] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const countryRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     function handleClick(e: MouseEvent): void {
-      if (countryRef.current && !countryRef.current.contains(e.target as Node)) setCountryOpen(false);
+      if (countryRef.current && !countryRef.current.contains(e.target as Node)) _setCountryOpen(false);
     }
     function handleEscape(e: KeyboardEvent): void {
-      if (e.key === "Escape") { setCountryOpen(false); setMobileOpen(false); }
+      if (e.key === "Escape") { _setCountryOpen(false); setMobileOpen(false); }
     }
     document.addEventListener("click", handleClick);
     document.addEventListener("keydown", handleEscape);
@@ -44,34 +44,12 @@ export default function PublicSearchHeader({ product, activeType, onTypeChange }
       <nav className="fixed top-0 w-full z-50 bg-white shadow-sm px-3 md:px-8 flex items-center justify-between border-b border-outline-variant min-h-[64px] md:h-[72px]">
         {/* Left: Country + B2B/B2C toggle */}
         <div className="shrink-0 md:w-1/3 flex items-center gap-3">
-          {/* Country dropdown — desktop only */}
+          {/* Country indicator — V1: Tunisie only, not interactive (structure preserved for international rollout) */}
           <div className="relative hidden md:block" ref={countryRef}>
-            <button
-              type="button"
-              onClick={(e) => { e.stopPropagation(); setCountryOpen(!countryOpen); }}
-              className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-sm text-on-surface-variant font-medium hover:bg-surface-container transition-colors"
-            >
+            <div className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-sm text-on-surface-variant/60 font-medium cursor-not-allowed">
               <span className="text-base">🇹🇳</span>
               <span>Tunisie</span>
-              <span className="material-symbols-outlined text-lg">expand_more</span>
-            </button>
-            {countryOpen && (
-              <div className="absolute left-0 mt-1 w-56 bg-white rounded-lg border border-outline-variant py-1.5 z-[60]" style={{ boxShadow: "0 8px 32px rgba(0,0,0,0.16)" }}>
-                <button type="button" className="w-full flex items-center gap-3 px-4 py-2.5 text-left hover:bg-[#EFF6FC] transition-colors">
-                  <span className="text-lg">🇹🇳</span>
-                  <span className="flex-1 text-sm font-semibold text-[#242424]">Tunisie</span>
-                  <span className="material-symbols-outlined text-primary text-lg" style={{ fontVariationSettings: "'FILL' 1" }}>check_circle</span>
-                </button>
-                <div className="my-1 h-px bg-outline-variant" />
-                <p className="px-4 py-1 text-[10px] font-bold uppercase tracking-widest text-on-surface-variant">Bient&ocirc;t disponible</p>
-                {["🇫🇷 France", "🇲🇦 Maroc", "🇩🇿 Algérie"].map((c) => (
-                  <button key={c} type="button" className="w-full flex items-center gap-3 px-4 py-2.5 text-left opacity-50 cursor-not-allowed" disabled>
-                    <span className="text-lg">{c.split(" ")[0]}</span>
-                    <span className="text-sm text-[#242424]">{c.split(" ").slice(1).join(" ")}</span>
-                  </button>
-                ))}
-              </div>
-            )}
+            </div>
           </div>
 
           {/* B2B/B2C toggle */}

@@ -625,7 +625,38 @@ If any gate fails, fix before committing.
 - **Dashboard preview:** `aspect-ratio: 4/1`, recommended `1600×400 px`.
 - **URL paste mode:** disabled via `_switchMode` prefix (code preserved).
 
+## W-CD Sprint Changes (August 2026)
+
+### Phone/WhatsApp normalization (+216)
+- **Helper:** `src/lib/phone.ts` — `normalizeTunisianPhone()` + `tunisianPhoneSchema` (Zod).
+- Rules: 8 digits → `+216XXXXXXXX`, `216+8` → `+216`, `+216+8` → OK, any other prefix → rejected.
+- Applied to **3 schemas**: `auth.schema.ts`, `account.schema.ts`, `account-resubmit.schema.ts`.
+- To open other countries: add their codes in `phone.ts` and adjust the regex.
+
+### RNE format (legalId)
+- **Format:** `^\d{7}[A-Z]$` (7 digits + 1 uppercase letter, e.g. `1234567A`).
+- Validated at signup only. `legalId` is `immutable: true` — existing accounts unaffected.
+
+### Required fields at signup (new registrations only)
+- `identityDocumentUrl`: now required (was optional). Label: "Document officiel récent (RNE)".
+- `address`: now required (was optional).
+- `postalCode`: new field, required. Format: 4 digits (Tunisian standard).
+- Existing accounts without these fields are never blocked (Zod server tolerant on account edit).
+
+### Postal code (Company.liveData.postalCode)
+- **Obligatoire** au signup, modifiable depuis le Compte via `pendingUpdates` (validation admin).
+- LinkUP editor: **lecture seule** (renvoi vers le Compte).
+- Affichage public: intégré dans `fullAddress` (`ProfileHero`).
+- Admin validation: affiché dans la fiche + diff de pendingUpdates.
+
+### Cross-links par entreprise
+- `CrossLinks` component receives `slug` + `visibleProfiles` (sibling profile visibility).
+- Cards point to `/{kind}/{slug}` (enterprise-specific, not generic engine homepage).
+- Card hidden if target profile is not publicly visible.
+- `siblingProfiles` computed in `public-profile.service.ts` for all 3 profile types.
+- **"Catalogue de Production" → "Nos activités"** (public + editor).
+
 ---
 
-*Last updated: August 18, 2026.*
+*Last updated: August 19, 2026.*
 *Maintained by: AGGREGAX SUARL — Ahmed Mrabet.*
