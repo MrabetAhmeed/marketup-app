@@ -262,7 +262,7 @@ export default function SignupUserPage(): JSX.Element {
                     J&apos;accepte les{" "}
                     <a href="https://vivasky.media/cgu_cgv.html" target="_blank" rel="noopener noreferrer" className="text-[#0078D4] font-semibold hover:underline">Conditions Générales d&apos;Utilisation (CGU)</a>{" "}
                     et les{" "}
-                    <a href="https://vivasky.media/cgu_cgv.html" target="_blank" rel="noopener noreferrer" className="text-[#0078D4] font-semibold hover:underline">Conditions Générales de Vente (CGU)</a>{" "}
+                    <a href="https://vivasky.media/cgu_cgv.html" target="_blank" rel="noopener noreferrer" className="text-[#0078D4] font-semibold hover:underline">Conditions Générales de Vente (CGV)</a>{" "}
                     {/* <span className="text-[#0078D4] font-semibold">Conditions Générales de Vente (CGV)</span>{" "} */}
                     de vivasky.media.
                   </span>
