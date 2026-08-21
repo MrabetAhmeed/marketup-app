@@ -152,6 +152,13 @@ export default function OnboardingPage(): JSX.Element {
                     );
                   })}
                 </div>
+                <a
+                  href="/"
+                  onClick={() => closeAll()}
+                  className="block mt-2 pt-2 border-t border-[#E0E0E0] text-center text-[11px] font-semibold text-[#616161] hover:text-[#0078D4] transition-colors py-1.5"
+                >
+                  Voir tout l&apos;écosystème VIVASKY
+                </a>
               </div>
             )}
           </div>

@@ -42,15 +42,7 @@ The narrative demo entity across all mockups is **TechnoFab Industries** (B2B ·
 
 Honour this canon when seeding dev databases.
 
----
-
-## 2-bis. Mockup filenames ≠ Next.js routes
-
-Mockup HTML filenames are documentation references, NOT literal Next.js routes. The Next.js implementation uses dynamic routes (`[slug]`). All routes are implemented.
-
-> **Full mapping table and rules:** see `reference/ROUTE_MAPPING.md`
-
-Key rules: never create a file named after a company slug; TechnoFab mockups demonstrate template logic, not specific content; admin profile-detail uses one dynamic route branching on `profile.kind`.
+Mockup HTML filenames are documentation references, NOT literal Next.js routes. Full mapping: `reference/ROUTE_MAPPING.md`.
 
 ---
 
@@ -79,26 +71,11 @@ Do **not** introduce alternatives without explicit human approval.
 
 ---
 
-## 3-bis. Email — SMTP client via Nodemailer
+## 3-bis. Email — SMTP via Nodemailer
 
-Resend a été remplacé par **Nodemailer** connecté au SMTP du client (PHPMailer credentials existants).
+Nodemailer connecte au SMTP du client. Si `SMTP_HOST` ou `SMTP_USER` vide, `sendEmail()` log un `console.warn` et return sans erreur. Architecture : `src/lib/email/sender.ts` (16 fonctions `send*`), templates dans `src/lib/email/templates/`.
 
-| Var | Description | Default |
-|---|---|---|
-| `SMTP_HOST` | Hostname du serveur SMTP | `""` (emails skippés si vide) |
-| `SMTP_PORT` | Port SMTP (465 = SSL, 587 = STARTTLS) | `465` |
-| `SMTP_SECURE` | Force TLS (`true`/`false`). Si absent : inféré (`true` si port 465) | *(auto)* |
-| `SMTP_USER` | Login SMTP | `""` (emails skippés si vide) |
-| `SMTP_PASS` | Mot de passe SMTP | `""` |
-| `EMAIL_FROM` | Adresse expéditeur (doit correspondre au domaine/boite authentifiée — SPF/relay) | `onboarding@resend.dev` |
-
-**Comportement dev :** si `SMTP_HOST` ou `SMTP_USER` est vide, `sendEmail()` log un `console.warn` et return sans erreur. Aucun email n'est envoyé.
-
-**Vérification connectivité :** `npx tsx scripts/check-smtp.ts` — appelle `transporter.verify()`, ne send rien.
-
-**Architecture :** `src/lib/email/sender.ts` expose 16 fonctions `send*`. Toutes passent par `sendEmail()` privé qui gère le transporter singleton. Les templates HTML sont dans `src/lib/email/templates/`. Chaque email est envoyé en multipart (HTML + text/plain auto-généré) pour la délivrabilité.
-
-**Emails en dev local :** les templates contenant des liens construisent les URLs via `env.NEXTAUTH_URL` (`http://localhost:3000` en dev). Le filtre sortant SMTP (Infomaniak) rejette les emails avec des liens `localhost` — c'est attendu. L'OTP (sans lien) passe. Pour tester les emails à liens, utiliser le serveur avec une URL https réelle.
+**Regle dev local :** le filtre sortant SMTP (Infomaniak) rejette les emails contenant des liens `localhost` — c'est attendu. L'OTP (sans lien) passe. Pour tester les emails a liens, utiliser le serveur avec une URL https reelle.
 
 ---
 
@@ -143,7 +120,7 @@ src/
 │   ├── api-error.ts               # AppError, ValidationError, NotFoundError, ...
 │   ├── auth-guards.ts             # requireOwner(), requireAdmin()
 │   ├── pusher.ts                  # real-time client
-│   └── email/                     # Resend templates + sender
+│   └── email/                     # Nodemailer templates + sender
 ├── models/                        # one file per Mongoose model
 │   ├── company.model.ts
 │   ├── user.model.ts
@@ -158,20 +135,8 @@ src/
 │   ├── gouvernorat.model.ts
 │   └── admin-user.model.ts
 ├── services/                      # business logic (called from API routes)
-│   ├── auth.service.ts
-│   ├── company.service.ts
-│   ├── profile.service.ts
-│   ├── boost.service.ts
-│   ├── rse.service.ts
-│   ├── notification.service.ts
-│   └── payment.service.ts
 ├── schemas/                       # Zod schemas (shared client/server)
-│   ├── auth.schema.ts
-│   ├── company.schema.ts
-│   ├── profile.schema.ts
-│   └── ...
 ├── types/                         # global TS types (enums, DTOs)
-│   └── index.ts
 ├── middleware.ts                  # route protection
 └── styles/
     └── globals.css                # Tailwind directives only
@@ -243,17 +208,17 @@ For company-level edits to validation-gated fields, write to `company.pendingUpd
 | Gouvernorat | `liveData.gouvernorat` |
 | Ville | `liveData.ville` |
 | Adresse | `liveData.address` |
-| Prénom du gérant | `liveData.gerantFirstName` |
-| Nom du gérant | `liveData.gerantLastName` |
+| Prenom du gerant | `liveData.gerantFirstName` |
+| Nom du gerant | `liveData.gerantLastName` |
 | Email de contact public | `liveData.contactEmail` |
-| Téléphone | `liveData.phone` |
+| Telephone | `liveData.phone` |
 | WhatsApp | `liveData.whatsapp` |
 
 Live Company fields (instant, no admin review): `liveData.languages`, `liveData.sectorId`, `liveData.gpsPosition` (set via Leaflet pin in LinkUP dashboard — Nominatim removed in PP-12.6).
 
-**Gerant identity (FB-7a):** `User.firstName`/`lastName` = identité déclarée à l'inscription, resynchronisée en best-effort à chaque approbation admin, utilisée uniquement pour le guard de signup (`verifyOtp`) — NON affichée dans l'application. `Company.liveData.gerantFirstName`/`gerantLastName` = identité publiée du gérant, modifiable uniquement via `pendingUpdates` + validation admin ; source de vérité de l'affichage dashboard, des fiches admin et de la dénormalisation `ownerFullName`.
+**Gerant identity (FB-7a):** `User.firstName`/`lastName` = identite declaree a l'inscription, NON affichee. `Company.liveData.gerantFirstName`/`gerantLastName` = identite publiee du gerant, modifiable uniquement via `pendingUpdates` + validation admin.
 
-**GPS position (PP-12.6):** `Company.liveData.gpsPosition` is a GeoJSON Point set by the owner via a draggable map marker in the LinkUP dashboard editor. It is a live field (instant, no admin review). Submitting a LinkUP profile requires `gpsPosition != null` (guard `MISSING_GPS` 422). The Nominatim geocoding service has been fully removed — the pin is the sole source of GPS coordinates.
+**GPS position (PP-12.6):** GeoJSON Point set via draggable map marker in LinkUP dashboard. Live field. Submitting LinkUP requires `gpsPosition != null` (guard `MISSING_GPS` 422). Nominatim fully removed.
 
 **Read `reference/SEED_ARCHITECTURE.md` §4 before writing any service that touches profile or company content.**
 
@@ -336,42 +301,32 @@ export class BusinessRuleError extends AppError { /* 422 */ }
 
 `POST /me/boost/checkout` and `POST /me/sponsoring/checkout` accept an `Idempotency-Key` header. Cache responses 24h keyed by `(userId, idempotencyKey)`. Return the cached response on retry.
 
-### 6.10–6.16 Implemented business rules (PP-11 → PP-14)
+### 6.10–6.30 Implemented business rules — INDEX
 
-These rules are fully implemented and tested. **Summaries below; full details in `reference/BUSINESS_RULES_DETAILED.md`.**
+> Full details: load skill **`marketup-business-rules`** (`.claude/skills/marketup-business-rules/SKILL.md`).
 
-- **6.10 TraceUP videos:** hybrid hard/soft — additions require admin review (`pendingData`), deletions are instant (soft). Deletions blocked during pending.
-- **6.11 Slug lifecycle:** regeneration on displayName change + 301 redirect via `slugHistory`. `SlugRedirectError` extends `Error` (not `AppError`).
-- **6.12 Admin validation hub:** single page `/admin/validation` with 4 tabs (Inscriptions · Modifications comptes · Profils · RSE), `?tab=` deep-linkable.
-- **6.13 Session invalidation:** `passwordChangedAt` check in jwt() callback + S8 fix (suspended/deleted companies lose sessions). Fail-open on DB unreachable.
-- **6.15 Placeholder mode:** `placeholderMode` enum `"hidden" | "coming_soon"` for `isPublic: false` profiles. Requires `publishedAt` set. Placeholder DTO is a strict whitelist (no data leak).
-- **6.16 Account deletion + suspension:** owner self-delete cascades across 9 models (soft-delete). Admin suspend requires reason. Slugs remain reserved forever.
-- **6.17 Tracking stats (PP-15a):** collection `ProfileStatsMonthly` (profileId + month YYYY-MM, unique index). Vues comptees par beacon client `<TrackView>` au mount reel (dedup sessionStorage, guard StrictMode). Clics sortants via `sendBeacon` sur ServicesGrid (s.external only). Endpoint `POST /api/v1/public/track` public, 204 always, bot filter UA, rate limit 60/min. `Profile.stats.viewsTotal/clicksTotal` incrementes en $inc parallele. `views30d` deprecie (conserve au schema, retire des DTO). Dashboard lit `ProfileStatsMonthly` mois courant + mois-1 pour tendance.
-- **6.18 Corbeille admin (PP-15b):** onglet "Supprimees" dans `/admin/entreprises`, fiche detail consultable read-only pour les companies deleted (`withDeleted: true`). `restoreCompanyByAdmin()` = cascade inverse symetrique (9 models, match exact `deletedAt: cascadeTimestamp`, transaction Mongoose). E1: company jamais validee (`validatedAt null`) restauree en "pending". Profils retrouvent leur status exact d'avant (la cascade PP-14 n'ecrit que `deletedAt`, jamais `status`). Endpoint `POST /admin/companies/[id]/restore`. Email dedie "company-restored". StatusPill kind "deleted".
-
-- **6.19 Sponsoring dynamique (C2):** workflow a etats : `pending` (demande owner) → `confirmed` (admin valide) → `active` (owner paie, from=paidAt, to=+7j) → `expired` (lazy). Terminaux : `rejected` (admin, raison obligatoire), `cancelled` (owner, pending/confirmed seulement — aucune annulation apres paiement V1). Guard anti-doublon : 1 seul sponsoring en pending|confirmed|active par (companyId, profileKind) → 409. rejected/cancelled/expired liberent le slot. Eligibilite demande : company active + profil du kind active+isPublic → sinon 422. Banniere publique : rotation aleatoire serveur parmi actifs du kind, mention "Sponsorise". Banniere defaut HTML/CSS quand aucun actif. Stats : impressions ($inc serveur au rendu SSR, fail-silent) + clics (sendBeacon sponsor_click → track endpoint, $inc fail-silent). Hub admin : onglet Sponsorings dans validation (5e tab), apercu banniere, lien cliquable, actions valider/refuser. Notifs : sponsoring_request_submitted (admin), sponsoring_validated (owner), sponsoring_rejected (owner), sponsoring_paid (admin+owner). 3 emails dedies + sendTransactionAdminEmail generique au paiement. Flag OFF : endpoints owner 403, admin accessible (lecture + valider/refuser).
-
-- **6.20 Notification actions (FB-2):** 3 endpoints owner — `PATCH /me/notifications/read-all`, `PATCH /me/notifications/[id]/read`, `DELETE /me/notifications/[id]` (soft-delete). Tous requireOwner + cross-tenant guard strict (recipientId === session userId). UI optimiste (state local) sur la page + les cards. La cloche admin est un compteur de taches pending (pas de read/delete).
-
-- **6.21 Signup frontiere passwordHash (FB-2):** a l'inscription, un user existant non verifie est ecrase SI il n'a PAS de passwordHash (etape 1 seule — le compte n'appartient a personne). Un user AVEC passwordHash (etape 2 faite) est refuse ("Cet email est deja utilise. Connectez-vous."). Au login, un user sans passwordHash recoit INVALID_CREDENTIALS generique (anti-enumeration). Le code SIGNUP_IN_PROGRESS est supprime.
-
-- **6.22 Forgot-password non verifie (FB-2):** `forgotPassword` envoie le lien si le user a un passwordHash, MEME si emailVerifiedAt est null. `resetPassword` pose emailVerifiedAt + cree les 3 profils via `ensureProfilesForCompany` (idempotent, E11000-safe) si le user etait non verifie. `ensureProfilesForCompany` est la fonction partagee utilisee par verifyOtp, login (lazy filet) et resetPassword.
-
-- **6.23 Obfuscation email support (FB-2):** l'email de support (`manager@vivasky.media`) n'apparait JAMAIS en clair dans le HTML source des pages rendues. Composant `<ObfuscatedEmail />` (client, assemble user+domain au mount via JS). Constante dans `src/lib/constants/support-email.ts`. Les emails HTML (templates Nodemailer) conservent l'email en clair (pas d'obfuscation dans un email).
-
-- **6.24 Secteurs referentiel definitif (FB-5):** 50 secteurs (25 B2B en 7 poles, 25 B2C en 8 groupes). Model Sector a 3 nouveaux champs : `group` (libelle du pole), `groupOrder` (tri des poles), `description` (texte entre parentheses). Le seed remplace integralement les anciens secteurs. Le modal picker `SectorPickerModal` remplace le dropdown de selection : titres de poles NON cliquables, items numerotes avec description, recherche interne. Gouvernorats tries alphabetiquement. Les secteurs suivent l'ordre des poles du client (PAS alphabetique).
-
-- **6.25 Recherche refonte (FB-3):** resultats affiches au chargement (auto-fetch au mount, limit 200). Pagination client 8/page (retour page 1 a chaque recherche). Secteur integre dans la barre de recherche (a cote de la ville). Liste "Populaire" retiree. Padding haut conserve, bas reduit. Ville + gouvernorat ajoutes au haystack texte des 3 moteurs (cherchable sans placeholder). Placeholders : BrandUP "Entreprise, secteur, activite…" · TraceUP "Entreprise, secteur, titre de video…" · LinkUP "Entreprise, contact, secteur…". Banniere sponsor filtre par `appliedSectorId` (apres recherche validee, pas au changement de filtre). Hauteur banniere h-[180px] md:h-[270px].
-
-- **6.26 Timbre fiscal (FB-6):** `FISCAL_STAMP_DT = 1` (non soumis a la TVA). `computeTTC(priceHT, vatRate, fiscalStampDT)` — 3e param optionnel (default 0, retrocompat). Transaction.fiscalStampDT (Number, default 0). Boost = 50 HT + 9,50 TVA + 1 timbre = 60,50 TTC. Sponsoring = 100 HT + 19 TVA + 1 timbre = 120 TTC. Affichage : ligne "Timbre fiscal" dans les modals de checkout, billing owner, admin transactions. Retrocompat : transactions anciennes (stamp 0) n'affichent pas la ligne. Aucun montant hardcode dans les UI — tout derive des constantes pricing.
-
-- **6.27 Visuels et finitions (FB-8):** Cards de recherche : boosted = etoile doree en overlay (rond, coin haut-droit), RSE = texte vert "RSE attestee" (remplace le pill gold). Badge RSE public : icone ESG (`public/badges/esg-icon.svg`, fill #1A2B8C) + libelle HTML "ENGAGEMENT SOCIAL ATTESTE" bleu marine a cote (responsive). Texte RSE : "Nous contribuons activement a la vie locale…". RseSection au canon (font-bold, rounded-xl, pas de gradient). Carte : tiles CARTO Light (`basemaps.cartocdn.com/light_all`). Admin : liens sociaux cliquables dans la fiche de validation (target=_blank + open_in_new). Notification in-app au refus RSE (`rse_receipt_rejected`, kind+icon+color coherents).
-
-- **6.28 Motif de refus pendingUpdates (FB-7b):** `rejectPendingUpdates` exige un `rejectionNote` (min 3 caractères). Le motif est stocké dans `Company.lastPendingRejection { note, rejectedAt }` (visible au owner via MeResponse, jamais dans un DTO public) ET dans `auditTrail.details.note`. Le champ `lastPendingRejection` est effacé (`null`) à la prochaine soumission de modifications par l'owner. Le refus d'inscription (compte) reste inchangé (motif dans `Company.rejectedReason`).
-
-- **6.29 Notifications/emails validation compte (FB-7b):** `approvePendingUpdates` et `rejectPendingUpdates` envoient notification in-app (`account_updates_approved` / `account_updates_rejected`) + email au owner. Les deux sont non-bloquants (try/catch). Les emails listent les labels des champs concernés. Le refus inclut le motif.
-
-- **6.30 Document légal remplaçable (FB-7b):** `Company.identityDocumentUrl` est remplaçable via `pendingUpdates` (key `"identityDocumentUrl"`). Upload via `POST /api/v1/me/legal-document` (requireOwner, PDF/JPG/PNG, 2 Mo, catégorie storage `identity-docs`). Coexistence : l'ancien reste dans `identityDocumentUrl`, le nouveau dans `pendingUpdates.fields[].newValue`. Approbation : le nouveau remplace l'ancien. Refus : `storage.delete(newUrl)` best-effort, l'ancien demeure.
+| # | Subject | Sprint |
+|---|---|---|
+| 6.10 | TraceUP videos: hybrid hard/soft add/delete | PP-11 |
+| 6.11 | Slug lifecycle: regeneration + 301 redirect via `slugHistory` | PP-11 |
+| 6.12 | Admin validation hub: 4 tabs, `?tab=` deep-linkable | PP-11 |
+| 6.13 | Session invalidation: `passwordChangedAt` + S8 suspend/delete | PP-12 |
+| 6.15 | Placeholder mode: `"hidden" \| "coming_soon"` for unpublished | PP-13 |
+| 6.16 | Account deletion + suspension: 9-model cascade | PP-14 |
+| 6.17 | Tracking stats: `ProfileStatsMonthly`, beacon, `<TrackView>` | PP-15a |
+| 6.18 | Corbeille admin: restore cascade, `POST /admin/companies/[id]/restore` | PP-15b |
+| 6.19 | Sponsoring dynamique: state machine, banner, stats, admin tab | C2 |
+| 6.20 | Notification actions: read/read-all/delete, cross-tenant guard | FB-2 |
+| 6.21 | Signup frontiere passwordHash: overwrite rules | FB-2 |
+| 6.22 | Forgot-password non verifie: `ensureProfilesForCompany` | FB-2 |
+| 6.23 | Obfuscation email support: `<ObfuscatedEmail />` | FB-2 |
+| 6.24 | Secteurs referentiel: 50 secteurs, `SectorPickerModal` | FB-5 |
+| 6.25 | Recherche refonte: auto-fetch, pagination 8/page, sector in bar | FB-3 |
+| 6.26 | Timbre fiscal: `FISCAL_STAMP_DT = 1`, `computeTTC` 3e param | FB-6 |
+| 6.27 | Visuels/finitions: boost star, RSE badge, CARTO tiles | FB-8 |
+| 6.28 | Motif de refus pendingUpdates: `lastPendingRejection` | FB-7b |
+| 6.29 | Notifications/emails validation compte | FB-7b |
+| 6.30 | Document legal remplacable via `pendingUpdates` | FB-7b |
 
 ---
 
@@ -433,6 +388,7 @@ When asked to do specific work, **always look in `.claude/skills/`** first:
 - Data modelling? → `marketup-data-models/SKILL.md`
 - API route? → `marketup-api-routes/SKILL.md`
 - UI / component? → `marketup-ui-canon/SKILL.md`
+- Business rules (§6.10–6.30)? → `marketup-business-rules/SKILL.md`
 
 ### Don't
 
@@ -454,102 +410,32 @@ When asked to do specific work, **always look in `.claude/skills/`** first:
 
 | Sprint | Scope |
 |---|---|
-| **C0** | Socle monetisation (flag, guard, adapter, helper boost) — **livré** |
-| **C3** | Facturation (billing owner, admin transactions, invoice numbering) — **livré** |
-| **C1** | Boost dynamique (checkout, activation, expiration, shuffle search) — **livré** |
-| **C2** | Sponsoring (voir §9-ter) — **livré** |
+| **C0–C3** | Monetisation complete (flag, boost, sponsoring, facturation) — **tout livre** |
 | **PP-17** | Seed prod (donnees de production initiales, sans TechnoFab demo) |
 | **DevOps** | Security headers S5, env prod, deploy pipeline |
 
 ---
 
-## 9-bis. Déploiement (Infomaniak / serveur RAM-limité)
+## 9-bis. Deploiement
 
-Le conteneur de production dispose de **~1.5 Go RAM**. Sans les garde-fous ci-dessous, `next build` SIGABRT (OOM) lors de la phase "Generating static pages".
-
-| Paramètre | Valeur | Où |
-|---|---|---|
-| `experimental.cpus` | `1` | `next.config.mjs` — limite les workers de static generation à 1 thread |
-| `NODE_OPTIONS` | `--max-old-space-size=1536` | variable d'environnement serveur (build + start) |
-
-**Rationale :** Next.js lance par défaut autant de workers que de CPU logiques. Sur un conteneur mutualisé avec peu de RAM, chaque worker consomme ~300-500 Mo → OOM. `cpus: 1` force un seul worker. `--max-old-space-size=1536` plafonne le heap V8 sous la limite conteneur.
-
-**Impact local :** le build est légèrement plus lent (~+30 %) car mono-worker. Le runtime (`next start`, `next dev`) est **inchangé**.
-
-**Règle de déploiement :** `git pull → npm run build → restart service`. Pas de CI/CD automatisé en V1 — déploiement manuel via SSH.
+**Deployer via le BUILDER du dashboard Infomaniak** (`npm ci && npm run build`). **JAMAIS d'install/build en session SSH interactive** (CephFS tue les sessions longues). `git pull` en SSH est OK (operation legere). Details complets : `reference/DEPLOY.md`.
 
 ---
 
-## 9-ter. Monetisation (C0 socle — sprint courant)
+## 9-ter. Monetisation
 
-**Flag runtime** : `MONETIZATION_ENABLED` dans `env.ts`. Absent ou invalide = **OFF** (fail-safe). Pas de `NEXT_PUBLIC_*` — lu au runtime uniquement. Un seul code/build, plusieurs deploiements (`.env` different par environnement).
-
-**Comportement OFF** : pages boost/sponsoring/billing = `FeatureComingSoonPage` (identique a avant). Endpoints monetisation futurs = `requireMonetization()` → 403 `MONETIZATION_DISABLED`.
-
-**Comportement ON** : flux complet avec paiement **simule** (pas de PSP reel en V1).
-
-### Adapter pattern (payment)
-
-`src/lib/payment/` — meme pattern que `src/lib/storage/` :
-- `types.ts` : `PaymentAdapter` interface (`createCheckout`, `verifyPayment`)
-- `simulated.ts` : adapter simule (paiement instantane, reference `SIM-...`)
-- `index.ts` : singleton `payment`, switch sur `PAYMENT_ADAPTER` env var (default `"simulated"`)
-- Point de branchement PSP futur = nouvel adapter, zero refonte
-
-### Decisions produit (D1-D12)
-
-| # | Decision |
-|---|---|
-| D1 | Boost = **50 DT HT / 30 jours** (`lib/pricing.ts` constants) |
-| D2 | Boost par **profileKind** (pas par company) |
-| D3 | Multi-profils simultanes OK, mais **jamais 2 actifs/pending sur le meme (companyId, profileKind)** |
-| D4 | Renouvellement **manuel** |
-| D5 | Sponsoring = **100 DT HT / 7 jours** |
-| D6 | Banniere sponsoring = **search uniquement** (pas sur pages profil public) |
-| D7 | Rotation = **aleatoire par affichage** |
-| D8 | Ciblage = **par moteur seul** (brandup/traceup/linkup) |
-| D9 | Facture = **numero + page detail, PAS de PDF V1** |
-| D10 | Admin transactions = **inclus en C3** |
-| D11 | Notif paiement admin = **in-app + email** |
-| D12 | `paid_simulated` = label owner **"Paye"**, mention "(test)" **admin only** |
-
-### Roadmap monetisation
-
-| Sprint | Scope | Depend |
-|---|---|---|
-| **C0** | Flag + guard + PaymentAdapter + helper boost + pricing constants | — | **livré** |
-| **C3** | Facturation : page billing, endpoint transactions, admin transactions, `generateInvoiceNumber` (MU-YYYY-NNNNN, Counter atomique). Admin voit toujours (pas de requireMonetization). D12 : owner voit "paid" pour paid_simulated, admin voit "Payé (test)". | C0 | **livré** |
-| **C1** | Boost : `checkoutBoost` (Mongoose session atomique Transaction+Boost), `expireStaleBoosts` lazy dans getMe, shuffle Fisher-Yates boosted x3 search, page dashboard 3 cards + modal checkout, notifs owner+admin in-app, email admin generique `sendTransactionAdminEmail`, `createNotification` generique. Guard anti-doublon `findActiveBoosts` (pas de status pending sur Boost). Renouvellement apres expiration seulement (D4). **Guard R1** : checkout exige `profile.status === "active" && isPublic === true` (422 BOOST_PROFILE_NOT_PUBLIC). **R1.4** : un boost deja actif n'est PAS coupe si le profil change d'etat ensuite (pas de pause/remboursement V1, expire naturellement). | C0+C3 | **livré** |
-| **C2** | Sponsoring : machine a etats (pending/confirmed/active/expired/rejected/cancelled), workflow demande→validation admin→paiement→banniere. SponsorBanner dynamique + defaut HTML/CSS. Stats impressions/clics. Hub admin onglet Sponsorings. | C0+C3 | **livré** |
-
-### Transaction model enums
-
-`status` : `"pending"` | `"paid"` | `"paid_simulated"` | `"refunded"` | `"failed"`
-`paymentMethod` : `"card"` | `"bank_transfer"` | `"manual"` | `"simulated"`
+Tout livre (C0–C3). Flag runtime `MONETIZATION_ENABLED` dans `env.ts` (OFF = fail-safe). Payment adapter pattern dans `src/lib/payment/` (simule en V1). Decisions produit D1–D12, transaction enums, pricing constants : voir `src/lib/pricing.ts`. Sprints W-B et W-CD livres : voir `reference/SPRINT_NOTES.md`.
 
 ---
 
 ## 10. Commands
 
 ```bash
-# Dev
-npm run dev               # Start Next.js on :3000
-npm run lint              # ESLint (fix with --fix)
-npm run typecheck         # tsc --noEmit
-npm run test              # Vitest (unit + integration)
-npm run test:e2e          # Playwright
-
-# DB
-npm run db:seed           # Seed dev data (port from reference/marketup_seed_data.js)
+npm run db:seed           # Seed dev data
 npm run db:reset          # Drop + reseed (DEV ONLY)
-
-# Build
-npm run build
-npm run start             # Production server
-
-# Pre-commit checks (run all)
-npm run lint && npm run typecheck && npm test
 ```
+
+**Apres un seed :** ouvrir une fenetre privee ou vider les cookies `next-auth.*` — un JWT stale provoque des 401.
 
 ---
 
@@ -563,7 +449,7 @@ npm run lint && npm run typecheck && npm test
 
 If any gate fails, fix before committing.
 
-**Gate tsc — cache propre obligatoire :** le cache `tsbuildinfo` / `.next` peut masquer des erreurs préexistantes. Au démarrage de chaque sprint (Phase 0), exécuter `tsc --noEmit` sur un cache propre (`rm -rf .next tsconfig.tsbuildinfo` avant). Un tsc vert sur cache chaud ne prouve rien.
+**Gate tsc — cache propre obligatoire :** le cache `tsbuildinfo` / `.next` peut masquer des erreurs preexistantes. Au demarrage de chaque sprint (Phase 0), executer `tsc --noEmit` sur un cache propre (`rm -rf .next tsconfig.tsbuildinfo` avant). Un tsc vert sur cache chaud ne prouve rien.
 
 ---
 
@@ -581,10 +467,8 @@ If any gate fails, fix before committing.
 
 ## 13. People & Roles
 
-- **Owner** = the business person registered to the platform. One owner per company. Account email is the login.
-- **Super Admin** = AGGREGAX / vivasky.media staff. Validates accounts, profiles, RSE receipts. Sees all transactions.
-- The demo super admin is **Bassem Admin** (`manager@vivasky.media`, avatar `BA` on purple `#5C2D91`).
-- The demo owner is **Ahmed Mrabet** (`ahmed@technofab.tn`, avatar `AM`).
+- **Owner** = business person, one per company. **Super Admin** = AGGREGAX/vivasky.media staff.
+- Demo admin: **Bassem Admin** (`manager@vivasky.media`). Demo owner: **Ahmed Mrabet** (`ahmed@technofab.tn`).
 
 ---
 
@@ -598,65 +482,11 @@ If any gate fails, fix before committing.
 
 ---
 
-## W-B Sprint Changes (August 2026)
+## Sprint notes (W-B, W-CD)
 
-### Branding: MARKET-UP → vivasky.media
-- **BRAND_NAME constant:** `src/lib/constants/brand.ts` — `BRAND_NAME = "vivasky.media"`, `BRAND_EMAIL_FOOTER = "vivasky.media - Tunisie"`.
-- All UI, emails, metadata now use `vivasky.media` instead of `MARKET-UP`.
-- Email display name: `vivasky.media <email@...>`.
-- Copyright: `© 2026 Vivaskymedia s.à.r.l. Tous droits réservés. Développée par AGGREGAX.` (year auto-extends after 2026).
-
-### Facturation → Commandes
-- **URL:** `/dashboard/billing` → `/dashboard/commandes` (301 redirect in `next.config.mjs`).
-- **Vocabulary:** "Facturation" → "Commandes", "N° de facture" → "N° de commande" everywhere.
-- **Numbering format:** `YYYY-NNNNN` (e.g. `2026-00001`). Old `MU-` prefix removed. Counter key unchanged (`invoice-{year}`).
-
-### Search titles per B2B/B2C type
-`PRODUCT_TITLES` in `SearchPageClient.tsx` — 6 combinations (3 engines × 2 types):
-- BrandUP B2B: "La référence des acteurs économiques tunisiens" / "Au cœur des marques"
-- BrandUP B2C: "La référence des marques en Tunisie" / "Au cœur des marques"
-- TraceUP: "Le flux vidéo de l'économie tunisienne" / "L'actualité des entreprises près de chez vous"
-- LinkUP: "L'accès direct à l'économie tunisienne" / "S'interconnecter et échanger"
-
-### Banner system
-- **Public banner ratio:** `aspect-ratio: 4/1` (replaces fixed heights `h-[180px] md:h-[270px]`).
-- **Default images:** `public/banners/default-{brandup,traceup,linkup}.jpg` per engine. HTML/CSS fallback if image missing.
-- **"En savoir plus" button:** HTML overlay `absolute bottom-3 right-3`, default banner only.
-- **Dashboard preview:** `aspect-ratio: 4/1`, recommended `1600×400 px`.
-- **URL paste mode:** disabled via `_switchMode` prefix (code preserved).
-
-## W-CD Sprint Changes (August 2026)
-
-### Phone/WhatsApp normalization (+216)
-- **Helper:** `src/lib/phone.ts` — `normalizeTunisianPhone()` + `tunisianPhoneSchema` (Zod).
-- Rules: 8 digits → `+216XXXXXXXX`, `216+8` → `+216`, `+216+8` → OK, any other prefix → rejected.
-- Applied to **3 schemas**: `auth.schema.ts`, `account.schema.ts`, `account-resubmit.schema.ts`.
-- To open other countries: add their codes in `phone.ts` and adjust the regex.
-
-### RNE format (legalId)
-- **Format:** `^\d{7}[A-Z]$` (7 digits + 1 uppercase letter, e.g. `1234567A`).
-- Validated at signup only. `legalId` is `immutable: true` — existing accounts unaffected.
-
-### Required fields at signup (new registrations only)
-- `identityDocumentUrl`: now required (was optional). Label: "Document officiel récent (RNE)".
-- `address`: now required (was optional).
-- `postalCode`: new field, required. Format: 4 digits (Tunisian standard).
-- Existing accounts without these fields are never blocked (Zod server tolerant on account edit).
-
-### Postal code (Company.liveData.postalCode)
-- **Obligatoire** au signup, modifiable depuis le Compte via `pendingUpdates` (validation admin).
-- LinkUP editor: **lecture seule** (renvoi vers le Compte).
-- Affichage public: intégré dans `fullAddress` (`ProfileHero`).
-- Admin validation: affiché dans la fiche + diff de pendingUpdates.
-
-### Cross-links par entreprise
-- `CrossLinks` component receives `slug` + `visibleProfiles` (sibling profile visibility).
-- Cards point to `/{kind}/{slug}` (enterprise-specific, not generic engine homepage).
-- Card hidden if target profile is not publicly visible.
-- `siblingProfiles` computed in `public-profile.service.ts` for all 3 profile types.
-- **"Catalogue de Production" → "Nos activités"** (public + editor).
+Detailed changes for Branding/Commandes/Banners (W-B) and Phone/RNE/PostalCode/CrossLinks (W-CD): see `reference/SPRINT_NOTES.md`.
 
 ---
 
-*Last updated: August 19, 2026.*
+*Last updated: August 20, 2026.*
 *Maintained by: AGGREGAX SUARL — Ahmed Mrabet.*
