@@ -9,6 +9,8 @@ import SponsorBanner from "./SponsorBanner";
 import SearchResultCard from "./SearchResultCard";
 import SearchEmptyState from "./SearchEmptyState";
 import ProfilePopup from "./ProfilePopup";
+import { SectorPickerModal } from "@/components/shared/SectorPickerModal";
+import type { SectorPickerItem } from "@/components/shared/SectorPickerModal";
 
 type ProductKey = "brandup" | "traceup" | "linkup";
 
@@ -41,13 +43,12 @@ const PRODUCT_TITLES: Record<ProductKey, Record<"B2B" | "B2C", { title: string; 
 
 const PAGE_SIZE = 8;
 
-interface SectorItem { slug: string; name: string; group?: string; groupOrder?: number }
 interface Gouvernorat { slug: string; name: string }
 
 interface SearchPageClientProps {
   product: ProductKey;
-  sectors: SectorItem[];
-  categories: SectorItem[];
+  sectors: SectorPickerItem[];
+  categories: SectorPickerItem[];
   gouvernorats: Gouvernorat[];
   sponsors?: SponsorBannerData[];
 }
@@ -58,6 +59,8 @@ export default function SearchPageClient({ product, sectors, categories, gouvern
   const [query, setQuery] = useState("");
   const [gouvernorat, setGouvernorat] = useState("");
   const [sectorId, setSectorId] = useState("");
+  const [sectorName, setSectorName] = useState("");
+  const [sectorModalOpen, setSectorModalOpen] = useState(false);
   const [results, setResults] = useState<CardType[]>([]);
   const [searchState, setSearchState] = useState<"initial" | "results" | "empty">("initial");
   const [loading, setLoading] = useState(false);
@@ -116,6 +119,7 @@ export default function SearchPageClient({ product, sectors, categories, gouvern
     setQuery("");
     setGouvernorat("");
     setSectorId("");
+    setSectorName("");
     setAppliedSectorId("");
     setResults([]);
     setSearchState("initial");
@@ -191,20 +195,18 @@ export default function SearchPageClient({ product, sectors, categories, gouvern
                   onKeyDown={handleKeyDown}
                 />
               </div>
-              {/* Sector dropdown */}
-              <div className="flex items-center px-3 w-full md:w-48 md:border-r border-[#D1D1D1]">
+              {/* Sector trigger — opens SectorPickerModal */}
+              <button
+                type="button"
+                onClick={() => setSectorModalOpen(true)}
+                className="flex items-center px-3 w-full md:w-48 md:border-r border-[#D1D1D1] text-left"
+              >
                 <span className="material-symbols-outlined text-[#616161] mr-2" style={{ fontSize: 18 }}>category</span>
-                <select
-                  className="w-full border-none focus:ring-0 focus:outline-none text-on-surface text-sm bg-transparent appearance-none py-3 truncate"
-                  value={sectorId}
-                  onChange={(e) => setSectorId(e.target.value)}
-                >
-                  <option value="">{activeType === "B2B" ? "Tous secteurs" : "Toutes cat\u00e9gories"}</option>
-                  {sectorList.map((s) => (
-                    <option key={s.slug} value={s.slug}>{s.name}</option>
-                  ))}
-                </select>
-              </div>
+                <span className="flex-1 text-sm text-on-surface truncate py-3">
+                  {sectorName || (activeType === "B2B" ? "Tous secteurs" : "Toutes cat\u00e9gories")}
+                </span>
+                <span className="material-symbols-outlined text-[#616161] ml-1" style={{ fontSize: 16 }}>expand_more</span>
+              </button>
               {/* Gouvernorat dropdown */}
               <div className="flex items-center px-3 w-full md:w-44">
                 <span className="material-symbols-outlined text-[#616161] mr-2" style={{ fontSize: 18 }}>location_on</span>
@@ -339,6 +341,19 @@ export default function SearchPageClient({ product, sectors, categories, gouvern
           onClose={() => setPopupSlug(null)}
         />
       )}
+
+      {/* Sector picker modal */}
+      <SectorPickerModal
+        open={sectorModalOpen}
+        onClose={() => setSectorModalOpen(false)}
+        onSelect={(slug, name) => {
+          setSectorId(slug);
+          setSectorName(name);
+        }}
+        sectors={sectorList}
+        title={activeType === "B2B" ? "Choisir un secteur" : "Choisir une cat\u00e9gorie"}
+        showAllOption
+      />
     </div>
   );
 }

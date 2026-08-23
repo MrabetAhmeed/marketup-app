@@ -17,6 +17,8 @@ interface SectorPickerModalProps {
   onSelect: (slug: string, name: string) => void;
   sectors: SectorPickerItem[];
   title?: string;
+  /** When true, show a "Tous les secteurs" entry at the top to clear the filter. Default false (signup). */
+  showAllOption?: boolean;
 }
 
 export function SectorPickerModal({
@@ -25,6 +27,7 @@ export function SectorPickerModal({
   onSelect,
   sectors,
   title = "Choisir un secteur",
+  showAllOption = false,
 }: SectorPickerModalProps): JSX.Element | null {
   const [search, setSearch] = useState("");
   const inputRef = useRef<HTMLInputElement>(null);
@@ -110,6 +113,23 @@ export function SectorPickerModal({
 
         {/* Scrollable list */}
         <div className="flex-1 overflow-y-auto px-5 py-3">
+          {/* "Tous les secteurs" — always visible, outside filtered groups */}
+          {showAllOption && (
+            <>
+              <button
+                type="button"
+                onClick={() => {
+                  onSelect("", "");
+                  onClose();
+                }}
+                className="w-full text-left px-3 py-2.5 rounded-lg hover:bg-surface-subtle transition-colors flex items-center gap-3 text-[13px] font-semibold text-ink-secondary"
+              >
+                <span className="material-symbols-outlined text-ink-tertiary" style={{ fontSize: 18 }}>clear_all</span>
+                Tous les secteurs
+              </button>
+              <div className="border-b border-surface-border my-2" />
+            </>
+          )}
           {grouped.length === 0 ? (
             <div className="py-8 text-center text-[13px] text-ink-tertiary">
               Aucun secteur correspondant
