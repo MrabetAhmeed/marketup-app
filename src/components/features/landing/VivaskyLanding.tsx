@@ -13,103 +13,66 @@
  *   animation: { breathe: "breathe 8s ease-in-out infinite" },
  */
 
-import { useRef } from "react";
+import { useRef, useState, useCallback } from "react";
 import Link from "next/link";
 import type { MouseEvent } from "react";
 
 type EcosystemCard = {
   readonly title: string;
+  readonly badge: string;
   readonly description: string;
-  /** Nom d'icône Material Symbols (canon projet — remplace Phosphor du mockup). */
+  /** Nom d'icône Material Symbols. */
   readonly icon: string;
   readonly imageUrl: string;
-  /** Route interne ("/brandup") ou placeholder "#". */
+  /** Route interne ("/brandup") ou URL externe. */
   readonly href: string;
-  /** Spans + min-heights (équivalent des règles nth-child du mockup). */
-  readonly layoutClass: string;
   /** Décalage du cycle colorBreathe pour un rendu organique. */
   readonly breatheDelay?: string;
+  /** Sous-modules affichés en chips (LifeUP uniquement). */
+  readonly subModules?: readonly string[];
 };
 
 const ECOSYSTEM_CARDS: readonly EcosystemCard[] = [
-  // {
-  //   title: "SkyMind",
-  //   description: "Progressez. Écrivez.",
-  //   icon: "edit",
-  //   imageUrl:
-  //     "https://images.unsplash.com/photo-1607551848581-7ee851bf978b?q=80&w=1174&auto=format&fit=crop",
-  //   href: "#",
-  //   layoutClass: "min-h-[280px] sm:col-span-2",
-  // },
-  // {
-  //   title: "WikiLife",
-  //   description: "Connaissance vivante pour le quotidien.",
-  //   icon: "public",
-  //   imageUrl:
-  //     "https://plus.unsplash.com/premium_photo-1723619021737-df1d775eccc8?q=80&w=1169&auto=format&fit=crop",
-  //   href: "#",
-  //   layoutClass: "min-h-[240px]",
-  //   breatheDelay: "2s",
-  // },
-  // {
-  //   title: "SkyBook",
-  //   description: "Lire à ciel ouvert.",
-  //   icon: "menu_book",
-  //   imageUrl:
-  //     "https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?q=80&w=600&auto=format&fit=crop",
-  //   href: "#",
-  //   layoutClass: "min-h-[240px]",
-  //   breatheDelay: "4s",
-  // },
-  {
-    title: "TraceUP",
-    description: "Média vidéo, entreprises traçables.",
-    icon: "videocam",
-    imageUrl:
-      "https://images.unsplash.com/photo-1601506521937-0121a7fc2a6b?q=80&w=800&auto=format&fit=crop",
-    href: "/onboarding?product=traceup",
-    layoutClass: "min-h-[240px] lg:row-span-2 lg:min-h-[500px]",
-    breatheDelay: "2s",
-  },
-  {
-    title: "LinkUP",
-    description: "Connectez tout, simplement.",
-    icon: "account_tree",
-    imageUrl:
-      "https://plus.unsplash.com/premium_photo-1764691489695-56c848f680dd?q=80&w=1460&auto=format&fit=crop",
-    href: "/onboarding?product=linkup",
-    layoutClass: "min-h-[240px]",
-    breatheDelay: "6s",
-  },
   {
     title: "BrandUP",
-    description: "La vitrine officielle du sourcing.",
+    badge: "Sourcing & Marque",
+    description: "La référence des marques en Tunisie.",
     icon: "storefront",
     imageUrl:
       "https://images.unsplash.com/photo-1542838132-92c53300491e?q=80&w=800&auto=format&fit=crop",
     href: "/onboarding?product=brandup",
-    layoutClass: "min-h-[240px]",
+  },
+  {
+    title: "TraceUP",
+    badge: "Média & Authentification",
+    description: "Le flux vidéo de l'économie tunisienne.",
+    icon: "videocam",
+    imageUrl:
+      "https://images.unsplash.com/photo-1601506521937-0121a7fc2a6b?q=80&w=800&auto=format&fit=crop",
+    href: "/onboarding?product=traceup",
+    breatheDelay: "2s",
+  },
+  {
+    title: "LinkUP",
+    badge: "Connexion & Hub",
+    description: "L'accès direct à l'économie tunisienne.",
+    icon: "account_tree",
+    imageUrl:
+      "https://plus.unsplash.com/premium_photo-1764691489695-56c848f680dd?q=80&w=1460&auto=format&fit=crop",
+    href: "/onboarding?product=linkup",
     breatheDelay: "4s",
   },
-  // {
-  //   title: "SkyERP",
-  //   description: "Manager online. Pilotage visionnaire.",
-  //   icon: "trending_up",
-  //   imageUrl:
-  //     "https://images.unsplash.com/photo-1551288049-bebda4e38f71?q=80&w=800&auto=format&fit=crop",
-  //   href: "#",
-  //   layoutClass: "min-h-[240px]",
-  // },
-  // {
-  //   title: "SkyQR",
-  //   description: "Générateur de QR code intelligent.",
-  //   icon: "qr_code_2",
-  //   imageUrl:
-  //     "https://images.unsplash.com/photo-1550482781-48d477e61c72?q=80&w=1170&auto=format&fit=crop",
-  //   href: "#",
-  //   layoutClass: "min-h-[240px]",
-  //   breatheDelay: "2s",
-  // },
+  {
+    title: "LifeUP",
+    badge: "Quotidien & Pilotage",
+    description: "Le web responsable et réfléchi.",
+    icon: "auto_awesome",
+    imageUrl:
+      "https://images.unsplash.com/photo-1607551848581-7ee851bf978b?q=80&w=1174&auto=format&fit=crop",
+    href: "https://vivasky.media/lifeup",
+    breatheDelay: "6s",
+    subModules: ["SkyMind", "SkyBook", "SkyNova", "SkyVibe", "WikiLife"],
+  },
 ];
 
 const CARD_CLASS = [
@@ -145,6 +108,8 @@ const BTN_PRIMARY_CLASS = `${BTN_CLASS} border-slate-900 bg-slate-900 text-white
 
 export function VivaskyLanding(): JSX.Element {
   const dialogRef = useRef<HTMLDialogElement>(null);
+  const [showCopied, setShowCopied] = useState(false);
+  const toastTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const openPitch = (): void => {
     dialogRef.current?.showModal();
@@ -154,16 +119,17 @@ export function VivaskyLanding(): JSX.Element {
     dialogRef.current?.close();
   };
 
-  const handleShare = (): void => {
+  const handleShare = useCallback((): void => {
     const url = window.location.href;
     if (typeof navigator.share === "function") {
       void navigator.share({ title: "Vivasky", url }).catch(() => undefined);
     } else {
-      // Le mockup affichait « Lien copié » sans copier — ici on copie réellement.
       void navigator.clipboard?.writeText(url).catch(() => undefined);
-      window.alert(`Lien copié : ${url}`);
+      if (toastTimer.current) clearTimeout(toastTimer.current);
+      setShowCopied(true);
+      toastTimer.current = setTimeout(() => setShowCopied(false), 2500);
     }
-  };
+  }, []);
 
   const handleCardMouseMove = (event: MouseEvent<HTMLAnchorElement>): void => {
     const card = event.currentTarget;
@@ -200,8 +166,8 @@ export function VivaskyLanding(): JSX.Element {
             <h1 className="mb-5 text-[clamp(2.5rem,4vw,4.5rem)] font-extrabold leading-[1.05] tracking-[-0.02em] text-slate-900">
               E-motion of life
             </h1>
-            <p className="max-w-[400px] text-[clamp(1rem,1.5vw,1.15rem)] leading-[1.6] text-slate-600">
-              L’écosystème de l’action responsable : <b>penser</b>, <b>créer</b> et{" "}
+            <p className="max-w-[440px] text-[clamp(1rem,1.5vw,1.15rem)] leading-[1.6] text-slate-600">
+              L&apos;écosystème de l&apos;action responsable structuré pour <b>penser</b>, <b>créer</b> et{" "}
               <b>piloter</b> au quotidien.
             </p>
           </div>
@@ -212,10 +178,10 @@ export function VivaskyLanding(): JSX.Element {
         </div>
 
         {/* Colonne droite — grille bento */}
-        <div className="grid grid-cols-1 gap-4 pb-10 sm:grid-cols-2">
+        <div className="grid grid-cols-1 gap-5 pb-10 sm:grid-cols-2">
           {ECOSYSTEM_CARDS.map((card) => {
             const isInternal = card.href.startsWith("/");
-            const cardClassName = `${CARD_CLASS} ${card.layoutClass}`;
+            const cardClassName = `${CARD_CLASS} min-h-[300px]`;
             const content = (
               <>
                 <div
@@ -227,17 +193,34 @@ export function VivaskyLanding(): JSX.Element {
                 />
                 <div className={CARD_OVERLAY_CLASS} />
                 <div className="relative z-[4] flex h-full flex-col p-6 text-white">
-                  <span
-                    aria-hidden="true"
-                    className="material-symbols-outlined self-end text-[28px] text-white/70 transition-all duration-[400ms] group-hover:rotate-[5deg] group-hover:scale-110 group-hover:text-white"
-                  >
-                    {card.icon}
-                  </span>
+                  <div className="flex w-full items-center justify-between">
+                    <span className="self-start rounded-xl border border-white/20 bg-white/15 px-2.5 py-1 text-[0.65rem] font-bold uppercase tracking-[1.5px] backdrop-blur-sm">
+                      {card.badge}
+                    </span>
+                    <span
+                      aria-hidden="true"
+                      className="material-symbols-outlined text-[28px] text-white/85 transition-all duration-[400ms] group-hover:rotate-[4deg] group-hover:scale-[1.15] group-hover:text-white"
+                    >
+                      {card.icon}
+                    </span>
+                  </div>
                   <div className="mt-auto">
-                    <div className="mb-1.5 text-xl font-bold">{card.title}</div>
-                    <div className="text-[0.85rem] leading-[1.4] text-white/80">
+                    <div className="mb-1.5 text-2xl font-extrabold tracking-tight">{card.title}</div>
+                    <div className="text-[0.85rem] leading-[1.4] text-white/85">
                       {card.description}
                     </div>
+                    {card.subModules && (
+                      <div className="mt-3 flex flex-wrap gap-[5px]">
+                        {card.subModules.map((mod) => (
+                          <span
+                            key={mod}
+                            className="rounded-md border border-white/15 bg-white/[0.12] px-2 py-[3px] text-[0.7rem] font-semibold text-white backdrop-blur-[4px] transition-all duration-200 group-hover:border-white/35 group-hover:bg-white/[0.22]"
+                          >
+                            {mod}
+                          </span>
+                        ))}
+                      </div>
+                    )}
                   </div>
                 </div>
               </>
@@ -274,16 +257,16 @@ export function VivaskyLanding(): JSX.Element {
       {/* Modal pitch (« Découvrir ») */}
       <dialog
         ref={dialogRef}
-        className="m-auto w-[90%] max-w-[500px] scale-95 rounded-2xl border border-black/[0.08] bg-white p-0 text-slate-900 opacity-0 shadow-[0_25px_50px_rgba(0,0,0,0.15)] transition-[opacity,transform] duration-300 open:scale-100 open:opacity-100 [&::backdrop]:bg-black/40 [&::backdrop]:backdrop-blur-[3px]"
+        className="m-auto max-h-[85vh] w-[90%] max-w-[550px] scale-95 overflow-hidden rounded-2xl border border-black/[0.08] bg-white p-0 text-slate-900 opacity-0 shadow-[0_25px_50px_rgba(0,0,0,0.2)] transition-[opacity,transform] duration-300 open:scale-100 open:opacity-100 [&::backdrop]:bg-black/40 [&::backdrop]:backdrop-blur-[4px]"
       >
-        <div className="p-8 text-justify text-sm">
-          <div className="mb-6 flex items-center justify-between border-b border-black/5 pb-4">
-            <h2 className="text-[21px] font-bold">Vivasky : Votre écosystème réflexe.</h2>
+        <div className="max-h-[85vh] overflow-y-auto p-8 text-justify text-sm leading-[1.6] scrollbar-thin">
+          <div className="mb-5 flex items-center justify-between border-b border-black/[0.08] pb-4">
+            <h2 className="text-lg font-bold">Vivasky : Votre écosystème réflexe.</h2>
             <button
               type="button"
               onClick={closePitch}
               aria-label="Fermer"
-              className="cursor-pointer text-2xl text-slate-600 transition-colors hover:text-slate-900"
+              className="cursor-pointer text-[26px] text-slate-600 transition-colors hover:text-slate-900"
             >
               &times;
             </button>
@@ -294,32 +277,34 @@ export function VivaskyLanding(): JSX.Element {
               <b>Touch your screens, get your needs.</b>
             </em>
           </p>
-          <p className="mt-4">
-            On ouvre un onglet, puis dix, on scrolle des heures un fil d’actualité saturé, et
-            nos données sont aspirées. Le web moderne nous éparpille. Internet dicte notre
-            rythme.
-          </p>
-          <p className="mt-4">
+          <br />
+          <p>
+            Le web moderne nous éparpille entre des dizaines d&apos;onglets, de publicités
+            intrusives et de notifications incessantes.{" "}
             <b>
-              Vivasky est né pour inverser ce rapport de force. Pour réinventer notre manière
-              de vivre avec le numérique.
-            </b>
+              Vivasky est conçu pour réinventer notre manière de vivre le numérique
+            </b>{" "}
+            en articulant votre quotidien autour de 4 piliers essentiels&nbsp;:
           </p>
-          <p className="mt-4">
-            Imaginez une grille unique, épurée, sous vos yeux, où votre esprit s’apaise. Un
-            besoin émerge ? Un simple effleurement d’écran y répond instantanément. En un
-            clic, vous reprenez les commandes de votre journée pour <b>penser</b> le savoir,{" "}
-            <b>créer</b> librement et <b>piloter</b> vos affaires.
-          </p>
-          <p className="mt-4">
-            Pour que chacun puisse vivre mieux avec le numérique, cet espace est entièrement
-            gratuit. Pas d’abonnement, pas de piège. Vivasky se finance exclusivement par une
-            publicité d’un genre nouveau : responsable, discrète et non intrusive, qui
-            respecte enfin votre attention.
-          </p>
-          <p className="mt-4">
-            Vivasky, c’est l’écosystème de l’action responsable. L’instinct de l’efficacité,
-            l’éthique en plus.
+
+          <div className="my-4 flex flex-col gap-3">
+            <div className="rounded-[10px] border border-black/[0.08] bg-slate-50 px-4 py-3">
+              <strong>BrandUP</strong> : La vitrine officielle et le sourcing éthique des marques.
+            </div>
+            <div className="rounded-[10px] border border-black/[0.08] bg-slate-50 px-4 py-3">
+              <strong>TraceUP</strong> : Le média vidéo et la traçabilité authentique des acteurs.
+            </div>
+            <div className="rounded-[10px] border border-black/[0.08] bg-slate-50 px-4 py-3">
+              <strong>LinkUP</strong> : La centralisation intelligente de vos liens et écosystèmes.
+            </div>
+            <div className="rounded-[10px] border border-black/[0.08] bg-slate-50 px-4 py-3">
+              <strong>LifeUP</strong> : La suite du quotidien réunissant réflexion (SkyMind), savoir (WikiLife, SkyNova), lecture (SkyBook) et lifestyle (SkyVibe).
+            </div>
+          </div>
+
+          <p>
+            Entièrement gratuit, financé par une publicité responsable et non intrusive qui
+            respecte votre attention.
           </p>
 
           <p className="mt-5 border-t border-black/10 pt-[15px] text-center italic text-[#666]">
@@ -327,6 +312,21 @@ export function VivaskyLanding(): JSX.Element {
           </p>
         </div>
       </dialog>
+
+      {/* Toast « Lien copié » */}
+      <div
+        className={`fixed bottom-6 left-1/2 z-50 flex -translate-x-1/2 items-center gap-2.5 rounded-lg border border-black/[0.08] bg-white px-5 py-3 shadow-[0_8px_30px_rgba(0,0,0,0.12)] transition-all duration-300 ${showCopied ? "translate-y-0 opacity-100" : "pointer-events-none translate-y-3 opacity-0"}`}
+      >
+        <span
+          aria-hidden="true"
+          className="material-symbols-outlined text-[20px] text-emerald-600"
+        >
+          check_circle
+        </span>
+        <span className="text-sm font-medium text-slate-900">
+          Lien copié avec succès
+        </span>
+      </div>
     </div>
   );
 }

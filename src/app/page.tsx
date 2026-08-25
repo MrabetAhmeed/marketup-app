@@ -3,7 +3,9 @@ import type { Metadata, Viewport } from "next";
 
 const TITLE = "vivasky.media — E-motion of Life";
 const DESCRIPTION =
-  "Vivasky, une constellation de plateformes pour apprendre, lire, créer et mieux comprendre le monde.";
+  "Vivasky, l'écosystème de l'action responsable structuré autour de 4 piliers : BrandUP, TraceUP, LinkUP et LifeUP.";
+const OG_DESCRIPTION =
+  "Vivasky, l'écosystème de l'action responsable : BrandUP, TraceUP, LinkUP, LifeUP.";
 const SHARE_IMAGE = "https://www.vivasky.media/images/vivasky_logo_share.png";
 
 export const metadata: Metadata = {
@@ -16,13 +18,13 @@ export const metadata: Metadata = {
     siteName: "Vivasky",
     url: "https://www.vivasky.media/",
     title: TITLE,
-    description: DESCRIPTION,
+    description: OG_DESCRIPTION,
     images: [{ url: SHARE_IMAGE, width: 1200, height: 630 }],
   },
   twitter: {
     card: "summary_large_image",
     title: TITLE,
-    description: DESCRIPTION,
+    description: OG_DESCRIPTION,
     images: [SHARE_IMAGE],
   },
 };
