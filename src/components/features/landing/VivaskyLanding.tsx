@@ -69,7 +69,7 @@ const ECOSYSTEM_CARDS: readonly EcosystemCard[] = [
     icon: "auto_awesome",
     imageUrl:
       "https://images.unsplash.com/photo-1607551848581-7ee851bf978b?q=80&w=1174&auto=format&fit=crop",
-    href: "https://vivasky.media/lifeup",
+    href: "https://lifeup.vivasky.media/",
     breatheDelay: "6s",
     subModules: ["SkyMind", "SkyBook", "SkyNova", "SkyVibe", "WikiLife"],
   },
