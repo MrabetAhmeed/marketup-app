@@ -24,7 +24,7 @@ export interface UploadResult {
 
 export interface StorageAdapter {
   upload(file: Buffer, options: UploadOptions): Promise<UploadResult>;
-  delete(key: string): Promise<void>;
+  delete(key: string, resourceType?: string): Promise<void>;
   getUrl(key: string): string;
   exists(key: string): Promise<boolean>;
 }

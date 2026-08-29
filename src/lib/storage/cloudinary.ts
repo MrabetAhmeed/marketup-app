@@ -64,10 +64,12 @@ export class CloudinaryStorageAdapter implements StorageAdapter {
     }
   }
 
-  async delete(key: string): Promise<void> {
+  async delete(key: string, resourceType?: string): Promise<void> {
     ensureConfigured();
     try {
-      await cloudinary.uploader.destroy(key);
+      await cloudinary.uploader.destroy(key, {
+        ...(resourceType ? { resource_type: resourceType } : {}),
+      });
     } catch (err) {
       // Idempotent: log but don't throw on delete failures
       console.warn("[cloudinary] Delete failed (non-blocking):", key, err);

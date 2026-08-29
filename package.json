@@ -4,6 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
+    "dev:preprod": "node scripts/dev-with-env.mjs .env.preprod",
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
@@ -13,10 +14,13 @@
     "test:e2e": "playwright test",
     "sync-shared": "node scripts/sync-shared.mjs",
     "predev": "npm run sync-shared",
+    "predev:preprod": "npm run sync-shared",
     "prebuild": "npm run sync-shared",
     "db:seed": "npx tsx --env-file=.env.local scripts/seed.ts",
     "db:reset": "npx tsx --env-file=.env.local scripts/reset.ts",
-    "check:smtp": "npx tsx --env-file=.env.local scripts/check-smtp.ts"
+    "check:smtp": "npx tsx --env-file=.env.local scripts/check-smtp.ts",
+    "backup": "npx tsx --env-file=.env.local scripts/backup.ts",
+    "restore": "npx tsx --env-file=.env.local scripts/restore.ts"
   },
   "dependencies": {
     "@base-ui/react": "^1.4.1",

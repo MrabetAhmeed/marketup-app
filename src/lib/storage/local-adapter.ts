@@ -36,7 +36,7 @@ export class LocalStorageAdapter implements StorageAdapter {
     };
   }
 
-  async delete(key: string): Promise<void> {
+  async delete(key: string, _resourceType?: string): Promise<void> {
     const filePath = path.join(this.basePath, key);
     try {
       await unlink(filePath);

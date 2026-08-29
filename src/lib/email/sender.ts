@@ -20,6 +20,7 @@ import { sponsoringValidatedEmailTemplate } from "./templates/sponsoring-validat
 import { sponsoringRejectedEmailTemplate } from "./templates/sponsoring-rejected";
 import { companyUpdatesApprovedEmailTemplate } from "./templates/company-updates-approved";
 import { companyUpdatesRejectedEmailTemplate } from "./templates/company-updates-rejected";
+import { backupFailedEmailTemplate } from "./templates/backup-failed";
 import type { Transporter } from "nodemailer";
 
 const FROM_ADDRESS = `vivasky.media <${env.EMAIL_FROM}>`;
@@ -370,4 +371,16 @@ export async function sendCompanyUpdatesRejectedEmail(params: {
     dashboardUrl: `${env.NEXTAUTH_URL}/dashboard/account`,
   });
   await sendEmail(params.userEmail, subject, html);
+}
+
+/** Alert admin that the daily backup job failed. */
+export async function sendBackupFailedEmail(params: {
+  error: string;
+  date: string;
+}): Promise<void> {
+  const { subject, html } = backupFailedEmailTemplate({
+    error: params.error,
+    date: params.date,
+  });
+  await sendEmail(env.ADMIN_NOTIFICATION_EMAIL, subject, html);
 }

@@ -15,7 +15,7 @@ export class R2StorageAdapter implements StorageAdapter {
     throw new Error("[R2StorageAdapter] Not implemented — use STORAGE_ADAPTER=local for V1");
   }
 
-  async delete(_key: string): Promise<void> {
+  async delete(_key: string, _resourceType?: string): Promise<void> {
     // TODO (V1.1): DeleteObjectCommand
     throw new Error("[R2StorageAdapter] Not implemented — use STORAGE_ADAPTER=local for V1");
   }

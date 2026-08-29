@@ -46,6 +46,10 @@ const envSchema = z.object({
   UPLOAD_ALLOWED_IMAGE_TYPES: z.string().default("image/jpeg,image/png,image/webp"),
   UPLOAD_ALLOWED_DOC_TYPES: z.string().default("application/pdf"),
 
+  // Backup
+  BACKUP_MONGODB_URI: z.string().default(""),
+  BACKUP_CRON_SECRET: z.string().default(""),
+
   // Cloudflare R2 (optional in dev — app must not crash if empty)
   R2_ACCOUNT_ID: z.string().default(""),
   R2_ACCESS_KEY_ID: z.string().default(""),
