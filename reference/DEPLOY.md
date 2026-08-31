@@ -108,6 +108,7 @@ Toutes les dates de backup sont en **UTC**. Le planificateur doit etre programme
 |---|---|---|---|
 | `BACKUP_MONGODB_URI` | `mongodb://user:pass@host:27017,...?ssl=true&...` | Oui (pour backup) | Forme longue, **sans nom de base** |
 | `BACKUP_CRON_SECRET` | String longue aleatoire | Oui (pour route) | `node -e "console.log(require('crypto').randomBytes(32).toString('base64'))"` |
+| `SIGNUP_TEMP_MAX_AGE_DAYS` | Entier >= 0 | Non (defaut: 7) | Age minimum (jours) des fichiers signup-temp avant purge. Mettre a `0` pour purge immediate lors d'un test ponctuel, puis supprimer la variable. |
 
 Si `BACKUP_MONGODB_URI` est vide, le job echoue explicitement (jamais de succes silencieux).
 

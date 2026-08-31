@@ -1,3 +1,5 @@
+export const dynamic = "force-dynamic";
+
 import Link from "next/link";
 import { pickLocale } from "@/lib/i18n";
 import { getCompanyForAdminReview } from "@/services/admin-company.service";

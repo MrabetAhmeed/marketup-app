@@ -1,5 +1,5 @@
-import mongoose from "mongoose";
 import * as readline from "node:readline";
+import mongoose from "mongoose";
 
 async function main(): Promise<void> {
   if (process.env.NODE_ENV === "production") {

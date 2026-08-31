@@ -40,11 +40,23 @@ async function main(): Promise<void> {
     console.log(`Purge palier 2: found=${result.purge.palier2.found}, deleted=${result.purge.palier2.deleted}, files=${result.purge.palier2.filesDeleted}`);
   }
 
+  if (result.signupTempPurge) {
+    console.log(`Signup-temp purge: listed=${result.signupTempPurge.listed}, deleted=${result.signupTempPurge.deleted}, skipped=${result.signupTempPurge.skippedReferenced}, errors=${result.signupTempPurge.errors}`);
+  }
+
+  if (result.warnings.length > 0) {
+    console.log("");
+    console.warn(`=== Warnings (${result.warnings.length}) ===`);
+    for (const w of result.warnings) {
+      console.warn(`  ⚠ ${w}`);
+    }
+  }
+
   if (result.error) {
     console.error(`Error: ${result.error}`);
   }
 
-  console.log(`\nOverall: ${result.success ? "SUCCESS" : "FAILED"}`);
+  console.log(`\nOverall: ${result.success ? "SUCCESS" : "FAILED"}${result.warnings.length > 0 ? ` (with ${result.warnings.length} warning(s))` : ""}`);
   process.exit(result.success ? 0 : 1);
 }
 

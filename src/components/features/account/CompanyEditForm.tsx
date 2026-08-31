@@ -3,8 +3,8 @@
 import { useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { signOut } from "next-auth/react";
-import { ObfuscatedEmail } from "@/components/shared/ObfuscatedEmail";
 import { useForm } from "react-hook-form";
+import { ObfuscatedEmail } from "@/components/shared/ObfuscatedEmail";
 import { useToast } from "@/components/shared/Toast";
 
 interface CompanyEditData {

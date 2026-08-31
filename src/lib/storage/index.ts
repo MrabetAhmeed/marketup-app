@@ -25,3 +25,4 @@ export const storage: StorageAdapter = createAdapter();
 
 export type { StorageAdapter, UploadOptions, UploadResult, UploadCategory } from "./types";
 export { StorageError } from "./types";
+export { parseCloudinaryUrl, deduceResourceType, deduceFormatFromUrl, isSafeToDeleteUrl, extractPublicIdFromUrl, safeDeleteByUrl, signIdentityDocUrl, isCloudinaryRawWithoutExtension } from "./helpers";

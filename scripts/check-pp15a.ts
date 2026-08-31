@@ -5,11 +5,12 @@
  * Run: npx tsx scripts/check-pp15a.ts
  */
 
-import * as dotenv from "dotenv";
 import * as path from "node:path";
+import * as dotenv from "dotenv";
 dotenv.config({ path: path.resolve(process.cwd(), ".env.local") });
 
 import mongoose from "mongoose";
+import { MongoMemoryReplSet } from "mongodb-memory-server";
 import { Company } from "../src/models/company.model";
 import { Profile } from "../src/models/profile.model";
 import "../src/models/profile-brandup.model";
@@ -17,7 +18,6 @@ import "../src/models/profile-traceup.model";
 import "../src/models/profile-linkup.model";
 import { ProfileStatsMonthlyModel } from "../src/models/profile-stats-monthly.model";
 import { recordTrackEvent, isBot, getCurrentMonth, getProfileMonthlyStats, computeTrend, getPreviousMonth } from "../src/services/track.service";
-import { MongoMemoryReplSet } from "mongodb-memory-server";
 
 let replSet: MongoMemoryReplSet;
 let passed = 0;

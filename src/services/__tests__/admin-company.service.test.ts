@@ -25,9 +25,16 @@ vi.mock("@/lib/email/sender", () => ({
 vi.mock("@/services/notifications.service", () => ({
   createNotification: vi.fn().mockResolvedValue(undefined),
 }));
-vi.mock("@/lib/storage", () => ({
-  storage: { delete: vi.fn().mockResolvedValue(undefined) },
-}));
+vi.mock("@/lib/storage", async () => {
+  const helpers = await vi.importActual<typeof import("@/lib/storage/helpers")>("@/lib/storage/helpers");
+  const mockDelete = vi.fn().mockResolvedValue(undefined);
+  const mockStorage = { delete: mockDelete, getSignedUrl: vi.fn().mockReturnValue("https://signed-url") };
+  return {
+    storage: mockStorage,
+    safeDeleteByUrl: (storage: unknown, url: string | null | undefined) => helpers.safeDeleteByUrl(mockStorage, url),
+    signIdentityDocUrl: (storage: unknown, url: string | null | undefined) => helpers.signIdentityDocUrl(mockStorage, url),
+  };
+});
 vi.mock("@/lib/env", () => ({
   env: {
     NEXTAUTH_URL: "http://localhost:3000",
@@ -643,16 +650,22 @@ describe("approvePendingUpdates — notification + email (FB-7b)", () => {
 // =========================================================================
 
 describe("approvePendingUpdates — identityDocumentUrl (FB-7b)", () => {
-  it("merges identityDocumentUrl from pendingUpdates", async () => {
+  it("merges identityDocumentUrl and deletes old file with type:'private'", async () => {
+    const { storage: mockStorage } = await import("@/lib/storage");
+    (mockStorage.delete as ReturnType<typeof vi.fn>).mockClear();
+
+    const oldUrl = "https://res.cloudinary.com/cloud/raw/private/v1234/marketup/companies/abc/identity-docs/old-rne.pdf";
+    const newUrl = "https://res.cloudinary.com/cloud/raw/private/v1234/marketup/companies/abc/identity-docs/2026-08-30-rne.pdf";
+
     await CompanyModel.findByIdAndUpdate(companyId, {
-      identityDocumentUrl: "https://old-doc.pdf",
+      identityDocumentUrl: oldUrl,
       pendingUpdates: {
         submittedAt: new Date(),
         fields: [{
           key: "identityDocumentUrl",
           label: "Document légal",
-          currentValue: "https://old-doc.pdf",
-          newValue: "https://new-doc.pdf",
+          currentValue: oldUrl,
+          newValue: newUrl,
         }],
       },
     });
@@ -660,14 +673,24 @@ describe("approvePendingUpdates — identityDocumentUrl (FB-7b)", () => {
     await approvePendingUpdates(companyId, adminId);
 
     const company = await CompanyModel.findById(companyId).lean();
-    expect(company.identityDocumentUrl).toBe("https://new-doc.pdf");
+    expect(company.identityDocumentUrl).toBe(newUrl);
     expect(company.pendingUpdates).toBeNull();
+
+    // FIX-1: old file must be deleted with correct resource_type and delivery type
+    expect(mockStorage.delete).toHaveBeenCalledWith(
+      "marketup/companies/abc/identity-docs/old-rne.pdf",
+      "raw",
+      "private",
+    );
   });
 });
 
 describe("rejectPendingUpdates — identityDocumentUrl cleanup (FB-7b)", () => {
-  it("calls storage.delete on rejected document (best-effort)", async () => {
+  it("calls storage.delete on rejected document with type:'private' (best-effort)", async () => {
     const { storage: mockStorage } = await import("@/lib/storage");
+    (mockStorage.delete as ReturnType<typeof vi.fn>).mockClear();
+
+    const rejectedUrl = "https://res.cloudinary.com/cloud/raw/private/v1234/marketup/companies/abc/identity-docs/2026-08-30-rne.pdf";
 
     await CompanyModel.findByIdAndUpdate(companyId, {
       pendingUpdates: {
@@ -675,16 +698,21 @@ describe("rejectPendingUpdates — identityDocumentUrl cleanup (FB-7b)", () => {
         fields: [{
           key: "identityDocumentUrl",
           label: "Document légal",
-          currentValue: "https://old-doc.pdf",
-          newValue: "https://rejected-doc.pdf",
+          currentValue: "https://res.cloudinary.com/cloud/raw/private/v1234/marketup/companies/abc/identity-docs/old-rne.pdf",
+          newValue: rejectedUrl,
         }],
       },
     });
 
     await rejectPendingUpdates(companyId, adminId, "Document illisible");
 
-    expect(mockStorage.delete).toHaveBeenCalledWith("https://rejected-doc.pdf");
+    // safeDeleteByUrl extracts public_id, resource_type AND delivery type
+    expect(mockStorage.delete).toHaveBeenCalledWith(
+      "marketup/companies/abc/identity-docs/2026-08-30-rne.pdf",
+      "raw",
+      "private",
+    );
     const company = await CompanyModel.findById(companyId).lean();
-    expect(company.identityDocumentUrl).toBeNull(); // old value not touched by reject (Mongoose default)
+    expect(company.identityDocumentUrl).toBeNull();
   });
 });

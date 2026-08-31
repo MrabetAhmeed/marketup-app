@@ -3,14 +3,18 @@ import {
   buildBackupDbName,
   formatDateUTC,
   isBackupExpired,
-  deduceResourceType,
-  isSafeToDeleteUrl,
   buildOrphanQuery,
-  extractPublicIdFromUrl,
   extractMongoDbName,
   computeCountersFromInvoiceNumbers,
   BACKUP_DB_REGEX,
 } from "@/services/backup-helpers";
+import {
+  deduceResourceType,
+  isSafeToDeleteUrl,
+  extractPublicIdFromUrl,
+  deduceFormatFromUrl,
+  isCloudinaryRawWithoutExtension,
+} from "@/lib/storage/helpers";
 
 // ---------------------------------------------------------------------------
 // buildBackupDbName
@@ -116,9 +120,21 @@ describe("deduceResourceType", () => {
     )).toBe("raw");
   });
 
+  it("returns 'raw' for URLs with /raw/private/ (signed)", () => {
+    expect(deduceResourceType(
+      "https://res.cloudinary.com/cloud/raw/private/s--Bqpn0YHL--/v1788091544/marketup/companies/signup-temp/legal-docs/doc.pdf",
+    )).toBe("raw");
+  });
+
   it("returns 'image' for URLs with /image/upload/", () => {
     expect(deduceResourceType(
       "https://res.cloudinary.com/cloud/image/upload/v1234/marketup/companies/abc/logos/2026-05-16-logo.jpg",
+    )).toBe("image");
+  });
+
+  it("returns 'image' for URLs with /image/private/", () => {
+    expect(deduceResourceType(
+      "https://res.cloudinary.com/cloud/image/private/s--abc123--/v1234/marketup/companies/abc/identity-docs/rne.jpg",
     )).toBe("image");
   });
 
@@ -146,6 +162,48 @@ describe("extractPublicIdFromUrl", () => {
 
   it("returns null for non-Cloudinary URLs", () => {
     expect(extractPublicIdFromUrl("https://example.com/file.jpg")).toBeNull();
+  });
+
+  it("returns null for /shared/ seed paths", () => {
+    expect(extractPublicIdFromUrl("/shared/default-banner.jpg")).toBeNull();
+    expect(extractPublicIdFromUrl("/shared/logos/technofab.png")).toBeNull();
+  });
+
+  it("handles deeply nested folders", () => {
+    expect(extractPublicIdFromUrl(
+      "https://res.cloudinary.com/cloud/image/upload/v9999/marketup/companies/abc123/gallery/sub/2026-08-30-photo.webp",
+    )).toBe("marketup/companies/abc123/gallery/sub/2026-08-30-photo");
+  });
+
+  it("returns null for Cloudinary URL without version segment", () => {
+    // URL like /upload/marketup/... without /v1234/ — should not match
+    expect(extractPublicIdFromUrl(
+      "https://res.cloudinary.com/cloud/image/upload/marketup/file.jpg",
+    )).toBeNull();
+  });
+
+  it("handles signup-temp prefix correctly", () => {
+    expect(extractPublicIdFromUrl(
+      "https://res.cloudinary.com/cloud/raw/upload/v1234/marketup/companies/signup-temp/legal-docs/2026-08-29-rne.pdf",
+    )).toBe("marketup/companies/signup-temp/legal-docs/2026-08-29-rne.pdf");
+  });
+
+  it("extracts from private URL with signature s--xxx--", () => {
+    expect(extractPublicIdFromUrl(
+      "https://res.cloudinary.com/cloud/raw/private/s--Bqpn0YHL--/v1788091544/marketup/companies/signup-temp/legal-docs/2026-08-29-rne.pdf",
+    )).toBe("marketup/companies/signup-temp/legal-docs/2026-08-29-rne.pdf");
+  });
+
+  it("extracts from private URL without signature", () => {
+    expect(extractPublicIdFromUrl(
+      "https://res.cloudinary.com/cloud/raw/private/v1234/marketup/companies/abc/identity-docs/doc.pdf",
+    )).toBe("marketup/companies/abc/identity-docs/doc.pdf");
+  });
+
+  it("extracts image from private URL (strips extension)", () => {
+    expect(extractPublicIdFromUrl(
+      "https://res.cloudinary.com/cloud/image/private/s--abc123--/v1234/marketup/companies/abc/identity-docs/rne.jpg",
+    )).toBe("marketup/companies/abc/identity-docs/rne");
   });
 });
 
@@ -314,5 +372,73 @@ describe("computeCountersFromInvoiceNumbers", () => {
     expect(result.get(2025)).toBe(20);
     expect(result.get(2026)).toBe(30);
     expect(result.size).toBe(3);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// deduceFormatFromUrl
+// ---------------------------------------------------------------------------
+
+describe("deduceFormatFromUrl", () => {
+  it("returns 'pdf' for raw PDF URL", () => {
+    expect(deduceFormatFromUrl(
+      "https://res.cloudinary.com/cloud/raw/upload/v1234/marketup/file.pdf",
+    )).toBe("pdf");
+  });
+
+  it("returns 'jpg' for image URL", () => {
+    expect(deduceFormatFromUrl(
+      "https://res.cloudinary.com/cloud/image/upload/v1234/marketup/logo.jpg",
+    )).toBe("jpg");
+  });
+
+  it("returns 'png' for private image URL", () => {
+    expect(deduceFormatFromUrl(
+      "https://res.cloudinary.com/cloud/image/private/s--abc--/v1234/marketup/rne.png",
+    )).toBe("png");
+  });
+
+  it("returns 'pdf' for private raw URL with signature", () => {
+    expect(deduceFormatFromUrl(
+      "https://res.cloudinary.com/cloud/raw/private/s--Bqpn0YHL--/v1788091544/marketup/companies/signup-temp/legal-docs/rne.pdf",
+    )).toBe("pdf");
+  });
+
+  it("returns '' for non-Cloudinary URL", () => {
+    expect(deduceFormatFromUrl("/shared/doc.pdf")).toBe("");
+  });
+});
+
+// ---------------------------------------------------------------------------
+// isCloudinaryRawWithoutExtension (used by ensurePdfExtension)
+// ---------------------------------------------------------------------------
+
+describe("isCloudinaryRawWithoutExtension", () => {
+  it("returns true for raw/upload URL without extension", () => {
+    expect(isCloudinaryRawWithoutExtension(
+      "https://res.cloudinary.com/cloud/raw/upload/v1234/marketup/companies/abc/legal-docs/rne",
+    )).toBe(true);
+  });
+
+  it("returns true for raw/private URL without extension", () => {
+    expect(isCloudinaryRawWithoutExtension(
+      "https://res.cloudinary.com/cloud/raw/private/s--xxx--/v1234/marketup/companies/abc/identity-docs/rne",
+    )).toBe(true);
+  });
+
+  it("returns false for raw URL with .pdf extension", () => {
+    expect(isCloudinaryRawWithoutExtension(
+      "https://res.cloudinary.com/cloud/raw/private/s--xxx--/v1234/marketup/file.pdf",
+    )).toBe(false);
+  });
+
+  it("returns false for image URLs", () => {
+    expect(isCloudinaryRawWithoutExtension(
+      "https://res.cloudinary.com/cloud/image/upload/v1234/marketup/logo.jpg",
+    )).toBe(false);
+  });
+
+  it("returns false for non-Cloudinary URLs", () => {
+    expect(isCloudinaryRawWithoutExtension("/shared/doc.pdf")).toBe(false);
   });
 });

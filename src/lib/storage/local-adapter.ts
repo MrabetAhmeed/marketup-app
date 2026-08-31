@@ -36,7 +36,7 @@ export class LocalStorageAdapter implements StorageAdapter {
     };
   }
 
-  async delete(key: string, _resourceType?: string): Promise<void> {
+  async delete(key: string, _resourceType?: string, _deliveryType?: string): Promise<void> {
     const filePath = path.join(this.basePath, key);
     try {
       await unlink(filePath);
@@ -56,7 +56,12 @@ export class LocalStorageAdapter implements StorageAdapter {
     return `/uploads/${key}`;
   }
 
-  async exists(key: string): Promise<boolean> {
+  getSignedUrl(key: string, _resourceType: string, _format: string, _expiresInSec: number): string {
+    // Local adapter: no signing, return direct URL
+    return this.getUrl(key);
+  }
+
+  async exists(key: string, _resourceType?: string, _deliveryType?: string): Promise<boolean> {
     const filePath = path.join(this.basePath, key);
     try {
       await access(filePath);

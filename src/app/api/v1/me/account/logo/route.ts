@@ -1,7 +1,7 @@
 import { NextRequest } from "next/server";
 import { requireOwner } from "@/lib/auth-guards";
 import { jsonOk, handleApiError } from "@/lib/api-response";
-import { uploadImageFromRequest } from "@/lib/upload";
+import { uploadImageFromRequest, MAX_LOGO_MB } from "@/lib/upload";
 import { connectDb } from "@/lib/db";
 import { User } from "@/models/user.model";
 import { Company } from "@/models/company.model";
@@ -25,6 +25,7 @@ export async function POST(req: NextRequest): Promise<Response> {
     const result = await uploadImageFromRequest(req, "file", {
       companyId,
       category: "logos",
+      maxSizeMb: MAX_LOGO_MB,
     });
 
     // Write to pendingUpdates instead of data.logoUrl (hard change PP-10)

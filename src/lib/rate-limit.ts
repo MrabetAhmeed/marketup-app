@@ -82,7 +82,11 @@ export const resendValidationIpLimit = createRateLimit(5 * 60_000, 10);
 /** Forgot password: 10 requests per 5 minutes per IP */
 export const forgotPasswordIpLimit = createRateLimit(5 * 60_000, 10);
 
-/** Signup document upload: 10 per hour per IP */
+/**
+ * Signup document upload: 10 per hour per IP.
+ * Known limitation (BLK-2): in-memory, resets on server restart,
+ * single-instance only. Acceptable for V1 on a single container.
+ */
 export const signupDocUploadIpLimit = createRateLimit(60 * 60_000, 10);
 
 /** Change password: 5 per hour per userId */

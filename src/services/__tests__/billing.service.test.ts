@@ -70,7 +70,7 @@ function makeTransaction(companyId: Types.ObjectId, overrides: Record<string, un
     companyId,
     type: "boost",
     profileKind: "brandup",
-    priceHT: 50,
+    priceHT: 900,
     vatRate: 0.19,
     currency: "DT",
     status: "paid",
@@ -94,9 +94,9 @@ describe("getOwnerTransactions", () => {
 
     const result = await getOwnerTransactions(String(company._id));
     expect(result).toHaveLength(2);
-    expect(result[0]!.priceHT).toBe(50);
-    expect(result[0]!.vatAmount).toBeCloseTo(9.5);
-    expect(result[0]!.priceTTC).toBeCloseTo(59.5);
+    expect(result[0]!.priceHT).toBe(900);
+    expect(result[0]!.vatAmount).toBeCloseTo(171);
+    expect(result[0]!.priceTTC).toBeCloseTo(1071);
     expect(result[0]!.currency).toBe("DT");
   });
 

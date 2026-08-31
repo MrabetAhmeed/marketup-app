@@ -26,7 +26,7 @@ import {
   sendCompanyUpdatesRejectedEmail,
 } from "@/lib/email/sender";
 import { createNotification } from "@/services/notifications.service";
-import { storage } from "@/lib/storage";
+import { storage, safeDeleteByUrl, signIdentityDocUrl } from "@/lib/storage";
 import type { SupportedLang } from "@/lib/i18n";
 import type { ProfileKind } from "@/types";
 
@@ -196,7 +196,7 @@ export async function getCompanyForAdminReview(
     ville: company.liveData?.ville ?? "",
     postalCode: company.liveData?.postalCode ?? null,
     address: company.liveData?.address ?? null,
-    identityDocumentUrl: company.identityDocumentUrl ?? null,
+    identityDocumentUrl: signIdentityDocUrl(storage, company.identityDocumentUrl),
     registeredAt: new Date(company.registeredAt).toISOString(),
     ownerName: company.liveData?.gerantFirstName || company.liveData?.gerantLastName
       ? `${company.liveData.gerantFirstName ?? ""} ${company.liveData.gerantLastName ?? ""}`.trim()
@@ -209,8 +209,8 @@ export async function getCompanyForAdminReview(
           fields: (company.pendingUpdates.fields ?? []).map((f: { key: string; label: string; currentValue: unknown; newValue: unknown }) => ({
             key: f.key,
             label: f.label,
-            currentValue: f.currentValue,
-            newValue: f.newValue,
+            currentValue: f.key === "identityDocumentUrl" ? signIdentityDocUrl(storage, f.currentValue as string | null) : f.currentValue,
+            newValue: f.key === "identityDocumentUrl" ? signIdentityDocUrl(storage, f.newValue as string | null) : f.newValue,
           })),
         }
       : null,
@@ -489,6 +489,21 @@ export async function approvePendingUpdates(
 
   await CompanyModel.findByIdAndUpdate(companyId, updateOps);
 
+  // --- FIX-1: Best-effort cleanup of old files replaced by approved changes ---
+  const FILE_KEYS = ["data.logoUrl", "data.bannerUrl", "identityDocumentUrl"];
+  for (const field of company.pendingUpdates.fields) {
+    if (!FILE_KEYS.includes(field.key)) continue;
+    const oldUrl = field.currentValue as string | null;
+    const newUrl = field.newValue as string | null;
+    if (oldUrl && newUrl && oldUrl !== newUrl) {
+      try {
+        await safeDeleteByUrl(storage, oldUrl);
+      } catch (err) {
+        console.warn(`[approvePendingUpdates] Old file cleanup failed (non-blocking) [${field.key}]:`, err);
+      }
+    }
+  }
+
   // --- Fire-and-forget: sync-back User identity + ownerFullName ---
   try {
     const gerantFirstField = company.pendingUpdates.fields.find(
@@ -621,16 +636,16 @@ export async function rejectPendingUpdates(
     console.warn("[rejectPendingUpdates] Notification/email failed (non-blocking):", err);
   }
 
-  // --- Best-effort: delete rejected identity document from storage ---
-  try {
-    const docField = company.pendingUpdates.fields.find(
-      (f: { key: string }) => f.key === "identityDocumentUrl",
-    );
-    if (docField && typeof docField.newValue === "string") {
-      await storage.delete(docField.newValue);
+  // --- FIX-3 + L630 fix: Best-effort cleanup of rejected file uploads ---
+  const FILE_KEYS_REJECT = ["identityDocumentUrl", "data.logoUrl", "data.bannerUrl"];
+  for (const field of company.pendingUpdates.fields) {
+    if (!FILE_KEYS_REJECT.includes(field.key)) continue;
+    const rejectedUrl = field.newValue as string | null;
+    try {
+      await safeDeleteByUrl(storage, rejectedUrl);
+    } catch (err) {
+      console.warn(`[rejectPendingUpdates] File cleanup failed (non-blocking) [${field.key}]:`, err);
     }
-  } catch (err) {
-    console.warn("[rejectPendingUpdates] Storage cleanup failed (non-blocking):", err);
   }
 }
 

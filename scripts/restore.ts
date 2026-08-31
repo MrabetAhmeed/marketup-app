@@ -15,8 +15,8 @@
  * The counters collection is NEVER restored. Invoice counters are recalculated
  * from the years present in the transactions collection.
  */
-import { MongoClient } from "mongodb";
 import * as readline from "readline";
+import { MongoClient } from "mongodb";
 
 // ---------------------------------------------------------------------------
 // Config

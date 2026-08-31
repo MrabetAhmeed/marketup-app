@@ -19,6 +19,7 @@ import {
   sendSponsoringValidatedEmail,
   sendSponsoringRejectedEmail,
 } from "@/lib/email/sender";
+import { safeDeleteByUrl } from "@/lib/storage/helpers";
 
 const TransactionModel = Transaction as any;
 const SponsoringModel = Sponsoring as any;
@@ -160,6 +161,14 @@ export async function cancelSponsoring(
     { _id: sponsoringId },
     { $set: { status: "cancelled", cancelledAt: new Date() } },
   );
+
+  // F7: Best-effort banner cleanup on cancellation
+  try {
+    const { storage } = await import("@/lib/storage");
+    await safeDeleteByUrl(storage, (doc as any).bannerUrl);
+  } catch (err) {
+    console.warn("[cancelSponsoring] Banner cleanup failed (non-blocking):", err);
+  }
 }
 
 // ---------------------------------------------------------------------------
@@ -232,6 +241,14 @@ export async function rejectSponsoring(
     { _id: sponsoringId },
     { $set: { status: "rejected", rejectionReason: reason } },
   );
+
+  // F7: Best-effort banner cleanup on rejection
+  try {
+    const { storage } = await import("@/lib/storage");
+    await safeDeleteByUrl(storage, (doc as any).bannerUrl);
+  } catch (err) {
+    console.warn("[rejectSponsoring] Banner cleanup failed (non-blocking):", err);
+  }
 
   // Notify owner
   const company = await CompanyModel.findById((doc as any).companyId).lean();

@@ -6,7 +6,7 @@ import { AppError, NotFoundError } from "@/lib/api-error";
 import { User } from "@/models/user.model";
 import { Association } from "@/models/association.model";
 import { RseReceipt } from "@/models/rse-receipt.model";
-import { uploadReceiptFromFile } from "@/lib/upload";
+import { uploadReceiptFromFile, MAX_RSE_RECEIPTS_PER_COMPANY } from "@/lib/upload";
 import { CreateRseDonationSchema } from "@/schemas/rse-donation.schema";
 export const dynamic = "force-dynamic";
 
@@ -46,6 +46,16 @@ export async function POST(req: NextRequest): Promise<Response> {
       ...rawFields,
       amount: Number(rawFields.amount),
     });
+
+    // Check receipt cap per company
+    const receiptCount = await RseReceiptModel.countDocuments({ companyId });
+    if (receiptCount >= MAX_RSE_RECEIPTS_PER_COMPANY) {
+      throw new AppError(
+        "RSE_RECEIPT_LIMIT",
+        `Vous avez atteint la limite de ${MAX_RSE_RECEIPTS_PER_COMPANY} reçus par entreprise. Supprimez un reçu existant pour en ajouter un nouveau.`,
+        422,
+      );
+    }
 
     // Verify association exists and is active
     const association = await AssociationModel.findById(parsed.associationId).lean();

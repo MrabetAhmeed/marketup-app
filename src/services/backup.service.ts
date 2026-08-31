@@ -10,10 +10,8 @@ import {
   buildBackupDbName,
   formatDateUTC,
   isBackupExpired,
-  deduceResourceType,
   isSafeToDeleteUrl,
   buildOrphanQuery,
-  extractPublicIdFromUrl,
   extractMongoDbName,
 } from "./backup-helpers";
 
@@ -26,10 +24,8 @@ export {
   buildBackupDbName,
   formatDateUTC,
   isBackupExpired,
-  deduceResourceType,
   isSafeToDeleteUrl,
   buildOrphanQuery,
-  extractPublicIdFromUrl,
   extractMongoDbName,
 } from "./backup-helpers";
 
@@ -78,11 +74,21 @@ export interface PurgeResult {
   palier2: PurgePalierResult;
 }
 
+export interface SignupTempPurgeResult {
+  listed: number;
+  deleted: number;
+  skippedReferenced: number;
+  errors: number;
+  warnings: string[];
+}
+
 export interface JobResult {
   success: boolean;
   backup: BackupResult | null;
   retention: { dropped: string[] };
   purge: PurgeResult | null;
+  signupTempPurge: SignupTempPurgeResult | null;
+  warnings: string[];
   error?: string;
 }
 
@@ -330,14 +336,9 @@ async function purgePalier(db: Db, palier: 1 | 2, now: Date): Promise<PurgePalie
     // Storage cleanup — last, best-effort
     if (isSafeToDeleteUrl(identityDocUrl)) {
       try {
-        const { storage } = await import("@/lib/storage");
-        const resourceType = deduceResourceType(identityDocUrl!);
-        // Extract the Cloudinary public_id from the URL
-        const publicId = extractPublicIdFromUrl(identityDocUrl!);
-        if (publicId) {
-          await storage.delete(publicId, resourceType);
-          result.filesDeleted++;
-        }
+        const { storage, safeDeleteByUrl } = await import("@/lib/storage");
+        const deleted = await safeDeleteByUrl(storage, identityDocUrl);
+        if (deleted) result.filesDeleted++;
       } catch (err) {
         console.warn(`[purge] File delete failed (non-blocking): ${identityDocUrl}`, err);
         result.fileErrors++;
@@ -346,6 +347,98 @@ async function purgePalier(db: Db, palier: 1 | 2, now: Date): Promise<PurgePalie
   }
 
   console.log(`[purge] Palier ${palier}: found=${result.found}, deleted=${result.deleted}, files=${result.filesDeleted}, fileErrors=${result.fileErrors}`);
+  return result;
+}
+
+// ---------------------------------------------------------------------------
+// Purge signup-temp orphan files (E)
+// ---------------------------------------------------------------------------
+
+const SIGNUP_TEMP_PREFIX = "marketup/companies/signup-temp/";
+
+export async function purgeSignupTempOrphans(sourceClient: MongoClient): Promise<SignupTempPurgeResult> {
+  const result: SignupTempPurgeResult = { listed: 0, deleted: 0, skippedReferenced: 0, errors: 0, warnings: [] };
+
+  // Dynamic import to avoid loading Cloudinary SDK at module level
+  const { v2: cloudinaryApi } = await import("cloudinary");
+
+  // Explicit configuration — phase 4 must not depend on phase 3 having configured the singleton
+  cloudinaryApi.config({
+    cloud_name: env.CLOUDINARY_CLOUD_NAME,
+    api_key: env.CLOUDINARY_API_KEY,
+    api_secret: env.CLOUDINARY_API_SECRET,
+    secure: true,
+  });
+
+  const sourceDbName = extractMongoDbName(env.MONGODB_URI);
+  if (!sourceDbName) return result;
+  const db = sourceClient.db(sourceDbName);
+  const companiesCol = db.collection("companies");
+
+  const maxAgeDays = env.SIGNUP_TEMP_MAX_AGE_DAYS;
+  console.log(`[signup-temp-purge] Age threshold: ${maxAgeDays} day(s)`);
+  const cutoff = new Date(Date.now() - maxAgeDays * 24 * 60 * 60 * 1_000);
+
+  // List files in both resource types
+  for (const resourceType of ["image", "raw"] as const) {
+    try {
+      console.log(`[signup-temp-purge] Listing prefix="${SIGNUP_TEMP_PREFIX}" resource_type="${resourceType}" type="private"...`);
+      let nextCursor: string | undefined;
+      do {
+        const listResult = await cloudinaryApi.api.resources({
+          type: "private",
+          resource_type: resourceType,
+          prefix: SIGNUP_TEMP_PREFIX,
+          max_results: 100,
+          ...(nextCursor ? { next_cursor: nextCursor } : {}),
+        });
+
+        const resources = listResult.resources ?? [];
+        console.log(`[signup-temp-purge] ${resourceType}/private: returned ${resources.length} resource(s)`);
+        result.listed += resources.length;
+
+        for (const res of resources) {
+          const createdAt = new Date(res.created_at);
+          if (createdAt >= cutoff) continue;
+
+          const publicId: string = res.public_id;
+
+          // Re-verify: is this public_id referenced by any company?
+          const referenced = await companiesCol.findOne({
+            $or: [
+              { identityDocumentUrl: { $regex: publicId.replace(/[.*+?^${}()|[\]\\]/g, "\\$&") } },
+              { "pendingUpdates.fields": { $elemMatch: { key: "identityDocumentUrl", newValue: { $regex: publicId.replace(/[.*+?^${}()|[\]\\]/g, "\\$&") } } } },
+            ],
+          });
+
+          if (referenced) {
+            result.skippedReferenced++;
+            continue;
+          }
+
+          try {
+            const res = await cloudinaryApi.uploader.destroy(publicId, { resource_type: resourceType, type: "private" });
+            if (res?.result !== "ok") {
+              console.warn(`[signup-temp-purge] destroy returned "${res?.result}" for ${publicId} (${resourceType}/private)`);
+            }
+            result.deleted++;
+          } catch (err) {
+            console.warn(`[signup-temp-purge] Failed to delete ${publicId}:`, err);
+            result.errors++;
+          }
+        }
+
+        nextCursor = listResult.next_cursor;
+      } while (nextCursor);
+    } catch (err) {
+      const msg = `Failed to list ${resourceType}/private resources: ${err instanceof Error ? err.message : String(err)}`;
+      console.warn(`[signup-temp-purge] ${msg}`);
+      result.errors++;
+      result.warnings.push(msg);
+    }
+  }
+
+  console.log(`[signup-temp-purge] listed=${result.listed}, deleted=${result.deleted}, skippedReferenced=${result.skippedReferenced}, errors=${result.errors}`);
   return result;
 }
 
@@ -360,7 +453,7 @@ export async function runBackupJob(): Promise<JobResult> {
   if (!env.BACKUP_MONGODB_URI) {
     const error = "BACKUP_MONGODB_URI is not configured. Backup cannot run.";
     console.error(`[backup] ${error}`);
-    return { success: false, backup: null, retention: { dropped: [] }, purge: null, error };
+    return { success: false, backup: null, retention: { dropped: [] }, purge: null, signupTempPurge: null, warnings: [], error };
   }
 
   let backupClient: MongoClient | null = null;
@@ -377,7 +470,7 @@ export async function runBackupJob(): Promise<JobResult> {
     const lock = await acquireLock(metaDb);
     if (!lock.acquired) {
       console.warn(`[backup] ${lock.reason}`);
-      return { success: false, backup: null, retention: { dropped: [] }, purge: null, error: lock.reason };
+      return { success: false, backup: null, retention: { dropped: [] }, purge: null, signupTempPurge: null, warnings: [], error: lock.reason };
     }
 
     try {
@@ -401,11 +494,28 @@ export async function runBackupJob(): Promise<JobResult> {
       console.log("[backup] Phase 3: Purge orphans...");
       const purgeResult = await purgeOrphans(sourceClient);
 
+      // 4. Purge signup-temp orphan files (best-effort)
+      console.log("[backup] Phase 4: Purge signup-temp orphans...");
+      let signupTempPurge: SignupTempPurgeResult | null = null;
+      const jobWarnings: string[] = [];
+      try {
+        signupTempPurge = await purgeSignupTempOrphans(sourceClient);
+        if (signupTempPurge.warnings.length > 0) {
+          jobWarnings.push(...signupTempPurge.warnings);
+        }
+      } catch (err) {
+        const msg = `signup-temp purge failed: ${err instanceof Error ? err.message : String(err)}`;
+        console.warn(`[backup] ${msg}`);
+        jobWarnings.push(msg);
+      }
+
       const jobResult: JobResult = {
         success: true,
         backup: backupResult,
         retention: retentionResult,
         purge: purgeResult,
+        signupTempPurge,
+        warnings: jobWarnings,
       };
 
       // Update meta trace
@@ -434,6 +544,8 @@ export async function runBackupJob(): Promise<JobResult> {
           backup: null,
           retention: { dropped: [] },
           purge: null,
+          signupTempPurge: null,
+          warnings: [],
           error: errorMsg,
         });
       } catch {
@@ -456,6 +568,8 @@ export async function runBackupJob(): Promise<JobResult> {
       backup: null,
       retention: { dropped: [] },
       purge: null,
+      signupTempPurge: null,
+      warnings: [],
       error: errorMsg,
     };
   } finally {

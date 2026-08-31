@@ -69,6 +69,10 @@ function SignupCompanyContent(): JSX.Element {
   }, [marketType, setValue]);
 
   async function handleDocUpload(file: File): Promise<void> {
+    if (file.size > 2 * 1024 * 1024) {
+      showToast("Fichier trop volumineux (2 Mo maximum).");
+      return;
+    }
     setDocFile(file);
     setDocUploading(true);
     try {
@@ -219,7 +223,7 @@ function SignupCompanyContent(): JSX.Element {
                     ) : (
                       <>
                         <div className="font-semibold text-[13px] text-[#242424] mb-0.5">Téléverser le document</div>
-                        <div className="text-[11.5px] text-[#616161]">PDF, JPG ou PNG · 5 Mo max</div>
+                        <div className="text-[11.5px] text-[#616161]">PDF, JPG ou PNG · 2 Mo max</div>
                       </>
                     )}
                   </div>
@@ -242,7 +246,7 @@ function SignupCompanyContent(): JSX.Element {
                 {errors.identityDocumentUrl ? (
                   <p className="text-xs text-[#D13438] mt-1">{errors.identityDocumentUrl.message}</p>
                 ) : (
-                  <p className="text-xs text-[#8A8886] mt-1">Document officiel (RNE) — PDF, JPG ou PNG · 5 Mo max</p>
+                  <p className="text-xs text-[#8A8886] mt-1">Document officiel (RNE) — PDF, JPG ou PNG · 2 Mo max</p>
                 )}
               </div>
 

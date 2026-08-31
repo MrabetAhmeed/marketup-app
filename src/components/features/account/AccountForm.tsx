@@ -9,7 +9,6 @@ import { ObfuscatedEmail } from "@/components/shared/ObfuscatedEmail";
 import { StatusPill } from "@/components/shared/StatusPill";
 import { FieldBadge } from "@/components/shared/FieldBadge";
 import { CopyGroup } from "@/components/shared/CopyGroup";
-
 import { useToast } from "@/components/shared/Toast";
 import type { MeResponse } from "@/types/dashboard";
 import { LogoUploadZone } from "./LogoUploadZone";

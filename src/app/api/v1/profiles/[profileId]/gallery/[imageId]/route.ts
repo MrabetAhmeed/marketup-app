@@ -6,7 +6,7 @@ import { Profile } from "@/models/profile.model";
 import { BrandUp } from "@/models/profile-brandup.model";
 import { User } from "@/models/user.model";
 import { AppError, NotFoundError } from "@/lib/api-error";
-import { storage } from "@/lib/storage";
+import { storage, safeDeleteByUrl } from "@/lib/storage";
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 const ProfileModel = Profile as any;
@@ -43,7 +43,7 @@ export async function DELETE(
 
     // Delete from storage (best-effort)
     if (image.url) {
-      try { await storage.delete(image.url); } catch { /* ignore */ }
+      try { await safeDeleteByUrl(storage, image.url); } catch { /* ignore */ }
     }
 
     // Remove from gallery + re-index order values

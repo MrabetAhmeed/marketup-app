@@ -2,7 +2,6 @@
 
 import { useState } from "react";
 import { StatusPill } from "@/components/shared/StatusPill";
-
 import { formatMoney } from "@/lib/pricing";
 import type { RseReceiptForUser } from "@/types/rse";
 

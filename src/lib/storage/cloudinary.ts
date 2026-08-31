@@ -41,6 +41,7 @@ export class CloudinaryStorageAdapter implements StorageAdapter {
                 public_id: this.buildPublicId(options),
                 overwrite: true,
                 ...(options.contentType === "application/pdf" && { format: "pdf" }),
+                ...(options.isPrivate && { type: "private" }),
               },
               (error, result) => {
                 if (error) return reject(error);
@@ -64,14 +65,23 @@ export class CloudinaryStorageAdapter implements StorageAdapter {
     }
   }
 
-  async delete(key: string, resourceType?: string): Promise<void> {
+  async delete(key: string, resourceType?: string, deliveryType?: string): Promise<void> {
     ensureConfigured();
     try {
-      await cloudinary.uploader.destroy(key, {
-        ...(resourceType ? { resource_type: resourceType } : {}),
-      });
+      const opts: Record<string, string> = {};
+      if (resourceType) opts.resource_type = resourceType;
+      if (deliveryType) opts.type = deliveryType;
+
+      const res = await cloudinary.uploader.destroy(key, opts);
+
+      // destroy returns { result: "ok" } on success, { result: "not found" } on miss — never throws
+      if (res?.result !== "ok") {
+        console.warn(
+          `[cloudinary] destroy returned "${res?.result}" for key="${key}" resource_type="${resourceType ?? "image"}" type="${deliveryType ?? "upload"}"`,
+        );
+      }
     } catch (err) {
-      // Idempotent: log but don't throw on delete failures
+      // Network / auth errors — log but don't throw (non-blocking)
       console.warn("[cloudinary] Delete failed (non-blocking):", key, err);
     }
   }
@@ -81,10 +91,23 @@ export class CloudinaryStorageAdapter implements StorageAdapter {
     return cloudinary.url(key, { secure: true });
   }
 
-  async exists(key: string): Promise<boolean> {
+  getSignedUrl(key: string, resourceType: string, format: string, expiresInSec: number): string {
+    ensureConfigured();
+    const expiresAt = Math.floor(Date.now() / 1000) + expiresInSec;
+    return cloudinary.utils.private_download_url(key, format, {
+      resource_type: resourceType,
+      type: "private",
+      expires_at: expiresAt,
+    });
+  }
+
+  async exists(key: string, resourceType?: string, deliveryType?: string): Promise<boolean> {
     ensureConfigured();
     try {
-      await cloudinary.api.resource(key);
+      await cloudinary.api.resource(key, {
+        ...(resourceType ? { resource_type: resourceType } : {}),
+        ...(deliveryType ? { type: deliveryType } : {}),
+      });
       return true;
     } catch {
       return false;
@@ -99,6 +122,11 @@ export class CloudinaryStorageAdapter implements StorageAdapter {
       .replace(/[^a-z0-9]+/g, "-")
       .replace(/^-+|-+$/g, "")
       .slice(0, 50);
+    // Add random suffix for signup-temp to prevent collision between concurrent signups
+    if (options.companyId === "signup-temp") {
+      const rand = Math.random().toString(36).slice(2, 8);
+      return `${date}-${slug}-${rand}`;
+    }
     return `${date}-${slug}`;
   }
 }

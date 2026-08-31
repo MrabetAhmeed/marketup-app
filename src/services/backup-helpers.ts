@@ -1,5 +1,8 @@
 import type { Document } from "mongodb";
 
+// Re-export storage helpers used by backup.service purgeOrphans guard
+export { isSafeToDeleteUrl } from "@/lib/storage/helpers";
+
 // ---------------------------------------------------------------------------
 // Pure helper functions for backup (no env or DB dependencies)
 // Extracted so tests can import without triggering env.ts validation.
@@ -39,24 +42,7 @@ export function isBackupExpired(dbName: string, now: Date, retentionDays: number
   return backupDate < cutoff;
 }
 
-/**
- * Determine the Cloudinary resource_type from a URL.
- * URLs containing `/raw/upload/` are PDFs (resource_type "raw").
- * Everything else defaults to "image".
- */
-export function deduceResourceType(url: string): string {
-  return url.includes("/raw/upload/") ? "raw" : "image";
-}
 
-/**
- * Check if a URL is safe to delete from remote storage.
- * Must be non-null, non-empty, not a /shared/ seed asset, and point to a remote host.
- */
-export function isSafeToDeleteUrl(url: string | null | undefined): boolean {
-  if (!url) return false;
-  if (url.includes("/shared/")) return false;
-  return url.startsWith("https://") || url.startsWith("http://");
-}
 
 /**
  * Select orphan users for a given purge palier.
@@ -144,17 +130,5 @@ export function computeCountersFromInvoiceNumbers(invoiceNumbers: string[]): Map
   return maxByYear;
 }
 
-/**
- * Extract the Cloudinary public_id from a full Cloudinary URL.
- * URL format: https://res.cloudinary.com/{cloud}/image/upload/v{version}/{public_id}.{ext}
- * or for raw: https://res.cloudinary.com/{cloud}/raw/upload/v{version}/{public_id}.{ext}
- */
-export function extractPublicIdFromUrl(url: string): string | null {
-  const match = url.match(/\/upload\/v\d+\/(.+)$/);
-  if (!match) return null;
-  const path = match[1]!;
-  if (url.includes("/raw/upload/")) {
-    return path;
-  }
-  return path.replace(/\.[^.]+$/, "");
-}
+
+

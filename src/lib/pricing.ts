@@ -39,12 +39,12 @@ export function computeTTC(
 // Product pricing constants (single source of truth — change here only)
 // ---------------------------------------------------------------------------
 
-/** Boost: 50 DT HT for 30 days, per profileKind */
-export const BOOST_PRICE_HT = 50;
+/** Boost: 900 DT HT for 30 days, per profileKind */
+export const BOOST_PRICE_HT = 900;
 export const BOOST_DURATION_DAYS = 30;
 
-/** Sponsoring: 100 DT HT for 7 days, per profileKind */
-export const SPONSORING_PRICE_HT = 100;
+/** Sponsoring: 700 DT HT for 7 days, per profileKind */
+export const SPONSORING_PRICE_HT = 700;
 export const SPONSORING_DURATION_DAYS = 7;
 
 /** Standard VAT rate (19%) */

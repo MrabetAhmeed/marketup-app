@@ -3,10 +3,10 @@
 // because Mongoose 9 infers strict types that require all fields including
 // timestamps. This is intentional for seed scripts only.
 
-import mongoose, { Types } from "mongoose";
 import type { Model } from "mongoose";
-import bcrypt from "bcryptjs";
 import * as readline from "node:readline";
+import bcrypt from "bcryptjs";
+import mongoose, { Types } from "mongoose";
 import { Company } from "../src/models/company.model";
 import { User } from "../src/models/user.model";
 import { AdminUser } from "../src/models/admin-user.model";

@@ -2,11 +2,12 @@ import { NextRequest } from "next/server";
 import { jsonOk, handleApiError } from "@/lib/api-response";
 import { AppError } from "@/lib/api-error";
 import { storage } from "@/lib/storage";
+import { MAX_LEGAL_DOC_MB } from "@/lib/upload";
 import { signupDocUploadIpLimit, getClientIp } from "@/lib/rate-limit";
 export const dynamic = "force-dynamic";
 
 const ALLOWED_TYPES = new Set(["application/pdf", "image/jpeg", "image/png", "image/webp"]);
-const MAX_SIZE_BYTES = 10 * 1024 * 1024; // 10 MB
+const MAX_SIZE_BYTES = MAX_LEGAL_DOC_MB * 1024 * 1024;
 
 /**
  * Public endpoint for uploading a legal document during signup.
@@ -43,7 +44,7 @@ export async function POST(req: NextRequest): Promise<Response> {
     if (file.size > MAX_SIZE_BYTES) {
       throw new AppError(
         "VALIDATION_FAILED",
-        "Fichier trop volumineux (10 Mo maximum).",
+        `Fichier trop volumineux (${MAX_LEGAL_DOC_MB} Mo maximum).`,
         400,
       );
     }
@@ -54,6 +55,7 @@ export async function POST(req: NextRequest): Promise<Response> {
       category: "legal-docs",
       originalName: file.name,
       contentType: file.type,
+      isPrivate: true,
     });
 
     return jsonOk({ url: result.url, publicId: result.key });

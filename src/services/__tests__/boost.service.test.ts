@@ -103,10 +103,10 @@ describe("checkoutBoost", () => {
 
     expect(result.boost.status).toBe("active");
     expect(result.boost.profileKind).toBe("brandup");
-    expect(result.transaction.priceHT).toBe(50);
-    expect(result.transaction.vatAmount).toBeCloseTo(9.5);
+    expect(result.transaction.priceHT).toBe(900);
+    expect(result.transaction.vatAmount).toBeCloseTo(171);
     expect(result.transaction.fiscalStampDT).toBe(1);
-    expect(result.transaction.priceTTC).toBeCloseTo(60.5);
+    expect(result.transaction.priceTTC).toBeCloseTo(1072);
     expect(result.transaction.currency).toBe("DT");
     expect(result.transaction.status).toBe("paid"); // paid_simulated mapped for owner
     expect(result.transaction.invoiceNumber).toMatch(/^\d{4}-\d{5}$/);
@@ -294,7 +294,7 @@ describe("getBoostHistory", () => {
       companyId: company._id,
       type: "boost",
       profileKind: "brandup",
-      priceHT: 50,
+      priceHT: 900,
       vatRate: 0.19,
       currency: "DT",
       status: "paid_simulated",
@@ -317,7 +317,7 @@ describe("getBoostHistory", () => {
     expect(items).toHaveLength(1);
     expect(items[0]!.profileKind).toBe("brandup");
     expect(items[0]!.status).toBe("expired");
-    expect(items[0]!.priceTTC).toBeCloseTo(59.5);
+    expect(items[0]!.priceTTC).toBeCloseTo(1071);
     expect(items[0]!.viewsAdded).toBe(42);
     expect(items[0]!.clicksAdded).toBe(5);
   });

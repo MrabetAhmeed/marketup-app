@@ -49,6 +49,7 @@ const envSchema = z.object({
   // Backup
   BACKUP_MONGODB_URI: z.string().default(""),
   BACKUP_CRON_SECRET: z.string().default(""),
+  SIGNUP_TEMP_MAX_AGE_DAYS: z.coerce.number().int().min(0).default(7),
 
   // Cloudflare R2 (optional in dev — app must not crash if empty)
   R2_ACCOUNT_ID: z.string().default(""),

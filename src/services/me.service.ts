@@ -3,6 +3,7 @@ import { Types } from "mongoose";
 import { connectDb } from "@/lib/db";
 import { pickLocale } from "@/lib/i18n";
 import { isProfileVisible } from "@/lib/visibility";
+import { storage, signIdentityDocUrl } from "@/lib/storage";
 import { Company } from "@/models/company.model";
 import { User } from "@/models/user.model";
 import { Profile } from "@/models/profile.model";
@@ -258,7 +259,7 @@ export async function getMe(
       color: company.data?.color ?? "#0078D4",
       legalId: company.legalId,
       vatNumber: company.vatNumber ?? null,
-      identityDocumentUrl: company.identityDocumentUrl ?? null,
+      identityDocumentUrl: signIdentityDocUrl(storage, company.identityDocumentUrl),
       accountEmail: company.accountEmail,
       country: company.country ?? "TN",
       sector: {
@@ -280,7 +281,16 @@ export async function getMe(
       languages: company.liveData.languages ?? ["fr"],
       registeredAt: new Date(company.registeredAt).toISOString(),
       validatedAt: toISOOrNull(company.validatedAt),
-      pendingUpdates: company.pendingUpdates ?? null,
+      pendingUpdates: company.pendingUpdates
+        ? {
+            ...company.pendingUpdates,
+            fields: (company.pendingUpdates.fields ?? []).map((f: { key: string; newValue: unknown; currentValue: unknown }) =>
+              f.key === "identityDocumentUrl"
+                ? { ...f, newValue: signIdentityDocUrl(storage, f.newValue as string | null), currentValue: signIdentityDocUrl(storage, f.currentValue as string | null) }
+                : f,
+            ),
+          }
+        : null,
       lastPendingRejection: company.lastPendingRejection
         ? { note: company.lastPendingRejection.note, rejectedAt: new Date(company.lastPendingRejection.rejectedAt).toISOString() }
         : null,

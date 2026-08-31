@@ -3,11 +3,12 @@
  * PP-15b Autonomous Audit Script — Corbeille admin + restauration
  * Run: MONGODB_URI=x NEXTAUTH_SECRET=x npx tsx scripts/check-pp15b.ts
  */
-import * as dotenv from "dotenv";
 import * as path from "node:path";
+import * as dotenv from "dotenv";
 dotenv.config({ path: path.resolve(process.cwd(), ".env.local") });
 
 import mongoose from "mongoose";
+import { MongoMemoryReplSet } from "mongodb-memory-server";
 import { Company } from "../src/models/company.model";
 import { User } from "../src/models/user.model";
 import { Profile } from "../src/models/profile.model";
@@ -21,7 +22,6 @@ import { RseReceipt } from "../src/models/rse-receipt.model";
 import { Notification } from "../src/models/notification.model";
 import { File as FileModel } from "../src/models/file.model";
 import { restoreCompanyByAdmin, listDeletedCompanies, listAllCompanies } from "../src/services/admin-company.service";
-import { MongoMemoryReplSet } from "mongodb-memory-server";
 
 let replSet: MongoMemoryReplSet;
 let passed = 0;

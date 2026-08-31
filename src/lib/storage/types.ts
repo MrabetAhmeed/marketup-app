@@ -11,6 +11,8 @@ export interface UploadOptions {
   category: UploadCategory;
   originalName: string;
   contentType: string;
+  /** Upload as private (Cloudinary type: "private") — requires signed URLs for access */
+  isPrivate?: boolean;
 }
 
 export interface UploadResult {
@@ -24,9 +26,11 @@ export interface UploadResult {
 
 export interface StorageAdapter {
   upload(file: Buffer, options: UploadOptions): Promise<UploadResult>;
-  delete(key: string, resourceType?: string): Promise<void>;
+  delete(key: string, resourceType?: string, deliveryType?: string): Promise<void>;
   getUrl(key: string): string;
-  exists(key: string): Promise<boolean>;
+  /** Generate a time-limited signed URL for a private resource. */
+  getSignedUrl(key: string, resourceType: string, format: string, expiresInSec: number): string;
+  exists(key: string, resourceType?: string, deliveryType?: string): Promise<boolean>;
 }
 
 // ---------------------------------------------------------------------------

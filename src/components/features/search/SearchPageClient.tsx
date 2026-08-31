@@ -5,12 +5,12 @@ import PublicSearchHeader from "@/components/shared/PublicSearchHeader";
 import PublicFooter from "@/components/shared/PublicFooter";
 import type { SearchResultCard as CardType } from "@/services/public-search.service";
 import type { SponsorBannerData } from "@/services/sponsoring.service";
+import { SectorPickerModal } from "@/components/shared/SectorPickerModal";
+import type { SectorPickerItem } from "@/components/shared/SectorPickerModal";
 import SponsorBanner from "./SponsorBanner";
 import SearchResultCard from "./SearchResultCard";
 import SearchEmptyState from "./SearchEmptyState";
 import ProfilePopup from "./ProfilePopup";
-import { SectorPickerModal } from "@/components/shared/SectorPickerModal";
-import type { SectorPickerItem } from "@/components/shared/SectorPickerModal";
 
 type ProductKey = "brandup" | "traceup" | "linkup";
 
