@@ -76,6 +76,23 @@
   }
 }
 
+/* Landing card-bg: animation breathe en CSS natif (Tailwind utilities
+   conflictent avec l'animation sur la propriété filter). */
+@keyframes colorBreathe {
+  0%, 100% { filter: grayscale(100%) brightness(0.7); }
+  50% { filter: grayscale(0%) brightness(1); }
+}
+.landing-card-bg {
+  filter: grayscale(100%) brightness(0.7);
+  animation: colorBreathe 8s ease-in-out infinite;
+}
+.group:hover .landing-card-bg {
+  animation: none;
+  filter: grayscale(0%) brightness(1);
+  transform: scale(1.06);
+  transition: transform 0.8s cubic-bezier(0.25, 1, 0.5, 1), filter 0.6s ease;
+}
+
 /* Hide Leaflet attribution flag (political marker) — data attribution kept */
 .leaflet-attribution-flag,
 .leaflet-control-attribution .leaflet-attribution-flag,

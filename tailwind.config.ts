@@ -127,14 +127,6 @@ const config: Config = {
       },
     },
   },
-  keyframes: {
-    breathe: {
-      "0%, 100%": { filter: "grayscale(100%) brightness(0.7)" },
-      "50%": { filter: "grayscale(0%) brightness(1)" },
-    },
-  },
-  animation: { breathe: "breathe 8s ease-in-out infinite" },
-
   plugins: [],
 };
 export default config;

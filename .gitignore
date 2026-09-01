@@ -45,3 +45,9 @@ Thumbs.db
 *.swo
 .gstack/
 .claude/settings.local.json
+.claude/
+
+
+reference/archive/
+
+

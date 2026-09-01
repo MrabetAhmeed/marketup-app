@@ -3,14 +3,7 @@
 /**
  * Portail vivasky.media — port du mockup `index.html` (landing racine).
  *
- * Dépendance tailwind.config.ts (theme.extend) requise pour `animate-breathe` :
- *   keyframes: {
- *     breathe: {
- *       "0%, 100%": { filter: "grayscale(100%) brightness(0.7)" },
- *       "50%": { filter: "grayscale(0%) brightness(1)" },
- *     },
- *   },
- *   animation: { breathe: "breathe 8s ease-in-out infinite" },
+ * Animation colorBreathe définie dans globals.css (.landing-card-bg).
  */
 
 import { useRef, useState, useCallback } from "react";
@@ -79,7 +72,7 @@ const CARD_CLASS = [
   "group relative overflow-hidden rounded-2xl bg-black no-underline",
   "shadow-[0_10px_30px_rgba(0,0,0,0.08)]",
   "transition-[transform,box-shadow] duration-[400ms] ease-[cubic-bezier(0.25,1,0.5,1)]",
-  "hover:-translate-y-1 hover:shadow-[0_20px_40px_rgba(0,0,0,0.2)]",
+  "hover:-translate-y-1 hover:shadow-[0_20px_40px_rgba(0,0,0,0.25)]",
   // Spotlight qui suit la souris (::before du mockup, piloté par --mouse-x / --mouse-y)
   "before:content-[''] before:pointer-events-none before:absolute before:z-[3]",
   "before:left-[var(--mouse-x,0)] before:top-[var(--mouse-y,0)]",
@@ -90,21 +83,19 @@ const CARD_CLASS = [
 
 const CARD_BG_CLASS = [
   "absolute inset-0 z-[1] bg-cover bg-center",
-  "grayscale brightness-[0.70] animate-breathe",
-  "[transition:transform_0.8s_cubic-bezier(0.25,1,0.5,1),filter_0.6s_ease]",
-  "group-hover:animate-none group-hover:grayscale-0 group-hover:brightness-100 group-hover:scale-[1.08]",
+  "landing-card-bg",
 ].join(" ");
 
 const CARD_OVERLAY_CLASS = [
   "absolute inset-0 z-[2] transition-all duration-500",
-  "bg-[linear-gradient(to_top,rgba(15,23,42,0.85)_0%,transparent_60%)]",
-  "group-hover:bg-[linear-gradient(to_top,rgba(15,23,42,0.95)_0%,rgba(15,23,42,0.2)_60%,transparent_100%)]",
+  "bg-[linear-gradient(to_top,rgba(15,23,42,0.92)_0%,rgba(15,23,42,0.3)_60%,transparent_100%)]",
+  "group-hover:bg-[linear-gradient(to_top,rgba(15,23,42,0.95)_0%,rgba(15,23,42,0.4)_60%,transparent_100%)]",
 ].join(" ");
 
 const BTN_CLASS =
-  "cursor-pointer rounded-md border px-4 py-1.5 text-[0.8rem] font-medium shadow-[0_2px_10px_rgba(0,0,0,0.02)] transition-all duration-300 hover:-translate-y-0.5 hover:shadow-[0_4px_12px_rgba(0,0,0,0.05)]";
+  "cursor-pointer rounded-lg border px-[18px] py-2 text-[0.85rem] font-semibold shadow-[0_2px_10px_rgba(0,0,0,0.02)] transition-all duration-300 hover:-translate-y-0.5 hover:shadow-[0_4px_12px_rgba(0,0,0,0.05)]";
 const BTN_SHARE_CLASS = `${BTN_CLASS} border-black/[0.08] bg-white text-slate-900`;
-const BTN_PRIMARY_CLASS = `${BTN_CLASS} border-slate-900 bg-slate-900 text-white hover:bg-slate-800`;
+const BTN_PRIMARY_CLASS = `${BTN_CLASS} border-slate-900 bg-[#002D6B] text-white hover:bg-slate-800`;
 
 export function VivaskyLanding(): JSX.Element {
   const dialogRef = useRef<HTMLDialogElement>(null);
@@ -155,7 +146,7 @@ export function VivaskyLanding(): JSX.Element {
           <header className="mb-auto flex w-full items-center justify-between pt-5">
             <a href="#">
               <img
-                src="https://vivasky.media/images/logo_gray_rectangle_name.png"
+                src="https://vivasky.media/images/logo_vivaskymedia.png"
                 alt="Vivasky Logo"
                 className="block h-[70%] w-[70%]"
               />
@@ -163,12 +154,11 @@ export function VivaskyLanding(): JSX.Element {
           </header>
 
           <div className="mt-5">
-            <h1 className="mb-5 text-[clamp(2.5rem,4vw,4.5rem)] font-extrabold leading-[1.05] tracking-[-0.02em] text-slate-900">
+            <h1 className="mb-5 text-[clamp(2.5rem,4vw,4.5rem)] font-semibold leading-[1.05] tracking-[-0.02em] text-[#002D6B]">
               E-motion of life
             </h1>
             <p className="max-w-[440px] text-[clamp(1rem,1.5vw,1.15rem)] leading-[1.6] text-slate-600">
-              L&apos;écosystème de l&apos;action responsable structuré pour <b>penser</b>, <b>créer</b> et{" "}
-              <b>piloter</b> au quotidien.
+              La référence des entreprises et des talents. <br />Un écosystème responsable pour penser, créer et piloter au quotidien. <br />Vivasky : <b>j&apos;y suis, j&apos;existe, je vis souverain</b>.
             </p>
           </div>
 
