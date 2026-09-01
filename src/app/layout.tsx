@@ -4,6 +4,7 @@ import type { Metadata } from "next";
 export const metadata: Metadata = {
   title: "vivasky.media",
   description: "La plateforme digitale des entreprises tunisiennes",
+  icons: { icon: "/favicon.png" },
 };
 
 export default function RootLayout({
