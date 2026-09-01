@@ -44,9 +44,9 @@ export default function PublicFooter(): JSX.Element {
           <div>
             <h4 className="text-on-surface font-bold text-[11px] uppercase tracking-widest mb-4">L&eacute;gal</h4>
             <ul className="space-y-2 text-xs text-on-surface-variant">
-              <li><span className="cursor-default">Confidentialit&eacute;</span></li>
-              <li><span className="cursor-default">Conditions g&eacute;n&eacute;rales</span></li>
-              <li><span className="cursor-default">Support</span></li>
+              <li><a href="https://vivasky.media/cgu_cgv.html" target="_blank" rel="noopener noreferrer" className="hover:text-primary transition-colors">Confidentialit&eacute;</a></li>
+              <li><a href="https://vivasky.media/cgu_cgv.html" target="_blank" rel="noopener noreferrer" className="hover:text-primary transition-colors">Conditions g&eacute;n&eacute;rales</a></li>
+              <li><a href="mailto:manager@vivasky.media" className="hover:text-primary transition-colors">Support</a></li>
             </ul>
           </div>
         </div>
