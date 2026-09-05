@@ -260,9 +260,9 @@ export default function SignupUserPage(): JSX.Element {
                   <input type="checkbox" required className="mt-0.5 w-[18px] h-[18px] border-[1.5px] border-[#8A8886] rounded-[3px] bg-white appearance-none cursor-pointer shrink-0 checked:bg-[#0078D4] checked:border-[#0078D4] focus:ring-2 focus:ring-[#EFF6FC] focus:outline-none" />
                   <span className="text-sm text-[#242424] leading-snug">
                     J&apos;accepte les{" "}
-                    <a href="https://vivasky.media/cgu_cgv.html" target="_blank" rel="noopener noreferrer" className="text-[#0078D4] font-semibold hover:underline">Conditions Générales d&apos;Utilisation (CGU)</a>{" "}
+                    <a href="/cgu_cgv.html" target="_blank" rel="noopener noreferrer" className="text-[#0078D4] font-semibold hover:underline">Conditions Générales d&apos;Utilisation (CGU)</a>{" "}
                     et les{" "}
-                    <a href="https://vivasky.media/cgu_cgv.html" target="_blank" rel="noopener noreferrer" className="text-[#0078D4] font-semibold hover:underline">Conditions Générales de Vente (CGV)</a>{" "}
+                    <a href="/cgu_cgv.html" target="_blank" rel="noopener noreferrer" className="text-[#0078D4] font-semibold hover:underline">Conditions Générales de Vente (CGV)</a>{" "}
                     {/* <span className="text-[#0078D4] font-semibold">Conditions Générales de Vente (CGV)</span>{" "} */}
                     de vivasky.media.
                   </span>

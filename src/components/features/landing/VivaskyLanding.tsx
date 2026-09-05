@@ -332,7 +332,7 @@ function FooterInner({ onShare, onPitch }: FooterInnerProps): JSX.Element {
       <span>
         {new Date().getFullYear()} © vivasky.media —{" "}
         <a
-          href="https://vivasky.media/cgu_cgv.html"
+          href="/cgu_cgv.html"
           target="_blank"
           rel="noopener noreferrer"
           className="font-medium text-slate-600 no-underline transition-colors hover:text-slate-900"
