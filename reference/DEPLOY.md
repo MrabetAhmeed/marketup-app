@@ -187,3 +187,59 @@ RESTORE_ALLOWED=1 npx tsx --env-file=.env.local scripts/restore.ts --execute
 - La **restauration test doit etre planifiee mensuellement** et tracee (la comparaison des comptages ne detecte pas un document corrompu — seule une restauration reelle valide la chaine).
 - Le backup doit etre **re-smoke apres la bascule vers la base de production** (changement d'URI, de cluster et de droits).
 - Un orphelin deja soft-deleted echappe a la purge des inscriptions (cas marginal, non traite — a ne pas laisser silencieux).
+
+---
+
+## En-tetes HTTP de securite (HEADERS-1)
+
+Configures dans `next.config.mjs` section `headers()`, appliques a toutes les routes (`/:path*`).
+
+| En-tete | Valeur | Role |
+|---|---|---|
+| `Strict-Transport-Security` | `max-age=300` | Force le navigateur a utiliser HTTPS pendant la duree indiquee |
+| `X-Frame-Options` | `DENY` | Interdit l'affichage du site dans un iframe (protection clickjacking) |
+| `X-Content-Type-Options` | `nosniff` | Empeche le navigateur de deviner le type MIME d'un fichier |
+| `Referrer-Policy` | `strict-origin-when-cross-origin` | Limite l'URL transmise aux sites tiers a l'origine seule |
+
+### HSTS — procedure d'allongement
+
+**Cet en-tete est memorise par le navigateur du visiteur.** Une valeur trop longue ne peut pas etre annulee cote serveur. Le visiteur devra attendre l'expiration. C'est le seul reglage de ce projet qui a un effet persistant cote client.
+
+**Progression :**
+
+| Palier | Duree | Quand passer |
+|---|---|---|
+| `300` (5 min) | Premier deploiement | Valeur actuelle |
+| `3600` (1 h) | Apres 24h sans incident HTTPS en production | |
+| `86400` (1 jour) | Apres 1 semaine sans incident | |
+| `31536000` (1 an) | Apres 1 mois sans incident — valeur definitive | |
+
+**Avant chaque palier, verifier :**
+
+1. Le certificat TLS est valide et se renouvelle automatiquement (Infomaniak gere le renouvellement Let's Encrypt)
+2. Toutes les pages repondent en HTTPS : page publique, dashboard, admin, route `/cgu_cgv.html`
+3. Aucune ressource mixte (HTTP) n'apparait dans la console navigateur (onglet Console + Network)
+4. Les sous-domaines (`static.vivasky.media`, `lifeup.vivasky.media`, `test.vivasky.media`) ne sont **PAS inclus** — pas de `includeSubDomains`, car ils sont hors de notre controle
+5. Pas de `preload` — l'inscription dans les listes de preload des navigateurs est irreversible a court terme
+
+**Pour changer :** modifier la constante `HSTS_MAX_AGE` dans `next.config.mjs`, rebuild, deployer.
+
+### Verification des en-tetes
+
+Apres chaque deploiement, verifier la presence des 4 en-tetes :
+
+```bash
+curl -I https://vivasky.media/
+```
+
+Les 4 en-tetes doivent apparaitre dans la reponse. Verifier aussi sur une page protegee et sur la route CGU :
+
+```bash
+curl -I https://vivasky.media/brandup
+curl -I https://vivasky.media/cgu_cgv.html
+```
+
+### Ce qui reste au backlog
+
+- **Content-Security-Policy** : politique complete de securite du contenu. Complexe a configurer avec Next.js (scripts inline, nonces). Backlog V1.1 (SEC-6).
+- **Permissions-Policy** : restreindre l'acces camera/micro/geolocation. Backlog V1.1 (SEC-7).
