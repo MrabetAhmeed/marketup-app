@@ -24,6 +24,10 @@ import { Sector } from "../src/models/sector.model";
 import { Gouvernorat } from "../src/models/gouvernorat.model";
 import { ProfileStatsMonthlyModel } from "../src/models/profile-stats-monthly.model";
 import { Counter } from "../src/models/counter.model";
+import { extractMongoDbName, checkDestructiveGuards } from "@/lib/uri-utils";
+
+// Databases where destructive scripts must NEVER run
+const PROTECTED_DATABASES = ["marketup_prod", "preprod"];
 
 // Helpers to bypass Mongoose 9 strict types in seed context
 const insert = (m: Model<any>, data: Record<string, unknown>) => m.create(data as any);
@@ -120,8 +124,23 @@ async function main(): Promise<void> {
     process.exit(1);
   }
 
+  // ── Cumulative guards (skip in test environment) ──
   if (process.env.NODE_ENV !== "test") {
-    const dbName = uri.split("/").pop()?.split("?")[0] ?? "unknown";
+    const guard = checkDestructiveGuards({
+      uri,
+      allowDestructive: process.env.ALLOW_DESTRUCTIVE_SEED,
+      protectedDatabases: PROTECTED_DATABASES,
+    });
+    if (!guard.allowed) {
+      console.error(`❌ Guard: ${guard.reason}`);
+      console.error("   This script drops ALL collections. It must NEVER run against a protected database.");
+      process.exit(1);
+    }
+  }
+
+  const dbName = extractMongoDbName(uri);
+
+  if (process.env.NODE_ENV !== "test") {
     const confirmed = await confirm(
       `This will DROP all existing data in "${dbName}" and reseed. Continue? (yes/no): `,
     );

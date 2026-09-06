@@ -17,6 +17,7 @@
     "predev:preprod": "npm run sync-shared",
     "prebuild": "npm run sync-shared",
     "db:seed": "npx tsx --env-file=.env.local scripts/seed.ts",
+    "db:seed-prod": "npx tsx scripts/seed-prod.ts",
     "db:reset": "npx tsx --env-file=.env.local scripts/reset.ts",
     "check:smtp": "npx tsx --env-file=.env.local scripts/check-smtp.ts",
     "backup": "npx tsx --env-file=.env.local scripts/backup.ts",

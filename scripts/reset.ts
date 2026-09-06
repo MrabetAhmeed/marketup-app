@@ -1,12 +1,11 @@
 import * as readline from "node:readline";
 import mongoose from "mongoose";
+import { extractMongoDbName, checkDestructiveGuards } from "@/lib/uri-utils";
+
+// Databases where destructive scripts must NEVER run
+const PROTECTED_DATABASES = ["marketup_prod", "preprod"];
 
 async function main(): Promise<void> {
-  if (process.env.NODE_ENV === "production") {
-    console.error("❌ Refusing to run db:reset in production.");
-    process.exit(1);
-  }
-
   // Load env
   const uri = process.env.MONGODB_URI;
   if (!uri) {
@@ -14,9 +13,24 @@ async function main(): Promise<void> {
     process.exit(1);
   }
 
+  // ── Cumulative guards (skip in test environment) ──
+  if (process.env.NODE_ENV !== "test") {
+    const guard = checkDestructiveGuards({
+      uri,
+      allowDestructive: process.env.ALLOW_DESTRUCTIVE_SEED,
+      protectedDatabases: PROTECTED_DATABASES,
+    });
+    if (!guard.allowed) {
+      console.error(`❌ Guard: ${guard.reason}`);
+      console.error("   This script drops ALL collections. It must NEVER run against a protected database.");
+      process.exit(1);
+    }
+  }
+
+  const dbName = extractMongoDbName(uri);
+
   // Confirmation prompt (skip in test)
   if (process.env.NODE_ENV !== "test") {
-    const dbName = uri.split("/").pop()?.split("?")[0] ?? "unknown";
     const confirmed = await confirm(`Drop ALL collections in "${dbName}"? (yes/no): `);
     if (!confirmed) {
       console.log("Aborted.");

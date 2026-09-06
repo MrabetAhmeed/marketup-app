@@ -67,46 +67,8 @@ export function buildOrphanQuery(palier: 1 | 2, now: Date): Document {
   };
 }
 
-/**
- * Extract the database name from a MongoDB connection URI.
- *
- * Supports all standard forms:
- *   - Multi-host:  mongodb://user:pass@h1:27017,h2:27017,h3:27017/dbname?opts
- *   - Multi-host without db: mongodb://user:pass@h1:27017,h2:27017,h3:27017?opts
- *   - Single host: mongodb://user:pass@host:27017/dbname?opts
- *   - SRV:         mongodb+srv://user:pass@cluster.xxx.net/dbname?opts
- *   - Encoded password (%40 etc.) in userinfo — must not confuse the @ separator
- *
- * Returns "" if no database name is present (valid for BACKUP_MONGODB_URI).
- */
-export function extractMongoDbName(uri: string): string {
-  // Strip scheme
-  let rest = uri.replace(/^mongodb(\+srv)?:\/\//, "");
-
-  // Strip userinfo (user:pass@) — find the LAST @ before the first / or ?
-  // This handles passwords with encoded @ (%40) since we look for literal @
-  const authEnd = rest.lastIndexOf("@");
-  if (authEnd !== -1) {
-    rest = rest.slice(authEnd + 1);
-  }
-
-  // rest is now: host1:port,host2:port,.../dbname?opts
-  //          or: host1:port,host2:port,...?opts
-  //          or: host1:port,host2:port,...
-
-  // Find the first / after the hosts — that starts the dbname
-  const slashIdx = rest.indexOf("/");
-  if (slashIdx === -1) {
-    // No / at all → no database name
-    return "";
-  }
-
-  // After the slash: dbname?opts or just dbname
-  const afterSlash = rest.slice(slashIdx + 1);
-  const qIdx = afterSlash.indexOf("?");
-  const dbName = qIdx === -1 ? afterSlash : afterSlash.slice(0, qIdx);
-  return dbName;
-}
+// Re-export from uri-utils (single source of truth — no env/DB dependencies)
+export { extractMongoDbName } from "@/lib/uri-utils";
 
 /**
  * Compute counter keys from a list of invoice numbers.

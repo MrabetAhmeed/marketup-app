@@ -289,7 +289,8 @@ describe("extractMongoDbName", () => {
     )).toBe("testdb");
   });
 
-  it("+srv with db name", () => {
+  // +srv is supported for parsing but NOT recommended in this project (see DEPLOY.md)
+  it("+srv with db name (supported but not recommended)", () => {
     expect(extractMongoDbName(
       "mongodb+srv://user:pass@cluster0.abc.mongodb.net/marketup_prod?retryWrites=true&w=majority",
     )).toBe("marketup_prod");
