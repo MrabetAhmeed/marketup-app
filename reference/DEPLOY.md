@@ -388,6 +388,60 @@ Modifier la constante `PROTECTED_DATABASES` en haut de `scripts/seed.ts` et `scr
 
 ---
 
+## Pages legales — routes proxy configurables (LEGAL-1)
+
+Cinq URL publiques servent les documents legaux heberges sur `static.vivasky.media`. Chaque route recupere le fichier distant, le proxie au visiteur, et affiche une page de repli en cas d'indisponibilite.
+
+### URL publiques
+
+| URL | Variable d'environnement | Valeur par defaut |
+|---|---|---|
+| `/cgu_cgv.html` | *(aucune — figee pour le prestataire de paiement)* | `https://static.vivasky.media/cgu_cgv.html` |
+| `/mentions-legales` | `MENTIONS_LEGALES_SOURCE_URL` | `https://static.vivasky.media/cgu_cgv.html#mentions-legales` |
+| `/cgu` | `CGU_SOURCE_URL` | `https://static.vivasky.media/cgu_cgv.html#cgu` |
+| `/cgv` | `CGV_SOURCE_URL` | `https://static.vivasky.media/cgu_cgv.html#cgv` |
+| `/confidentialite` | `CONFIDENTIALITE_SOURCE_URL` | `https://static.vivasky.media/cgu_cgv.html#confidentialite` |
+
+### Fragment automatique
+
+Si l'URL de configuration contient un fragment (`#section`), le proxy :
+1. Retire le fragment avant la requete HTTP sortante (les fragments ne transitent pas sur le reseau).
+2. Injecte un script de defilement dans le HTML recu pour positionner le navigateur sur la section.
+3. Journalise un avertissement si l'identifiant est absent du document (la page s'affiche normalement en haut).
+
+### ATTENTION — guillemets obligatoires dans les fichiers .env
+
+`dotenv` traite le caractere `#` comme un commentaire en ligne. **Sans guillemets, le fragment est silencieusement supprime** et le defilement ne fonctionne pas.
+
+```bash
+# FAUX — le fragment #cgu est supprime silencieusement :
+CGU_SOURCE_URL=https://static.vivasky.media/cgu_cgv.html#cgu
+
+# CORRECT — les guillemets preservent le fragment :
+CGU_SOURCE_URL="https://static.vivasky.media/cgu_cgv.html#cgu"
+```
+
+Les valeurs par defaut (codees dans `env.ts`) ne sont pas affectees par ce probleme — elles contiennent les fragments. Ce piege ne se manifeste que lorsqu'on surcharge une variable dans `.env.local` ou `.env.prod`.
+
+### Basculer d'un fichier unique a des fichiers separes
+
+Quand le client livre des fichiers separes (par ex. `cgu.html`, `cgv.html`) :
+
+1. Modifier les variables d'environnement :
+   ```
+   CGU_SOURCE_URL=https://static.vivasky.media/cgu.html
+   CGV_SOURCE_URL=https://static.vivasky.media/cgv.html
+   ```
+   (sans fragment — pas besoin de guillemets)
+
+2. Rebuild et redemarrer. **Aucune modification de code necessaire.**
+
+### Basculer de fichiers separes a un fichier unique
+
+Remettre les URL avec `#fragment` pointant vers le fichier combine. **Guillemets obligatoires.** Rebuild et redemarrer.
+
+---
+
 ## Modifications manuelles en base : ce qui est sur et ce qui ne l'est pas
 
 > Guide pour Ahmed, pour les operations directes dans Atlas.

@@ -51,6 +51,12 @@ const envSchema = z.object({
   BACKUP_CRON_SECRET: z.string().default(""),
   SIGNUP_TEMP_MAX_AGE_DAYS: z.coerce.number().int().min(0).default(7),
 
+  // Legal pages — external document URLs (with optional #fragment for scroll)
+  MENTIONS_LEGALES_SOURCE_URL: z.string().url().default("https://static.vivasky.media/cgu_cgv.html#mentions-legales"),
+  CGU_SOURCE_URL: z.string().url().default("https://static.vivasky.media/cgu_cgv.html#cgu"),
+  CGV_SOURCE_URL: z.string().url().default("https://static.vivasky.media/cgu_cgv.html#cgv"),
+  CONFIDENTIALITE_SOURCE_URL: z.string().url().default("https://static.vivasky.media/cgu_cgv.html#confidentialite"),
+
   // Cloudflare R2 (optional in dev — app must not crash if empty)
   R2_ACCOUNT_ID: z.string().default(""),
   R2_ACCESS_KEY_ID: z.string().default(""),
