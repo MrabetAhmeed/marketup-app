@@ -6,7 +6,7 @@ const DESCRIPTION =
   "Vivasky, l'écosystème de l'action responsable structuré autour de 4 piliers : BrandUP, TraceUP, LinkUP et LifeUP.";
 const OG_DESCRIPTION =
   "Vivasky, l'écosystème de l'action responsable : BrandUP, TraceUP, LinkUP, LifeUP.";
-const SHARE_IMAGE = "https://www.vivasky.media/images/vivasky_logo_share.png";
+const SHARE_IMAGE = "https://static.vivasky.media/images/vivasky_logo_share.png";
 
 export const metadata: Metadata = {
   title: TITLE,

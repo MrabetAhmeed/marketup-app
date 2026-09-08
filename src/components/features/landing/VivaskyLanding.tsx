@@ -146,7 +146,7 @@ export function VivaskyLanding(): JSX.Element {
           <header className="mb-auto flex w-full items-center justify-between pt-5">
             <a href="#">
               <img
-                src="https://vivasky.media/images/logo_vivaskymedia.png"
+                src="https://static.vivasky.media/images/logo_vivaskymedia.png"
                 alt="Vivasky Logo"
                 className="block h-[70%] w-[70%]"
               />
@@ -331,14 +331,15 @@ function FooterInner({ onShare, onPitch }: FooterInnerProps): JSX.Element {
     <>
       <span>
         {new Date().getFullYear()} © vivasky.media —{" "}
-        <a
-          href="/cgu_cgv.html"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="font-medium text-slate-600 no-underline transition-colors hover:text-slate-900"
-        >
-          Conditions
-        </a>
+        <a href="/mentions-legales" target="_blank" rel="noopener noreferrer" className="font-medium text-slate-600 no-underline transition-colors hover:text-slate-900">Mentions légales</a>
+        {" · "}
+        <a href="/cgu" target="_blank" rel="noopener noreferrer" className="font-medium text-slate-600 no-underline transition-colors hover:text-slate-900">CGU</a>
+        {" · "}
+        <a href="/cgv" target="_blank" rel="noopener noreferrer" className="font-medium text-slate-600 no-underline transition-colors hover:text-slate-900">CGV</a>
+        {" · "}
+        <a href="/confidentialite" target="_blank" rel="noopener noreferrer" className="font-medium text-slate-600 no-underline transition-colors hover:text-slate-900">Confidentialité</a>
+        {" · "}
+        <a href="mailto:contact@vivasky.media" className="font-medium text-slate-600 no-underline transition-colors hover:text-slate-900">E-mail: contact@vivasky.media</a>
       </span>
       <div className="flex gap-2.5">
         <button type="button" onClick={onShare} className={BTN_SHARE_CLASS}>
