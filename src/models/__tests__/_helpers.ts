@@ -4,7 +4,7 @@ import { MongoMemoryServer } from "mongodb-memory-server";
 let mongod: MongoMemoryServer | null = null;
 
 export async function setupMongoMemory(): Promise<() => Promise<void>> {
-  mongod = await MongoMemoryServer.create();
+  mongod = await MongoMemoryServer.create({ instance: { launchTimeout: 20_000 } });
   const uri = mongod.getUri();
   await mongoose.connect(uri);
   // Ensure all indexes are created (required for unique compound index tests)

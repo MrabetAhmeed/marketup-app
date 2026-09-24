@@ -33,7 +33,7 @@ let client: MongoClient;
 let dbName: string;
 
 beforeAll(async () => {
-  replSet = await MongoMemoryReplSet.create({ replSet: { count: 1 } });
+  replSet = await MongoMemoryReplSet.create({ replSet: { count: 1 }, instanceOpts: [{ launchTimeout: 20_000 }] });
   const uri = replSet.getUri();
   dbName = "purge_test_db";
   // Connect with explicit db name

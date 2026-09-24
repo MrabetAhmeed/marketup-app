@@ -33,7 +33,7 @@ const SponsoringModel = Sponsoring as any;
 let replSet: MongoMemoryReplSet;
 
 beforeAll(async () => {
-  replSet = await MongoMemoryReplSet.create({ replSet: { count: 1 } });
+  replSet = await MongoMemoryReplSet.create({ replSet: { count: 1 }, instanceOpts: [{ launchTimeout: 20_000 }] });
   await mongoose.connect(replSet.getUri());
 }, 60_000);
 
