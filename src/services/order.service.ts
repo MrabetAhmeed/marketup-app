@@ -241,7 +241,9 @@ export async function createOrderAndStartPayment(
       amountMillimes: expectedAmountMillimes(spec),
       successUrl: `${base}/api/v1/payments/return?order=${orderId}&result=success`,
       failUrl: `${base}/api/v1/payments/return?order=${orderId}&result=fail`,
-      webhookUrl: `${base}/api/v1/webhooks/payment/${webhookSecret}?order=${orderId}`,
+      // Order id in the path, no query string: the operator appends its own
+      // "?payment_id=…" and would corrupt a parameter of ours (F3.1).
+      webhookUrl: `${base}/api/v1/webhooks/payment/${webhookSecret}/${orderId}`,
       acceptedMethods: env.PAYMENT_ACCEPTED_METHODS,
       sessionTimeoutSeconds: env.PAYMENT_SESSION_TIMEOUT_SECONDS,
     });

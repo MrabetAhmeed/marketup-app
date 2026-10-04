@@ -14,7 +14,7 @@ const PARAMS = {
   amountMillimes: 1_072_000,
   successUrl: "https://app.test/api/v1/payments/return?order=665f1f77bcf86cd799439011&result=success",
   failUrl: "https://app.test/api/v1/payments/return?order=665f1f77bcf86cd799439011&result=fail",
-  webhookUrl: "https://app.test/api/v1/webhooks/payment/secret?order=665f1f77bcf86cd799439011",
+  webhookUrl: "https://app.test/api/v1/webhooks/payment/secret/665f1f77bcf86cd799439011",
   acceptedMethods: ["card" as const],
   sessionTimeoutSeconds: 1200,
 };

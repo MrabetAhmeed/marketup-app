@@ -7,6 +7,7 @@ import { POST as cancelCampaign } from "@/app/api/v1/me/sponsoring/[id]/cancel/r
 import { POST as sponsoringCheckout } from "@/app/api/v1/me/sponsoring/checkout/route";
 import { GET as ownerCampaigns } from "@/app/api/v1/me/sponsoring/route";
 import { GET as paymentReturn } from "@/app/api/v1/payments/return/route";
+import { GET as webhookByPathGet, POST as webhookByPathPost } from "@/app/api/v1/webhooks/payment/[secret]/[orderId]/route";
 import { GET as webhookGet, POST as webhookPost } from "@/app/api/v1/webhooks/payment/[secret]/route";
 
 // ---------------------------------------------------------------------------
@@ -89,7 +90,154 @@ beforeEach(() => {
   vi.spyOn(console, "error").mockImplementation(() => undefined);
 });
 
-describe("webhook route", () => {
+// ---------------------------------------------------------------------------
+// F3.1 — the requests Flouci really sent during the smoke test, replayed as is
+// ---------------------------------------------------------------------------
+
+describe("webhook route — order id in the path (F3.1)", () => {
+  const SMOKE_ORDER = "6ac263299b9c5cccb5dcb8c6";
+
+  /** What Flouci does to the URL we give it: a GET, empty body, "?payment_id=…&success=…" appended. */
+  function flouciCall(orderId: string, success: "True" | "False", paymentId = "n_MXItTjRJ2XoFPt_a8vYw"): NextRequest {
+    return new NextRequest(
+      `https://app.test/api/v1/webhooks/payment/x/${orderId}?payment_id=${paymentId}&success=${success}`,
+      { method: "GET", headers: { "Content-Type": "application/json" } },
+    );
+  }
+
+  it("GET with ?payment_id=…&success=True and an empty body: confirms our order id, answers 200", async () => {
+    const res = await webhookByPathGet(flouciCall(SMOKE_ORDER, "True"), { params: { secret: WEBHOOK_SECRET, orderId: SMOKE_ORDER } });
+
+    expect(res.status).toBe(200);
+    expect(await res.json()).toEqual({ received: true });
+    expect(confirmOrder).toHaveBeenCalledTimes(1);
+    expect(confirmOrder).toHaveBeenCalledWith(SMOKE_ORDER, { trigger: "webhook" });
+  });
+
+  it("POST on the new form: same treatment, with or without a body", async () => {
+    const empty = new NextRequest(`https://app.test/api/v1/webhooks/payment/x/${SMOKE_ORDER}?payment_id=abc&success=True`, { method: "POST" });
+    const withBody = new NextRequest(`https://app.test/api/v1/webhooks/payment/x/${SMOKE_ORDER}`, {
+      method: "POST", body: '{"payment_id":"abc","success":true}', headers: { "Content-Type": "application/json" },
+    });
+
+    for (const req of [empty, withBody]) {
+      const res = await webhookByPathPost(req, { params: { secret: WEBHOOK_SECRET, orderId: SMOKE_ORDER } });
+      expect(res.status).toBe(200);
+    }
+    expect(confirmOrder).toHaveBeenCalledTimes(2);
+    expect(confirmOrder).toHaveBeenNthCalledWith(1, SMOKE_ORDER, { trigger: "webhook" });
+    expect(confirmOrder).toHaveBeenNthCalledWith(2, SMOKE_ORDER, { trigger: "webhook" });
+  });
+
+  it("payment_id and success are logged, never passed to the confirmation", async () => {
+    const info = vi.spyOn(console, "info").mockImplementation(() => undefined);
+    await webhookByPathGet(flouciCall(SMOKE_ORDER, "False", "mTaay5kpSbuTFdwsuD70rw"), { params: { secret: WEBHOOK_SECRET, orderId: SMOKE_ORDER } });
+
+    const logged = JSON.stringify(info.mock.calls);
+    expect(logged).toContain("mTaay5kpSbuTFdwsuD70rw");
+    expect(logged).toContain("success");
+    expect(logged).not.toContain(WEBHOOK_SECRET);
+    // Only our order id and the trigger reach the service
+    expect(confirmOrder.mock.calls[0]).toEqual([SMOKE_ORDER, { trigger: "webhook" }]);
+  });
+
+  it.each(["paid", "activation_pending", "failed", "expired", "pending"])(
+    "order found, outcome %s: 200 — nothing for the operator to retry",
+    async (outcome) => {
+      confirmOrder.mockResolvedValue({ outcome, changed: false });
+      const res = await webhookByPathGet(flouciCall(SMOKE_ORDER, "True"), { params: { secret: WEBHOOK_SECRET, orderId: SMOKE_ORDER } });
+      expect(res.status).toBe(200);
+    },
+  );
+
+  it("order not found: 200 with a log line, nothing to replay", async () => {
+    confirmOrder.mockResolvedValue({ outcome: "not_found", changed: false });
+    const warn = vi.spyOn(console, "warn").mockImplementation(() => undefined);
+
+    const res = await webhookByPathGet(flouciCall(SMOKE_ORDER, "True"), { params: { secret: WEBHOOK_SECRET, orderId: SMOKE_ORDER } });
+
+    expect(res.status).toBe(200);
+    expect(JSON.stringify(warn.mock.calls)).toContain("not found");
+    warn.mockRestore();
+  });
+
+  it.each(["not-an-id", "6ac263299b9c5cccb5dcb8c", "6ac263299b9c5cccb5dcb8c6?payment_id=x", ""])(
+    "malformed order id %j: 400, the confirmation is not called",
+    async (orderId) => {
+      const res = await webhookByPathGet(
+        new NextRequest("https://app.test/api/v1/webhooks/payment/x/y?payment_id=abc&success=True"),
+        { params: { secret: WEBHOOK_SECRET, orderId } },
+      );
+      expect(res.status).toBe(400);
+      expect(confirmOrder).not.toHaveBeenCalled();
+    },
+  );
+
+  it.each([
+    ["wrong secret", "x".repeat(32)],
+    ["wrong length", "short"],
+    ["empty", ""],
+  ])("%s: 401, the confirmation is not called", async (_label, secret) => {
+    for (const handler of [webhookByPathGet, webhookByPathPost]) {
+      const res = await handler(flouciCall(SMOKE_ORDER, "True"), { params: { secret, orderId: SMOKE_ORDER } });
+      expect(res.status).toBe(401);
+    }
+    expect(confirmOrder).not.toHaveBeenCalled();
+  });
+
+  it("no secret configured: every call is refused", async () => {
+    envMock.PAYMENT_WEBHOOK_SECRET = undefined;
+    const res = await webhookByPathGet(flouciCall(SMOKE_ORDER, "True"), { params: { secret: "unset", orderId: SMOKE_ORDER } });
+    expect(res.status).toBe(401);
+    expect(confirmOrder).not.toHaveBeenCalled();
+  });
+
+  it("operator unreachable: no outcome, an error answer lets the operator call again", async () => {
+    confirmOrder.mockRejectedValue(new Error("Flouci verify_payment: network error"));
+    const res = await webhookByPathGet(flouciCall(SMOKE_ORDER, "True"), { params: { secret: WEBHOOK_SECRET, orderId: SMOKE_ORDER } });
+    expect(res.status).toBe(502);
+  });
+});
+
+describe("webhook route — legacy form, tolerant (F3.1)", () => {
+  it("GET with the exact value logged during the smoke test: order id extracted, confirmation called, 200", async () => {
+    // [payment-webhook] received method=GET … query={"order":"6ac263299b9c5cccb5dcb8c6?payment_id=n_MXItTjRJ2XoFPt_a8vYw","success":"True"}
+    const req = new NextRequest(
+      "https://app.test/api/v1/webhooks/payment/x?order=6ac263299b9c5cccb5dcb8c6?payment_id=n_MXItTjRJ2XoFPt_a8vYw&success=True",
+      { method: "GET", headers: { "Content-Type": "application/json" } },
+    );
+    // The request really parses to the logged query
+    expect(Object.fromEntries(new URL(req.url).searchParams)).toEqual({
+      order: "6ac263299b9c5cccb5dcb8c6?payment_id=n_MXItTjRJ2XoFPt_a8vYw",
+      success: "True",
+    });
+
+    const res = await webhookGet(req, { params: { secret: WEBHOOK_SECRET } });
+
+    expect(res.status).toBe(200);
+    expect(confirmOrder).toHaveBeenCalledTimes(1);
+    expect(confirmOrder).toHaveBeenCalledWith("6ac263299b9c5cccb5dcb8c6", { trigger: "webhook" });
+  });
+
+  it("the second logged request (success=False) is treated the same way", async () => {
+    const req = new NextRequest(
+      "https://app.test/api/v1/webhooks/payment/x?order=6ac263d49b9c5cccb5dcb8ca?payment_id=mTaay5kpSbuTFdwsuD70rw&success=False",
+      { method: "GET" },
+    );
+    const res = await webhookGet(req, { params: { secret: WEBHOOK_SECRET } });
+    expect(res.status).toBe(200);
+    expect(confirmOrder).toHaveBeenCalledWith("6ac263d49b9c5cccb5dcb8ca", { trigger: "webhook" });
+  });
+
+  it("still refuses a wrong secret before extracting anything", async () => {
+    const req = new NextRequest("https://app.test/api/v1/webhooks/payment/x?order=6ac263299b9c5cccb5dcb8c6?payment_id=abc&success=True");
+    const res = await webhookGet(req, { params: { secret: "x".repeat(32) } });
+    expect(res.status).toBe(401);
+    expect(confirmOrder).not.toHaveBeenCalled();
+  });
+});
+
+describe("webhook route — legacy form", () => {
   it("correct secret: confirms the order named in the URL, without throttling", async () => {
     const res = await webhookPost(webhookRequest("POST", `?order=${ORDER_ID}`, '{"payment_id":"abc"}'), { params: { secret: WEBHOOK_SECRET } });
     expect(res.status).toBe(200);
@@ -97,7 +245,7 @@ describe("webhook route", () => {
     expect(confirmOrder).toHaveBeenCalledWith(ORDER_ID, { trigger: "webhook" });
   });
 
-  it("accepts a GET as well: the operator's method is not documented", async () => {
+  it("accepts a GET as well: it is the method Flouci uses", async () => {
     const res = await webhookGet(webhookRequest("GET"), { params: { secret: WEBHOOK_SECRET } });
     expect(res.status).toBe(200);
     expect(confirmOrder).toHaveBeenCalledWith(ORDER_ID, { trigger: "webhook" });

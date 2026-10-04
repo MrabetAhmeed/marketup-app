@@ -4,6 +4,7 @@ import mongoose from "mongoose";
 import { MongoMemoryReplSet } from "mongodb-memory-server";
 import { NextRequest } from "next/server";
 import { GET as paymentReturn } from "@/app/api/v1/payments/return/route";
+import { GET as paymentWebhook } from "@/app/api/v1/webhooks/payment/[secret]/[orderId]/route";
 import { FlouciPaymentAdapter } from "@/lib/payment/flouci";
 import { orderOutcomeBanner } from "@/lib/payment/order-labels";
 import { SimulatedPaymentAdapter } from "@/lib/payment/simulated";
@@ -179,7 +180,9 @@ describe("checkout — two-step", () => {
     expect(params.amountMillimes).toBe(BOOST_TTC_MILLIMES);
     expect(params.successUrl).toBe(`https://app.test/api/v1/payments/return?order=${orderId}&result=success`);
     expect(params.failUrl).toBe(`https://app.test/api/v1/payments/return?order=${orderId}&result=fail`);
-    expect(params.webhookUrl).toBe(`https://app.test/api/v1/webhooks/payment/${"w".repeat(32)}?order=${orderId}`);
+    // Order id in the path, no query string: the operator appends its own "?payment_id=…"
+    expect(params.webhookUrl).toBe(`https://app.test/api/v1/webhooks/payment/${"w".repeat(32)}/${orderId}`);
+    expect(params.webhookUrl).not.toContain("?");
     expect(params.acceptedMethods).toEqual(["card"]);
     expect(params.sessionTimeoutSeconds).toBe(1200);
 
@@ -667,6 +670,103 @@ describe("return route — safety", () => {
     const after = orderOutcomeBanner({ ...(await order(orderId)), id: orderId });
     expect(after.tone).toBe("success");
     expect(after.action).toBeUndefined();
+  });
+});
+
+// ---------------------------------------------------------------------------
+// F3.1 — webhook route with the real confirmation service behind it
+// ---------------------------------------------------------------------------
+
+describe("webhook route — end to end (F3.1)", () => {
+  const SECRET = "w".repeat(32);
+
+  /** The call Flouci makes to the webhook URL stored for this order: GET, empty body, its own query appended. */
+  async function flouciCallsWebhook(orderId: string, success: "True" | "False"): Promise<Response> {
+    const webhookUrl: string = adapter.createPayment.mock.calls.at(-1)![0].webhookUrl;
+    expect(webhookUrl).toBe(`https://app.test/api/v1/webhooks/payment/${SECRET}/${orderId}`);
+    const req = new NextRequest(`${webhookUrl}?payment_id=n_MXItTjRJ2XoFPt_a8vYw&success=${success}`, {
+      method: "GET",
+      headers: { "Content-Type": "application/json" },
+    });
+    return paymentWebhook(req, { params: { secret: SECRET, orderId } });
+  }
+
+  it("the webhook alone confirms the order: the buyer may have closed the browser", async () => {
+    const { company, orderId } = await pendingBoostOrder();
+    verifies("success");
+
+    const res = await flouciCallsWebhook(orderId, "True");
+
+    expect(res.status).toBe(200);
+    expect((await order(orderId)).status).toBe("paid");
+    expect(await BoostModel.countDocuments({ companyId: company._id, status: "active" })).toBe(1);
+    // Verified with the payment id stored on the order, not the one in the query
+    expect(adapter.verifyPayment).toHaveBeenCalledWith((await order(orderId)).externalPaymentId);
+    expect(adapter.verifyPayment).not.toHaveBeenCalledWith("n_MXItTjRJ2XoFPt_a8vYw");
+  });
+
+  it("webhook on an order already paid: the operator is not asked again, 200", async () => {
+    const { company, orderId } = await pendingBoostOrder();
+    verifies("success");
+    await confirmOrder(orderId, { trigger: "return" });
+    adapter.verifyPayment.mockClear();
+
+    const first = await flouciCallsWebhook(orderId, "True");
+    const retry = await flouciCallsWebhook(orderId, "True");
+
+    expect(first.status).toBe(200);
+    expect(retry.status).toBe(200);
+    expect(adapter.verifyPayment).not.toHaveBeenCalled();
+    expect(await BoostModel.countDocuments({ companyId: company._id })).toBe(1);
+  });
+
+  it("success=True received while the operator's verification says failure: the verification wins", async () => {
+    const { company, orderId } = await pendingBoostOrder();
+    verifies("failure", null, null);
+
+    const res = await flouciCallsWebhook(orderId, "True");
+
+    expect(res.status).toBe(200);
+    const doc = await order(orderId);
+    expect(doc.status).toBe("failed");
+    expect(doc.failureReason).toBe("payment_failure");
+    expect(await BoostModel.countDocuments({ companyId: company._id })).toBe(0);
+  });
+
+  it("success=False received while the operator's verification says success: the verification wins too", async () => {
+    const { company, orderId } = await pendingBoostOrder();
+    verifies("success");
+
+    const res = await flouciCallsWebhook(orderId, "False");
+
+    expect(res.status).toBe(200);
+    expect((await order(orderId)).status).toBe("paid");
+    expect(await BoostModel.countDocuments({ companyId: company._id })).toBe(1);
+  });
+
+  it("unknown order: 200, the operator is not asked, nothing is confirmed", async () => {
+    const unknown = String(new mongoose.Types.ObjectId());
+    const warn = vi.spyOn(console, "warn").mockImplementation(() => undefined);
+    const req = new NextRequest(`https://app.test/api/v1/webhooks/payment/${SECRET}/${unknown}?payment_id=abc&success=True`);
+
+    const res = await paymentWebhook(req, { params: { secret: SECRET, orderId: unknown } });
+    warn.mockRestore();
+
+    expect(res.status).toBe(200);
+    expect(adapter.verifyPayment).not.toHaveBeenCalled();
+    expect(await BoostModel.countDocuments({})).toBe(0);
+  });
+
+  it("wrong secret: 401, the order is left untouched and the operator is not asked", async () => {
+    const { orderId } = await pendingBoostOrder();
+    verifies("success");
+    const req = new NextRequest(`https://app.test/api/v1/webhooks/payment/wrong/${orderId}?payment_id=abc&success=True`);
+
+    const res = await paymentWebhook(req, { params: { secret: "x".repeat(32), orderId } });
+
+    expect(res.status).toBe(401);
+    expect(adapter.verifyPayment).not.toHaveBeenCalled();
+    expect((await order(orderId)).status).toBe("pending");
   });
 });
 
