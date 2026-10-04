@@ -5,7 +5,8 @@ import { env } from "@/lib/env";
 import { AppError, BusinessRuleError, NotFoundError } from "@/lib/api-error";
 import { SPONSORING_PRICE_HT, SPONSORING_DURATION_DAYS, DEFAULT_VAT_RATE, FISCAL_STAMP_DT, computeTTC, formatMoney } from "@/lib/pricing";
 import { generateInvoiceNumber } from "@/lib/invoice";
-import { payment } from "@/lib/payment";
+import { getPaymentAdapter, payment } from "@/lib/payment";
+import { isPendingOrderConflict } from "@/lib/payment/order-conflict";
 import { Transaction } from "@/models/transaction.model";
 import { Sponsoring } from "@/models/sponsoring.model";
 import { Profile } from "@/models/profile.model";
@@ -391,9 +392,17 @@ export async function checkoutSponsoring(
         invoiceNumber,
         idempotencyKey,
         refId: sponsoringId,
+        durationDays: SPONSORING_DURATION_DAYS,
+        adapterEnvironment: getPaymentAdapter().describe().environment,
       }],
       { session },
-    );
+    ).catch((err: unknown) => {
+      // Another order for the same campaign is pending or being written: refuse, never a 500
+      if (isPendingOrderConflict(err)) {
+        throw new AppError("SPONSORING_CHECKOUT_IN_PROGRESS", "Un paiement est déjà en cours pour cette campagne.", 409);
+      }
+      throw err;
+    });
 
     // Process payment
     const checkout = await payment.createCheckout({

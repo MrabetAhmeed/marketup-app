@@ -486,3 +486,60 @@ describe("cross-tenant", () => {
       .rejects.toThrow(); // NotFoundError — not found for this company
   });
 });
+
+// ---------------------------------------------------------------------------
+// V1.2 F2 — fields frozen on the order at purchase
+// ---------------------------------------------------------------------------
+
+describe("checkoutSponsoring — frozen fields (F2)", () => {
+  it("freezes the duration and the adapter environment on the order", async () => {
+    const company = await createTestCompany();
+    const doc = await SponsoringModel.create({
+      companyId: company._id, profileKind: "brandup",
+      bannerUrl: BANNER, linkUrl: LINK, status: "confirmed",
+      confirmedAt: new Date(),
+    });
+
+    const { checkoutSponsoring } = await import("@/services/sponsoring.service");
+    const result = await checkoutSponsoring(String(company._id), String(doc._id), "spo-key-f2-frozen");
+
+    const order = await mongoose.connection
+      .collection("transactions")
+      .findOne({ _id: new mongoose.Types.ObjectId(result.transaction.id) });
+    expect(order!.durationDays).toBe(7);
+    expect(order!.adapterEnvironment).toBe("test");
+    expect(order!.activationPending).toBe(false);
+    expect(order!.activationPendingReason).toBeNull();
+  });
+});
+
+// ---------------------------------------------------------------------------
+// V1.2 F2 — a second order for the same campaign is a 409, never a 500
+// ---------------------------------------------------------------------------
+
+describe("checkoutSponsoring — pending order conflict (F2)", () => {
+  it("returns 409 SPONSORING_CHECKOUT_IN_PROGRESS when a pending order already exists", async () => {
+    const company = await createTestCompany();
+    const doc = await SponsoringModel.create({
+      companyId: company._id, profileKind: "brandup",
+      bannerUrl: BANNER, linkUrl: LINK, status: "confirmed",
+      confirmedAt: new Date(),
+    });
+    // The Transaction model is registered by the service import: build its indexes first
+    const { checkoutSponsoring } = await import("@/services/sponsoring.service");
+    await mongoose.connection.syncIndexes();
+    await mongoose.connection.collection("transactions").insertOne({
+      companyId: company._id, type: "sponsoring", refId: doc._id, profileKind: "brandup",
+      priceHT: 700, vatRate: 0.19, status: "pending", idempotencyKey: null, deletedAt: null,
+    });
+
+    await expect(checkoutSponsoring(String(company._id), String(doc._id), "spo-key-f2-conflict")).rejects.toMatchObject({
+      code: "SPONSORING_CHECKOUT_IN_PROGRESS",
+      status: 409,
+    });
+
+    const updated = await SponsoringModel.findById(doc._id).lean();
+    expect(updated.status).toBe("confirmed");
+    expect(await mongoose.connection.collection("transactions").countDocuments({ companyId: company._id })).toBe(1);
+  });
+});

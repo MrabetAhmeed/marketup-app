@@ -5,7 +5,8 @@ import { env } from "@/lib/env";
 import { AppError, BusinessRuleError, NotFoundError } from "@/lib/api-error";
 import { BOOST_PRICE_HT, BOOST_DURATION_DAYS, DEFAULT_VAT_RATE, FISCAL_STAMP_DT, computeTTC, formatMoney } from "@/lib/pricing";
 import { generateInvoiceNumber } from "@/lib/invoice";
-import { payment } from "@/lib/payment";
+import { getPaymentAdapter, payment } from "@/lib/payment";
+import { isPendingOrderConflict } from "@/lib/payment/order-conflict";
 import { Transaction } from "@/models/transaction.model";
 import { Boost, findActiveBoosts } from "@/models/boost.model";
 import { Profile } from "@/models/profile.model";
@@ -141,9 +142,17 @@ export async function checkoutBoost(
         paidAt: null,
         invoiceNumber,
         idempotencyKey,
+        durationDays: BOOST_DURATION_DAYS,
+        adapterEnvironment: getPaymentAdapter().describe().environment,
       }],
       { session },
-    );
+    ).catch((err: unknown) => {
+      // Another order for the same boost is pending or being written: refuse, never a 500
+      if (isPendingOrderConflict(err)) {
+        throw new AppError("BOOST_CHECKOUT_IN_PROGRESS", "Un paiement est déjà en cours pour ce boost.", 409);
+      }
+      throw err;
+    });
 
     // Process payment (simulated = instant)
     const checkout = await payment.createCheckout({

@@ -30,9 +30,29 @@ export function computeTTC(
   vatRate: number,
   fiscalStampDT: number = 0,
 ): { vatAmount: number; fiscalStampDT: number; priceTTC: number } {
-  const vatAmount = Math.round(priceHT * vatRate * 100) / 100;
-  const priceTTC = priceHT + vatAmount + fiscalStampDT;
+  const vatAmount = roundToMillime(priceHT * vatRate);
+  const priceTTC = roundToMillime(priceHT + vatAmount + fiscalStampDT);
   return { vatAmount, fiscalStampDT, priceTTC };
+}
+
+/** The dinar has three decimals: amounts are rounded to the millime. */
+function roundToMillime(amountDT: number): number {
+  return Math.round(amountDT * 1000) / 1000;
+}
+
+/**
+ * Convert an amount in dinars to millimes (1 DT = 1 000 millimes), as an integer.
+ * The only conversion used to talk to the payment operator.
+ *
+ * Examples:
+ *   dtToMillimes(1072)  -> 1072000
+ *   dtToMillimes(1.005) -> 1005
+ */
+export function dtToMillimes(amountDT: number): number {
+  if (!Number.isFinite(amountDT) || amountDT < 0) {
+    throw new Error("amountDT must be a finite, non-negative number");
+  }
+  return Math.round(amountDT * 1000);
 }
 
 // ---------------------------------------------------------------------------

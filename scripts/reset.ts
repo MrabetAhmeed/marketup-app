@@ -1,5 +1,6 @@
 import * as readline from "node:readline";
 import mongoose from "mongoose";
+import { migrateOrderIndexes } from "@/lib/payment/order-index-migration";
 import { extractMongoDbName, checkDestructiveGuards } from "@/lib/uri-utils";
 
 // Databases where destructive scripts must NEVER run
@@ -57,8 +58,16 @@ async function main(): Promise<void> {
   }
 
   console.log("✅ Database reset");
+
+  // The application never builds the order indexes (V1.2 F2): the collections were
+  // just dropped, so the migration is replayed in apply mode.
+  const migration = await migrateOrderIndexes(db, {
+    apply: true,
+    log: (line) => console.log(`  [migrate-payment-indexes] ${line}`),
+  });
+
   await mongoose.disconnect();
-  process.exit(0);
+  process.exit(migration.exitCode);
 }
 
 function confirm(question: string): Promise<boolean> {

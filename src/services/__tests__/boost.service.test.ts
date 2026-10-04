@@ -350,3 +350,67 @@ describe("getBoostHistory", () => {
     expect(itemsA[0]!.id).not.toBe(itemsB[0]!.id);
   });
 });
+
+// ---------------------------------------------------------------------------
+// V1.2 F2 — fields frozen on the order at purchase
+// ---------------------------------------------------------------------------
+
+describe("checkoutBoost — frozen fields (F2)", () => {
+  it("freezes the duration and the adapter environment on the order", async () => {
+    const company = await createTestCompany();
+    await createTestProfile(company._id, "brandup");
+
+    const { checkoutBoost } = await import("@/services/boost.service");
+    const result = await checkoutBoost(String(company._id), "brandup", "key-f2-frozen");
+
+    const order = await TransactionModel.findById(result.transaction.id).lean();
+    expect(order.durationDays).toBe(30);
+    expect(order.adapterEnvironment).toBe("test");
+    expect(order.activationPending).toBe(false);
+    expect(order.activationPendingReason).toBeNull();
+  });
+});
+
+// ---------------------------------------------------------------------------
+// V1.2 F2 — a second order for the same service is a 409, never a 500
+// ---------------------------------------------------------------------------
+
+describe("checkoutBoost — pending order conflict (F2)", () => {
+  it("returns 409 BOOST_CHECKOUT_IN_PROGRESS when a pending order already exists", async () => {
+    const company = await createTestCompany();
+    await createTestProfile(company._id, "brandup");
+    await TransactionModel.create({
+      companyId: company._id, type: "boost", profileKind: "brandup",
+      priceHT: 900, vatRate: 0.19, status: "pending",
+    });
+
+    const { checkoutBoost } = await import("@/services/boost.service");
+    await expect(checkoutBoost(String(company._id), "brandup", "key-f2-conflict")).rejects.toMatchObject({
+      code: "BOOST_CHECKOUT_IN_PROGRESS",
+      status: 409,
+    });
+
+    expect(await TransactionModel.countDocuments({ companyId: company._id })).toBe(1);
+    expect(await BoostModel.countDocuments({ companyId: company._id })).toBe(0);
+  });
+
+  it("two simultaneous purchases: one succeeds, the other is refused without a second boost", async () => {
+    const company = await createTestCompany();
+    await createTestProfile(company._id, "brandup");
+
+    const { checkoutBoost } = await import("@/services/boost.service");
+    const outcomes = await Promise.allSettled([
+      checkoutBoost(String(company._id), "brandup", "key-f2-simul-a"),
+      checkoutBoost(String(company._id), "brandup", "key-f2-simul-b"),
+    ]);
+
+    const fulfilled = outcomes.filter((o) => o.status === "fulfilled");
+    const rejected = outcomes.filter((o): o is PromiseRejectedResult => o.status === "rejected");
+    expect(fulfilled).toHaveLength(1);
+    expect(rejected).toHaveLength(1);
+    expect(rejected[0]!.reason).toMatchObject({ code: "BOOST_CHECKOUT_IN_PROGRESS", status: 409 });
+
+    expect(await BoostModel.countDocuments({ companyId: company._id })).toBe(1);
+    expect(await TransactionModel.countDocuments({ companyId: company._id })).toBe(1);
+  });
+});

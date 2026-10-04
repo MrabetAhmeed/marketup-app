@@ -24,6 +24,7 @@ import { Sector } from "../src/models/sector.model";
 import { Gouvernorat } from "../src/models/gouvernorat.model";
 import { ProfileStatsMonthlyModel } from "../src/models/profile-stats-monthly.model";
 import { Counter } from "../src/models/counter.model";
+import { migrateOrderIndexes } from "@/lib/payment/order-index-migration";
 import { extractMongoDbName, checkDestructiveGuards } from "@/lib/uri-utils";
 
 // Databases where destructive scripts must NEVER run
@@ -197,8 +198,15 @@ async function main(): Promise<void> {
   // Print summary
   printSummary(canonOk);
 
+  // The application never builds the order indexes (V1.2 F2): the collections were
+  // just dropped, so the migration is replayed in apply mode.
+  const migration = await migrateOrderIndexes(db, {
+    apply: true,
+    log: (line) => console.log(`  [migrate-payment-indexes] ${line}`),
+  });
+
   await mongoose.disconnect();
-  process.exit(canonOk ? 0 : 1);
+  process.exit(canonOk && migration.exitCode === 0 ? 0 : 1);
 }
 
 // ═══════════════════════════════════════════════════
