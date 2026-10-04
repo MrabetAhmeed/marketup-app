@@ -468,7 +468,7 @@ If any gate fails, fix before committing.
 ## 13. People & Roles
 
 - **Owner** = business person, one per company. **Super Admin** = AGGREGAX/vivasky.media staff.
-- Demo admin: **Bassem Admin** (`manager@vivasky.media`). Demo owner: **Ahmed Mrabet** (`ahmed@technofab.tn`).
+- Demo admin: **Bassem Admin** (`manager@vivasky.media`). Demo owner: **Ahmed Mrabet** (`ahmed@technofab.test`).
 
 ---
 

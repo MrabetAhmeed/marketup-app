@@ -370,7 +370,7 @@ fetch('/api/v1/me/account', {
 ## Setup
 - URL testée : /dashboard/...
 - Endpoint : PATCH /api/v1/...
-- Login : ahmed@technofab.tn / Demo1234!
+- Login : ahmed@technofab.test / Demo1234!
 - Browser : Chrome / Firefox / Edge (privé pour A.1)
 - Date : YYYY-MM-DD
 

@@ -76,7 +76,7 @@ beforeEach(async () => {
   await GouvernoratModel.create({ slug: "sousse", name: { fr: "Sousse" }, order: 1 });
 
   const user = await UserModel.create({
-    email: "ahmed@technofab.tn",
+    email: "ahmed@technofab.test",
     firstName: "Ahmed",
     lastName: "Mrabet",
     passwordHash: "hashedpw",
@@ -89,7 +89,7 @@ beforeEach(async () => {
     slug: "technofab-industries",
     type: "B2B",
     legalId: "TN-RNE-001",
-    accountEmail: "ahmed@technofab.tn",
+    accountEmail: "ahmed@technofab.test",
     country: "TN",
     data: {
       displayName: { fr: "TechnoFab Industries", ar: "", en: "" },
@@ -98,7 +98,7 @@ beforeEach(async () => {
       sectorId: "mecanique",
       gouvernorat: "sousse",
       ville: "Sousse",
-      contactEmail: "ahmed@technofab.tn",
+      contactEmail: "ahmed@technofab.test",
       languages: ["fr"],
     },
     status: "active",

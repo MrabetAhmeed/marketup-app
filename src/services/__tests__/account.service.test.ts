@@ -72,7 +72,7 @@ beforeEach(async () => {
     slug: "technofab-industries",
     type: "B2B",
     legalId: "TN-RNE-001",
-    accountEmail: "ahmed@technofab.tn",
+    accountEmail: "ahmed@technofab.test",
     country: "TN",
     data: {
       displayName: { fr: "TechnoFab Industries", ar: "", en: "" },
@@ -84,7 +84,7 @@ beforeEach(async () => {
       sectorId: "mecanique",
       gouvernorat: "sousse",
       ville: "Sousse",
-      contactEmail: "ahmed@technofab.tn",
+      contactEmail: "ahmed@technofab.test",
       phone: "+21698000001",
       whatsapp: "+21698000001",
       gerantFirstName: "Ahmed",
@@ -97,7 +97,7 @@ beforeEach(async () => {
   });
 
   const user = await UserModel.create({
-    email: "ahmed@technofab.tn",
+    email: "ahmed@technofab.test",
     firstName: "Ahmed",
     lastName: "Mrabet",
     passwordHash: "hashedpw",
@@ -185,13 +185,13 @@ describe("updateMeAccount — contact fields (FB-7a: pendingUpdates)", () => {
   });
 
   it("PATCH contactEmail → creates pendingUpdates", async () => {
-    await updateMeAccount(userId, { contactEmail: "new@technofab.tn" });
+    await updateMeAccount(userId, { contactEmail: "new@technofab.test" });
 
     const company = await CompanyModel.findById(companyId).lean();
     const f = company.pendingUpdates.fields.find((x: any) => x.key === "liveData.contactEmail");
     expect(f).toBeDefined();
-    expect(f.newValue).toBe("new@technofab.tn");
-    expect(company.liveData.contactEmail).toBe("ahmed@technofab.tn");
+    expect(f.newValue).toBe("new@technofab.test");
+    expect(company.liveData.contactEmail).toBe("ahmed@technofab.test");
   });
 
   it("PATCH phone + firstName → both in pendingUpdates", async () => {
