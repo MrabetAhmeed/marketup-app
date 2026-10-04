@@ -34,20 +34,7 @@ async function main(): Promise<void> {
   console.log("\n2. SimulatedPaymentAdapter");
   const adapter = new SimulatedPaymentAdapter();
 
-  const checkout = await adapter.createCheckout({
-    companyId: "test-company",
-    type: "boost",
-    profileKind: "brandup",
-    priceHT: 50,
-    vatRate: 0.19,
-    idempotencyKey: "check-c0-test",
-  });
-  check("createCheckout status = " + checkout.status + " (expected paid_simulated)", checkout.status === "paid_simulated");
-  check("reference starts with SIM- = " + checkout.reference, checkout.reference.startsWith("SIM-"));
-  check("paymentMethod = " + checkout.paymentMethod + " (expected simulated)", checkout.paymentMethod === "simulated");
-  check("paidAt is ISO string", checkout.paidAt != null && !isNaN(Date.parse(checkout.paidAt)));
-
-  // Two-step interface (V1.2 F1): verify a payment created through createPayment
+  // Two-step interface (V1.2 F1/F3): verify a payment created through createPayment
   const created = await adapter.createPayment({
     orderId: "check-c0-order",
     amountMillimes: 1_000,
@@ -57,8 +44,13 @@ async function main(): Promise<void> {
     acceptedMethods: ["card"],
     sessionTimeoutSeconds: 1200,
   });
+  check("externalId starts with SIM- = " + created.externalId, created.externalId.startsWith("SIM-"));
   const verify = await adapter.verifyPayment(created.externalId);
   check("verifyPayment status = " + verify.status + " (expected success)", verify.status === "success");
+  check("verifyPayment method = " + verify.method + " (expected simulated)", verify.method === "simulated");
+  // Stateless: another instance (a restarted server) verifies the same payment
+  const afterRestart = await new SimulatedPaymentAdapter().verifyPayment(created.externalId);
+  check("verifyPayment survives a restart", afterRestart.status === "success" && afterRestart.amountMillimes === 1_000);
 
   // 3. Transaction enum (static check — model accepts new values)
   console.log("\n3. Transaction enum values");

@@ -60,24 +60,25 @@ describe("requireMonetization", () => {
 // ---------------------------------------------------------------------------
 
 describe("SimulatedPaymentAdapter", () => {
-  it("createCheckout returns paid_simulated with SIM- reference", async () => {
+  it("createPayment returns a SIM- reference and redirects to our own return link", async () => {
     const { SimulatedPaymentAdapter } = await import("@/lib/payment/simulated");
     const adapter = new SimulatedPaymentAdapter();
-    const result = await adapter.createCheckout({
-      companyId: "abc123",
-      type: "boost",
-      profileKind: "brandup",
-      priceHT: 50,
-      vatRate: 0.19,
-      idempotencyKey: "test-key-1",
+    const result = await adapter.createPayment({
+      orderId: "order-1",
+      amountMillimes: 60_500,
+      successUrl: "https://app.test/api/v1/payments/return?order=order-1&result=success",
+      failUrl: "https://app.test/api/v1/payments/return?order=order-1&result=fail",
+      webhookUrl: "https://app.test/hook",
+      acceptedMethods: ["card"],
+      sessionTimeoutSeconds: 1200,
     });
 
-    expect(result.status).toBe("paid_simulated");
-    expect(result.reference).toMatch(/^SIM-/);
-    expect(result.paymentMethod).toBe("simulated");
-    expect(result.paidAt).toBeTruthy();
-    // paidAt is a valid ISO string
-    expect(new Date(result.paidAt!).toISOString()).toBe(result.paidAt);
+    expect(result.externalId).toMatch(/^SIM-/);
+    const url = new URL(result.redirectUrl);
+    expect(url.pathname).toBe("/api/v1/payments/return");
+    expect(url.searchParams.get("order")).toBe("order-1");
+    expect(url.searchParams.get("result")).toBe("success");
+    expect(url.searchParams.get("payment_id")).toBe(result.externalId);
   });
 
   it("verifyPayment returns a normalized success for a payment it created", async () => {

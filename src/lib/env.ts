@@ -51,6 +51,13 @@ const envObjectSchema = z.object({
         .min(1, "PAYMENT_ACCEPTED_METHODS must list at least one method"),
     ),
   PAYMENT_SESSION_TIMEOUT_SECONDS: z.coerce.number().int().positive().default(1200),
+  // Simulator only: outcome of every simulated payment (F3 G3).
+  PAYMENT_SIMULATED_OUTCOME: z.preprocess(
+    emptyToUndefined,
+    z.enum(["success", "failure"], {
+      errorMap: () => ({ message: "PAYMENT_SIMULATED_OUTCOME must be \"success\" or \"failure\"" }),
+    }).default("success"),
+  ),
   PAYMENT_WEBHOOK_SECRET: optionalString(),
   PAYMENT_SWEEP_SECRET: optionalString(),
   FLOUCI_PUBLIC_KEY: optionalString(),

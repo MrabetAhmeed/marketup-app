@@ -11,7 +11,7 @@ export type PaymentEnvironment = "test" | "production";
 
 export type PaymentMethodKind = "card" | "wallet";
 
-/** PSP status, normalized. Mapping to order states happens in the services (F3). */
+/** PSP status, normalized. Mapping to order states happens in order.service.ts. */
 export type NormalizedPaymentStatus =
   | "success"
   | "pending"
@@ -59,29 +59,4 @@ export interface PaymentAdapter {
   /** Network or HTTP failures throw — a status is never invented. */
   verifyPayment(externalId: string): Promise<VerifyPaymentResult>;
   describe(): PaymentAdapterDescription;
-}
-
-// ---------------------------------------------------------------------------
-// One-step checkout — transitional, used by the current purchase flow until
-// the two-step flow replaces it in F3.
-// ---------------------------------------------------------------------------
-
-export interface CheckoutParams {
-  companyId: string;
-  type: PaymentType;
-  profileKind: "brandup" | "traceup" | "linkup";
-  priceHT: number;
-  vatRate: number;
-  idempotencyKey: string;
-}
-
-export interface CheckoutResult {
-  /** Payment reference (unique per transaction) */
-  reference: string;
-  /** Resulting status after checkout */
-  status: "paid_simulated" | "pending";
-  /** ISO timestamp of payment (null if pending redirect to PSP) */
-  paidAt: string | null;
-  /** Payment method recorded */
-  paymentMethod: "simulated" | "card" | "bank_transfer";
 }

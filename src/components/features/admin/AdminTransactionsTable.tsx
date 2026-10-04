@@ -2,6 +2,7 @@
 
 import { useState, useMemo } from "react";
 import { StatusPill } from "@/components/shared/StatusPill";
+import { activationPendingReasonLabel, orderStatusPill } from "@/lib/payment/order-labels";
 import { formatMoney } from "@/lib/pricing";
 
 interface TransactionAdminDTO {
@@ -15,7 +16,10 @@ interface TransactionAdminDTO {
   fiscalStampDT: number;
   priceTTC: number;
   currency: string;
-  status: "pending" | "paid" | "paid_simulated" | "refunded" | "failed";
+  status: "pending" | "paid" | "paid_simulated" | "refunded" | "failed" | "expired";
+  activationPending: boolean;
+  activationPendingReason: string | null;
+  deleted: boolean;
   paymentMethod: string | null;
   paymentReference: string | null;
   invoiceNumber: string | null;
@@ -42,36 +46,30 @@ function formatDate(iso: string): string {
   });
 }
 
-function statusPillKind(status: string): "paid" | "pending" | "failed" | "refunded" {
-  if (status === "paid" || status === "paid_simulated") return "paid";
-  if (status === "refunded") return "refunded";
-  if (status === "failed") return "failed";
-  return "pending";
-}
-
-function statusLabel(status: string): string {
-  if (status === "paid_simulated") return "Payé (test)";
-  if (status === "paid") return "Payé";
-  if (status === "refunded") return "Remboursé";
-  if (status === "failed") return "Échoué";
-  return "En attente";
-}
+/** Filter value of the pending-activation view (not an order status). */
+const ACTIVATION_PENDING_FILTER = "activation_pending";
 
 interface AdminTransactionsTableProps {
   transactions: TransactionAdminDTO[];
+  /** Paid orders awaiting activation, deleted accounts included. */
+  pendingActivation: TransactionAdminDTO[];
 }
 
-export function AdminTransactionsTable({ transactions }: AdminTransactionsTableProps): JSX.Element {
+export function AdminTransactionsTable({ transactions, pendingActivation }: AdminTransactionsTableProps): JSX.Element {
   const [filterStatus, setFilterStatus] = useState<string>("");
   const [filterType, setFilterType] = useState<string>("");
 
   const filtered = useMemo(() => {
+    // The pending-activation view is the only one listing the orders of deleted accounts.
+    if (filterStatus === ACTIVATION_PENDING_FILTER) {
+      return pendingActivation.filter((t) => !filterType || t.type === filterType);
+    }
     return transactions.filter((t) => {
       if (filterStatus && t.status !== filterStatus) return false;
       if (filterType && t.type !== filterType) return false;
       return true;
     });
-  }, [transactions, filterStatus, filterType]);
+  }, [transactions, pendingActivation, filterStatus, filterType]);
 
   return (
     <div>
@@ -85,9 +83,11 @@ export function AdminTransactionsTable({ transactions }: AdminTransactionsTableP
           <option value="">Tous les statuts</option>
           <option value="paid">Payé</option>
           <option value="paid_simulated">Payé (test)</option>
-          <option value="pending">En attente</option>
+          <option value="pending">En attente de paiement</option>
           <option value="refunded">Remboursé</option>
           <option value="failed">Échoué</option>
+          <option value="expired">Expiré</option>
+          <option value={ACTIVATION_PENDING_FILTER}>Payé — activation en attente ({pendingActivation.length})</option>
         </select>
         <select
           value={filterType}
@@ -99,14 +99,14 @@ export function AdminTransactionsTable({ transactions }: AdminTransactionsTableP
           <option value="sponsoring">Sponsoring</option>
         </select>
         <span className="text-[11px] text-ink-tertiary ml-auto">
-          {filtered.length} transaction{filtered.length !== 1 ? "s" : ""}
+          {filtered.length} commande{filtered.length !== 1 ? "s" : ""}
         </span>
       </div>
 
       {/* Table */}
       {filtered.length === 0 ? (
         <div className="card p-8 text-center">
-          <p className="text-[13px] text-ink-secondary">Aucune transaction trouvée.</p>
+          <p className="text-[13px] text-ink-secondary">Aucune commande trouvée.</p>
         </div>
       ) : (
         <div className="card overflow-hidden">
@@ -124,9 +124,14 @@ export function AdminTransactionsTable({ transactions }: AdminTransactionsTableP
                 </tr>
               </thead>
               <tbody>
-                {filtered.map((t) => (
+                {filtered.map((t) => {
+                  const pill = orderStatusPill(t);
+                  return (
                   <tr key={t.id} className="border-b border-surface-border last:border-0 hover:bg-surface-muted/30 transition-colors">
-                    <td className="px-4 py-2.5 font-medium text-ink-primary">{t.companyDisplayName}</td>
+                    <td className="px-4 py-2.5 font-medium text-ink-primary">
+                      {t.companyDisplayName}
+                      {t.deleted && <span className="block text-[11px] font-normal text-ink-tertiary">Compte supprimé</span>}
+                    </td>
                     <td className="px-4 py-2.5 text-ink-secondary">{TYPE_LABELS[t.type]}</td>
                     <td className="px-4 py-2.5 text-ink-secondary">{t.profileKind ? KIND_LABELS[t.profileKind] : "—"}</td>
                     <td className="px-4 py-2.5 text-right">
@@ -134,12 +139,18 @@ export function AdminTransactionsTable({ transactions }: AdminTransactionsTableP
                       <span className="text-ink-tertiary ml-1">DT</span>
                     </td>
                     <td className="px-4 py-2.5">
-                      <StatusPill kind={statusPillKind(t.status)}>{statusLabel(t.status)}</StatusPill>
+                      <StatusPill kind={pill.kind}>{pill.label}</StatusPill>
+                      {t.activationPending && (
+                        <span className="block mt-1 text-[11px] text-ink-tertiary">
+                          Cause : {activationPendingReasonLabel(t.activationPendingReason)}
+                        </span>
+                      )}
                     </td>
                     <td className="px-4 py-2.5 font-mono text-[11px] text-ink-secondary">{t.invoiceNumber || "—"}</td>
                     <td className="px-4 py-2.5 text-ink-secondary">{t.paidAt ? formatDate(t.paidAt) : formatDate(t.createdAt)}</td>
                   </tr>
-                ))}
+                  );
+                })}
               </tbody>
             </table>
           </div>

@@ -39,6 +39,16 @@ vi.mock("@/lib/env", () => ({
   },
 }));
 
+// V1.2 F3 — the payment operator is a fake: no network call
+const { paymentAdapter } = vi.hoisted(() => ({
+  paymentAdapter: {
+    createPayment: vi.fn(),
+    verifyPayment: vi.fn(),
+    describe: () => ({ name: "flouci", environment: "test" }),
+  },
+}));
+vi.mock("@/lib/payment", () => ({ getPaymentAdapter: () => paymentAdapter }));
+
 import { deleteMyAccount } from "@/services/account-delete.service";
 import { suspendCompanyByAdmin, reactivateCompanyByAdmin } from "@/services/admin-company.service";
 import { ensureUniqueSlug } from "@/lib/slug";
@@ -403,5 +413,69 @@ describe("reactivateCompanyByAdmin — cleanup + audit trail", () => {
     const co = await CompanyModel.findById(companyId).setOptions({ withDeleted: true }).lean();
     const invalidated = isSessionInvalidatedByCompanyStatus(co?.status);
     expect(invalidated).toBe(false);
+  });
+});
+
+// ═══════════════════════════════════════════════════════════════════════
+// V1.2 F3 — D2: a payment in progress blocks the deletion
+// ═══════════════════════════════════════════════════════════════════════
+
+describe("deleteMyAccount — orders in progress (F3)", () => {
+  async function addOrder(fields: Record<string, unknown>): Promise<string> {
+    const order = await TransactionModel.create({
+      companyId, type: "boost", profileKind: "traceup", priceHT: 900, vatRate: 0.19, fiscalStampDT: 1,
+      externalPaymentId: "PAY-1", redirectUrl: "https://checkout.flouci.test/pay/PAY-1",
+      ...fields,
+    });
+    return String(order._id);
+  }
+
+  it("refuses while an order is still pending at the operator — nothing is deleted", async () => {
+    await seedFullCompany();
+    await addOrder({ status: "pending" });
+    paymentAdapter.verifyPayment.mockResolvedValue({ status: "pending", amountMillimes: null, method: null, raw: {} });
+
+    await expect(deleteMyAccount(userId, "TestPass123!")).rejects.toMatchObject({
+      code: "ACCOUNT_DELETE_PAYMENT_PENDING",
+      status: 422,
+    });
+
+    const company = await CompanyModel.findById(companyId).lean();
+    expect(company.status).toBe("active");
+    expect(company.deletedAt).toBeNull();
+    expect((await UserModel.findById(userId).lean()).deletedAt).toBeNull();
+  });
+
+  it("continues when the pending order turns out expired", async () => {
+    await seedFullCompany();
+    const orderId = await addOrder({ status: "pending" });
+    paymentAdapter.verifyPayment.mockResolvedValue({ status: "expired", amountMillimes: null, method: null, raw: {} });
+
+    await deleteMyAccount(userId, "TestPass123!");
+
+    const company = await CompanyModel.findById(companyId).setOptions({ withDeleted: true }).lean();
+    expect(company.status).toBe("deleted");
+    const order = await TransactionModel.findById(orderId).setOptions({ withDeleted: true }).lean();
+    expect(order.status).toBe("expired");
+  });
+
+  it("refuses a paid order awaiting activation, pointing to the support", async () => {
+    await seedFullCompany();
+    await addOrder({ status: "paid", activationPending: true, activationPendingReason: "profile_ineligible" });
+
+    await expect(deleteMyAccount(userId, "TestPass123!")).rejects.toMatchObject({
+      code: "ACCOUNT_DELETE_ACTIVATION_PENDING",
+      message: expect.stringContaining("Contactez le support"),
+    });
+    expect((await CompanyModel.findById(companyId).lean()).status).toBe("active");
+    expect(paymentAdapter.verifyPayment).not.toHaveBeenCalled();
+  });
+
+  it("a wrong password is refused before any order is verified", async () => {
+    await seedFullCompany();
+    await addOrder({ status: "pending" });
+
+    await expect(deleteMyAccount(userId, "WrongPass!")).rejects.toMatchObject({ code: "INVALID_PASSWORD" });
+    expect(paymentAdapter.verifyPayment).not.toHaveBeenCalled();
   });
 });

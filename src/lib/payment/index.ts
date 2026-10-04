@@ -1,6 +1,7 @@
 import { env } from "@/lib/env";
+import { FlouciPaymentAdapter } from "./flouci";
 import { SimulatedPaymentAdapter } from "./simulated";
-import type { CheckoutParams, CheckoutResult, PaymentAdapter, PaymentAdapterName } from "./types";
+import type { PaymentAdapter, PaymentAdapterName } from "./types";
 
 /**
  * Fail-closed selection (cadrage V1.2 V6): the adapter comes from the validated
@@ -10,10 +11,21 @@ import type { CheckoutParams, CheckoutResult, PaymentAdapter, PaymentAdapterName
 function createAdapter(name: PaymentAdapterName): PaymentAdapter {
   switch (name) {
     case "simulated":
-      return new SimulatedPaymentAdapter();
-    case "flouci":
-      // The Flouci adapter is written in F3; until then selecting it must not start.
-      throw new Error("PAYMENT_ADAPTER=flouci is not available yet (Flouci adapter lands in sprint F3)");
+      return new SimulatedPaymentAdapter({ outcome: env.PAYMENT_SIMULATED_OUTCOME });
+    case "flouci": {
+      // env.ts guarantees these four when PAYMENT_ADAPTER=flouci; checked again
+      // so a partial configuration can never reach the operator.
+      const { FLOUCI_PUBLIC_KEY, FLOUCI_PRIVATE_KEY, FLOUCI_BASE_URL, FLOUCI_ENVIRONMENT } = env;
+      if (!FLOUCI_PUBLIC_KEY || !FLOUCI_PRIVATE_KEY || !FLOUCI_BASE_URL || !FLOUCI_ENVIRONMENT) {
+        throw new Error("PAYMENT_ADAPTER=flouci requires FLOUCI_PUBLIC_KEY, FLOUCI_PRIVATE_KEY, FLOUCI_BASE_URL and FLOUCI_ENVIRONMENT");
+      }
+      return new FlouciPaymentAdapter({
+        publicKey: FLOUCI_PUBLIC_KEY,
+        privateKey: FLOUCI_PRIVATE_KEY,
+        baseUrl: FLOUCI_BASE_URL,
+        environment: FLOUCI_ENVIRONMENT,
+      });
+    }
     default: {
       const unreachable: never = name;
       void unreachable;
@@ -36,18 +48,17 @@ export function getPaymentAdapter(): PaymentAdapter {
 }
 
 /**
- * One-step checkout used by the current purchase flow (boost, sponsoring).
- * Only the simulator can settle instantly; F3 replaces this with the two-step flow.
+ * Forbidden combination, checked at server start (F3 G4): production + purchases
+ * open + simulator. The simulator confirms every payment without any money
+ * moving, so it would hand out services for free. Every other combination is allowed.
  */
-export const payment = {
-  createCheckout(params: CheckoutParams): Promise<CheckoutResult> {
-    const current = getPaymentAdapter();
-    if (!(current instanceof SimulatedPaymentAdapter)) {
-      throw new Error("One-step checkout requires the simulated payment adapter");
-    }
-    return current.createCheckout(params);
-  },
-};
+export function assertPaymentSetupAllowed(): void {
+  if (process.env.NODE_ENV === "production" && env.MONETIZATION_ENABLED && env.PAYMENT_ADAPTER === "simulated") {
+    throw new Error(
+      "PAYMENT_ADAPTER=simulated is forbidden in production while MONETIZATION_ENABLED is on: the simulator would hand out services for free",
+    );
+  }
+}
 
 export type {
   PaymentAdapter,
@@ -60,6 +71,4 @@ export type {
   CreatePaymentParams,
   CreatePaymentResult,
   VerifyPaymentResult,
-  CheckoutParams,
-  CheckoutResult,
 } from "./types";

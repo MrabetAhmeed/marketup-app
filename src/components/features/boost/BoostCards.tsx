@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
 import { formatMoney, BOOST_PRICE_HT, BOOST_DURATION_DAYS, DEFAULT_VAT_RATE, FISCAL_STAMP_DT, computeTTC } from "@/lib/pricing";
 
 interface BoostInfo {
@@ -88,13 +87,9 @@ interface BoostCardsProps {
 }
 
 export function BoostCards({ data }: BoostCardsProps): JSX.Element {
-  const router = useRouter();
   const [checkoutKind, setCheckoutKind] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
-  const [successKind, setSuccessKind] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
-  // B1: local override after successful checkout — card shows active immediately
-  const [localBoosts, setLocalBoosts] = useState<Record<string, BoostInfo>>({});
 
   const { vatAmount, priceTTC } = computeTTC(BOOST_PRICE_HT, DEFAULT_VAT_RATE, FISCAL_STAMP_DT);
 
@@ -114,23 +109,12 @@ export function BoostCards({ data }: BoostCardsProps): JSX.Element {
         const body = await res.json().catch(() => ({}));
         throw new Error(body?.error?.message || "Erreur lors du paiement");
       }
-      const result = await res.json();
-      // Update local state with returned boost data
-      setLocalBoosts((prev) => ({
-        ...prev,
-        [kind]: {
-          id: result.boost.id,
-          from: result.boost.from,
-          to: result.boost.to,
-          status: result.boost.status,
-        },
-      }));
-      setCheckoutKind(null);
-      setSuccessKind(kind);
-      router.refresh();
+      // Two-step purchase: the order is created, the buyer goes to the payment page.
+      // The boost is only activated once the payment is verified.
+      const result: { redirectUrl: string } = await res.json();
+      window.location.assign(result.redirectUrl);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Erreur inconnue");
-    } finally {
       setLoading(false);
     }
   }
@@ -142,7 +126,7 @@ export function BoostCards({ data }: BoostCardsProps): JSX.Element {
         {data.map((item) => {
           const config = KIND_CONFIG[item.kind];
           if (!config) return null;
-          const boost = localBoosts[item.kind] ?? item.activeBoost;
+          const boost = item.activeBoost;
           const blocking = getBlockingReason(item);
           const canBoost = !blocking && !boost;
 
@@ -267,11 +251,6 @@ export function BoostCards({ data }: BoostCardsProps): JSX.Element {
                   </button>
                 )}
 
-                {successKind === item.kind && (
-                  <div className="mt-2 p-2 bg-status-active-bg border border-status-active-border rounded text-[11px] text-status-active-fg font-semibold text-center">
-                    Boost activé avec succès !
-                  </div>
-                )}
               </div>
             </div>
           );

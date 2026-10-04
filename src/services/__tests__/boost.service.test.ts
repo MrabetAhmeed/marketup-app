@@ -91,37 +91,48 @@ async function createTestProfile(companyId: mongoose.Types.ObjectId, kind: strin
   });
 }
 
+/** Second step of the purchase: the (simulated) payment is verified server-side. */
+async function payAndConfirm(checkout: { orderId: string }): Promise<void> {
+  const { confirmOrder } = await import("@/services/order.service");
+  await confirmOrder(checkout.orderId, { trigger: "return" });
+}
+
 // ---------------------------------------------------------------------------
 // checkoutBoost
 // ---------------------------------------------------------------------------
 
 describe("checkoutBoost", () => {
-  it("creates Transaction + Boost atomically with correct amounts", async () => {
+  it("creates a pending order with correct amounts; the boost is activated only after confirmation", async () => {
     const company = await createTestCompany();
     await createTestProfile(company._id, "brandup");
 
     const { checkoutBoost } = await import("@/services/boost.service");
     const result = await checkoutBoost(String(company._id), "brandup", "key-1");
 
-    expect(result.boost.status).toBe("active");
-    expect(result.boost.profileKind).toBe("brandup");
-    expect(result.transaction.priceHT).toBe(900);
-    expect(result.transaction.vatAmount).toBeCloseTo(171);
-    expect(result.transaction.fiscalStampDT).toBe(1);
-    expect(result.transaction.priceTTC).toBeCloseTo(1072);
-    expect(result.transaction.currency).toBe("DT");
-    expect(result.transaction.status).toBe("paid"); // paid_simulated mapped for owner
-    expect(result.transaction.invoiceNumber).toMatch(/^\d{4}-\d{5}$/);
+    // Step 1 — order pending, buyer sent to the (simulated) payment, no boost yet
+    expect(result.redirectUrl).toContain(`/api/v1/payments/return?order=${result.orderId}&result=success`);
+    const pending = await TransactionModel.findById(result.orderId).lean();
+    expect(pending!.status).toBe("pending");
+    expect(pending!.priceHT).toBe(900);
+    expect(pending!.fiscalStampDT).toBe(1);
+    expect(pending!.currency).toBe("DT");
+    expect(pending!.invoiceNumber).toMatch(/^\d{4}-\d{5}$/);
+    expect(pending!.externalPaymentId).toMatch(/^SIM-success-1072000-/);
+    expect(await BoostModel.countDocuments({ companyId: company._id })).toBe(0);
 
-    // Verify DB state
-    const tx = await TransactionModel.findById(result.transaction.id).lean();
+    // Step 2 — server-side verification
+    const { confirmOrder } = await import("@/services/order.service");
+    expect(await confirmOrder(result.orderId, { trigger: "return" })).toEqual({ outcome: "paid", changed: true });
+
+    const tx = await TransactionModel.findById(result.orderId).lean();
     expect(tx!.status).toBe("paid_simulated"); // raw DB has paid_simulated
     expect(tx!.paymentReference).toMatch(/^SIM-/);
-    expect(tx!.fiscalStampDT).toBe(1);
+    expect(tx!.paymentMethod).toBe("simulated");
 
-    const boost = await BoostModel.findById(result.boost.id).lean();
+    const boost = await BoostModel.findOne({ companyId: company._id }).lean();
     expect(boost!.status).toBe("active");
-    expect(String(boost!.transactionId)).toBe(result.transaction.id);
+    expect(boost!.profileKind).toBe("brandup");
+    expect(String(boost!.transactionId)).toBe(result.orderId);
   });
 
   it("returns 409 BOOST_ALREADY_ACTIVE when boost exists on same profile", async () => {
@@ -129,7 +140,7 @@ describe("checkoutBoost", () => {
     await createTestProfile(company._id, "brandup");
 
     const { checkoutBoost } = await import("@/services/boost.service");
-    await checkoutBoost(String(company._id), "brandup", "key-dup-1");
+    await payAndConfirm(await checkoutBoost(String(company._id), "brandup", "key-dup-1"));
 
     await expect(
       checkoutBoost(String(company._id), "brandup", "key-dup-2"),
@@ -145,8 +156,9 @@ describe("checkoutBoost", () => {
     const r1 = await checkoutBoost(String(company._id), "brandup", "key-multi-1");
     const r2 = await checkoutBoost(String(company._id), "traceup", "key-multi-2");
 
-    expect(r1.boost.profileKind).toBe("brandup");
-    expect(r2.boost.profileKind).toBe("traceup");
+    expect(r1.orderId).not.toBe(r2.orderId);
+    expect((await TransactionModel.findById(r1.orderId).lean())!.profileKind).toBe("brandup");
+    expect((await TransactionModel.findById(r2.orderId).lean())!.profileKind).toBe("traceup");
   });
 
   it("rejects when profile does not exist", async () => {
@@ -204,7 +216,7 @@ describe("checkoutBoost", () => {
 
     const { checkoutBoost } = await import("@/services/boost.service");
     const result = await checkoutBoost(String(company._id), "brandup", "key-public-ok");
-    expect(result.boost.status).toBe("active");
+    expect((await TransactionModel.findById(result.orderId).lean())!.status).toBe("pending");
   });
 
   it("idempotency: same key returns same transaction", async () => {
@@ -215,20 +227,22 @@ describe("checkoutBoost", () => {
     const r1 = await checkoutBoost(String(company._id), "brandup", "idemp-key");
     const r2 = await checkoutBoost(String(company._id), "brandup", "idemp-key");
 
-    expect(r1.transaction.id).toBe(r2.transaction.id);
-    expect(r1.boost.id).toBe(r2.boost.id);
+    expect(r1.orderId).toBe(r2.orderId);
+    expect(r1.redirectUrl).toBe(r2.redirectUrl);
 
     // Only 1 transaction in DB
     const txCount = await TransactionModel.countDocuments({ companyId: company._id, type: "boost" });
     expect(txCount).toBe(1);
   });
 
-  it("creates owner notification on checkout", async () => {
+  it("creates owner notification once the payment is confirmed", async () => {
     const company = await createTestCompany();
     await createTestProfile(company._id, "brandup");
 
     const { checkoutBoost } = await import("@/services/boost.service");
-    await checkoutBoost(String(company._id), "brandup", "key-notif");
+    const result = await checkoutBoost(String(company._id), "brandup", "key-notif");
+    expect(await (Notification as any).countDocuments({ kind: "boost_paid" })).toBe(0);
+    await payAndConfirm(result);
 
     // Wait for async notification
     await new Promise((r) => setTimeout(r, 200));
@@ -363,7 +377,7 @@ describe("checkoutBoost — frozen fields (F2)", () => {
     const { checkoutBoost } = await import("@/services/boost.service");
     const result = await checkoutBoost(String(company._id), "brandup", "key-f2-frozen");
 
-    const order = await TransactionModel.findById(result.transaction.id).lean();
+    const order = await TransactionModel.findById(result.orderId).lean();
     expect(order.durationDays).toBe(30);
     expect(order.adapterEnvironment).toBe("test");
     expect(order.activationPending).toBe(false);
@@ -394,7 +408,7 @@ describe("checkoutBoost — pending order conflict (F2)", () => {
     expect(await BoostModel.countDocuments({ companyId: company._id })).toBe(0);
   });
 
-  it("two simultaneous purchases: one succeeds, the other is refused without a second boost", async () => {
+  it("two simultaneous purchases: one order is created, the other click is refused", async () => {
     const company = await createTestCompany();
     await createTestProfile(company._id, "brandup");
 
@@ -410,7 +424,8 @@ describe("checkoutBoost — pending order conflict (F2)", () => {
     expect(rejected).toHaveLength(1);
     expect(rejected[0]!.reason).toMatchObject({ code: "BOOST_CHECKOUT_IN_PROGRESS", status: 409 });
 
-    expect(await BoostModel.countDocuments({ companyId: company._id })).toBe(1);
+    // One single order; the boost only exists once that order is confirmed
     expect(await TransactionModel.countDocuments({ companyId: company._id })).toBe(1);
+    expect(await BoostModel.countDocuments({ companyId: company._id })).toBe(0);
   });
 });

@@ -18,15 +18,25 @@ export default async function BoostPage(): Promise<JSX.Element> {
   if (!me) redirect("/session-expired");
   guardActiveCompany(me.company.status);
 
-  if (!me.features.monetization) {
-    return <FeatureComingSoonPage kind="boost" />;
-  }
-
   await connectDb();
   const [activeBoosts, history] = await Promise.all([
     findActiveBoosts({ companyId: session.user.companyId }),
     getBoostHistory(session.user.companyId),
   ]);
+
+  // Purchases closed: the purchase part is unchanged, the history stays visible (V1.2 F3).
+  if (!me.features.monetization) {
+    return (
+      <>
+        <FeatureComingSoonPage kind="boost" />
+        {history.length > 0 && (
+          <div className="max-w-[1120px] mx-auto px-4 md:px-8 pb-6">
+            <BoostHistory items={history} />
+          </div>
+        )}
+      </>
+    );
+  }
 
   const kinds = ["brandup", "traceup", "linkup"] as const;
   const data = kinds.map((kind) => {

@@ -16,11 +16,21 @@ export default async function SponsoringPage(): Promise<JSX.Element> {
   if (!me) redirect("/session-expired");
   guardActiveCompany(me.company.status);
 
-  if (!me.features.monetization) {
-    return <FeatureComingSoonPage kind="sponsoring" />;
-  }
-
   const dashboard = await getSponsoringDashboard(session.user.companyId);
+
+  // Purchases closed: the purchase part is unchanged, the history stays visible (V1.2 F3).
+  if (!me.features.monetization) {
+    return (
+      <>
+        <FeatureComingSoonPage kind="sponsoring" />
+        {dashboard.history.length > 0 && (
+          <div className="max-w-[1120px] mx-auto px-4 md:px-8 pb-6">
+            <SponsoringHistory items={dashboard.history} />
+          </div>
+        )}
+      </>
+    );
+  }
 
   return (
     <div className="max-w-[1120px] mx-auto py-6 px-4 md:px-8 space-y-6">

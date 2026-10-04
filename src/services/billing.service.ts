@@ -15,7 +15,9 @@ export interface TransactionOwnerDTO {
   fiscalStampDT: number;
   priceTTC: number;
   currency: string;
-  status: "pending" | "paid" | "refunded" | "failed";
+  status: "pending" | "paid" | "refunded" | "failed" | "expired";
+  activationPending: boolean;
+  activationPendingReason: string | null;
   paymentMethod: string | null;
   invoiceNumber: string | null;
   paidAt: string | null;
@@ -33,7 +35,11 @@ export interface TransactionAdminDTO {
   fiscalStampDT: number;
   priceTTC: number;
   currency: string;
-  status: "pending" | "paid" | "paid_simulated" | "refunded" | "failed";
+  status: "pending" | "paid" | "paid_simulated" | "refunded" | "failed" | "expired";
+  activationPending: boolean;
+  activationPendingReason: string | null;
+  /** True when the order belongs to a deleted account (only listed in the pending-activation view). */
+  deleted: boolean;
   paymentMethod: string | null;
   paymentReference: string | null;
   invoiceNumber: string | null;
@@ -70,6 +76,8 @@ export async function getOwnerTransactions(companyId: string): Promise<Transacti
       priceTTC,
       currency: (t.currency as string) || "DT",
       status: ownerStatus as TransactionOwnerDTO["status"],
+      activationPending: t.activationPending === true,
+      activationPendingReason: (t.activationPendingReason as string) ?? null,
       paymentMethod: (t.paymentMethod as string) ?? null,
       invoiceNumber: (t.invoiceNumber as string) ?? null,
       paidAt: t.paidAt ? (t.paidAt as Date).toISOString() : null,
@@ -85,6 +93,12 @@ export async function getOwnerTransactions(companyId: string): Promise<Transacti
 interface AdminTransactionsFilter {
   status?: string;
   type?: string;
+  /**
+   * Paid orders waiting for their activation. The only listing that includes
+   * the orders of deleted accounts: without it the admin could not handle a
+   * payment cashed on an account deleted in the meantime.
+   */
+  activationPending?: boolean;
 }
 
 export async function getAdminTransactions(
@@ -97,7 +111,7 @@ export async function getAdminTransactions(
   if (filter.type) query.type = filter.type;
 
   const docs = await Transaction.aggregate([
-    { $match: { deletedAt: null, ...query } },
+    { $match: filter.activationPending ? { ...query, activationPending: true } : { deletedAt: null, ...query } },
     { $sort: { paidAt: -1, createdAt: -1 } },
     {
       $lookup: {
@@ -120,6 +134,9 @@ export async function getAdminTransactions(
         fiscalStampDT: 1,
         currency: 1,
         status: 1,
+        activationPending: 1,
+        activationPendingReason: 1,
+        deletedAt: 1,
         paymentMethod: 1,
         paymentReference: 1,
         invoiceNumber: 1,
@@ -144,6 +161,9 @@ export async function getAdminTransactions(
       priceTTC,
       currency: (t.currency as string) || "DT",
       status: t.status as TransactionAdminDTO["status"],
+      activationPending: t.activationPending === true,
+      activationPendingReason: (t.activationPendingReason as string) ?? null,
+      deleted: t.deletedAt != null,
       paymentMethod: (t.paymentMethod as string) ?? null,
       paymentReference: (t.paymentReference as string) ?? null,
       invoiceNumber: (t.invoiceNumber as string) ?? null,

@@ -28,6 +28,7 @@ const PAYMENT_VARS = [
   "PAYMENT_ADAPTER",
   "PAYMENT_ACCEPTED_METHODS",
   "PAYMENT_SESSION_TIMEOUT_SECONDS",
+  "PAYMENT_SIMULATED_OUTCOME",
   "PAYMENT_WEBHOOK_SECRET",
   "PAYMENT_SWEEP_SECRET",
   "FLOUCI_PUBLIC_KEY",
@@ -163,17 +164,123 @@ describe("payment adapter selection", () => {
 
   it("fails closed when the adapter is missing — no fallback to the simulator", async () => {
     vi.doMock("@/lib/env", () => ({ env: {} }));
-    const { getPaymentAdapter, payment } = await import("@/lib/payment");
+    const { getPaymentAdapter } = await import("@/lib/payment");
     expect(() => getPaymentAdapter()).toThrow("PAYMENT_ADAPTER is missing or invalid");
-    expect(() => payment.createCheckout({
-      companyId: "c", type: "boost", profileKind: "linkup", priceHT: 900, vatRate: 0.19, idempotencyKey: "k",
-    })).toThrow("PAYMENT_ADAPTER is missing or invalid");
   });
 
-  it("refuses flouci until its adapter exists (F3)", async () => {
-    vi.doMock("@/lib/env", () => ({ env: { PAYMENT_ADAPTER: "flouci" } }));
+  it("selects flouci and describes its declared environment (F3)", async () => {
+    vi.doMock("@/lib/env", () => ({
+      env: {
+        PAYMENT_ADAPTER: "flouci",
+        FLOUCI_PUBLIC_KEY: "pk",
+        FLOUCI_PRIVATE_KEY: "sk",
+        FLOUCI_BASE_URL: "https://developers.flouci.com",
+        FLOUCI_ENVIRONMENT: "production",
+      },
+    }));
     const { getPaymentAdapter } = await import("@/lib/payment");
-    expect(() => getPaymentAdapter()).toThrow("not available yet");
+    expect(getPaymentAdapter().describe()).toEqual({ name: "flouci", environment: "production" });
+  });
+
+  it("refuses flouci with an incomplete configuration, without echoing any value", async () => {
+    vi.doMock("@/lib/env", () => ({
+      env: { PAYMENT_ADAPTER: "flouci", FLOUCI_PUBLIC_KEY: "pk-value-that-must-not-leak" },
+    }));
+    const { getPaymentAdapter } = await import("@/lib/payment");
+    let message = "";
+    try {
+      getPaymentAdapter();
+    } catch (err) {
+      message = String(err);
+    }
+    expect(message).toContain("FLOUCI_PRIVATE_KEY");
+    expect(message).not.toContain("pk-value-that-must-not-leak");
+  });
+
+  it("gives the simulator the configured outcome (PAYMENT_SIMULATED_OUTCOME)", async () => {
+    vi.doMock("@/lib/env", () => ({ env: { PAYMENT_ADAPTER: "simulated", PAYMENT_SIMULATED_OUTCOME: "failure" } }));
+    const { getPaymentAdapter } = await import("@/lib/payment");
+    const { externalId } = await getPaymentAdapter().createPayment({
+      orderId: "o", amountMillimes: 1000, successUrl: "https://app.test/ok", failUrl: "https://app.test/ko",
+      webhookUrl: "https://app.test/hook", acceptedMethods: ["card"], sessionTimeoutSeconds: 1200,
+    });
+    expect((await getPaymentAdapter().verifyPayment(externalId)).status).toBe("failure");
+  });
+});
+
+describe("PAYMENT_SIMULATED_OUTCOME", () => {
+  it("defaults to success", async () => {
+    const { error } = await loadEnv(BASE_ENV);
+    expect(error).toBeNull();
+    const { env } = await import("@/lib/env");
+    expect(env.PAYMENT_SIMULATED_OUTCOME).toBe("success");
+  });
+
+  it("accepts failure", async () => {
+    const { error } = await loadEnv({ ...BASE_ENV, PAYMENT_SIMULATED_OUTCOME: "failure" });
+    expect(error).toBeNull();
+    const { env } = await import("@/lib/env");
+    expect(env.PAYMENT_SIMULATED_OUTCOME).toBe("failure");
+  });
+
+  it("rejects anything else, naming the variable", async () => {
+    const { error, logged } = await loadEnv({ ...BASE_ENV, PAYMENT_SIMULATED_OUTCOME: "maybe" });
+    expect(error).toBeInstanceOf(Error);
+    expect(logged).toContain("PAYMENT_SIMULATED_OUTCOME");
+  });
+});
+
+// ---------------------------------------------------------------------------
+// F3 G4 — production + purchases open + simulator must refuse to start
+// ---------------------------------------------------------------------------
+
+describe("forbidden start combination (G4)", () => {
+  async function setup(nodeEnv: string, flag: boolean, adapterName: string): Promise<() => void> {
+    vi.stubEnv("NODE_ENV", nodeEnv);
+    vi.doMock("@/lib/env", () => ({ env: { PAYMENT_ADAPTER: adapterName, MONETIZATION_ENABLED: flag } }));
+    const { assertPaymentSetupAllowed } = await import("@/lib/payment");
+    return assertPaymentSetupAllowed;
+  }
+
+  it("refuses production + flag on + simulator, with an explicit message", async () => {
+    const assert = await setup("production", true, "simulated");
+    expect(() => assert()).toThrow("PAYMENT_ADAPTER=simulated is forbidden in production while MONETIZATION_ENABLED is on");
+  });
+
+  it.each([
+    ["production", false, "simulated"],
+    ["production", true, "flouci"],
+    ["development", true, "simulated"],
+    ["test", true, "simulated"],
+  ])("allows %s + flag %s + %s", async (nodeEnv, flag, adapterName) => {
+    const assert = await setup(nodeEnv as string, flag as boolean, adapterName as string);
+    expect(() => assert()).not.toThrow();
+  });
+
+  it("register() exits the process on the forbidden combination", async () => {
+    vi.stubEnv("NEXT_RUNTIME", "nodejs");
+    vi.stubEnv("NODE_ENV", "production");
+    vi.doMock("@/lib/env", () => ({ env: { PAYMENT_ADAPTER: "simulated", MONETIZATION_ENABLED: true } }));
+    const exit = vi.spyOn(process, "exit").mockImplementation(() => undefined as never);
+    const logged = vi.spyOn(console, "error").mockImplementation(() => undefined);
+    const { register } = await import("@/instrumentation");
+    await register();
+    expect(exit).toHaveBeenCalledWith(1);
+    expect(JSON.stringify(logged.mock.calls)).toContain("forbidden in production");
+    exit.mockRestore();
+    logged.mockRestore();
+  });
+
+  it("register() checks nothing while the application is being built", async () => {
+    vi.stubEnv("NEXT_RUNTIME", "nodejs");
+    vi.stubEnv("NODE_ENV", "production");
+    vi.stubEnv("NEXT_PHASE", "phase-production-build");
+    vi.doMock("@/lib/env", () => ({ env: { PAYMENT_ADAPTER: "simulated", MONETIZATION_ENABLED: true } }));
+    const exit = vi.spyOn(process, "exit").mockImplementation(() => undefined as never);
+    const { register } = await import("@/instrumentation");
+    await register();
+    expect(exit).not.toHaveBeenCalled();
+    exit.mockRestore();
   });
 });
 
@@ -206,6 +313,14 @@ describe("SimulatedPaymentAdapter — two-step interface", () => {
     const { externalId, redirectUrl } = await adapter.createPayment(params);
     expect(redirectUrl.startsWith(params.failUrl)).toBe(true);
     expect((await adapter.verifyPayment(externalId)).status).toBe("failure");
+  });
+
+  it("keeps no state: another instance (a restarted server) verifies the same payment", async () => {
+    const { SimulatedPaymentAdapter } = await import("@/lib/payment/simulated");
+    const { externalId } = await new SimulatedPaymentAdapter().createPayment(params);
+    expect(externalId).toMatch(/^SIM-success-1072000-[a-z0-9]+$/);
+    const verified = await new SimulatedPaymentAdapter({ outcome: "failure" }).verifyPayment(externalId);
+    expect(verified).toMatchObject({ status: "success", amountMillimes: 1_072_000, method: "simulated" });
   });
 
   it("throws on an unknown payment id instead of inventing a status", async () => {

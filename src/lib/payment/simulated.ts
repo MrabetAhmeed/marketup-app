@@ -1,9 +1,6 @@
 import type {
-  CheckoutParams,
-  CheckoutResult,
   CreatePaymentParams,
   CreatePaymentResult,
-  NormalizedPaymentStatus,
   PaymentAdapter,
   PaymentAdapterDescription,
   VerifyPaymentResult,
@@ -11,27 +8,20 @@ import type {
 
 export type SimulatedOutcome = "success" | "failure";
 
-interface SimulatedPayment {
-  amountMillimes: number;
-  status: NormalizedPaymentStatus;
-}
-
-function newReference(): string {
-  const ts = Date.now().toString(36);
-  const rand = Math.random().toString(36).slice(2, 8);
-  return `SIM-${ts}-${rand}`;
-}
+// SIM-<outcome>-<amount in millimes>-<random>
+const SIMULATED_ID = /^SIM-(success|failure)-(\d+)-[a-z0-9]+$/;
 
 /**
- * Simulated payment adapter — no real PSP.
+ * Simulated payment adapter — no real PSP, no state.
  *
- * createPayment returns an internal redirect URL (our own success or fail link)
- * so the two-step flow can be exercised without Flouci. The outcome is chosen
- * at construction: "success" by default, "failure" to exercise the error path.
+ * The payment id encodes the outcome and the amount, so verifyPayment answers
+ * without any storage and survives a server restart. The redirect URL is our
+ * own return link: the two-step flow can be exercised end to end locally.
+ * The outcome is chosen at construction (PAYMENT_SIMULATED_OUTCOME), "success"
+ * by default, "failure" to exercise the error path.
  */
 export class SimulatedPaymentAdapter implements PaymentAdapter {
   private readonly outcome: SimulatedOutcome;
-  private readonly payments = new Map<string, SimulatedPayment>();
 
   constructor(options: { outcome?: SimulatedOutcome } = {}) {
     this.outcome = options.outcome ?? "success";
@@ -42,42 +32,29 @@ export class SimulatedPaymentAdapter implements PaymentAdapter {
       throw new Error("amountMillimes must be a positive integer");
     }
 
-    const externalId = newReference();
-    const status: NormalizedPaymentStatus = this.outcome === "success" ? "success" : "failure";
-    this.payments.set(externalId, { amountMillimes: params.amountMillimes, status });
+    const random = `${Date.now().toString(36)}${Math.random().toString(36).slice(2, 8)}`;
+    const externalId = `SIM-${this.outcome}-${params.amountMillimes}-${random}`;
 
-    const redirectUrl = new URL(status === "success" ? params.successUrl : params.failUrl);
+    const redirectUrl = new URL(this.outcome === "success" ? params.successUrl : params.failUrl);
     redirectUrl.searchParams.set("payment_id", externalId);
     return { externalId, redirectUrl: redirectUrl.toString() };
   }
 
   async verifyPayment(externalId: string): Promise<VerifyPaymentResult> {
-    const payment = this.payments.get(externalId);
-    if (!payment) {
+    const match = SIMULATED_ID.exec(externalId);
+    if (!match) {
       throw new Error("Unknown simulated payment");
     }
+    const status = match[1] === "success" ? "success" : "failure";
     return {
-      status: payment.status,
-      amountMillimes: payment.amountMillimes,
+      status,
+      amountMillimes: Number(match[2]),
       method: "simulated",
-      raw: { adapter: "simulated", externalId, status: payment.status },
+      raw: { adapter: "simulated", externalId, status },
     };
   }
 
   describe(): PaymentAdapterDescription {
     return { name: "simulated", environment: "test" };
-  }
-
-  /**
-   * One-step checkout used by the current purchase flow — instant "paid",
-   * unchanged behaviour. Removed when F3 switches to the two-step flow.
-   */
-  async createCheckout(_params: CheckoutParams): Promise<CheckoutResult> {
-    return {
-      reference: newReference(),
-      status: "paid_simulated",
-      paidAt: new Date().toISOString(),
-      paymentMethod: "simulated",
-    };
   }
 }

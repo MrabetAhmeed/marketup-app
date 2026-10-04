@@ -394,11 +394,15 @@ export function SponsoringCards({ data }: SponsoringCardsProps): JSX.Element {
       if (!res.ok) {
         const err = await res.json().catch(() => ({}));
         setCheckoutError(err?.error?.message || "Erreur lors du paiement.");
+        setCheckoutLoading(false);
         return;
       }
-      setCheckoutTarget(null);
-      router.refresh();
-    } finally {
+      // Two-step purchase: the order is created, the buyer goes to the payment page.
+      // The campaign is only activated once the payment is verified.
+      const result: { redirectUrl: string } = await res.json();
+      window.location.assign(result.redirectUrl);
+    } catch {
+      setCheckoutError("Erreur lors du paiement.");
       setCheckoutLoading(false);
     }
   }

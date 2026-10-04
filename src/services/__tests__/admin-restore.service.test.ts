@@ -46,6 +46,7 @@ const adminId = new mongoose.Types.ObjectId().toString();
 beforeAll(async () => {
   replSet = await MongoMemoryReplSet.create({ replSet: { count: 1 }, instanceOpts: [{ launchTimeout: 20_000 }] });
   await mongoose.connect(replSet.getUri());
+  await mongoose.connection.syncIndexes();
   // Pre-create all collections to avoid "catalog changes" errors in transactions
   const uid = new mongoose.Types.ObjectId();
   const cid = new mongoose.Types.ObjectId();

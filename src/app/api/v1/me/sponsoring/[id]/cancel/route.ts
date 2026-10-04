@@ -1,5 +1,5 @@
 import { NextRequest } from "next/server";
-import { requireOwner, requireMonetization } from "@/lib/auth-guards";
+import { requireOwner } from "@/lib/auth-guards";
 import { jsonOk, handleApiError } from "@/lib/api-response";
 import { cancelSponsoring } from "@/services/sponsoring.service";
 
@@ -8,7 +8,6 @@ export async function POST(
   { params }: { params: Promise<{ id: string }> },
 ): Promise<Response> {
   try {
-    requireMonetization();
     const session = await requireOwner();
     const { id } = await params;
     await cancelSponsoring(session.user.companyId!, id);

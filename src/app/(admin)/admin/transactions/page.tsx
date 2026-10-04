@@ -8,7 +8,10 @@ export default async function AdminTransactionsPage(): Promise<JSX.Element> {
   const session = await getServerSession(authOptions);
   if (!session?.user || session.user.role !== "SUPER_ADMIN") redirect("/login");
 
-  const transactions = await getAdminTransactions();
+  const [transactions, pendingActivation] = await Promise.all([
+    getAdminTransactions(),
+    getAdminTransactions({ activationPending: true }),
+  ]);
 
   return (
     <div className="py-6 px-6">
@@ -17,7 +20,7 @@ export default async function AdminTransactionsPage(): Promise<JSX.Element> {
         <p className="text-[13px] text-ink-secondary mt-1">Toutes les transactions de la plateforme</p>
       </div>
 
-      <AdminTransactionsTable transactions={transactions} />
+      <AdminTransactionsTable transactions={transactions} pendingActivation={pendingActivation} />
     </div>
   );
 }

@@ -32,11 +32,19 @@ const TransactionSchema = new Schema(
     },
     paymentMethod: {
       type: String,
-      enum: ["card", "bank_transfer", "manual", "simulated"],
+      enum: ["card", "wallet", "bank_transfer", "manual", "simulated"],
       default: null,
     },
     paymentReference: { type: String, default: null },
     paidAt: { type: Date, default: null },
+
+    // Two-step payment (F3): what the payment operator gave us for this order.
+    externalPaymentId: { type: String, default: null },
+    redirectUrl: { type: String, default: null },
+    // Why the order is `failed` (operator unreachable, payment refused…)
+    failureReason: { type: String, default: null },
+    // Last time the payment was verified with the operator (throttles re-verification)
+    lastVerifiedAt: { type: Date, default: null },
 
     // Paid but not activated: an admin decides (declared in F2, produced from F3).
     activationPending: { type: Boolean, default: false },

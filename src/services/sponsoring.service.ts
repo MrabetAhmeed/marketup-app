@@ -1,13 +1,9 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import mongoose from "mongoose";
 import { connectDb } from "@/lib/db";
 import { env } from "@/lib/env";
 import { AppError, BusinessRuleError, NotFoundError } from "@/lib/api-error";
-import { SPONSORING_PRICE_HT, SPONSORING_DURATION_DAYS, DEFAULT_VAT_RATE, FISCAL_STAMP_DT, computeTTC, formatMoney } from "@/lib/pricing";
+import { SPONSORING_PRICE_HT, SPONSORING_DURATION_DAYS, DEFAULT_VAT_RATE, FISCAL_STAMP_DT, computeTTC } from "@/lib/pricing";
 import { generateInvoiceNumber } from "@/lib/invoice";
-import { getPaymentAdapter, payment } from "@/lib/payment";
-import { isPendingOrderConflict } from "@/lib/payment/order-conflict";
-import { Transaction } from "@/models/transaction.model";
 import { Sponsoring } from "@/models/sponsoring.model";
 import { Profile } from "@/models/profile.model";
 import { Company } from "@/models/company.model";
@@ -15,14 +11,19 @@ import { AdminUser } from "@/models/admin-user.model";
 import { User } from "@/models/user.model";
 import { createNotification } from "@/services/notifications.service";
 import {
-  sendTransactionAdminEmail,
+  assertNoPendingOrderForCampaign,
+  createOrderAndStartPayment,
+  findOrderByIdempotencyKey,
+  resumeOrReleasePendingOrder,
+} from "@/services/order.service";
+import {
   sendSponsoringSubmittedEmail,
   sendSponsoringValidatedEmail,
   sendSponsoringRejectedEmail,
 } from "@/lib/email/sender";
 import { safeDeleteByUrl } from "@/lib/storage/helpers";
+import type { CheckoutOrderResult } from "@/services/order.service";
 
-const TransactionModel = Transaction as any;
 const SponsoringModel = Sponsoring as any;
 const ProfileModel = Profile as any;
 const CompanyModel = Company as any;
@@ -158,6 +159,9 @@ export async function cancelSponsoring(
     );
   }
 
+  // A payment in progress locks the campaign (V1.2 F3)
+  await assertNoPendingOrderForCampaign(companyId, sponsoringId);
+
   await SponsoringModel.updateOne(
     { _id: sponsoringId },
     { $set: { status: "cancelled", cancelledAt: new Date() } },
@@ -283,69 +287,35 @@ export async function rejectSponsoring(
 }
 
 // ---------------------------------------------------------------------------
-// checkoutSponsoring — owner pays (confirmed → active)
+// checkoutSponsoring — first step of the two-step purchase (V1.2 F3)
+//
+// Creates the order `pending` and returns where the buyer must go to pay.
+// The campaign only becomes active in confirmOrder (order.service.ts), after
+// the payment has been verified with the operator.
 // ---------------------------------------------------------------------------
 
-export interface CheckoutSponsoringResult {
-  sponsoring: {
-    id: string;
-    profileKind: string;
-    from: string;
-    to: string;
-    status: string;
-  };
-  transaction: {
-    id: string;
-    type: string;
-    priceHT: number;
-    vatAmount: number;
-    fiscalStampDT: number;
-    priceTTC: number;
-    currency: string;
-    status: string;
-    invoiceNumber: string;
-    paidAt: string | null;
-  };
-}
+const CHECKOUT_IN_PROGRESS = {
+  code: "SPONSORING_CHECKOUT_IN_PROGRESS",
+  message: "Un paiement est déjà en cours pour cette campagne.",
+};
 
 export async function checkoutSponsoring(
   companyId: string,
   sponsoringId: string,
   idempotencyKey: string,
-): Promise<CheckoutSponsoringResult> {
+): Promise<CheckoutOrderResult> {
   await connectDb();
 
-  // Idempotency check
-  const existingTx = await TransactionModel.findOne({
-    companyId,
-    idempotencyKey,
-    type: "sponsoring",
-  }).lean();
-  if (existingTx) {
-    const existingSponsoring = await SponsoringModel.findOne({ transactionId: existingTx._id }).lean();
-    const { vatAmount, priceTTC } = computeTTC(existingTx.priceHT, existingTx.vatRate, existingTx.fiscalStampDT ?? 0);
-    return {
-      sponsoring: {
-        id: existingSponsoring ? String(existingSponsoring._id) : "",
-        profileKind: existingTx.profileKind,
-        from: existingSponsoring?.from ? new Date(existingSponsoring.from).toISOString() : "",
-        to: existingSponsoring?.to ? new Date(existingSponsoring.to).toISOString() : "",
-        status: existingSponsoring?.status ?? "active",
-      },
-      transaction: {
-        id: String(existingTx._id),
-        type: "sponsoring",
-        priceHT: existingTx.priceHT,
-        vatAmount,
-        fiscalStampDT: existingTx.fiscalStampDT ?? 0,
-        priceTTC,
-        currency: existingTx.currency || "DT",
-        status: existingTx.status === "paid_simulated" ? "paid" : existingTx.status,
-        invoiceNumber: existingTx.invoiceNumber,
-        paidAt: existingTx.paidAt ? new Date(existingTx.paidAt).toISOString() : null,
-      },
-    };
-  }
+  // Idempotency: the same key hands back the same order
+  const sameKey = await findOrderByIdempotencyKey(companyId, "sponsoring", idempotencyKey);
+  if (sameKey) return sameKey;
+
+  // A pending order for this campaign: resume it, or release it
+  const resumed = await resumeOrReleasePendingOrder(
+    { companyId, type: "sponsoring", refId: sponsoringId },
+    CHECKOUT_IN_PROGRESS,
+  );
+  if (resumed) return resumed;
 
   // Guards
   const sponsoring = await SponsoringModel.findOne({ _id: sponsoringId, companyId }).lean();
@@ -360,156 +330,23 @@ export async function checkoutSponsoring(
   const company = await CompanyModel.findById(companyId).lean();
   if (!company) throw new NotFoundError("Entreprise");
 
-  const profileKind = (sponsoring as any).profileKind;
-
-  // Generate invoice number before session
   const invoiceNumber = await generateInvoiceNumber();
 
-  // Atomic: Transaction + Sponsoring update
-  const session = await mongoose.startSession();
-  let result: CheckoutSponsoringResult;
-
-  try {
-    session.startTransaction();
-
-    const now = new Date();
-    const to = new Date(now.getTime() + SPONSORING_DURATION_DAYS * 86_400_000);
-
-    // Create Transaction
-    const [txDoc] = await TransactionModel.create(
-      [{
-        companyId,
-        type: "sponsoring",
-        profileKind,
-        priceHT: SPONSORING_PRICE_HT,
-        vatRate: DEFAULT_VAT_RATE,
-        fiscalStampDT: FISCAL_STAMP_DT,
-        currency: "DT",
-        status: "pending",
-        paymentMethod: null,
-        paymentReference: null,
-        paidAt: null,
-        invoiceNumber,
-        idempotencyKey,
-        refId: sponsoringId,
-        durationDays: SPONSORING_DURATION_DAYS,
-        adapterEnvironment: getPaymentAdapter().describe().environment,
-      }],
-      { session },
-    ).catch((err: unknown) => {
-      // Another order for the same campaign is pending or being written: refuse, never a 500
-      if (isPendingOrderConflict(err)) {
-        throw new AppError("SPONSORING_CHECKOUT_IN_PROGRESS", "Un paiement est déjà en cours pour cette campagne.", 409);
-      }
-      throw err;
-    });
-
-    // Process payment
-    const checkout = await payment.createCheckout({
+  return createOrderAndStartPayment(
+    {
       companyId,
       type: "sponsoring",
-      profileKind,
+      profileKind: (sponsoring as any).profileKind,
+      refId: sponsoringId,
       priceHT: SPONSORING_PRICE_HT,
       vatRate: DEFAULT_VAT_RATE,
+      fiscalStampDT: FISCAL_STAMP_DT,
+      durationDays: SPONSORING_DURATION_DAYS,
+      invoiceNumber,
       idempotencyKey,
-    });
-
-    // Update transaction
-    txDoc.status = checkout.status;
-    txDoc.paymentMethod = checkout.paymentMethod;
-    txDoc.paymentReference = checkout.reference;
-    txDoc.paidAt = checkout.paidAt ? new Date(checkout.paidAt) : null;
-    await txDoc.save({ session });
-
-    // Activate sponsoring
-    await SponsoringModel.updateOne(
-      { _id: sponsoringId },
-      {
-        $set: {
-          status: "active",
-          from: now,
-          to,
-          transactionId: txDoc._id,
-          paidAt: checkout.paidAt ? new Date(checkout.paidAt) : now,
-        },
-      },
-      { session },
-    );
-
-    await session.commitTransaction();
-
-    const { vatAmount, priceTTC } = computeTTC(SPONSORING_PRICE_HT, DEFAULT_VAT_RATE, FISCAL_STAMP_DT);
-    result = {
-      sponsoring: {
-        id: String(sponsoringId),
-        profileKind,
-        from: now.toISOString(),
-        to: to.toISOString(),
-        status: "active",
-      },
-      transaction: {
-        id: String(txDoc._id),
-        type: "sponsoring",
-        priceHT: SPONSORING_PRICE_HT,
-        vatAmount,
-        fiscalStampDT: FISCAL_STAMP_DT,
-        priceTTC,
-        currency: "DT",
-        status: checkout.status === "paid_simulated" ? "paid" : checkout.status,
-        invoiceNumber,
-        paidAt: checkout.paidAt,
-      },
-    };
-  } catch (err) {
-    await session.abortTransaction();
-    throw err;
-  } finally {
-    session.endSession();
-  }
-
-  // Post-commit notifications (non-blocking)
-  const { priceTTC: ttc } = computeTTC(SPONSORING_PRICE_HT, DEFAULT_VAT_RATE, FISCAL_STAMP_DT);
-  const companyName = (company as any).data?.displayName?.fr || "Entreprise";
-
-  // Owner notification
-  const ownerUserId = String((company as any).ownerUserId);
-  createNotification({
-    recipientType: "owner",
-    recipientId: ownerUserId,
-    kind: "sponsoring_paid",
-    icon: "campaign",
-    color: "success",
-    title: { fr: `Campagne ${kindLabel(profileKind)} lancée` },
-    body: { fr: `Votre campagne sponsorisée ${kindLabel(profileKind)} est active pour ${SPONSORING_DURATION_DAYS} jours. Montant : ${formatMoney(ttc)} DT TTC.` },
-    actionUrl: "/dashboard/sponsoring",
-    actionLabel: { fr: "Voir ma campagne" },
-  }).catch((err) => console.error("[sponsoring] owner paid notification failed:", err));
-
-  // Admin notification + email
-  const adminUser = await AdminUserModel.findOne({}).lean();
-  if (adminUser) {
-    createNotification({
-      recipientType: "admin",
-      recipientId: String((adminUser as any)._id),
-      kind: "sponsoring_paid",
-      icon: "campaign",
-      color: "success",
-      title: { fr: `Paiement sponsoring — ${companyName}` },
-      body: { fr: `${companyName} a payé une campagne ${kindLabel(profileKind)}. Montant : ${formatMoney(ttc)} DT TTC.` },
-      actionUrl: "/admin/transactions",
-      actionLabel: { fr: "Voir" },
-    }).catch((err) => console.error("[sponsoring] admin paid notification failed:", err));
-  }
-
-  sendTransactionAdminEmail({
-    adminEmail: env.ADMIN_NOTIFICATION_EMAIL,
-    companyName,
-    type: "sponsoring",
-    amountTTC: formatMoney(ttc),
-    invoiceNumber: result.transaction.invoiceNumber,
-  }).catch((err) => console.error("[sponsoring] admin paid email failed:", err));
-
-  return result;
+    },
+    CHECKOUT_IN_PROGRESS,
+  );
 }
 
 // ---------------------------------------------------------------------------

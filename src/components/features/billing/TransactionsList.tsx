@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { StatusPill } from "@/components/shared/StatusPill";
+import { activationPendingReasonLabel, orderStatusPill } from "@/lib/payment/order-labels";
 import { formatMoney } from "@/lib/pricing";
 
 interface TransactionDTO {
@@ -13,7 +14,9 @@ interface TransactionDTO {
   fiscalStampDT: number;
   priceTTC: number;
   currency: string;
-  status: "pending" | "paid" | "refunded" | "failed";
+  status: "pending" | "paid" | "refunded" | "failed" | "expired";
+  activationPending: boolean;
+  activationPendingReason: string | null;
   paymentMethod: string | null;
   invoiceNumber: string | null;
   paidAt: string | null;
@@ -33,6 +36,7 @@ const KIND_LABELS: Record<string, string> = {
 
 const METHOD_LABELS: Record<string, string> = {
   card: "Carte bancaire",
+  wallet: "Portefeuille Flouci",
   bank_transfer: "Virement bancaire",
   manual: "Manuel",
   simulated: "Simulé",
@@ -59,8 +63,8 @@ export function TransactionsList({ transactions }: TransactionsListProps): JSX.E
         <div className="w-16 h-16 rounded-xl bg-surface-muted flex items-center justify-center mx-auto mb-4">
           <span className="material-symbols-outlined text-ink-tertiary" style={{ fontSize: 32 }}>receipt_long</span>
         </div>
-        <h3 className="font-heading font-semibold text-[16px] text-ink-primary mb-2">Aucune transaction</h3>
-        <p className="text-[13px] text-ink-secondary">Vos transactions de boost et sponsoring apparaîtront ici.</p>
+        <h3 className="font-heading font-semibold text-[16px] text-ink-primary mb-2">Aucune commande</h3>
+        <p className="text-[13px] text-ink-secondary">Vos commandes de boost et sponsoring apparaîtront ici.</p>
       </div>
     );
   }
@@ -69,6 +73,7 @@ export function TransactionsList({ transactions }: TransactionsListProps): JSX.E
     <div className="space-y-2">
       {transactions.map((t) => {
         const expanded = expandedId === t.id;
+        const pill = orderStatusPill(t);
         return (
           <div key={t.id} className="card overflow-hidden">
             {/* Summary row */}
@@ -96,7 +101,7 @@ export function TransactionsList({ transactions }: TransactionsListProps): JSX.E
                 </div>
               </div>
               <div className="text-right flex items-center gap-3">
-                <StatusPill kind={t.status}/>
+                <StatusPill kind={pill.kind}>{pill.label}</StatusPill>
                 <span className="text-[14px] font-bold text-ink-primary">
                   {formatMoney(t.priceTTC)}
                   <span className="text-[11px] font-normal text-ink-secondary ml-1">DT</span>
@@ -142,6 +147,14 @@ export function TransactionsList({ transactions }: TransactionsListProps): JSX.E
                     <div>
                       <span className="text-ink-tertiary">N° de commande</span>
                       <div className="font-semibold text-ink-primary font-mono text-[11px]">{t.invoiceNumber}</div>
+                    </div>
+                  )}
+                  {t.activationPending && (
+                    <div className="col-span-2">
+                      <span className="text-ink-tertiary">Activation en attente</span>
+                      <div className="font-semibold text-ink-primary">
+                        Paiement reçu, service non activé : {activationPendingReasonLabel(t.activationPendingReason)}. Notre équipe vous contactera.
+                      </div>
                     </div>
                   )}
                 </div>

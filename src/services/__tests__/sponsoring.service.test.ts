@@ -288,8 +288,10 @@ describe("cancelSponsoring", () => {
 // ---------------------------------------------------------------------------
 
 describe("checkoutSponsoring", () => {
-  it("confirmed → active with Transaction", async () => {
+  it("confirmed → pending order, then active once the payment is confirmed", async () => {
     const company = await createTestCompany();
+    // The campaign's profile must still be public when the payment is confirmed
+    await createTestProfile(company._id, "brandup");
     const doc = await SponsoringModel.create({
       companyId: company._id, profileKind: "brandup",
       bannerUrl: BANNER, linkUrl: LINK, status: "confirmed",
@@ -299,13 +301,21 @@ describe("checkoutSponsoring", () => {
     const { checkoutSponsoring } = await import("@/services/sponsoring.service");
     const result = await checkoutSponsoring(String(company._id), String(doc._id), "spo-key-1");
 
-    expect(result.sponsoring.status).toBe("active");
-    expect(result.transaction.priceHT).toBe(700);
-    expect(result.transaction.vatAmount).toBeCloseTo(133);
-    expect(result.transaction.fiscalStampDT).toBe(1);
-    expect(result.transaction.priceTTC).toBeCloseTo(834);
-    expect(result.transaction.status).toBe("paid");
-    expect(result.transaction.invoiceNumber).toMatch(/^\d{4}-\d{5}$/);
+    // Step 1 — order pending, campaign untouched
+    expect(result.redirectUrl).toContain(`/api/v1/payments/return?order=${result.orderId}&result=success`);
+    const orders = mongoose.connection.collection("transactions");
+    const pending = await orders.findOne({ _id: new mongoose.Types.ObjectId(result.orderId) });
+    expect(pending!.status).toBe("pending");
+    expect(pending!.priceHT).toBe(700);
+    expect(pending!.fiscalStampDT).toBe(1);
+    expect(pending!.invoiceNumber).toMatch(/^\d{4}-\d{5}$/);
+    expect(pending!.externalPaymentId).toMatch(/^SIM-success-834000-/);
+    expect((await SponsoringModel.findById(doc._id).lean()).status).toBe("confirmed");
+
+    // Step 2 — server-side verification
+    const { confirmOrder } = await import("@/services/order.service");
+    expect(await confirmOrder(result.orderId, { trigger: "return" })).toEqual({ outcome: "paid", changed: true });
+    expect((await orders.findOne({ _id: pending!._id }))!.status).toBe("paid_simulated");
 
     const updated = await SponsoringModel.findById(doc._id).lean();
     expect(updated.status).toBe("active");
@@ -505,7 +515,7 @@ describe("checkoutSponsoring — frozen fields (F2)", () => {
 
     const order = await mongoose.connection
       .collection("transactions")
-      .findOne({ _id: new mongoose.Types.ObjectId(result.transaction.id) });
+      .findOne({ _id: new mongoose.Types.ObjectId(result.orderId) });
     expect(order!.durationDays).toBe(7);
     expect(order!.adapterEnvironment).toBe("test");
     expect(order!.activationPending).toBe(false);

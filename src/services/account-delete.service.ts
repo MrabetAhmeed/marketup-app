@@ -13,6 +13,7 @@ import { RseReceipt } from "@/models/rse-receipt.model";
 import { Notification } from "@/models/notification.model";
 import { File } from "@/models/file.model";
 import { sendAccountDeletedEmail } from "@/lib/email/sender";
+import { assertAccountCanBeDeleted } from "@/services/order.service";
 
 // Mongoose 9 strict types
 const CompanyModel = Company as any;
@@ -56,6 +57,9 @@ export async function deleteMyAccount(
   if (!company) {
     throw new NotFoundError("Company");
   }
+
+  // V1.2 F3 — a payment in progress or a paid order awaiting activation blocks the deletion
+  await assertAccountCanBeDeleted(companyId);
 
   const now = new Date();
   const email = user.email;

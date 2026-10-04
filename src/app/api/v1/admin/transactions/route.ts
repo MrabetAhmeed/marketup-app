@@ -11,7 +11,9 @@ export async function GET(req: NextRequest): Promise<Response> {
     const status = url.searchParams.get("status") || undefined;
     const type = url.searchParams.get("type") || undefined;
 
-    const transactions = await getAdminTransactions({ status, type });
+    const activationPending = url.searchParams.get("activationPending") === "true";
+
+    const transactions = await getAdminTransactions({ status, type, activationPending });
     return jsonOk({ items: transactions });
   } catch (err) {
     return handleApiError(err);

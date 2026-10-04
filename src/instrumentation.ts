@@ -12,9 +12,12 @@
  */
 export async function register(): Promise<void> {
   if (process.env.NEXT_RUNTIME !== "nodejs") return;
+  // The build also loads this hook: only a starting server is checked.
+  if (process.env.NEXT_PHASE === "phase-production-build") return;
 
   try {
-    const { getPaymentAdapter } = await import("@/lib/payment");
+    const { assertPaymentSetupAllowed, getPaymentAdapter } = await import("@/lib/payment");
+    assertPaymentSetupAllowed();
     const { name, environment } = getPaymentAdapter().describe();
     console.info(`[payment] adapter=${name} environment=${environment}`);
   } catch (err) {
