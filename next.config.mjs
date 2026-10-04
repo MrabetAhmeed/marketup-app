@@ -25,6 +25,9 @@ const HSTS_MAX_AGE = 300;
 const nextConfig = {
   experimental: {
     cpus: 1,
+    // Runs src/instrumentation.ts at server start: payment configuration is
+    // validated at boot, not on the first purchase (cadrage V1.2 V6).
+    instrumentationHook: true,
   },
   async headers() {
     return [

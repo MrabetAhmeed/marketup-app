@@ -47,8 +47,18 @@ async function main(): Promise<void> {
   check("paymentMethod = " + checkout.paymentMethod + " (expected simulated)", checkout.paymentMethod === "simulated");
   check("paidAt is ISO string", checkout.paidAt != null && !isNaN(Date.parse(checkout.paidAt)));
 
-  const verify = await adapter.verifyPayment(checkout.reference);
-  check("verifyPayment = " + verify + " (expected paid_simulated)", verify === "paid_simulated");
+  // Two-step interface (V1.2 F1): verify a payment created through createPayment
+  const created = await adapter.createPayment({
+    orderId: "check-c0-order",
+    amountMillimes: 1_000,
+    successUrl: "https://example.test/success",
+    failUrl: "https://example.test/fail",
+    webhookUrl: "https://example.test/webhook",
+    acceptedMethods: ["card"],
+    sessionTimeoutSeconds: 1200,
+  });
+  const verify = await adapter.verifyPayment(created.externalId);
+  check("verifyPayment status = " + verify.status + " (expected success)", verify.status === "success");
 
   // 3. Transaction enum (static check — model accepts new values)
   console.log("\n3. Transaction enum values");

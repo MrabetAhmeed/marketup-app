@@ -80,11 +80,21 @@ describe("SimulatedPaymentAdapter", () => {
     expect(new Date(result.paidAt!).toISOString()).toBe(result.paidAt);
   });
 
-  it("verifyPayment returns paid_simulated", async () => {
+  it("verifyPayment returns a normalized success for a payment it created", async () => {
     const { SimulatedPaymentAdapter } = await import("@/lib/payment/simulated");
     const adapter = new SimulatedPaymentAdapter();
-    const status = await adapter.verifyPayment("SIM-whatever");
-    expect(status).toBe("paid_simulated");
+    const { externalId } = await adapter.createPayment({
+      orderId: "order-1",
+      amountMillimes: 1_072_000,
+      successUrl: "https://app.test/ok",
+      failUrl: "https://app.test/ko",
+      webhookUrl: "https://app.test/hook",
+      acceptedMethods: ["card"],
+      sessionTimeoutSeconds: 1200,
+    });
+    const result = await adapter.verifyPayment(externalId);
+    expect(result.status).toBe("success");
+    expect(result.amountMillimes).toBe(1_072_000);
   });
 });
 

@@ -17,6 +17,7 @@ vi.mock("@/lib/env", () => ({
     NEXTAUTH_URL: "http://localhost:3000",
     MONETIZATION_ENABLED: true,
     ADMIN_NOTIFICATION_EMAIL: "admin@test.dev",
+    PAYMENT_ADAPTER: "simulated",
   },
 }));
 vi.mock("@/lib/email/sender", () => ({
