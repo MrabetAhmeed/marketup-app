@@ -36,6 +36,7 @@ let replSet: MongoMemoryReplSet;
 beforeAll(async () => {
   replSet = await MongoMemoryReplSet.create({ replSet: { count: 1 }, instanceOpts: [{ launchTimeout: 20_000 }] });
   await mongoose.connect(replSet.getUri());
+  await mongoose.connection.syncIndexes();
 }, 60_000);
 
 afterAll(async () => {
